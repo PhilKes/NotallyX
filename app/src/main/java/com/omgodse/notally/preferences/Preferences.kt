@@ -4,11 +4,9 @@ import android.app.Application
 import android.preference.PreferenceManager
 
 /**
- * Custom implementation of androidx.preference library
- * Way faster, simpler and smaller, logic of storing preferences has been decoupled
- * from their UI.
- * It is backed by SharedPreferences but it should be trivial to shift to another
- * source if needed.
+ * Custom implementation of androidx.preference library Way faster, simpler and smaller, logic of
+ * storing preferences has been decoupled from their UI. It is backed by SharedPreferences but it
+ * should be trivial to shift to another source if needed.
  */
 class Preferences private constructor(app: Application) {
 
@@ -21,18 +19,21 @@ class Preferences private constructor(app: Application) {
     val dateFormat = BetterLiveData(getListPref(DateFormat))
 
     val textSize = BetterLiveData(getListPref(TextSize))
+    val listItemSorting = BetterLiveData(getListPref(ListItemSorting))
     var maxItems = getSeekbarPref(MaxItems)
     var maxLines = getSeekbarPref(MaxLines)
     var maxTitle = getSeekbarPref(MaxTitle)
 
     val autoBackup = BetterLiveData(getTextPref(AutoBackup))
 
-    private fun getListPref(info: ListInfo) = requireNotNull(preferences.getString(info.key, info.defaultValue))
+    private fun getListPref(info: ListInfo) =
+        requireNotNull(preferences.getString(info.key, info.defaultValue))
 
-    private fun getTextPref(info: TextInfo) = requireNotNull(preferences.getString(info.key, info.defaultValue))
+    private fun getTextPref(info: TextInfo) =
+        requireNotNull(preferences.getString(info.key, info.defaultValue))
 
-    private fun getSeekbarPref(info: SeekbarInfo) = requireNotNull(preferences.getInt(info.key, info.defaultValue))
-
+    private fun getSeekbarPref(info: SeekbarInfo) =
+        requireNotNull(preferences.getInt(info.key, info.defaultValue))
 
     fun getWidgetData(id: Int) = preferences.getLong("widget:$id", 0)
 
@@ -67,7 +68,6 @@ class Preferences private constructor(app: Application) {
         return updatableWidgets
     }
 
-
     fun savePreference(info: SeekbarInfo, value: Int) {
         editor.putInt(info.key, value)
         editor.commit()
@@ -86,6 +86,7 @@ class Preferences private constructor(app: Application) {
             Theme -> theme.postValue(getListPref(info))
             DateFormat -> dateFormat.postValue(getListPref(info))
             TextSize -> textSize.postValue(getListPref(info))
+            ListItemSorting -> listItemSorting.postValue(getListPref(info))
         }
     }
 
@@ -97,22 +98,21 @@ class Preferences private constructor(app: Application) {
         }
     }
 
-
     fun showDateCreated(): Boolean {
         return dateFormat.value != DateFormat.none
     }
 
     companion object {
 
-        @Volatile
-        private var instance: Preferences? = null
+        @Volatile private var instance: Preferences? = null
 
         fun getInstance(app: Application): Preferences {
-            return instance ?: synchronized(this) {
-                val instance = Preferences(app)
-                this.instance = instance
-                return instance
-            }
+            return instance
+                ?: synchronized(this) {
+                    val instance = Preferences(app)
+                    this.instance = instance
+                    return instance
+                }
         }
     }
 }

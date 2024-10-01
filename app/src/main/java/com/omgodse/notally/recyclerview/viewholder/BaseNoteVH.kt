@@ -3,6 +3,7 @@ package com.omgodse.notally.recyclerview.viewholder
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.View
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
@@ -19,7 +20,8 @@ import com.omgodse.notally.R
 import com.omgodse.notally.databinding.RecyclerBaseNoteBinding
 import com.omgodse.notally.miscellaneous.Operations
 import com.omgodse.notally.miscellaneous.applySpans
-import com.omgodse.notally.preferences.DateFormat
+import com.omgodse.notally.miscellaneous.displayFormattedTimestamp
+import com.omgodse.notally.miscellaneous.dp
 import com.omgodse.notally.preferences.TextSize
 import com.omgodse.notally.recyclerview.ItemListener
 import com.omgodse.notally.room.BaseNote
@@ -28,9 +30,7 @@ import com.omgodse.notally.room.Image
 import com.omgodse.notally.room.ListItem
 import com.omgodse.notally.room.SpanRepresentation
 import com.omgodse.notally.room.Type
-import org.ocpsoft.prettytime.PrettyTime
 import java.io.File
-import java.util.Date
 
 class BaseNoteVH(
     private val binding: RecyclerBaseNoteBinding,
@@ -40,8 +40,6 @@ class BaseNoteVH(
     maxLines: Int,
     maxTitle: Int,
     listener: ItemListener,
-    private val prettyTime: PrettyTime,
-    private val formatter: java.text.DateFormat,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
@@ -60,9 +58,7 @@ class BaseNoteVH(
         binding.Title.maxLines = maxTitle
         binding.Note.maxLines = maxLines
 
-        binding.root.setOnClickListener {
-            listener.onClick(adapterPosition)
-        }
+        binding.root.setOnClickListener { listener.onClick(adapterPosition) }
 
         binding.root.setOnLongClickListener {
             listener.onLongClick(adapterPosition)
@@ -82,7 +78,7 @@ class BaseNoteVH(
             Type.LIST -> bindList(baseNote.items)
         }
 
-        setDate(baseNote.timestamp)
+        binding.Date.displayFormattedTimestamp(baseNote.timestamp, dateFormat)
         setColor(baseNote.color)
         setImages(baseNote.images, mediaRoot)
 
@@ -121,6 +117,11 @@ class BaseNoteVH(
                         view.text = item.body
                         handleChecked(view, item.checked)
                         view.visibility = View.VISIBLE
+                        if (item.isChild) {
+                            val layoutParams = view.layoutParams as LinearLayout.LayoutParams
+                            layoutParams.marginStart = 150.dp
+                            view.layoutParams = layoutParams
+                        }
                     } else view.visibility = View.GONE
                 }
             }
@@ -130,18 +131,6 @@ class BaseNoteVH(
                 binding.ItemsRemaining.text = (items.size - maxItems).toString()
             } else binding.ItemsRemaining.visibility = View.GONE
         }
-    }
-
-
-    private fun setDate(timestamp: Long) {
-        if (dateFormat != DateFormat.none) {
-            binding.Date.visibility = View.VISIBLE
-            val date = Date(timestamp)
-            when (dateFormat) {
-                DateFormat.relative -> binding.Date.text = prettyTime.format(date)
-                DateFormat.absolute -> binding.Date.text = formatter.format(date)
-            }
-        } else binding.Date.visibility = View.GONE
     }
 
     private fun setColor(color: Color) {
@@ -171,28 +160,30 @@ class BaseNoteVH(
                 .centerCrop()
                 .transition(DrawableTransitionOptions.withCrossFade())
                 .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .listener(object : RequestListener<Drawable> {
+                .listener(
+                    object : RequestListener<Drawable> {
 
-                    override fun onLoadFailed(
-                        e: GlideException?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        binding.Message.visibility = View.VISIBLE
-                        return false
-                    }
+                        override fun onLoadFailed(
+                            e: GlideException?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            isFirstResource: Boolean,
+                        ): Boolean {
+                            binding.Message.visibility = View.VISIBLE
+                            return false
+                        }
 
-                    override fun onResourceReady(
-                        resource: Drawable?,
-                        model: Any?,
-                        target: Target<Drawable>?,
-                        dataSource: DataSource?,
-                        isFirstResource: Boolean
-                    ): Boolean {
-                        return false
+                        override fun onResourceReady(
+                            resource: Drawable?,
+                            model: Any?,
+                            target: Target<Drawable>?,
+                            dataSource: DataSource?,
+                            isFirstResource: Boolean,
+                        ): Boolean {
+                            return false
+                        }
                     }
-                })
+                )
                 .into(binding.ImageView)
         } else {
             binding.ImageView.visibility = View.GONE
@@ -201,11 +192,12 @@ class BaseNoteVH(
         }
     }
 
-
     private fun isEmpty(baseNote: BaseNote): Boolean {
         return when (baseNote.type) {
-            Type.NOTE -> baseNote.title.isBlank() && baseNote.body.isBlank() && baseNote.images.isEmpty()
-            Type.LIST -> baseNote.title.isBlank() && baseNote.items.isEmpty() && baseNote.images.isEmpty()
+            Type.NOTE ->
+                baseNote.title.isBlank() && baseNote.body.isBlank() && baseNote.images.isEmpty()
+            Type.LIST ->
+                baseNote.title.isBlank() && baseNote.items.isEmpty() && baseNote.images.isEmpty()
         }
     }
 
@@ -218,7 +210,18 @@ class BaseNoteVH(
 
     private fun handleChecked(textView: TextView, checked: Boolean) {
         if (checked) {
-            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.checkbox_16, 0, 0, 0)
-        } else textView.setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.checkbox_outline_16, 0, 0, 0)
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.checkbox_16,
+                0,
+                0,
+                0,
+            )
+        } else
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                R.drawable.checkbox_outline_16,
+                0,
+                0,
+                0,
+            )
     }
 }

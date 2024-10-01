@@ -3,7 +3,9 @@ package com.omgodse.notally.activities
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
+import android.text.Editable
 import android.text.Spanned
+import android.text.TextWatcher
 import android.text.style.CharacterStyle
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
@@ -15,20 +17,20 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.core.text.getSpans
-import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.omgodse.notally.LinkMovementMethod
 import com.omgodse.notally.R
 import com.omgodse.notally.miscellaneous.add
+import com.omgodse.notally.miscellaneous.createTextWatcherWithHistory
 import com.omgodse.notally.miscellaneous.setOnNextAction
 import com.omgodse.notally.room.Type
 
 class TakeNote : NotallyActivity(Type.NOTE) {
 
+    private lateinit var enterBodyTextWatcher: TextWatcher
+
     override fun configureUI() {
-        binding.EnterTitle.setOnNextAction {
-            binding.EnterBody.requestFocus()
-        }
+        binding.EnterTitle.setOnNextAction { binding.EnterBody.requestFocus() }
 
         setupEditor()
 
@@ -37,68 +39,77 @@ class TakeNote : NotallyActivity(Type.NOTE) {
         }
     }
 
-
     override fun setupListeners() {
         super.setupListeners()
-        binding.EnterBody.doAfterTextChanged { text ->
-            model.body = requireNotNull(text)
+        enterBodyTextWatcher = run {
+            binding.EnterBody.createTextWatcherWithHistory(changeHistory) { text: String ->
+                model.body = Editable.Factory.getInstance().newEditable(text)
+            }
         }
+        binding.EnterBody.addTextChangedListener(enterBodyTextWatcher)
     }
 
     override fun setStateFromModel() {
         super.setStateFromModel()
-        binding.EnterBody.text = model.body
+        updateEditText()
     }
 
+    private fun updateEditText() {
+        binding.EnterBody.removeTextChangedListener(enterBodyTextWatcher)
+        binding.EnterBody.text = model.body
+        binding.EnterBody.addTextChangedListener(enterBodyTextWatcher)
+    }
 
     private fun setupEditor() {
         setupMovementMethod()
 
-        binding.EnterBody.customSelectionActionModeCallback = object : ActionMode.Callback {
-            override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
+        binding.EnterBody.customSelectionActionModeCallback =
+            object : ActionMode.Callback {
+                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
 
-            override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?) = false
+                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?) = false
 
-            override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                binding.EnterBody.isActionModeOn = true
-                // Try block is there because this will crash on MiUI as Xiaomi has a broken ActionMode implementation
-                try {
-                    if (menu != null) {
-                        menu.add(R.string.bold, 0) {
-                            applySpan(StyleSpan(Typeface.BOLD))
-                            mode?.finish()
+                override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                    binding.EnterBody.isActionModeOn = true
+                    // Try block is there because this will crash on MiUI as Xiaomi has a broken
+                    // ActionMode implementation
+                    try {
+                        if (menu != null) {
+                            menu.add(R.string.bold, 0) {
+                                applySpan(StyleSpan(Typeface.BOLD))
+                                mode?.finish()
+                            }
+                            menu.add(R.string.link, 0) {
+                                applySpan(URLSpan(null))
+                                mode?.finish()
+                            }
+                            menu.add(R.string.italic, 0) {
+                                applySpan(StyleSpan(Typeface.ITALIC))
+                                mode?.finish()
+                            }
+                            menu.add(R.string.monospace, 0) {
+                                applySpan(TypefaceSpan("monospace"))
+                                mode?.finish()
+                            }
+                            menu.add(R.string.strikethrough, 0) {
+                                applySpan(StrikethroughSpan())
+                                mode?.finish()
+                            }
+                            menu.add(R.string.clear_formatting, 0) {
+                                removeSpans()
+                                mode?.finish()
+                            }
                         }
-                        menu.add(R.string.link, 0) {
-                            applySpan(URLSpan(null))
-                            mode?.finish()
-                        }
-                        menu.add(R.string.italic, 0) {
-                            applySpan(StyleSpan(Typeface.ITALIC))
-                            mode?.finish()
-                        }
-                        menu.add(R.string.monospace, 0) {
-                            applySpan(TypefaceSpan("monospace"))
-                            mode?.finish()
-                        }
-                        menu.add(R.string.strikethrough, 0) {
-                            applySpan(StrikethroughSpan())
-                            mode?.finish()
-                        }
-                        menu.add(R.string.clear_formatting, 0) {
-                            removeSpans()
-                            mode?.finish()
-                        }
+                    } catch (exception: Exception) {
+                        exception.printStackTrace()
                     }
-                } catch (exception: Exception) {
-                    exception.printStackTrace()
+                    return true
                 }
-                return true
-            }
 
-            override fun onDestroyActionMode(mode: ActionMode?) {
-                binding.EnterBody.isActionModeOn = false
+                override fun onDestroyActionMode(mode: ActionMode?) {
+                    binding.EnterBody.isActionModeOn = false
+                }
             }
-        }
     }
 
     private fun setupMovementMethod() {
@@ -120,16 +131,17 @@ class TakeNote : NotallyActivity(Type.NOTE) {
                                 try {
                                     startActivity(intent)
                                 } catch (exception: Exception) {
-                                    Toast.makeText(this, R.string.cant_open_link, Toast.LENGTH_LONG).show()
+                                    Toast.makeText(this, R.string.cant_open_link, Toast.LENGTH_LONG)
+                                        .show()
                                 }
                             }
                         }
                     }
-                }.show()
+                }
+                .show()
         }
         binding.EnterBody.movementMethod = movementMethod
     }
-
 
     private fun removeSpans() {
         val selectionEnd = binding.EnterBody.selectionEnd
@@ -151,12 +163,15 @@ class TakeNote : NotallyActivity(Type.NOTE) {
         }
     }
 
-    private fun ifBothNotNullAndInvalid(start: Int?, end: Int?, function: (start: Int, end: Int) -> Unit) {
+    private fun ifBothNotNullAndInvalid(
+        start: Int?,
+        end: Int?,
+        function: (start: Int, end: Int) -> Unit,
+    ) {
         if (start != null && start != -1 && end != null && end != -1) {
             function.invoke(start, end)
         }
     }
-
 
     companion object {
 

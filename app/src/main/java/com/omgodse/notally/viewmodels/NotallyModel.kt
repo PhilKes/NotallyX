@@ -40,12 +40,12 @@ import com.omgodse.notally.room.NotallyDatabase
 import com.omgodse.notally.room.SpanRepresentation
 import com.omgodse.notally.room.Type
 import com.omgodse.notally.widget.WidgetProvider
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileInputStream
 import java.util.UUID
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
@@ -83,32 +83,36 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     fun addAudio() {
         viewModelScope.launch {
-            val audio = withContext(Dispatchers.IO) {
-                /*
-                Regenerate because the directory may have been deleted between the time of activity creation
-                and audio recording
-                */
-                audioRoot = IO.getExternalAudioDirectory(app)
-                requireNotNull(audioRoot) { "audioRoot is null" }
+            val audio =
+                withContext(Dispatchers.IO) {
+                    /*
+                    Regenerate because the directory may have been deleted between the time of activity creation
+                    and audio recording
+                    */
+                    audioRoot = IO.getExternalAudioDirectory(app)
+                    requireNotNull(audioRoot) { "audioRoot is null" }
 
-                /*
-                If we have reached this point, an SD card (emulated or real) exists and audioRoot
-                is not null. audioRoot.exists() can be false if the folder `Audio` has been deleted after
-                the previous line, but audioRoot itself can't be null
-                */
-                val original = IO.getTempAudioFile(app)
-                val name = "${UUID.randomUUID()}.m4a"
-                val final = File(audioRoot, name)
-                val input = FileInputStream(original)
-                IO.copyStreamToFile(input, final)
+                    /*
+                    If we have reached this point, an SD card (emulated or real) exists and audioRoot
+                    is not null. audioRoot.exists() can be false if the folder `Audio` has been deleted after
+                    the previous line, but audioRoot itself can't be null
+                    */
+                    val original = IO.getTempAudioFile(app)
+                    val name = "${UUID.randomUUID()}.m4a"
+                    val final = File(audioRoot, name)
+                    val input = FileInputStream(original)
+                    IO.copyStreamToFile(input, final)
 
-                original.delete()
+                    original.delete()
 
-                val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(final.path)
-                val duration = requireNotNull(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION))
-                Audio(name, duration.toLong(), System.currentTimeMillis())
-            }
+                    val retriever = MediaMetadataRetriever()
+                    retriever.setDataSource(final.path)
+                    val duration =
+                        requireNotNull(
+                            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                        )
+                    Audio(name, duration.toLong(), System.currentTimeMillis())
+                }
             val copy = ArrayList(audios.value)
             copy.add(audio)
             audios.value = copy
@@ -125,7 +129,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             AttachmentDeleteService.start(app, arrayListOf(audio))
         }
     }
-
 
     fun addImages(uris: Array<Uri>) {
         val unknownName = app.getString(R.string.unknown_name)
@@ -222,12 +225,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-
     fun setLabels(list: List<String>) {
         labels.clear()
         labels.addAll(list)
     }
-
 
     suspend fun setState(id: Long) {
         if (id != 0L) {
@@ -265,7 +266,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         id = withContext(Dispatchers.IO) { baseNoteDao.insert(getBaseNote()) }
     }
 
-
     suspend fun deleteBaseNote() {
         withContext(Dispatchers.IO) { baseNoteDao.delete(id) }
         WidgetProvider.sendBroadcast(app, longArrayOf(id))
@@ -287,12 +287,25 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         withContext(Dispatchers.IO) { baseNoteDao.updateAudios(id, audios.value) }
     }
 
-
     private fun getBaseNote(): BaseNote {
         val spans = getFilteredSpans(body)
         val body = this.body.trimEnd().toString()
         val items = this.items.filter { item -> item.body.isNotEmpty() }
-        return BaseNote(id, type, folder, color, title, pinned, timestamp, labels, body, spans, items, images.value, audios.value)
+        return BaseNote(
+            id,
+            type,
+            folder,
+            color,
+            title,
+            pinned,
+            timestamp,
+            labels,
+            body,
+            spans,
+            items,
+            images.value,
+            audios.value,
+        )
     }
 
     private fun getFilteredSpans(spanned: Spanned): ArrayList<SpanRepresentation> {
@@ -320,11 +333,14 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         return getFilteredRepresentations(ArrayList(representations))
     }
 
-    private fun getFilteredRepresentations(representations: ArrayList<SpanRepresentation>): ArrayList<SpanRepresentation> {
+    private fun getFilteredRepresentations(
+        representations: ArrayList<SpanRepresentation>
+    ): ArrayList<SpanRepresentation> {
         representations.forEachIndexed { index, representation ->
-            val match = representations.find { spanRepresentation ->
-                spanRepresentation.isEqualInSize(representation)
-            }
+            val match =
+                representations.find { spanRepresentation ->
+                    spanRepresentation.isEqualInSize(representation)
+                }
             if (match != null && representations.indexOf(match) != index) {
                 if (match.bold) {
                     representation.bold = true

@@ -26,12 +26,15 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.omgodse.notally.R
+import com.omgodse.notally.changehistory.ChangeHistory
 import com.omgodse.notally.databinding.ActivityNotallyBinding
 import com.omgodse.notally.databinding.DialogProgressBinding
 import com.omgodse.notally.image.ImageError
 import com.omgodse.notally.miscellaneous.Constants
 import com.omgodse.notally.miscellaneous.Operations
 import com.omgodse.notally.miscellaneous.add
+import com.omgodse.notally.miscellaneous.displayFormattedTimestamp
+import com.omgodse.notally.preferences.Preferences
 import com.omgodse.notally.preferences.TextSize
 import com.omgodse.notally.recyclerview.adapter.AudioAdapter
 import com.omgodse.notally.recyclerview.adapter.ErrorAdapter
@@ -42,16 +45,19 @@ import com.omgodse.notally.room.Image
 import com.omgodse.notally.room.Type
 import com.omgodse.notally.viewmodels.NotallyModel
 import com.omgodse.notally.widget.WidgetProvider
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.text.DateFormat
 
 abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
 
     internal lateinit var binding: ActivityNotallyBinding
+
     internal val model: NotallyModel by viewModels()
+    internal lateinit var preferences: Preferences
+    internal lateinit var changeHistory: ChangeHistory
 
     override fun finish() {
-        lifecycleScope.launch {
+        lifecycleScope.launch(Dispatchers.Main) {
             model.saveNote()
             WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
             super.finish()
@@ -67,9 +73,9 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         }
     }
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        preferences = Preferences.getInstance(application)
         model.type = type
         initialiseBinding()
         setContentView(binding.root)
@@ -97,7 +103,6 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         }
     }
 
-
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (resultCode == Activity.RESULT_OK) {
@@ -109,7 +114,8 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
                         val uris = arrayOf(uri)
                         model.addImages(uris)
                     } else if (clipData != null) {
-                        val uris = Array(clipData.itemCount) { index -> clipData.getItemAt(index).uri }
+                        val uris =
+                            Array(clipData.itemCount) { index -> clipData.getItemAt(index).uri }
                         model.addImages(uris)
                     }
                 }
@@ -137,18 +143,79 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         }
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             REQUEST_NOTIFICATION_PERMISSION -> selectImages()
             REQUEST_AUDIO_PERMISSION -> {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (
+                    grantResults.isNotEmpty() &&
+                        grantResults[0] == PackageManager.PERMISSION_GRANTED
+                ) {
                     recordAudio()
                 } else handleRejection()
             }
         }
     }
 
+    protected open fun initActionManager(undo: MenuItem, redo: MenuItem) {
+        changeHistory = ChangeHistory {
+            undo.isEnabled = changeHistory.canUndo()
+            redo.isEnabled = changeHistory.canRedo()
+        }
+    }
+
+    protected open fun setupToolbar() {
+        binding.Toolbar.setNavigationOnClickListener { finish() }
+
+        val menu = binding.Toolbar.menu
+        val pin =
+            menu.add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { item ->
+                pin(item)
+            }
+        bindPinned(pin)
+
+        val undo =
+            menu.add(R.string.undo, R.drawable.undo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                changeHistory.undo()
+            }
+        val redo =
+            menu.add(R.string.redo, R.drawable.redo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                changeHistory.redo()
+            }
+
+        initActionManager(undo, redo)
+
+        undo.isEnabled = changeHistory.canUndo()
+        redo.isEnabled = changeHistory.canRedo()
+
+        menu.add(R.string.share, R.drawable.share) { share() }
+        menu.add(R.string.labels, R.drawable.label) { label() }
+        menu.add(R.string.add_images, R.drawable.add_images) { checkNotificationPermission() }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            menu.add(R.string.record_audio, R.drawable.record_audio) { checkAudioPermission() }
+        }
+
+        when (model.folder) {
+            Folder.NOTES -> {
+                menu.add(R.string.delete, R.drawable.delete) { delete() }
+                menu.add(R.string.archive, R.drawable.archive) { archive() }
+            }
+            Folder.DELETED -> {
+                menu.add(R.string.restore, R.drawable.restore) { restore() }
+                menu.add(R.string.delete_forever, R.drawable.delete) { deleteForever() }
+            }
+            Folder.ARCHIVED -> {
+                menu.add(R.string.delete, R.drawable.delete) { delete() }
+                menu.add(R.string.unarchive, R.drawable.unarchive) { restore() }
+            }
+        }
+    }
 
     abstract fun configureUI()
 
@@ -159,15 +226,13 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
     }
 
     open fun setStateFromModel() {
-        val formatter = DateFormat.getDateInstance(DateFormat.FULL)
-        binding.DateCreated.text = formatter.format(model.timestamp)
+        binding.DateCreated.displayFormattedTimestamp(model.timestamp, preferences.dateFormat.value)
 
         binding.EnterTitle.setText(model.title)
         Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
 
         setColor()
     }
-
 
     private fun handleSharedNote() {
         val title = intent.getStringExtra(Intent.EXTRA_SUBJECT)
@@ -183,7 +248,6 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
             model.title = title
         }
     }
-
 
     @RequiresApi(24)
     private fun checkAudioPermission() {
@@ -219,7 +283,6 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         } else selectImages()
     }
 
-
     private fun recordAudio() {
         if (model.audioRoot != null) {
             val intent = Intent(this, RecordAudio::class.java)
@@ -250,12 +313,12 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         } else Toast.makeText(this, R.string.insert_an_sd_card_images, Toast.LENGTH_LONG).show()
     }
 
-
     private fun share() {
-        val body = when (type) {
-            Type.NOTE -> model.body
-            Type.LIST -> Operations.getBody(model.items)
-        }
+        val body =
+            when (type) {
+                Type.NOTE -> model.body
+                Type.LIST -> Operations.getBody(model.items)
+            }
         Operations.shareNote(this, model.title, body)
     }
 
@@ -298,25 +361,28 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         bindPinned(item)
     }
 
-
     private fun setupImages() {
-        val adapter = PreviewImageAdapter(model.imageRoot) { position ->
-            val intent = Intent(this, ViewImage::class.java)
-            intent.putExtra(ViewImage.POSITION, position)
-            intent.putExtra(Constants.SelectedBaseNote, model.id)
-            startActivityForResult(intent, REQUEST_VIEW_IMAGES)
-        }
-
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                binding.ImagePreview.scrollToPosition(positionStart)
+        val adapter =
+            PreviewImageAdapter(model.imageRoot) { position ->
+                val intent = Intent(this, ViewImage::class.java)
+                intent.putExtra(ViewImage.POSITION, position)
+                intent.putExtra(Constants.SelectedBaseNote, model.id)
+                startActivityForResult(intent, REQUEST_VIEW_IMAGES)
             }
-        })
+
+        adapter.registerAdapterDataObserver(
+            object : RecyclerView.AdapterDataObserver() {
+
+                override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                    binding.ImagePreview.scrollToPosition(positionStart)
+                }
+            }
+        )
 
         binding.ImagePreview.setHasFixedSize(true)
         binding.ImagePreview.adapter = adapter
-        binding.ImagePreview.layoutManager = LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
+        binding.ImagePreview.layoutManager =
+            LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
         PagerSnapHelper().attachToRecyclerView(binding.ImagePreview)
 
         model.images.observe(this) { list ->
@@ -325,18 +391,20 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         }
 
         val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
-        val dialog = MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.adding_images)
-            .setView(dialogBinding.root)
-            .setCancelable(false)
-            .create()
+        val dialog =
+            MaterialAlertDialogBuilder(this)
+                .setTitle(R.string.adding_images)
+                .setView(dialogBinding.root)
+                .setCancelable(false)
+                .create()
 
         model.addingImages.observe(this) { progress ->
             if (progress.inProgress) {
                 dialog.show()
                 dialogBinding.ProgressBar.max = progress.total
                 dialogBinding.ProgressBar.setProgressCompat(progress.current, true)
-                dialogBinding.Count.text = getString(R.string.count, progress.current, progress.total)
+                dialogBinding.Count.text =
+                    getString(R.string.count, progress.current, progress.total)
             } else dialog.dismiss()
         }
 
@@ -347,12 +415,14 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
 
     private fun displayImageErrors(errors: List<ImageError>) {
         val recyclerView = RecyclerView(this)
-        recyclerView.layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+        recyclerView.layoutParams =
+            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
         recyclerView.adapter = ErrorAdapter(errors)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            recyclerView.scrollIndicators = View.SCROLL_INDICATOR_TOP or View.SCROLL_INDICATOR_BOTTOM
+            recyclerView.scrollIndicators =
+                View.SCROLL_INDICATOR_TOP or View.SCROLL_INDICATOR_BOTTOM
         }
 
         val title = resources.getQuantityString(R.plurals.cant_add_images, errors.size, errors.size)
@@ -382,7 +452,6 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         }
     }
 
-
     private fun setColor() {
         val color = Operations.extractColor(model.color, this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -391,37 +460,6 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         binding.root.setBackgroundColor(color)
         binding.RecyclerView.setBackgroundColor(color)
         binding.Toolbar.backgroundTintList = ColorStateList.valueOf(color)
-    }
-
-    private fun setupToolbar() {
-        binding.Toolbar.setNavigationOnClickListener { finish() }
-
-        val menu = binding.Toolbar.menu
-        val pin = menu.add(R.string.pin, R.drawable.pin) { item -> pin(item) }
-        bindPinned(pin)
-
-        menu.add(R.string.share, R.drawable.share) { share() }
-        menu.add(R.string.labels, R.drawable.label) { label() }
-        menu.add(R.string.add_images, R.drawable.add_images) { checkNotificationPermission() }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            menu.add(R.string.record_audio, R.drawable.record_audio) { checkAudioPermission() }
-        }
-
-        when (model.folder) {
-            Folder.NOTES -> {
-                menu.add(R.string.delete, R.drawable.delete) { delete() }
-                menu.add(R.string.archive, R.drawable.archive) { archive() }
-            }
-            Folder.DELETED -> {
-                menu.add(R.string.restore, R.drawable.restore) { restore() }
-                menu.add(R.string.delete_forever, R.drawable.delete) { deleteForever() }
-            }
-            Folder.ARCHIVED -> {
-                menu.add(R.string.delete, R.drawable.delete) { delete() }
-                menu.add(R.string.unarchive, R.drawable.unarchive) { restore() }
-            }
-        }
     }
 
     private fun initialiseBinding() {

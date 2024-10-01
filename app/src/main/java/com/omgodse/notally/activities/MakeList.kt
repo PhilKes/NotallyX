@@ -1,81 +1,97 @@
 package com.omgodse.notally.activities
 
+import android.os.Build
+import android.view.MenuItem
+import android.view.inputmethod.InputMethodManager
+import com.omgodse.notally.R
+import com.omgodse.notally.changehistory.ChangeHistory
+import com.omgodse.notally.miscellaneous.add
 import com.omgodse.notally.miscellaneous.setOnNextAction
-import com.omgodse.notally.recyclerview.ListItemListener
+import com.omgodse.notally.preferences.Preferences
+import com.omgodse.notally.recyclerview.ListManager
 import com.omgodse.notally.recyclerview.adapter.MakeListAdapter
-import com.omgodse.notally.recyclerview.viewholder.MakeListVH
-import com.omgodse.notally.room.ListItem
 import com.omgodse.notally.room.Type
 
 class MakeList : NotallyActivity(Type.LIST) {
 
     private lateinit var adapter: MakeListAdapter
 
-    override fun configureUI() {
-        binding.EnterTitle.setOnNextAction {
-            moveToNext(-1)
+    private lateinit var listManager: ListManager
+
+    override fun setupToolbar() {
+        super.setupToolbar()
+        binding.Toolbar.menu.add(
+            1,
+            R.string.delete_checked_items,
+            R.drawable.delete_all,
+            MenuItem.SHOW_AS_ACTION_IF_ROOM,
+        ) {
+            listManager.deleteCheckedItems()
         }
+        binding.Toolbar.menu.add(
+            1,
+            R.string.check_all_items,
+            R.drawable.checkbox_fill,
+            MenuItem.SHOW_AS_ACTION_IF_ROOM,
+        ) {
+            listManager.changeCheckedForAll(true)
+        }
+        binding.Toolbar.menu.add(
+            1,
+            R.string.uncheck_all_items,
+            R.drawable.checkbox,
+            MenuItem.SHOW_AS_ACTION_IF_ROOM,
+        ) {
+            listManager.changeCheckedForAll(false)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            binding.Toolbar.menu.setGroupDividerEnabled(true)
+        }
+    }
+
+    override fun initActionManager(undo: MenuItem, redo: MenuItem) {
+        changeHistory = ChangeHistory {
+            undo.isEnabled = changeHistory.canUndo()
+            redo.isEnabled = changeHistory.canRedo()
+        }
+    }
+
+    override fun configureUI() {
+        binding.EnterTitle.setOnNextAction { listManager.moveFocusToNext(-1) }
 
         if (model.isNewNote) {
             if (model.items.isEmpty()) {
-                addListItem()
+                listManager.add(pushChange = false)
             }
         }
     }
 
-
     override fun setupListeners() {
         super.setupListeners()
-        binding.AddItem.setOnClickListener {
-            addListItem()
-        }
+        binding.AddItem.setOnClickListener { listManager.add() }
     }
 
     override fun setStateFromModel() {
         super.setStateFromModel()
         val elevation = resources.displayMetrics.density * 2
-
-        adapter = MakeListAdapter(model.textSize, elevation, model.items, object : ListItemListener {
-
-            override fun delete(position: Int) {
-                model.items.removeAt(position)
-                adapter.notifyItemRemoved(position)
-            }
-
-            override fun moveToNext(position: Int) {
-                this@MakeList.moveToNext(position)
-            }
-
-            override fun textChanged(position: Int, text: String) {
-                model.items[position].body = text
-            }
-
-            override fun checkedChanged(position: Int, checked: Boolean) {
-                model.items[position].checked = checked
-            }
-        })
-
+        listManager =
+            ListManager(
+                model.items,
+                binding.RecyclerView,
+                changeHistory,
+                preferences,
+                getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager,
+            )
+        adapter =
+            MakeListAdapter(
+                model.textSize,
+                elevation,
+                model.items,
+                Preferences.getInstance(application),
+                listManager,
+            )
         binding.RecyclerView.adapter = adapter
-    }
-
-
-    private fun addListItem() {
-        val position = model.items.size
-        val listItem = ListItem(String(), false)
-        model.items.add(listItem)
-        adapter.notifyItemInserted(position)
-        binding.RecyclerView.post {
-            val viewHolder = binding.RecyclerView.findViewHolderForAdapterPosition(position) as MakeListVH?
-            viewHolder?.binding?.EditText?.requestFocus()
-        }
-    }
-
-    private fun moveToNext(currentPosition: Int) {
-        val viewHolder = binding.RecyclerView.findViewHolderForAdapterPosition(currentPosition + 1) as MakeListVH?
-        if (viewHolder != null) {
-            if (viewHolder.binding.CheckBox.isChecked) {
-                moveToNext(currentPosition + 1)
-            } else viewHolder.binding.EditText.requestFocus()
-        } else addListItem()
+        listManager.adapter = adapter
+        listManager.initList()
     }
 }

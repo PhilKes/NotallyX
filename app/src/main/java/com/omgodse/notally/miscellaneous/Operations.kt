@@ -59,25 +59,24 @@ object Operations {
         writer.close()
     }
 
-
     fun extractColor(color: Color, context: Context): Int {
-        val id = when (color) {
-            Color.DEFAULT -> R.color.Default
-            Color.CORAL -> R.color.Coral
-            Color.ORANGE -> R.color.Orange
-            Color.SAND -> R.color.Sand
-            Color.STORM -> R.color.Storm
-            Color.FOG -> R.color.Fog
-            Color.SAGE -> R.color.Sage
-            Color.MINT -> R.color.Mint
-            Color.DUSK -> R.color.Dusk
-            Color.FLOWER -> R.color.Flower
-            Color.BLOSSOM -> R.color.Blossom
-            Color.CLAY -> R.color.Clay
-        }
+        val id =
+            when (color) {
+                Color.DEFAULT -> R.color.Default
+                Color.CORAL -> R.color.Coral
+                Color.ORANGE -> R.color.Orange
+                Color.SAND -> R.color.Sand
+                Color.STORM -> R.color.Storm
+                Color.FOG -> R.color.Fog
+                Color.SAGE -> R.color.Sage
+                Color.MINT -> R.color.Mint
+                Color.DUSK -> R.color.Dusk
+                Color.FLOWER -> R.color.Flower
+                Color.BLOSSOM -> R.color.Blossom
+                Color.CLAY -> R.color.Clay
+            }
         return ContextCompat.getColor(context, id)
     }
-
 
     fun shareNote(context: Context, title: String, body: CharSequence) {
         val text = body.toString()
@@ -91,14 +90,13 @@ object Operations {
         context.startActivity(chooser)
     }
 
-
     fun getBody(list: List<ListItem>) = buildString {
         for (item in list) {
             val check = if (item.checked) "[✓]" else "[ ]"
-            appendLine("$check ${item.body}")
+            val childIndentation = if (item.isChild) "    " else ""
+            appendLine("$childIndentation$check ${item.body}")
         }
     }
-
 
     fun bindLabels(group: ChipGroup, labels: List<String>, textSize: String) {
         if (labels.isEmpty()) {
@@ -120,10 +118,11 @@ object Operations {
     }
 
     private fun getOutlinedDrawable(context: Context): MaterialShapeDrawable {
-        val model = ShapeAppearanceModel.builder()
-            .setAllCorners(RoundedCornerTreatment())
-            .setAllCornerSizes(RelativeCornerSize(0.5f))
-            .build()
+        val model =
+            ShapeAppearanceModel.builder()
+                .setAllCorners(RoundedCornerTreatment())
+                .setAllCornerSizes(RelativeCornerSize(0.5f))
+                .build()
 
         val drawable = MaterialShapeDrawable(model)
         drawable.fillColor = ColorStateList.valueOf(0)

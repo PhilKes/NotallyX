@@ -1,10 +1,12 @@
 package com.omgodse.notally.miscellaneous
 
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
 import android.text.Spanned
+import android.text.TextWatcher
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
@@ -12,15 +14,23 @@ import android.text.style.URLSpan
 import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.RemoteViews
+import android.widget.TextView
 import com.omgodse.notally.activities.TakeNote
+import com.omgodse.notally.changehistory.ChangeHistory
+import com.omgodse.notally.changehistory.EditTextChange
+import com.omgodse.notally.recyclerview.ListManager
 import com.omgodse.notally.room.SpanRepresentation
+import java.util.Date
+import kotlin.math.roundToInt
+import org.ocpsoft.prettytime.PrettyTime
 
 /**
- * For some reason, this method crashes sometimes with an
- * IndexOutOfBoundsException that I've not been able to replicate.
- * When this happens, to prevent the entire app from crashing and becoming
+ * For some reason, this method crashes sometimes with an IndexOutOfBoundsException that I've not
+ * been able to replicate. When this happens, to prevent the entire app from crashing and becoming
  * unusable, the exception is suppressed.
  */
 fun String.applySpans(representations: List<SpanRepresentation>): Editable {
@@ -50,7 +60,6 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
     return editable
 }
 
-
 private fun String.getURL(start: Int, end: Int): String {
     return if (end <= length) {
         TakeNote.getURLFrom(substring(start, end))
@@ -62,7 +71,6 @@ private fun Spannable.setSpan(span: Any, start: Int, end: Int) {
         setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
     } else setSpan(span, start, length, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 }
-
 
 fun EditText.setOnNextAction(onNext: () -> Unit) {
     setRawInputType(InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_CAP_SENTENCES)
@@ -82,14 +90,116 @@ fun EditText.setOnNextAction(onNext: () -> Unit) {
     }
 }
 
-
 fun Menu.add(title: Int, drawable: Int, onClick: (item: MenuItem) -> Unit): MenuItem {
-    val menuItem = add(title)
+    return add(Menu.NONE, title, drawable, MenuItem.SHOW_AS_ACTION_IF_ROOM, onClick)
+}
+
+fun Menu.add(
+    title: Int,
+    drawable: Int,
+    showAsAction: Int,
+    onClick: (item: MenuItem) -> Unit,
+): MenuItem {
+    return add(Menu.NONE, title, drawable, showAsAction, onClick)
+}
+
+fun Menu.add(
+    groupId: Int,
+    title: Int,
+    drawable: Int,
+    showAsAction: Int,
+    onClick: (item: MenuItem) -> Unit,
+): MenuItem {
+    val menuItem = add(groupId, Menu.NONE, Menu.NONE, title)
     menuItem.setIcon(drawable)
     menuItem.setOnMenuItemClickListener { item ->
         onClick(item)
         return@setOnMenuItemClickListener false
     }
-    menuItem.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+    menuItem.setShowAsAction(showAsAction)
     return menuItem
+}
+
+fun TextView.displayFormattedTimestamp(timestamp: Long, dateFormat: String) {
+    if (dateFormat != com.omgodse.notally.preferences.DateFormat.none) {
+        visibility = View.VISIBLE
+        text = formatTimestamp(timestamp, dateFormat)
+    } else visibility = View.GONE
+}
+
+fun RemoteViews.displayFormattedTimestamp(id: Int, timestamp: Long, dateFormat: String) {
+    if (dateFormat != com.omgodse.notally.preferences.DateFormat.none) {
+        setViewVisibility(id, View.VISIBLE)
+        setTextViewText(id, formatTimestamp(timestamp, dateFormat))
+    } else setViewVisibility(id, View.GONE)
+}
+
+val Int.dp: Int
+    get() = (this / Resources.getSystem().displayMetrics.density).roundToInt()
+
+/**
+ * Creates a TextWatcher for an EditText that is part of a list. Everytime the text is changed, a
+ * Change is added to the ChangeHistory.
+ *
+ * @param positionGetter Function to determine the current position of the EditText in the list
+ *   (e.g. the current adapterPosition when using RecyclerViewer.Adapter)
+ * @param updateModel Function to update the model. Is called on any text changes and on undo/redo.
+ */
+fun EditText.createListTextWatcherWithHistory(listManager: ListManager, positionGetter: () -> Int) =
+    object : TextWatcher {
+        private lateinit var currentTextBefore: String
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            currentTextBefore = s.toString()
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+        override fun afterTextChanged(s: Editable?) {
+            listManager.changeText(
+                this@createListTextWatcherWithHistory,
+                this,
+                positionGetter.invoke(),
+                currentTextBefore,
+                requireNotNull(s).toString(),
+            )
+        }
+    }
+
+fun EditText.createTextWatcherWithHistory(
+    changeHistory: ChangeHistory,
+    updateModel: (text: String) -> Unit,
+) =
+    object : TextWatcher {
+        private lateinit var currentTextBefore: String
+
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            currentTextBefore = s.toString()
+        }
+
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+        override fun afterTextChanged(s: Editable?) {
+            val textBefore = currentTextBefore
+            val textAfter = requireNotNull(s).toString()
+            updateModel.invoke(textAfter)
+
+            changeHistory.push(
+                EditTextChange(
+                    this@createTextWatcherWithHistory,
+                    textAfter,
+                    textBefore,
+                    this,
+                    updateModel,
+                )
+            )
+        }
+    }
+
+private fun formatTimestamp(timestamp: Long, dateFormat: String): String {
+    val date = Date(timestamp)
+    return when (dateFormat) {
+        com.omgodse.notally.preferences.DateFormat.relative -> PrettyTime().format(date)
+        else -> java.text.DateFormat.getDateInstance(java.text.DateFormat.FULL).format(date)
+    }
 }
