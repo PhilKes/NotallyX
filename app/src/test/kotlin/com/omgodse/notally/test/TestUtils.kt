@@ -1,6 +1,7 @@
 package com.omgodse.notally.test
 
 import android.util.Log
+import com.omgodse.notally.changehistory.ChangeCheckedForAllChange
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListCheckedChange
 import com.omgodse.notally.changehistory.ListIsChildChange
@@ -48,12 +49,11 @@ fun ListManager.simulateDrag(positionFrom: Int, positionTo: Int): Int? {
             newPosition = this.move(i, i + itemCount, false, false)
         }
     } else {
-        for ((idx, i) in (positionFrom downTo positionTo + 1).withIndex()) {
+        for (i in positionFrom downTo positionTo + 1) {
             newPosition = this.move(i, i - 1, false, false)
         }
     }
     if (newPosition != null) {
-        // The items have already been moved accordingly via move() calls
         this.finishMove(positionFrom, positionTo, newPosition, item, true, true)
     }
     return newPosition
@@ -74,10 +74,9 @@ fun List<ListItem>.assertOrder(vararg itemBodies: String) {
     }
 }
 
-fun List<ListItem>.assertChecked(startingPosition: Int = 0, vararg checked: Boolean) {
+fun List<ListItem>.assertChecked(vararg checked: Boolean) {
     checked.forEachIndexed { index, expected ->
-        val position = index + startingPosition
-        assertEquals("checked at position: $position", expected, get(position).checked)
+        assertEquals("checked at position: $index", expected, get(index).checked)
     }
 }
 
@@ -120,4 +119,18 @@ fun ListIsChildChange.assert(newValue: Boolean, position: Int, positionAfter: In
 fun ListAddChange.assert(position: Int, newItem: ListItem) {
     assertEquals("position", position, this.position)
     assertEquals("newItem", newItem, this.itemBeforeInsert)
+}
+
+fun ChangeCheckedForAllChange.assert(
+    checked: Boolean,
+    changedPositions: Collection<Int>,
+    changedPositionsAfterSort: Collection<Int>,
+) {
+    assertEquals("checked", checked, this.checked)
+    assertEquals("changedPositions", changedPositions, this.changedPositions)
+    assertEquals(
+        "changedPositionsAfterSort",
+        changedPositionsAfterSort,
+        this.changedPositionsAfterSort,
+    )
 }

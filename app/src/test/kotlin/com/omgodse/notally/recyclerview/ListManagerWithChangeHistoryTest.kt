@@ -45,11 +45,11 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         while (changeHistory.canUndo()) {
             changeHistory.undo()
         }
-        items.assertChecked(0, false, false, false, false, false, false)
+        items.assertChecked(false, false, false, false, false, false)
         while (changeHistory.canRedo()) {
             changeHistory.redo()
         }
-        items.assertChecked(0, *checkedValues)
+        items.assertChecked(*checkedValues)
     }
 
     @Test
@@ -67,12 +67,12 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         while (changeHistory.canUndo()) {
             changeHistory.undo()
         }
-        items.assertChecked(0, false, false, false, false, false, false)
+        items.assertChecked(false, false, false, false, false, false)
         items.assertOrder("A", "B", "C", "D", "E", "F")
         while (changeHistory.canRedo()) {
             changeHistory.redo()
         }
-        items.assertChecked(0, *checkedValues)
+        items.assertChecked(*checkedValues)
         items.assertOrder(*bodiesAfterMove)
     }
 
@@ -185,7 +185,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         val bodiesAfterAdd = items.map { it.body }.toTypedArray()
         val checkedValues = items.map { it.checked }.toBooleanArray()
         items.assertOrder(*bodiesAfterAdd)
-        items.assertChecked(0, *checkedValues)
+        items.assertChecked(*checkedValues)
         "Parent6".assertChildren("Child4")
         "Parent4".assertChildren("Child2", "Child3")
 
@@ -195,14 +195,48 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         }
         items.assertOrder("A", "B", "C", "D", "E", "F")
         listOf("A", "B", "C", "D", "E", "F").forEach { it.assertChildren() }
-        items.assertChecked(0, false, false, false, false, false, false)
+        items.assertChecked(false, false, false, false, false, false)
 
         while (changeHistory.canRedo()) {
             changeHistory.redo()
         }
         items.assertOrder(*bodiesAfterAdd)
-        items.assertChecked(0, *checkedValues)
+        items.assertChecked(*checkedValues)
         "Parent6".assertChildren("Child4")
         "Parent4".assertChildren("Child2", "Child3")
+    }
+
+    @Test
+    fun `undo and redo check all with auto-sort enabled`() {
+        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(2, true)
+        listManager.changeChecked(0, true)
+        listManager.changeCheckedForAll(true)
+
+        changeHistory.undo()
+        items.assertOrder("B", "E", "F", "A", "C", "D")
+        items.assertChecked(false, false, false, true, true, true)
+
+        changeHistory.redo()
+        items.assertOrder("A", "B", "C", "D", "E", "F")
+        items.assertChecked(true, true, true, true, true, true)
+    }
+
+    @Test
+    fun `undo and redo uncheck all with auto-sort enabled`() {
+        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(2, true)
+        listManager.changeChecked(0, true)
+        listManager.changeCheckedForAll(false)
+
+        changeHistory.undo()
+        items.assertOrder("B", "E", "F", "A", "C", "D")
+        items.assertChecked(false, false, false, true, true, true)
+
+        changeHistory.redo()
+        items.assertOrder("A", "B", "C", "D", "E", "F")
+        items.assertChecked(false, false, false, false, false, false)
     }
 }

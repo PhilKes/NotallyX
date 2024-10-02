@@ -127,3 +127,8 @@ fun List<ListItem>.setCheckedAndNotify(
 operator fun ListItem.plus(list: MutableList<ListItem>): List<ListItem> {
     return mutableListOf(this) + list
 }
+
+fun List<ListItem>.toReadableString(): String {
+    return map { "${it.toString()} uncheckedPos: ${it.uncheckedPosition} id: ${it.id}" }
+        .joinToString("\n")
+}

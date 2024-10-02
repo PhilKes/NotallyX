@@ -1,6 +1,5 @@
 package com.omgodse.notally.miscellaneous
 
-import com.omgodse.notally.recyclerview.updateUncheckedPositions
 import com.omgodse.notally.room.ListItem
 
 class CheckedSorter : ListItemSorterStrategy {
@@ -54,7 +53,7 @@ class CheckedSorter : ListItemSorterStrategy {
                     }
                 )
         val sortedItems = sortedGroups.flatten().toMutableList()
-        sortedItems.updateUncheckedPositions()
+        //        sortedItems.updateUncheckedPositions()
         return sortedItems
     }
 }

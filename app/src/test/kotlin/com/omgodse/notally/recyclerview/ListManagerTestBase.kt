@@ -58,7 +58,6 @@ open class ListManagerTestBase {
     }
 
     protected operator fun List<ListItem>.get(body: String): ListItem {
-        // Find the item with the matching name and return it
         return this.find { it.body == body }!!
     }
 

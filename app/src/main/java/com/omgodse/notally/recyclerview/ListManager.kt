@@ -1,9 +1,11 @@
 package com.omgodse.notally.recyclerview
 
 import android.text.TextWatcher
+import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
+import com.omgodse.notally.changehistory.ChangeCheckedForAllChange
 import com.omgodse.notally.changehistory.ChangeHistory
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListCheckedChange
@@ -44,7 +46,7 @@ class ListManager(
                 newItem.uncheckedPosition = insertPosition
             }
         }
-        items.sortAndUpdateItems(adapter = adapter)
+        sortAndUpdate()
         items.updateAllChildren()
         if (pushChange) {
             changeHistory.push(ListAddChange(position, itemBeforeInsert, this))
@@ -195,11 +197,6 @@ class ListManager(
             }
             return position
         }
-        if (!checked && isAutoSortByCheckedEnabled()) {
-            // TODO: atm needed for correct sorting. If an item is unchecked without decrementing
-            //   uncheckedPosition it will be positioned 1 below its correct position
-            item.uncheckedPosition = item.uncheckedPosition?.dec()
-        }
         val (updatedItem, updatedList) = checkWithAllChildren(position, checked)
         items.sortAndUpdateItems(updatedList, false, adapter)
 
@@ -210,9 +207,37 @@ class ListManager(
         return positionAfter
     }
 
-    fun changeCheckedForAll(checked: Boolean) {
-        items.indices.forEach { items.setCheckedAndNotify(it, checked, adapter) }
-        // TODO: Add to ChangeHistory - Have to make a snapshot of which items were checked before
+    fun changeCheckedForAll(checked: Boolean, pushChange: Boolean = true) {
+        val (changedPositions, changedPositionsAfterSort) = check(checked, items.indices.toList())
+        if (pushChange) {
+            changeHistory.push(
+                ChangeCheckedForAllChange(
+                    checked,
+                    changedPositions,
+                    changedPositionsAfterSort,
+                    this,
+                )
+            )
+        }
+    }
+
+    fun sortAndUpdate() {
+        items.sortAndUpdateItems(adapter = adapter)
+    }
+
+    fun check(checked: Boolean, positions: Collection<Int>): Pair<List<Int>, List<Int>> {
+        val changedPositions = mutableListOf<Int>()
+        positions.forEach {
+            val item = items[it]
+            if (item.checked != checked) {
+                changedPositions.add(it)
+                items.setCheckedAndNotify(it, checked, adapter)
+            }
+        }
+        val changedItems = changedPositions.map { items[it] }.toMutableList()
+        sortAndUpdate()
+        val changedPositionsAfterSort = changedItems.map { items.indexOf(it) }.toMutableList()
+        return Pair(changedPositions, changedPositionsAfterSort)
     }
 
     fun changeIsChild(position: Int, isChild: Boolean, pushChange: Boolean = true) {
@@ -243,6 +268,7 @@ class ListManager(
     fun initList() {
         items.forEachIndexed { index, item -> item.id = index }
         items.sortAndUpdateItems(initUncheckedPositions = true, adapter = adapter)
+        Log.d(TAG, "initList:\n${items.toReadableString()}")
     }
 
     internal fun defaultNewItem(position: Int) =
@@ -308,5 +334,6 @@ class ListManager(
 
     companion object {
         private val SORTERS = mapOf(ListItemSorting.autoSortByChecked to CheckedSorter())
+        private const val TAG = "ListManager"
     }
 }
