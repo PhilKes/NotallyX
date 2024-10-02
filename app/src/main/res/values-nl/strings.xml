@@ -19,7 +19,7 @@
     <string name="record_audio">Audio opnemen</string>
     <string name="change_color">Kleur wijzigen</string>
     <string name="delete_forever">Definitief verwijderen</string>
-    <string name="remove_checked_items">Geselecteerde items verwijderen</string>
+    <string name="delete_checked_items">Geselecteerde items verwijderen</string>
     <string name="check_all_items">Alle items selecteren</string>
     <string name="uncheck_all_items">Selectie opheffen van alle items</string>
 
