@@ -6,6 +6,6 @@ interface ListItemSorterStrategy {
 
     fun sort(
         list: MutableList<ListItem>,
-        initUncheckedPositions: Boolean = false,
+        initSortingPosition: Boolean = false,
     ): MutableList<ListItem>
 }

@@ -16,7 +16,7 @@ fun MutableList<ListItem>.moveItemRangeAndNotify(
     removeAll(itemsToMove)
     val insertIndex = if (fromIndex < toIndex) toIndex - itemCount + 1 else toIndex
     addAll(insertIndex, itemsToMove)
-    updateUncheckedPositions()
+    updateSortingPosition()
     val movedIndexes =
         if (fromIndex < toIndex) {
             itemCount - 1 downTo 0
@@ -40,8 +40,8 @@ fun MutableList<ListItem>.addAndNotify(
     item: ListItem,
     adapter: RecyclerView.Adapter<*>,
 ) {
-    if (item.checked && item.uncheckedPosition == null) {
-        item.uncheckedPosition = position
+    if (item.checked && item.sortingPosition == null) {
+        item.sortingPosition = position
     }
     add(position, item)
     adapter.notifyItemInserted(position)
@@ -86,8 +86,8 @@ fun List<ListItem>.updateAllChildren() {
     }
 }
 
-fun MutableList<ListItem>.updateUncheckedPositions() {
-    forEachIndexed { index, item -> if (!item.checked) item.uncheckedPosition = index }
+fun MutableList<ListItem>.updateSortingPosition() {
+    forEachIndexed { index, item -> if (!item.checked) item.sortingPosition = index }
 }
 
 fun List<ListItem>.setIsChildAndNotify(
@@ -129,6 +129,6 @@ operator fun ListItem.plus(list: MutableList<ListItem>): List<ListItem> {
 }
 
 fun List<ListItem>.toReadableString(): String {
-    return map { "${it.toString()} uncheckedPos: ${it.uncheckedPosition} id: ${it.id}" }
+    return map { "${it.toString()} uncheckedPos: ${it.sortingPosition} id: ${it.id}" }
         .joinToString("\n")
 }

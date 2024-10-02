@@ -1,8 +1,10 @@
 package com.omgodse.notally.recyclerview
 
 import com.omgodse.notally.changehistory.ChangeCheckedForAllChange
+import com.omgodse.notally.changehistory.DeleteCheckedChange
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListCheckedChange
+import com.omgodse.notally.changehistory.ListDeleteChange
 import com.omgodse.notally.changehistory.ListIsChildChange
 import com.omgodse.notally.changehistory.ListMoveChange
 import com.omgodse.notally.preferences.ListItemSorting
@@ -16,6 +18,7 @@ import com.omgodse.notally.test.mockPreferences
 import com.omgodse.notally.test.printList
 import com.omgodse.notally.test.simulateDrag
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Test
 import org.mockito.Mockito.anyInt
@@ -73,7 +76,7 @@ class ListManagerTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `add checked item with correct uncheckedPosition`() {
+    fun `add checked item with correct sortingPosition`() {
         mockPreferences(preferences)
         val itemToAdd = ListItem("Test", true, false, null, mutableListOf())
         val newItem = itemToAdd.clone() as ListItem
@@ -81,7 +84,7 @@ class ListManagerTest : ListManagerTestBase() {
 
         "Test".assertPosition(0)
         "Test".assertIsChecked()
-        "Test".assertUncheckedPosition(0)
+        "Test".assertSortingPosition(0)
         items.assertSize(7)
         verify(adapter).notifyItemInserted(0)
         verifyNoMoreInteractions(adapter)
@@ -89,7 +92,7 @@ class ListManagerTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `add checked item with correct uncheckedPosition when auto-sort enabled`() {
+    fun `add checked item with correct sortingPosition when auto-sort enabled`() {
         mockPreferences(preferences, ListItemSorting.autoSortByChecked)
         val itemToAdd = ListItem("Test", true, false, null, mutableListOf())
         val newItem = itemToAdd.clone() as ListItem
@@ -97,7 +100,7 @@ class ListManagerTest : ListManagerTestBase() {
 
         "Test".assertPosition(6)
         "Test".assertIsChecked()
-        "Test".assertUncheckedPosition(0)
+        "Test".assertSortingPosition(0)
         items.assertSize(7)
         verify(adapter).notifyItemInserted(0)
         verify(adapter).notifyItemMoved(0, 6)
@@ -122,9 +125,9 @@ class ListManagerTest : ListManagerTestBase() {
         "Parent".assertPosition(6)
         "Child1".assertPosition(7)
         "Child2".assertPosition(8)
-        "Parent".assertUncheckedPosition(6)
-        "Child1".assertUncheckedPosition(7)
-        "Child2".assertUncheckedPosition(8)
+        "Parent".assertSortingPosition(6)
+        "Child1".assertSortingPosition(7)
+        "Child2".assertSortingPosition(8)
         items.assertSize(9)
 
         verify(adapter).notifyItemInserted(6)
@@ -147,6 +150,7 @@ class ListManagerTest : ListManagerTestBase() {
         items.assertSize(6)
         verify(adapter, never()).notifyItemRangeRemoved(0, 1)
         verifyNoMoreInteractions(adapter)
+        assertFalse(changeHistory.canUndo())
     }
 
     @Test
@@ -158,6 +162,7 @@ class ListManagerTest : ListManagerTestBase() {
         items.assertSize(5)
         verify(adapter).notifyItemRangeRemoved(0, 1)
         verifyNoMoreInteractions(adapter)
+        (changeHistory.lookUp() as ListDeleteChange).assert(0, deletedItem)
     }
 
     @Test
@@ -173,6 +178,7 @@ class ListManagerTest : ListManagerTestBase() {
         deletedItem.assertChildren("B")
         verify(adapter).notifyItemRangeRemoved(0, 2) // 1 parent + 1 child
         verifyNoMoreInteractions(adapter)
+        (changeHistory.lookUp() as ListDeleteChange).assert(0, deletedItem)
     }
 
     @Test
@@ -182,6 +188,46 @@ class ListManagerTest : ListManagerTestBase() {
 
         assertNull(deletedItem)
         verify(adapter, never()).notifyItemRangeRemoved(anyInt(), anyInt())
+        assertFalse(changeHistory.canUndo())
+    }
+
+    // endregion
+
+    // region deleteCheckedItems
+
+    @Test
+    fun `delete checked items`() {
+        mockPreferences(preferences)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(2, true)
+        listManager.changeChecked(0, true)
+        reset(adapter)
+        val itemsBeforeDelete = items.toMutableList()
+
+        listManager.deleteCheckedItems()
+
+        items.assertOrder("B", "E", "F")
+        verify(adapter).notifyItemRangeRemoved(0, 1)
+        verify(adapter).notifyItemRangeRemoved(2, 2)
+        verifyNoMoreInteractions(adapter)
+        (changeHistory.lookUp() as DeleteCheckedChange).assert(itemsBeforeDelete)
+    }
+
+    @Test
+    fun `delete checked items with auto-sort enabled`() {
+        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(2, true)
+        listManager.changeChecked(0, true)
+        reset(adapter)
+        val itemsBeforeDelete = items.toMutableList()
+
+        listManager.deleteCheckedItems()
+
+        items.assertOrder("B", "E", "F")
+        verify(adapter).notifyItemRangeRemoved(3, 3)
+        verifyNoMoreInteractions(adapter)
+        (changeHistory.lookUp() as DeleteCheckedChange).assert(itemsBeforeDelete)
     }
 
     // endregion
@@ -628,21 +674,21 @@ class ListManagerTest : ListManagerTestBase() {
         val positionAfter = listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
-        "A".assertUncheckedPosition(0)
+        "A".assertSortingPosition(0)
         (changeHistory.lookUp() as ListCheckedChange).assert(true, 0, 0)
         verify(adapter).notifyItemRangeChanged(0, 1, null)
         verifyNoMoreInteractions(adapter)
     }
 
     @Test
-    fun `changeChecked unchecks item and updates uncheckedPosition`() {
+    fun `changeChecked unchecks item and updates sortingPosition`() {
         mockPreferences(preferences)
         listManager.changeChecked(0, true)
         reset(adapter)
         listManager.changeChecked(0, checked = false, pushChange = true)
 
         "A".assertIsNotChecked()
-        "A".assertUncheckedPosition(0)
+        "A".assertSortingPosition(0)
         verify(adapter).notifyItemRangeChanged(0, 1, null)
         (changeHistory.lookUp() as ListCheckedChange).assert(false, 0, 0)
         verifyNoMoreInteractions(adapter)
@@ -657,7 +703,7 @@ class ListManagerTest : ListManagerTestBase() {
         val positionAfter = listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
-        "A".assertUncheckedPosition(0)
+        "A".assertSortingPosition(0)
         assertEquals(0, positionAfter)
         verify(adapter, never()).notifyItemRangeRemoved(anyInt(), anyInt())
         verify(adapter, never()).notifyItemRangeInserted(anyInt(), anyInt())
@@ -675,7 +721,7 @@ class ListManagerTest : ListManagerTestBase() {
         "A".assertIsNotChecked()
         "A".assertChildren("B")
         "B".assertIsChecked()
-        "B".assertUncheckedPosition(1)
+        "B".assertSortingPosition(1)
         verify(adapter).notifyItemChanged(1)
         (changeHistory.lookUp() as ListCheckedChange).assert(true, 1, 1)
         verifyNoMoreInteractions(adapter)
@@ -694,9 +740,9 @@ class ListManagerTest : ListManagerTestBase() {
         "B".assertIsChecked()
         "C".assertIsChecked()
         "A".assertChildren("B", "C")
-        "A".assertUncheckedPosition(0)
-        "B".assertUncheckedPosition(1)
-        "C".assertUncheckedPosition(2)
+        "A".assertSortingPosition(0)
+        "B".assertSortingPosition(1)
+        "C".assertSortingPosition(2)
         verify(adapter).notifyItemRangeChanged(0, 3, null)
         (changeHistory.lookUp() as ListCheckedChange).assert(true, 0, 0)
         verifyNoMoreInteractions(adapter)
@@ -713,7 +759,7 @@ class ListManagerTest : ListManagerTestBase() {
         "A".assertIsNotChecked()
         "A".assertChildren("B")
         "B".assertIsChecked()
-        "B".assertUncheckedPosition(1)
+        "B".assertSortingPosition(1)
         verify(adapter).notifyItemChanged(1)
         (changeHistory.lookUp() as ListCheckedChange).assert(true, 1, 1)
         verifyNoMoreInteractions(adapter)
@@ -732,9 +778,9 @@ class ListManagerTest : ListManagerTestBase() {
         "B".assertIsChecked()
         "C".assertIsChecked()
         "A".assertChildren("B", "C")
-        "A".assertUncheckedPosition(0)
-        "B".assertUncheckedPosition(1)
-        "C".assertUncheckedPosition(2)
+        "A".assertSortingPosition(0)
+        "B".assertSortingPosition(1)
+        "C".assertSortingPosition(2)
         "A".assertPosition(3)
         "B".assertPosition(4)
         "C".assertPosition(5)
@@ -758,9 +804,9 @@ class ListManagerTest : ListManagerTestBase() {
         "B".assertIsNotChecked()
         "C".assertIsNotChecked()
         "A".assertChildren("B", "C")
-        "A".assertUncheckedPosition(0)
-        "B".assertUncheckedPosition(1)
-        "C".assertUncheckedPosition(2)
+        "A".assertSortingPosition(0)
+        "B".assertSortingPosition(1)
+        "C".assertSortingPosition(2)
         "A".assertPosition(0)
         "B".assertPosition(1)
         "C".assertPosition(2)

@@ -2,8 +2,10 @@ package com.omgodse.notally.test
 
 import android.util.Log
 import com.omgodse.notally.changehistory.ChangeCheckedForAllChange
+import com.omgodse.notally.changehistory.DeleteCheckedChange
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListCheckedChange
+import com.omgodse.notally.changehistory.ListDeleteChange
 import com.omgodse.notally.changehistory.ListIsChildChange
 import com.omgodse.notally.changehistory.ListMoveChange
 import com.omgodse.notally.preferences.BetterLiveData
@@ -21,11 +23,11 @@ fun createListItem(
     body: String,
     checked: Boolean = false,
     isChild: Boolean = false,
-    uncheckedPosition: Int? = null,
+    sortingPosition: Int? = null,
     children: MutableList<ListItem> = mutableListOf(),
     id: Int = -1,
 ): ListItem {
-    return ListItem(body, checked, isChild, uncheckedPosition, children, id)
+    return ListItem(body, checked, isChild, sortingPosition, children, id)
 }
 
 fun mockPreferences(preferences: Preferences, sorting: String = ListItemSorting.noAutoSort) {
@@ -121,6 +123,11 @@ fun ListAddChange.assert(position: Int, newItem: ListItem) {
     assertEquals("newItem", newItem, this.itemBeforeInsert)
 }
 
+fun ListDeleteChange.assert(position: Int, deletedItem: ListItem?) {
+    assertEquals("position", position, this.position)
+    assertEquals("deletedItem", deletedItem, this.deletedItem)
+}
+
 fun ChangeCheckedForAllChange.assert(
     checked: Boolean,
     changedPositions: Collection<Int>,
@@ -133,4 +140,8 @@ fun ChangeCheckedForAllChange.assert(
         changedPositionsAfterSort,
         this.changedPositionsAfterSort,
     )
+}
+
+fun DeleteCheckedChange.assert(itemsBeforeDelete: List<ListItem>) {
+    assertEquals("itemsBeforeDelete", itemsBeforeDelete, this.itemsBeforeDelete)
 }

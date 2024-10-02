@@ -88,6 +88,8 @@ class MakeListVH(
         binding.EditText.addTextChangedListener(editTextWatcher)
         binding.EditText.setOnKeyListener { _, keyCode, event ->
             if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_DEL) {
+                // TODO: when there are multiple checked items above it does not jump to the last
+                // unchecked item but always re-adds a new item
                 listManager.delete(adapterPosition, false)
             }
             true

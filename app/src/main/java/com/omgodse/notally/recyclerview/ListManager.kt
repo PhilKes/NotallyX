@@ -7,6 +7,7 @@ import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
 import com.omgodse.notally.changehistory.ChangeCheckedForAllChange
 import com.omgodse.notally.changehistory.ChangeHistory
+import com.omgodse.notally.changehistory.DeleteCheckedChange
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListCheckedChange
 import com.omgodse.notally.changehistory.ListDeleteChange
@@ -31,6 +32,7 @@ class ListManager(
     private val inputMethodManager: InputMethodManager,
 ) {
 
+    private var nextItemId: Int = 0
     internal lateinit var adapter: RecyclerView.Adapter<MakeListVH>
 
     fun add(
@@ -42,8 +44,9 @@ class ListManager(
         for ((idx, newItem) in (item + item.children).withIndex()) {
             val insertPosition = position + idx
             items.addAndNotify(insertPosition, newItem, adapter)
-            if (newItem.uncheckedPosition == null) {
-                newItem.uncheckedPosition = insertPosition
+            if (newItem.sortingPosition == null) {
+                 // TODO: should check if an checked item has this position already
+                newItem.sortingPosition = insertPosition
             }
         }
         sortAndUpdate()
@@ -188,7 +191,7 @@ class ListManager(
             return position
         }
         if (checked) {
-            item.uncheckedPosition = position
+            item.sortingPosition = position
         }
         if (item.isChild) {
             items.setCheckedAndNotify(position, checked, adapter)
@@ -260,14 +263,22 @@ class ListManager(
         return items[position]
     }
 
-    fun deleteCheckedItems() {
-        items.updateList(items.filter { !it.checked }.toMutableList(), adapter)
-        // TODO: Add to ChangeHistory
+    fun deleteCheckedItems(pushChange: Boolean = true) {
+        val itemsBeforeDelete = items.toMutableList()
+        updateList(items.filter { !it.checked }.toMutableList())
+        if (pushChange) {
+            changeHistory.push(DeleteCheckedChange(itemsBeforeDelete, this))
+        }
+    }
+
+    fun updateList(newList: MutableList<ListItem>) {
+        items.updateList(newList, adapter)
     }
 
     fun initList() {
         items.forEachIndexed { index, item -> item.id = index }
-        items.sortAndUpdateItems(initUncheckedPositions = true, adapter = adapter)
+        nextItemId = items.size
+        items.sortAndUpdateItems(initSortingPositions = true, adapter = adapter)
         Log.d(TAG, "initList:\n${items.toReadableString()}")
     }
 
@@ -280,6 +291,7 @@ class ListManager(
                     (position > 0 && items[position - 1].isChild)),
             null,
             mutableListOf(),
+            nextItemId++,
         )
 
     private fun isAutoSortByCheckedEnabled() =
@@ -324,11 +336,11 @@ class ListManager(
 
     private fun MutableList<ListItem>.sortAndUpdateItems(
         newList: MutableList<ListItem> = items,
-        initUncheckedPositions: Boolean = false,
+        initSortingPositions: Boolean = false,
         adapter: RecyclerView.Adapter<*>,
     ) {
         val sortedList =
-            SORTERS[preferences.listItemSorting.value]?.sort(newList, initUncheckedPositions)
+            SORTERS[preferences.listItemSorting.value]?.sort(newList, initSortingPositions)
         this.updateList(sortedList ?: newList.toMutableList(), adapter)
     }
 

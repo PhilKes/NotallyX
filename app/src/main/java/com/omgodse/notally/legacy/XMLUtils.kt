@@ -7,11 +7,11 @@ import com.omgodse.notally.room.Label
 import com.omgodse.notally.room.ListItem
 import com.omgodse.notally.room.SpanRepresentation
 import com.omgodse.notally.room.Type
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserFactory
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
-import org.xmlpull.v1.XmlPullParser
-import org.xmlpull.v1.XmlPullParserFactory
 
 object XMLUtils {
 
@@ -119,7 +119,7 @@ object XMLUtils {
         var body = String()
         var checked = false
         var isChild = false
-        var uncheckedPosition: Int? = null
+        var sortingPosition: Int? = null
 
         // TODO: migration required?
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
@@ -128,7 +128,7 @@ object XMLUtils {
                     "text" -> body = parser.nextText()
                     "checked" -> checked = parser.nextText()?.toBoolean() ?: false
                     "isChild" -> isChild = parser.nextText()?.toBoolean() ?: false
-                    "uncheckedPosition" -> uncheckedPosition = parser.nextText()?.toInt()
+                    "sortingPosition" -> sortingPosition = parser.nextText()?.toInt()
                 }
             } else if (parser.eventType == XmlPullParser.END_TAG) {
                 if (parser.name == rootTag) {
@@ -137,7 +137,7 @@ object XMLUtils {
             }
         }
 
-        return ListItem(body, checked, isChild, uncheckedPosition, mutableListOf())
+        return ListItem(body, checked, isChild, sortingPosition, mutableListOf())
     }
 
     private fun parseSpan(parser: XmlPullParser): SpanRepresentation {

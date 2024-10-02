@@ -15,4 +15,12 @@ class ChangeCheckedForAllChange(
     override fun undo() {
         listManager.check(!checked, changedPositionsAfterSort)
     }
+
+    override fun toString(): String {
+        return "ChangeCheckedForAllChange checked: $checked changedPositions: ${
+            changedPositions.joinToString(
+                ","
+            )
+        } changedPositionsAfterSort: ${changedPositionsAfterSort.joinToString(",")}"
+    }
 }

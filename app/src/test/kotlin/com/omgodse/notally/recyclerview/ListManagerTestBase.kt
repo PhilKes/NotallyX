@@ -48,7 +48,7 @@ open class ListManagerTestBase {
                 createListItem("E", id = 4),
                 createListItem("F", id = 5),
             )
-        items.updateUncheckedPositions()
+        items.updateSortingPosition()
         listManager =
             ListManager(items, recyclerView, changeHistory, preferences, inputMethodManager)
         listManager.adapter = adapter as RecyclerView.Adapter<MakeListVH>
@@ -77,11 +77,11 @@ open class ListManagerTestBase {
         assertFalse("checked", items.find { it.body == this }!!.checked)
     }
 
-    protected fun String.assertUncheckedPosition(expected: Int) {
+    protected fun String.assertSortingPosition(expected: Int) {
         assertEquals(
-            "uncheckedPosition",
+            "sortingPosition",
             expected,
-            items.find { it.body == this }!!.uncheckedPosition,
+            items.find { it.body == this }!!.sortingPosition,
         )
     }
 
