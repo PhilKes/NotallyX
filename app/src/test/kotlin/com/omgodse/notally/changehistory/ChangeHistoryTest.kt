@@ -39,10 +39,8 @@ class ChangeHistoryTest {
         changeHistory.push(change)
         changeHistory.undo()
 
-        // Verify undo() is called on the change
         verify(change).undo()
 
-        // Verify stackPointer is decremented to -1
         verify(onStackChanged).invoke(-1)
     }
 
@@ -54,11 +52,9 @@ class ChangeHistoryTest {
         changeHistory.undo()
         changeHistory.redo()
 
-        // Verify redo() is called on the change
         verify(change).redo()
-
-        // Verify stackPointer is incremented back to 0
-        verify(onStackChanged, times(2)).invoke(0) // Called once during push and once during redo
+        // Called once during push and once during redo
+        verify(onStackChanged, times(2)).invoke(0)
     }
 
     @Test

@@ -80,8 +80,8 @@ object Converters {
             val body = jsonObject.getString("body")
             val checked = jsonObject.getBoolean("checked")
             val isChild = jsonObject.getSafeBoolean("isChild")
-            val uncheckedPosition = jsonObject.getSafeInt("uncheckedPosition")
-            ListItem(body, checked, isChild, uncheckedPosition, mutableListOf())
+            val sortingPosition = jsonObject.getSafeInt("sortingPosition")
+            ListItem(body, checked, isChild, sortingPosition, mutableListOf())
         }
     }
 
@@ -94,7 +94,7 @@ object Converters {
                 jsonObject.put("body", item.body)
                 jsonObject.put("checked", item.checked)
                 jsonObject.put("isChild", item.isChild)
-                jsonObject.put("uncheckedPosition", item.uncheckedPosition)
+                jsonObject.put("sortingPosition", item.sortingPosition)
             }
         return JSONArray(objects)
     }

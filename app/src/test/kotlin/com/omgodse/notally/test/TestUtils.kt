@@ -1,34 +1,32 @@
 package com.omgodse.notally.test
 
 import android.util.Log
+import com.omgodse.notally.changehistory.ChangeCheckedForAllChange
+import com.omgodse.notally.changehistory.DeleteCheckedChange
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListCheckedChange
+import com.omgodse.notally.changehistory.ListDeleteChange
 import com.omgodse.notally.changehistory.ListIsChildChange
 import com.omgodse.notally.changehistory.ListMoveChange
-import com.omgodse.notally.preferences.BetterLiveData
-import com.omgodse.notally.preferences.ListItemSorting
-import com.omgodse.notally.preferences.Preferences
+import com.omgodse.notally.recyclerview.ListItemSortedList
 import com.omgodse.notally.recyclerview.ListManager
+import com.omgodse.notally.recyclerview.toReadableString
 import com.omgodse.notally.room.ListItem
 import io.mockk.every
 import io.mockk.mockkStatic
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
-import org.mockito.Mockito.`when`
+import org.mockito.Mockito
 
 fun createListItem(
     body: String,
     checked: Boolean = false,
     isChild: Boolean = false,
-    uncheckedPosition: Int? = null,
+    sortingPosition: Int? = null,
     children: MutableList<ListItem> = mutableListOf(),
     id: Int = -1,
 ): ListItem {
-    return ListItem(body, checked, isChild, uncheckedPosition, children, id)
-}
-
-fun mockPreferences(preferences: Preferences, sorting: String = ListItemSorting.noAutoSort) {
-    `when`(preferences.listItemSorting).thenReturn(BetterLiveData(sorting))
+    return ListItem(body, checked, isChild, sortingPosition, children, id)
 }
 
 fun mockAndroidLog() {
@@ -48,36 +46,32 @@ fun ListManager.simulateDrag(positionFrom: Int, positionTo: Int): Int? {
             newPosition = this.move(i, i + itemCount, false, false)
         }
     } else {
-        for ((idx, i) in (positionFrom downTo positionTo + 1).withIndex()) {
+        for (i in positionFrom downTo positionTo + 1) {
             newPosition = this.move(i, i - 1, false, false)
         }
     }
     if (newPosition != null) {
-        // The items have already been moved accordingly via move() calls
         this.finishMove(positionFrom, positionTo, newPosition, item, true, true)
     }
     return newPosition
 }
 
-fun List<ListItem>.printList(text: String? = null) {
+fun ListItemSortedList.printList(text: String? = null) {
     text?.let { print("--------------\n$it\n") }
     println("--------------")
-    println(joinToString("\n"))
+    println(toReadableString())
     println("--------------")
 }
 
-fun List<ListItem>.readableString() = joinToString("\n")
-
-fun List<ListItem>.assertOrder(vararg itemBodies: String) {
+fun ListItemSortedList.assertOrder(vararg itemBodies: String) {
     itemBodies.forEachIndexed { position, s ->
-        assertEquals("${this.readableString()}\nAt position: $position", s, get(position).body)
+        assertEquals("${this.toReadableString()}\nAt position: $position", s, get(position).body)
     }
 }
 
-fun List<ListItem>.assertChecked(startingPosition: Int = 0, vararg checked: Boolean) {
+fun ListItemSortedList.assertChecked(vararg checked: Boolean) {
     checked.forEachIndexed { index, expected ->
-        val position = index + startingPosition
-        assertEquals("checked at position: $position", expected, get(position).checked)
+        assertEquals("checked at position: $index", expected, get(index).checked)
     }
 }
 
@@ -120,4 +114,36 @@ fun ListIsChildChange.assert(newValue: Boolean, position: Int, positionAfter: In
 fun ListAddChange.assert(position: Int, newItem: ListItem) {
     assertEquals("position", position, this.position)
     assertEquals("newItem", newItem, this.itemBeforeInsert)
+}
+
+fun ListDeleteChange.assert(position: Int, deletedItem: ListItem?) {
+    assertEquals("position", position, this.position)
+    assertEquals("deletedItem", deletedItem, this.deletedItem)
+}
+
+fun ChangeCheckedForAllChange.assert(
+    checked: Boolean,
+    changedPositions: Collection<Int>,
+    changedPositionsAfterSort: Collection<Int>,
+) {
+    assertEquals("checked", checked, this.checked)
+    assertEquals("changedPositions", changedPositions, this.changedPositions)
+    assertEquals(
+        "changedPositionsAfterSort",
+        changedPositionsAfterSort,
+        this.changedPositionsAfterSort,
+    )
+}
+
+fun DeleteCheckedChange.assert(itemsBeforeDelete: List<ListItem>) {
+    assertEquals("itemsBeforeDelete", itemsBeforeDelete, this.itemsBeforeDelete)
+}
+
+object MockitoHelper {
+    fun <T> anyObject(): T {
+        Mockito.any<T>()
+        return uninitialized()
+    }
+
+    @Suppress("UNCHECKED_CAST") fun <T> uninitialized(): T = null as T
 }

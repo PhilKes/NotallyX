@@ -1,16 +1,15 @@
 package com.omgodse.notally.miscellaneous
 
-import com.omgodse.notally.recyclerview.updateUncheckedPositions
 import com.omgodse.notally.room.ListItem
 
 class CheckedSorter : ListItemSorterStrategy {
     override fun sort(
         list: MutableList<ListItem>,
-        initUncheckedPositions: Boolean,
+        initSortingPositions: Boolean,
     ): MutableList<ListItem> {
-        if (initUncheckedPositions) {
+        if (initSortingPositions) {
             list.forEachIndexed { index, item ->
-                if (item.uncheckedPosition == null) item.uncheckedPosition = index
+                if (item.sortingPosition == null) item.sortingPosition = index
             }
         }
         // Sorted by parents
@@ -48,13 +47,13 @@ class CheckedSorter : ListItemSorterStrategy {
                         if (!parent1.checked && parent2.checked) {
                             return@Comparator -1
                         }
-                        return@Comparator parent1.uncheckedPosition!!.compareTo(
-                            parent2.uncheckedPosition!!
+                        return@Comparator parent1.sortingPosition!!.compareTo(
+                            parent2.sortingPosition!!
                         )
                     }
                 )
         val sortedItems = sortedGroups.flatten().toMutableList()
-        sortedItems.updateUncheckedPositions()
+        //        sortedItems.updateSortingPositions()
         return sortedItems
     }
 }
