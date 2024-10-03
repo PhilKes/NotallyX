@@ -58,8 +58,7 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
-            model.saveNote()
-            WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
+            saveNote()
             super.finish()
         }
     }
@@ -67,10 +66,12 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong("id", model.id)
-        lifecycleScope.launch {
-            model.saveNote()
-            WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
-        }
+        lifecycleScope.launch { saveNote() }
+    }
+
+    open suspend fun saveNote() {
+        model.saveNote()
+        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -317,7 +318,7 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         val body =
             when (type) {
                 Type.NOTE -> model.body
-                Type.LIST -> Operations.getBody(model.items)
+                Type.LIST -> Operations.getBody(model.items!!.toMutableList())
             }
         Operations.shareNote(this, model.title, body)
     }

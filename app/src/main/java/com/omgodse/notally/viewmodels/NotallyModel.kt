@@ -275,8 +275,8 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    suspend fun saveNote(): Long {
-        return withContext(Dispatchers.IO) { baseNoteDao.insert(getBaseNote()) }
+    suspend fun saveNote(items: List<ListItem> = this.items): Long {
+        return withContext(Dispatchers.IO) { baseNoteDao.insert(getBaseNote(items)) }
     }
 
     private suspend fun updateImages() {
@@ -287,10 +287,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         withContext(Dispatchers.IO) { baseNoteDao.updateAudios(id, audios.value) }
     }
 
-    private fun getBaseNote(): BaseNote {
+    private fun getBaseNote(currentItems: List<ListItem> = this.items): BaseNote {
         val spans = getFilteredSpans(body)
         val body = this.body.trimEnd().toString()
-        val items = this.items.filter { item -> item.body.isNotEmpty() }
+        val items = currentItems.filter { item -> item.body.isNotEmpty() }
         return BaseNote(
             id,
             type,
