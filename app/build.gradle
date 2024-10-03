@@ -55,7 +55,7 @@ ktfmt {
 }
 
 tasks.withType(Test).configureEach {
-    dependsOn 'ktfmtFormat'
+//    dependsOn 'ktfmtFormat'
 }
 
 dependencies {

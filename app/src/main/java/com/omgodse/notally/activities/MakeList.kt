@@ -7,16 +7,28 @@ import com.omgodse.notally.R
 import com.omgodse.notally.changehistory.ChangeHistory
 import com.omgodse.notally.miscellaneous.add
 import com.omgodse.notally.miscellaneous.setOnNextAction
+import com.omgodse.notally.preferences.ListItemSorting
 import com.omgodse.notally.preferences.Preferences
+import com.omgodse.notally.recyclerview.ListItemNoSortCallback
+import com.omgodse.notally.recyclerview.ListItemSortedByCheckedCallback
+import com.omgodse.notally.recyclerview.ListItemSortedList
 import com.omgodse.notally.recyclerview.ListManager
 import com.omgodse.notally.recyclerview.adapter.MakeListAdapter
+import com.omgodse.notally.recyclerview.toMutableList
 import com.omgodse.notally.room.Type
+import com.omgodse.notally.widget.WidgetProvider
 
 class MakeList : NotallyActivity(Type.LIST) {
 
     private lateinit var adapter: MakeListAdapter
+    private lateinit var items: ListItemSortedList
 
     private lateinit var listManager: ListManager
+
+    override suspend fun saveNote() {
+        model.saveNote(items.toMutableList())
+        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
+    }
 
     override fun setupToolbar() {
         super.setupToolbar()
@@ -76,7 +88,6 @@ class MakeList : NotallyActivity(Type.LIST) {
         val elevation = resources.displayMetrics.density * 2
         listManager =
             ListManager(
-                model.items,
                 binding.RecyclerView,
                 changeHistory,
                 preferences,
@@ -86,12 +97,22 @@ class MakeList : NotallyActivity(Type.LIST) {
             MakeListAdapter(
                 model.textSize,
                 elevation,
-                model.items,
                 Preferences.getInstance(application),
                 listManager,
             )
+        val sortCallback =
+            when (preferences.listItemSorting.value) {
+                ListItemSorting.autoSortByChecked -> ListItemSortedByCheckedCallback(adapter)
+                else -> ListItemNoSortCallback(adapter)
+            }
+        items = ListItemSortedList(sortCallback)
+        if (sortCallback is ListItemSortedByCheckedCallback) {
+            sortCallback.setList(items)
+        }
+        items.addAll(model.items)
+        adapter.setList(items)
         binding.RecyclerView.adapter = adapter
         listManager.adapter = adapter
-        listManager.initList()
+        listManager.initList(items)
     }
 }
