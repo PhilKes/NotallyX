@@ -1,17 +1,17 @@
-package com.omgodse.notally.recyclerview
+package com.omgodse.notally.recyclerview.listmanager
 
 import com.omgodse.notally.preferences.ListItemSorting
+import com.omgodse.notally.recyclerview.lastIndex
+import com.omgodse.notally.recyclerview.map
 import com.omgodse.notally.test.assertChecked
 import com.omgodse.notally.test.assertOrder
-import com.omgodse.notally.test.createListItem
-import com.omgodse.notally.test.mockPreferences
 import org.junit.Test
 
 class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo moves`() {
-        mockPreferences(preferences)
+        setSorting(ListItemSorting.noAutoSort)
         listManager.move(0, 4)
         listManager.move(2, 3)
         listManager.move(4, 1)
@@ -33,7 +33,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo changeChecked`() {
-        mockPreferences(preferences)
+        setSorting(ListItemSorting.noAutoSort)
         listManager.changeChecked(0, true)
         listManager.changeChecked(3, true)
         listManager.changeChecked(0, false)
@@ -54,7 +54,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo changeChecked if auto-sort enabled`() {
-        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSorting.autoSortByChecked)
         listManager.changeChecked(0, true)
         listManager.changeChecked(3, true)
         listManager.changeChecked(0, false)
@@ -77,8 +77,25 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
     }
 
     @Test
+    fun `undo and redo changeChecked false on child item`() {
+        setSorting(ListItemSorting.autoSortByChecked)
+        listManager.changeIsChild(2, true)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(1, checked = true, pushChange = true)
+        listManager.changeChecked(4, checked = false, pushChange = true)
+
+        changeHistory.undo()
+
+        items.assertOrder("A", "E", "F", "B", "C", "D")
+        "B".assertIsChecked()
+        "C".assertIsChecked()
+        "D".assertIsChecked()
+        "B".assertChildren("C", "D")
+    }
+
+    @Test
     fun `undo and redo changeIsChild`() {
-        mockPreferences(preferences)
+        setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
         listManager.changeIsChild(4, true)
@@ -102,20 +119,13 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo add parents with children`() {
-        mockPreferences(preferences)
-        val child1 = createListItem("Child1", isChild = true)
-        val child2 = createListItem("Child2", isChild = true)
-        val child3 = createListItem("Child3", isChild = true)
-        val child4 = createListItem("Child4", isChild = true)
-        listManager.add(0, createListItem("Parent1", children = mutableListOf(child1)))
-        listManager.add(4, createListItem("Parent2"))
-        listManager.add(0, createListItem("Parent3"))
-        listManager.add(3, createListItem("Parent4", children = mutableListOf(child2)))
-        listManager.add(item = createListItem("Parent5"))
-        listManager.add(
-            items.lastIndex,
-            createListItem("Parent6", children = mutableListOf(child3, child4)),
-        )
+        setSorting(ListItemSorting.noAutoSort)
+        listManager.addWithChildren(0, "Parent1", "Child1")
+        listManager.addWithChildren(4, "Parent2")
+        listManager.addWithChildren(0, "Parent3")
+        listManager.addWithChildren(3, "Parent4", "Child2")
+        listManager.addWithChildren(parentBody = "Parent5")
+        listManager.addWithChildren(items.lastIndex, "Parent6", "Child3", "Child4")
         val bodiesAfterAdd = items.map { it.body }.toTypedArray()
 
         while (changeHistory.canUndo()) {
@@ -138,7 +148,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo delete parents with children`() {
-        mockPreferences(preferences)
+        setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(3, true)
         listManager.changeIsChild(4, true)
@@ -162,7 +172,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo check all with auto-sort enabled`() {
-        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSorting.autoSortByChecked)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
@@ -179,7 +189,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo uncheck all with auto-sort enabled`() {
-        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSorting.autoSortByChecked)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
@@ -196,7 +206,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo delete checked with auto-sort enabled`() {
-        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSorting.autoSortByChecked)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
@@ -213,7 +223,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo various changes with auto-sort enabled`() {
-        mockPreferences(preferences, ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSorting.autoSortByChecked)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(3, true)
         listManager.changeIsChild(4, true)
@@ -256,20 +266,5 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         items.assertChecked(*checkedValues)
         "Parent6".assertChildren("Child4")
         "Parent4".assertChildren("Child2", "Child3")
-    }
-
-    private fun ListManager.addWithChildren(
-        position: Int,
-        parentBody: String,
-        vararg childrenBodies: String,
-    ) {
-        this.add(
-            position,
-            createListItem(
-                body = parentBody,
-                children =
-                    childrenBodies.map { createListItem(body = it, isChild = true) }.toMutableList(),
-            ),
-        )
     }
 }
