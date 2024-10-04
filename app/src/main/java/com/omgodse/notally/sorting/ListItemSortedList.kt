@@ -29,12 +29,14 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         add(item)
     }
 
-    fun forceItemIsChild(item: ListItem, isChild: Boolean) {
-        if (item.isChild != isChild) {
-            if (!item.isChild && isChild) {
+    fun forceItemIsChild(item: ListItem, newValue: Boolean) {
+        if (item.isChild != newValue) {
+            if (!item.isChild) {
                 item.children.clear()
+            } else {
+                removeChildFromParent(item)
             }
-            item.isChild = isChild
+            item.isChild = newValue
         }
         if (item.isChild) {
             updateChildInParent(item.order!!, item)
@@ -76,7 +78,7 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         }
     }
 
-    private fun removeChildFromParent(item: ListItem) {
+    fun removeChildFromParent(item: ListItem) {
         findParent(item)?.let { (_, parent) ->
             val childIndex = parent.children.indexOfFirst { child -> child.id == item.id }
             parent.children.removeAt(childIndex)
@@ -112,6 +114,4 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         }
         return position
     }
-
-
 }

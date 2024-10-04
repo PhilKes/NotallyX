@@ -147,8 +147,9 @@ class ListManager(
         val checkChildPosition = if (positionTo < positionFrom) positionTo - 1 else positionTo
         val forceIsChild =
             when {
-                positionTo == 0 -> false
+                positionTo == 0 && itemFrom.isChild -> false
                 updateChildren && checkChildPosition.isBeforeChildItemOfOtherParent -> true
+                itemFrom.isChild -> true // if child is moved parent could change
                 else -> null
             }
 

@@ -13,7 +13,18 @@ class ListItemNoSortCallback(adapter: RecyclerView.Adapter<*>?) :
             item1 == null && item2 == null -> 0
             item1 == null && item2 != null -> -1
             item1 != null && item2 == null -> 1
-            else -> item1!!.order!!.compareTo(item2!!.order!!)
+            else -> {
+                val orderCmp = item1!!.order!!.compareTo(item2!!.order!!)
+                if (orderCmp == 0 && item1.isChildOf(item2)) {
+                    return -1 // happens when a parent with children is moved up, the children is
+                              // moved first
+                }
+                if (orderCmp == 0 && item2.isChildOf(item1)) {
+                    return 1 // happens when a parent with children is moved down, the children is
+                             // moved first
+                }
+                return orderCmp
+            }
         }
     }
 

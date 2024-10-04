@@ -114,7 +114,8 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
         Log.d(TAG, "onChanged: pos: $position count: $count")
         super.onChanged(position, count, payload)
     }
-    companion object{
+
+    companion object {
         private const val TAG = "ListItemSortedByCheckedCallback"
     }
 }

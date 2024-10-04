@@ -32,7 +32,7 @@ class DragCallback(private val elevation: Float, private val listManager: ListMa
     override fun onMove(view: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
         val from = viewHolder.adapterPosition
         val to = target.adapterPosition
-        if(from == -1 || to == -1){
+        if (from == -1 || to == -1) {
             return false
         }
         if (positionFrom == null) {

@@ -24,22 +24,38 @@ fun ListItemSortedList.moveItemRange(
 
     this.beginBatchedUpdates()
 
-    val insertPosition = if (fromIndex < toIndex) toIndex - itemCount + 1 else toIndex
+    val isMoveUp = fromIndex < toIndex
+    val insertPosition = if (isMoveUp) toIndex - itemCount + 1 else toIndex
 
-    if (fromIndex < toIndex) {
+    if (isMoveUp) {
         this.shiftItemOrders(fromIndex + itemCount until toIndex + 1, -itemCount)
     } else {
         this.shiftItemOrders(toIndex until fromIndex, itemCount)
     }
 
-    val itemsToMove = (0 until itemCount).map { this.removeItemAt(fromIndex) }
-
-    itemsToMove.forEachIndexed { index, item ->
-        val movedItem = item.clone() as ListItem
-        movedItem.order = insertPosition + index
-        this.add(movedItem, forceIsChild)
+    val itemsToMove =
+        (0 until itemCount)
+            .map { this[fromIndex + it] }
+            .mapIndexed { index, item ->
+                val movedItem = item.clone() as ListItem
+                movedItem.order = insertPosition + index
+                movedItem
+            }
+    itemsToMove
+        .reversed() // start with children on bottom
+        .forEach { listItem -> this.updateItemAt(this.findById(listItem.id)!!.first, listItem) }
+    itemsToMove.forEach {
+        if (forceIsChild != null) {
+            val item = this.findById(it.id)!!.second
+            if (forceIsChild) {
+                // In this case it was already a child and moved to other positions,
+                // therefore reset the child association
+                this.removeChildFromParent(item)
+                item.isChild = false
+            }
+            this.forceItemIsChild(item, forceIsChild)
+        }
     }
-
     this.endBatchedUpdates()
     val newPosition = this.indexOfFirst { it.id == itemsToMove[0].id }!!
     return newPosition
