@@ -208,7 +208,12 @@ class ListManager(
         }
     }
 
-    fun changeChecked(position: Int, checked: Boolean, pushChange: Boolean = true): Int {
+    fun changeChecked(
+        position: Int,
+        checked: Boolean,
+        pushChange: Boolean = true,
+        recalcChildrenPositions: Boolean = false
+    ): Int {
         val item = items[position]
         if (item.checked == checked) {
             return position
@@ -219,7 +224,7 @@ class ListManager(
         if (item.isChild) {
             return changeCheckedForChild(checked, item, pushChange, position)
         }
-        val positionAfter = items.setCheckedWithChildren(position, checked)
+        val positionAfter = items.setCheckedWithChildren(position, checked, recalcChildrenPositions)
         if (pushChange) {
             changeHistory.push(ListCheckedChange(checked, position, positionAfter, this))
         }
@@ -233,10 +238,14 @@ class ListManager(
         position: Int,
     ): Int {
         var changePushedByParent = false
+        var actualPosition = position
         if (!checked) {
             val (parentPosition, parent) = items.findParent(item)!!
+            // If a child is being unchecked and the parent was checked, the parent gets unchecked too
             if (parent.checked) {
-                val parentPositionAfter = items.setChecked(parentPosition, false)
+                val parentPositionAfter =
+                    items.setChecked(parentPosition, false, recalcChildrenPositions = true)
+                actualPosition = items.findById(item.id)!!.first
                 if (pushChange) {
                     changeHistory.push(
                         ListCheckedChange(false, parentPosition, parentPositionAfter, this)
@@ -245,15 +254,41 @@ class ListManager(
                 }
             }
         }
-        val positionAfter = items.setChecked(position, checked)
+        val positionAfter = items.setChecked(actualPosition, checked)
         if (pushChange && !changePushedByParent) {
-            changeHistory.push(ListCheckedChange(checked, position, positionAfter, this))
+            changeHistory.push(ListCheckedChange(checked, actualPosition, positionAfter, this))
         }
         return positionAfter
     }
 
     fun changeCheckedForAll(checked: Boolean, pushChange: Boolean = true) {
-        val (changedPositions, changedPositionsAfterSort) = check(checked, items.indices.toList())
+        val parentIds = mutableListOf<Int>()
+        val changedPositions = mutableListOf<Int>()
+        items.reversed().forEachIndexed { position, item ->
+            if (!item.isChild) {
+                parentIds.add(item.id)
+                changedPositions.add(position)
+                changedPositions.addAll(item.children.indices.map { position + it + 1 })
+            }
+        }
+        parentIds.forEach {
+            val (position, _) = items.findById(it)!!
+            val newPosition =
+                changeChecked(position, checked, pushChange = false, recalcChildrenPositions = true)
+//            changedPositionsAfterSort.add(newPosition)
+        }
+        val changedPositionsAfterSort = mutableListOf<Int>()
+        parentIds.forEach {
+            val (position, parent) = items.findById(it)!!
+            changedPositionsAfterSort.add(position)
+            changedPositionsAfterSort.addAll(parent.children.indices.map { position + it + 1 })
+        }
+//        val (changedPositions, changedPositionsAfterSort) = check(checked, positionsInOrder, recalcParentPositions = true)
+//        val (changedPositions, changedPositionsAfterSort) = check(
+//            checked,
+//            items.indices.toList(),
+//            recalcParentPositions = false
+//        )
         if (pushChange) {
             changeHistory.push(
                 ChangeCheckedForAllChange(
@@ -270,8 +305,12 @@ class ListManager(
     //        items.sortAndUpdateItems(adapter = adapter)
     //    }
 
-    fun check(checked: Boolean, positions: Collection<Int>): Pair<List<Int>, List<Int>> {
-        return items.setChecked(positions, checked)
+    fun check(
+        checked: Boolean,
+        positions: Collection<Int>,
+        recalcParentPositions: Boolean = false
+    ): Pair<List<Int>, List<Int>> {
+        return items.setChecked(positions, checked, recalcParentPositions)
         //        val changedPositions = mutableListOf<Int>()
         //        items.beginBatchedUpdates()
         //        positions.forEach {

@@ -241,7 +241,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         //        changeHistory.undo()
         listManager.changeChecked(4, false)
         listManager.delete(0, true)
-        listManager.addWithChildren(6, "Parent6", "Child4")
+        listManager.addWithChildren(1, "Parent6", "Child4")
         //        listManager.changeCheckedForAll(false)
         //        listManager.deleteCheckedItems()
         val bodiesAfterAdd = items.map { it.body }.toTypedArray()

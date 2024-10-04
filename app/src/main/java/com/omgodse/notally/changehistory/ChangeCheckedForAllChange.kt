@@ -10,6 +10,7 @@ class ChangeCheckedForAllChange(
 ) : Change {
     override fun redo() {
         listManager.check(checked, changedPositions)
+//        listManager.changeCheckedForAll(checked,pushChange = false)
     }
 
     override fun undo() {

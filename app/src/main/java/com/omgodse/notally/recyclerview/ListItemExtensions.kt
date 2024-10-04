@@ -170,19 +170,32 @@ fun ListItemSortedList.setIsChild(positions: List<Int>, isChild: Boolean) {
     updatePositions(changedPositions, items)
 }
 
-fun ListItemSortedList.setChecked(position: Int, checked: Boolean): Int {
+fun ListItemSortedList.setChecked(
+    position: Int,
+    checked: Boolean,
+    recalcChildrenPositions: Boolean = false
+): Int {
     val item = this[position].clone() as ListItem
     if (item.checked != checked) {
         item.checked = checked
-        this.updateItemAt(position, item)
-        return this.indexOf(item)
+//        this.updateItemAt(position, item)
+//        return this.indexOf(item)
     }
-    return position
+//    this.beginBatchedUpdates() // TODO: less notifies?
+    val (_, changedPositionsAfterSort) = this.setChecked(listOf(position), checked, false)
+    if (recalcChildrenPositions) {
+        item.children.forEach { child ->
+            this.recalculatePositionOfItemAt(this.findById(child.id)!!.first)
+        }
+    }
+//    this.endBatchedUpdates()
+    return changedPositionsAfterSort[0]
 }
 
 fun ListItemSortedList.setChecked(
     positions: Collection<Int>,
     checked: Boolean,
+    recalcChildrenPositions: Boolean = false
 ): Pair<List<Int>, List<Int>> {
     val changedPositions = mutableListOf<Int>()
     val items = this.cloneList()
@@ -193,7 +206,8 @@ fun ListItemSortedList.setChecked(
             item.checked = checked
         }
     }
-    val changedPositionsAfterSort = updatePositions(changedPositions, items)
+    val changedPositionsAfterSort =
+        updatePositions(changedPositions, items, recalcChildrenPositions)
     return Pair(changedPositions, changedPositionsAfterSort)
 }
 
@@ -202,19 +216,36 @@ fun ListItemSortedList.setChecked(
  *
  * @return The position of the checked item afterwards
  */
-fun ListItemSortedList.setCheckedWithChildren(position: Int, checked: Boolean): Int {
+fun ListItemSortedList.setCheckedWithChildren(
+    position: Int,
+    checked: Boolean,
+    recalcChildrenPositions: Boolean = false
+): Int {
     val parent = this[position]
     var childrenWithSameChecked = 0
-    parent.children.forEach {
-        val updatedChild = this.find { item -> item.id == it.id }!!
-        if (updatedChild.checked != checked) {
-            childrenWithSameChecked++
-        }
-    }
-    val positionsWithChildren = (position..position + childrenWithSameChecked).toList()
+//    parent.children.forEach {
+//        val updatedChild = this.find { item -> item.id == it.id }!!
+//        if (updatedChild.checked != checked) {
+//            childrenWithSameChecked++
+//        }
+//    }
+    val positionsWithChildren = (position..position + parent.children.size).toList()
 
-    val (_, changedPositionsAfterSort) = this.setChecked(positionsWithChildren, checked)
+    val (_, changedPositionsAfterSort) = this.setChecked(
+        positionsWithChildren,
+        checked,
+        recalcChildrenPositions
+    )
     return changedPositionsAfterSort[0]
+}
+
+fun ListItemSortedList.findById(id: Int): Pair<Int, ListItem>? {
+    val position = this.indexOfFirst { it.id == id } ?: return null
+    return Pair(position, this[position])
+}
+
+fun MutableList<ListItem>.containsId(id: Int): Boolean {
+    return this.any { it.id == id }
 }
 
 operator fun ListItem.plus(list: List<ListItem>): List<ListItem> {
@@ -233,26 +264,45 @@ fun Collection<ListItem>.toReadableString(): String {
 
 fun ListItemSortedList.findParent(childItem: ListItem): Pair<Int, ListItem>? {
     this.indices.forEach {
-        if (this[it].children.find { child -> child.id == childItem.id } != null) {
+        if (this[it].findChild(childItem.id) != null) {
             return Pair(it, this[it])
         }
     }
     return null
 }
 
+fun ListItem.findChild(childId: Int): ListItem? {
+    return this.children.find { child -> child.id == childId }
+}
+
+fun ListItemSortedList.reversed(): List<ListItem> {
+    return toMutableList().reversed()
+}
+
 private fun ListItemSortedList.updatePositions(
     changedPositions: MutableList<Int>,
-    items: MutableList<ListItem>,
+    updatedItems: MutableList<ListItem>,
+    recalcChildrenPositions: Boolean = false
 ): List<Int> {
     this.beginBatchedUpdates()
+    val idsOfChildren = mutableListOf<Int>()
     changedPositions.forEach {
-        val updatedItem = items[it]
+        val updatedItem = updatedItems[it]
         val newPosition = this.indexOfFirst { item -> item.id == updatedItem.id }!!
+        if (updatedItem.isChild) {
+            idsOfChildren.add(updatedItem.id)
+        }
         this.updateItemAt(newPosition, updatedItem)
     }
+    if (recalcChildrenPositions) {
+        idsOfChildren.forEach { childId ->
+            this.recalculatePositionOfItemAt(this.indexOfFirst { it.id == childId }!!)
+        }
+    }
+
     val changedPositionsAfterSort =
         changedPositions
-            .map { pos -> this.indexOfFirst { item -> item.id == items[pos].id }!! }
+            .map { pos -> this.indexOfFirst { item -> item.id == updatedItems[pos].id }!! }
             .toList()
     this.endBatchedUpdates()
     return changedPositionsAfterSort

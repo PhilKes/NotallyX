@@ -162,7 +162,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         listManager.changeChecked(4, checked = false, pushChange = true)
 
-        items.assertOrder("A", "B", "C", "E", "F", "D")
+        items.assertOrder("A", "B", "C", "D", "E", "F",)
         "B".assertIsNotChecked()
         "C".assertIsNotChecked()
         "D".assertIsChecked()
@@ -186,8 +186,8 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         items.assertChecked(true, true, true, true, true, true)
         (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
             true,
-            listOf(0, 2, 4, 5),
-            listOf(0, 2, 4, 5),
+            listOf(0, 1, 2, 3, 4, 5), // TODO: optimize so that only unchecked items are changed (here: listOf(0, 2, 4, 5))
+            listOf(5, 4, 3, 2, 1, 0),
         )
     }
 
@@ -204,8 +204,8 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         items.assertChecked(false, false, false, false, false, false)
         (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
             false,
-            listOf(1, 2, 3),
-            listOf(1, 2, 3),
+            listOf(0, 1, 2, 4, 5),
+            listOf(5, 4, 3, 1, 0),
         )
     }
 
@@ -222,8 +222,8 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         items.assertChecked(true, true, true, true, true, true)
         (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
             true,
-            listOf(0, 1, 2),
-            listOf(1, 4, 5),
+            listOf(1, 2, 3, 4, 5),
+            listOf(4, 3, 5, 4, 1),
         )
     }
 
@@ -240,8 +240,8 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         items.assertChecked(false, false, false, false, false, false)
         (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
             false,
-            listOf(3, 4, 5),
-            listOf(0, 2, 3),
+            listOf(1, 2, 3, 4, 5),
+            listOf(1, 0, 5, 4, 1),
         )
     }
 

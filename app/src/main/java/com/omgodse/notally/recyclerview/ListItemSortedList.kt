@@ -53,8 +53,11 @@ class ListItemSortedList(callback: Callback<ListItem>) :
                 }
                 item.isChild = isChild
             }
+            if(item.isChild) {
+                updateChildInParent(item.sortingPosition!!, item)
+            }
         }
-        add(item)
+        add(item) // TODO: can skip the isChild update in other method
     }
 
     override fun remove(item: ListItem?): Boolean {
