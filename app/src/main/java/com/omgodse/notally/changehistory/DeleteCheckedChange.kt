@@ -5,7 +5,7 @@ import com.omgodse.notally.recyclerview.toReadableString
 import com.omgodse.notally.room.ListItem
 
 class DeleteCheckedChange(
-    internal val itemsBeforeDelete: MutableList<ListItem>,
+    internal val deletedItems: List<ListItem>,
     private val listManager: ListManager,
 ) : Change {
     override fun redo() {
@@ -13,10 +13,10 @@ class DeleteCheckedChange(
     }
 
     override fun undo() {
-        listManager.updateList(itemsBeforeDelete)
+        deletedItems.forEach { listManager.add(it.sortingPosition!!, it) }
     }
 
     override fun toString(): String {
-        return "DeleteCheckedChange itemsBeforeDelete:\n${itemsBeforeDelete.toReadableString()}"
+        return "DeleteCheckedChange deletedItems:\n${deletedItems.toReadableString()}"
     }
 }

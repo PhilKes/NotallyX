@@ -4,12 +4,12 @@ import com.omgodse.notally.changehistory.DeleteCheckedChange
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListDeleteChange
 import com.omgodse.notally.preferences.ListItemSorting
-import com.omgodse.notally.recyclerview.toMutableList
 import com.omgodse.notally.room.ListItem
 import com.omgodse.notally.test.assert
 import com.omgodse.notally.test.assertChildren
 import com.omgodse.notally.test.assertOrder
 import com.omgodse.notally.test.createListItem
+import com.omgodse.notally.test.find
 import com.omgodse.notally.test.printList
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -164,12 +164,12 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
-        val itemsBeforeDelete = items.toMutableList()
+        val deletedItems = items.find("A", "C")
 
         listManager.deleteCheckedItems()
 
         items.assertOrder("B", "E", "F")
-        (changeHistory.lookUp() as DeleteCheckedChange).assert(itemsBeforeDelete)
+        (changeHistory.lookUp() as DeleteCheckedChange).assert(deletedItems)
     }
 
     @Test
@@ -178,12 +178,11 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
-        val itemsBeforeDelete = items.toMutableList()
-
+        val deletedItems = items.find("A", "C")
         listManager.deleteCheckedItems()
 
         items.assertOrder("B", "E", "F")
-        (changeHistory.lookUp() as DeleteCheckedChange).assert(itemsBeforeDelete)
+        (changeHistory.lookUp() as DeleteCheckedChange).assert(deletedItems)
     }
 
     // endregion

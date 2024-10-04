@@ -4,19 +4,19 @@ import com.omgodse.notally.recyclerview.ListManager
 import com.omgodse.notally.room.ListItem
 
 class ListDeleteChange(
-    position: Int,
+    internal val sortingPosition: Int,
     internal val deletedItem: ListItem,
     private val listManager: ListManager,
-) : ListChange(position) {
+) : Change {
     override fun redo() {
-        listManager.delete(position, pushChange = false)
+        listManager.deleteById(deletedItem.id, pushChange = false)
     }
 
     override fun undo() {
-        listManager.add(position, deletedItem, pushChange = false)
+        listManager.add(sortingPosition, deletedItem, pushChange = false)
     }
 
     override fun toString(): String {
-        return "DeleteChange at $position"
+        return "DeleteChange id: ${deletedItem.id} sortingPosition: $sortingPosition deletedItem: $deletedItem"
     }
 }

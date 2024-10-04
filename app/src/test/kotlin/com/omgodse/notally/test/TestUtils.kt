@@ -10,6 +10,7 @@ import com.omgodse.notally.changehistory.ListIsChildChange
 import com.omgodse.notally.changehistory.ListMoveChange
 import com.omgodse.notally.recyclerview.ListItemSortedList
 import com.omgodse.notally.recyclerview.ListManager
+import com.omgodse.notally.recyclerview.find
 import com.omgodse.notally.recyclerview.toReadableString
 import com.omgodse.notally.room.ListItem
 import io.mockk.every
@@ -63,9 +64,19 @@ fun ListItemSortedList.printList(text: String? = null) {
     println("--------------")
 }
 
+fun ListItemSortedList.find(vararg bodies: String): List<ListItem> {
+    return bodies.map { body -> this.find { it.body == body }!! }
+}
+
 fun ListItemSortedList.assertOrder(vararg itemBodies: String) {
     itemBodies.forEachIndexed { position, s ->
         assertEquals("${this.toReadableString()}\nAt position: $position", s, get(position).body)
+    }
+}
+
+fun ListItemSortedList.assertIds(vararg itemIds: Int) {
+    itemIds.forEachIndexed { position, s ->
+        assertEquals("id", s, get(position).id)
     }
 }
 
@@ -99,16 +110,14 @@ fun ListMoveChange.assert(from: Int, to: Int, after: Int, itemBeforeMove: String
     assertEquals("itemBeforeMove", itemBeforeMove, this.itemBeforeMove.toString())
 }
 
-fun ListCheckedChange.assert(newValue: Boolean, position: Int, positionAfter: Int) {
+fun ListCheckedChange.assert(newValue: Boolean, itemId: Int) {
     assertEquals("checked", newValue, this.newValue)
-    assertEquals("position", position, this.position)
-    assertEquals("positionAfter", positionAfter, this.positionAfter)
+    assertEquals("itemId", itemId, this.itemId)
 }
 
-fun ListIsChildChange.assert(newValue: Boolean, position: Int, positionAfter: Int) {
+fun ListIsChildChange.assert(newValue: Boolean, position: Int) {
     assertEquals("isChild", newValue, this.newValue)
     assertEquals("position", position, this.position)
-    assertEquals("positionAfter", positionAfter, this.positionAfter)
 }
 
 fun ListAddChange.assert(position: Int, newItem: ListItem) {
@@ -116,21 +125,18 @@ fun ListAddChange.assert(position: Int, newItem: ListItem) {
     assertEquals("newItem", newItem, this.itemBeforeInsert)
 }
 
-fun ListDeleteChange.assert(position: Int, deletedItem: ListItem?) {
-    assertEquals("position", position, this.position)
+fun ListDeleteChange.assert(sortingPosition: Int, deletedItem: ListItem?) {
+    assertEquals("sortingPosition", sortingPosition, this.sortingPosition)
     assertEquals("deletedItem", deletedItem, this.deletedItem)
 }
 
-fun ChangeCheckedForAllChange.assert(
-    checked: Boolean,
-    changedPositions: Collection<Int>
-) {
+fun ChangeCheckedForAllChange.assert(checked: Boolean, changedPositions: Collection<Int>) {
     assertEquals("checked", checked, this.checked)
     assertEquals("changedIds", changedPositions, this.changedIds)
 }
 
 fun DeleteCheckedChange.assert(itemsBeforeDelete: List<ListItem>) {
-    assertEquals("itemsBeforeDelete", itemsBeforeDelete, this.itemsBeforeDelete)
+    assertEquals("itemsBeforeDelete", itemsBeforeDelete, this.deletedItems)
 }
 
 object MockitoHelper {

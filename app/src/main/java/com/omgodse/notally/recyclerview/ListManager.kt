@@ -14,7 +14,6 @@ import com.omgodse.notally.changehistory.ListDeleteChange
 import com.omgodse.notally.changehistory.ListEditTextChange
 import com.omgodse.notally.changehistory.ListIsChildChange
 import com.omgodse.notally.changehistory.ListMoveChange
-import com.omgodse.notally.miscellaneous.CheckedSorter
 import com.omgodse.notally.preferences.ListItemSorting
 import com.omgodse.notally.preferences.Preferences
 import com.omgodse.notally.recyclerview.viewholder.MakeListVH
@@ -40,6 +39,14 @@ class ListManager(
         item: ListItem = defaultNewItem(position),
         pushChange: Boolean = true,
     ) {
+        if (item.id == -1) {
+            item.id = nextItemId++
+        }
+        item.children.forEach {
+            if (it.id == -1) {
+                it.id = nextItemId++
+            }
+        }
         val itemBeforeInsert = item.clone() as ListItem
         items.beginBatchedUpdates()
         for ((idx, newItem) in (item + item.children).withIndex()) {
@@ -59,12 +66,10 @@ class ListManager(
             items.add(newItem, forceIsChild)
         }
         items.endBatchedUpdates()
-        //        sortAndUpdate()
-        //        items.updateAllChildren()
-        val positionAfterAdd = items.indexOf(item)
         if (pushChange) {
-            changeHistory.push(ListAddChange(position, positionAfterAdd, itemBeforeInsert, this))
+            changeHistory.push(ListAddChange(position, item.id, itemBeforeInsert, this))
         }
+        val positionAfterAdd = items.findById(item.id)!!.first
         recyclerView.post {
             val viewHolder =
                 recyclerView.findViewHolderForAdapterPosition(positionAfterAdd) as MakeListVH?
@@ -105,9 +110,19 @@ class ListManager(
             }
         }
         if (item != null && pushChange) {
-            changeHistory.push(ListDeleteChange(position, item, this))
+            changeHistory.push(ListDeleteChange(item.sortingPosition!!, item, this))
         }
         return item
+    }
+
+    fun deleteById(
+        itemId: Int,
+        force: Boolean = true,
+        childrenToDelete: List<ListItem>? = null,
+        pushChange: Boolean = true,
+        allowFocusChange: Boolean = true,
+    ): ListItem? {
+        return delete(items.findById(itemId)!!.first, force, childrenToDelete, pushChange, allowFocusChange)
     }
 
     /** @return position of the moved item afterwards */
@@ -164,8 +179,6 @@ class ListManager(
                 items.setIsChild(newPosition, true, true)
             } else if (newPosition == 0) {
                 items.setIsChild(newPosition, false)
-            } else {
-                //                items.updateAllChildren()
             }
         }
         if (pushChange) {
@@ -211,24 +224,28 @@ class ListManager(
     fun changeChecked(
         position: Int,
         checked: Boolean,
-        pushChange: Boolean = true,
-        recalcChildrenPositions: Boolean = false
-    ): Int {
+        pushChange: Boolean = true
+    ) {
         val item = items[position]
         if (item.checked == checked) {
-            return position
+            return
         }
-        //        if (checked) {
-        //            item.sortingPosition = position
-        //        }
         if (item.isChild) {
-            return changeCheckedForChild(checked, item, pushChange, position)
+            changeCheckedForChild(checked, item, pushChange, position)
+            return
         }
-        val positionAfter = items.setCheckedWithChildren(position, checked, recalcChildrenPositions)
+        items.setCheckedWithChildren(position, checked)
         if (pushChange) {
-            changeHistory.push(ListCheckedChange(checked, position, positionAfter, this))
+            changeHistory.push(ListCheckedChange(checked, item.id, this))
         }
-        return positionAfter
+    }
+
+    fun changeCheckedById(
+        id: Int,
+        checked: Boolean,
+        pushChange: Boolean = true,
+    ) {
+        changeChecked(items.findById(id)!!.first, checked, pushChange)
     }
 
     private fun changeCheckedForChild(
@@ -236,29 +253,26 @@ class ListManager(
         item: ListItem,
         pushChange: Boolean,
         position: Int,
-    ): Int {
+    ) {
         var changePushedByParent = false
         var actualPosition = position
+        val (parentPosition, parent) = items.findParent(item)!!
         if (!checked) {
-            val (parentPosition, parent) = items.findParent(item)!!
-            // If a child is being unchecked and the parent was checked, the parent gets unchecked too
+            // If a child is being unchecked and the parent was checked, the parent gets unchecked
+            // too
             if (parent.checked) {
-                val parentPositionAfter =
-                    items.setChecked(parentPosition, false, recalcChildrenPositions = true)
+                items.setChecked(parentPosition, false, recalcChildrenPositions = true)
                 actualPosition = items.findById(item.id)!!.first
-                if (pushChange) {
-                    changeHistory.push(
-                        ListCheckedChange(false, parentPosition, parentPositionAfter, this)
-                    )
-                    changePushedByParent = true
-                }
             }
         }
-        val positionAfter = items.setChecked(actualPosition, checked)
-        if (pushChange && !changePushedByParent) {
-            changeHistory.push(ListCheckedChange(checked, actualPosition, positionAfter, this))
+        items.setChecked(actualPosition, checked)
+        if (parent.children.areAllChecked() && !parent.checked) {
+            // TODO: also check parent!
+            items.setChecked(parentPosition, true, recalcChildrenPositions = true)
         }
-        return positionAfter
+        if (pushChange && !changePushedByParent) {
+            changeHistory.push(ListCheckedChange(checked, item.id, this))
+        }
     }
 
     fun changeCheckedForAll(checked: Boolean, pushChange: Boolean = true) {
@@ -267,46 +281,36 @@ class ListManager(
         items
             .reversed() // has to be reversed, otherwise the sorting is in the wrong order
             .forEachIndexed { position, item ->
-            if (!item.isChild) {
-                parentIds.add(item.id)
+                if (!item.isChild) {
+                    parentIds.add(item.id)
+                }
+                if (item.checked != checked) {
+                    changedIds.add(item.id)
+                }
             }
-            if (item.checked != checked) {
-                changedIds.add(item.id)
-            }
-        }
         parentIds.forEach {
             val (position, _) = items.findById(it)!!
-            changeChecked(position, checked, pushChange = false, recalcChildrenPositions = true)
+            changeChecked(position, checked, pushChange = false)
         }
         if (pushChange) {
-            changeHistory.push(
-                ChangeCheckedForAllChange(
-                    checked,
-                    changedIds,
-                    this,
-                )
-            )
+            changeHistory.push(ChangeCheckedForAllChange(checked, changedIds, this))
         }
     }
-
-    //    fun sortAndUpdate() {
-    //        items.sortAndUpdateItems(adapter = adapter)
-    //    }
 
     fun check(
         checked: Boolean,
         positions: Collection<Int>,
-        recalcParentPositions: Boolean = false
+        recalcChildrenPositions: Boolean = false,
     ): Pair<List<Int>, List<Int>> {
-        return items.setChecked(positions, checked, recalcParentPositions)
+        return items.setChecked(positions, checked, recalcChildrenPositions)
     }
 
     fun checkByIds(
         checked: Boolean,
         ids: Collection<Int>,
-        recalcParentPositions: Boolean = false
+        recalcChildrenPositions: Boolean = false,
     ): Pair<List<Int>, List<Int>> {
-        return check(checked, ids.map { items.findById(it)!!.first }, recalcParentPositions)
+        return check(checked, ids.map { items.findById(it)!!.first }, recalcChildrenPositions)
     }
 
     fun changeIsChild(position: Int, isChild: Boolean, pushChange: Boolean = true) {
@@ -330,15 +334,26 @@ class ListManager(
     }
 
     fun deleteCheckedItems(pushChange: Boolean = true) {
-        val itemsBeforeDelete = items.toMutableList()
-        updateList(items.filter { !it.checked }.toMutableList())
+        val itemsToDelete =
+            items.filter { it.checked }.map { it.clone() as ListItem }.sortedBy { it.isChild }
+        items.beginBatchedUpdates()
+        itemsToDelete
+            .reversed() // delete children first so sorting works properly
+            .forEach { items.deleteItem(it) }
+        val deletedItems =
+            itemsToDelete.toMutableList().filter { item ->
+                // If a parent with its children was deleted, remove the children item
+                // since DeleteCheckedChange uses listManager.add, which already adds the children
+                // from
+                // parent.children list
+                !(item.isChild && itemsToDelete.any { parent ->
+                    parent.children.any { it.id == item.id }
+                })
+            }
+        items.endBatchedUpdates()
         if (pushChange) {
-            changeHistory.push(DeleteCheckedChange(itemsBeforeDelete, this))
+            changeHistory.push(DeleteCheckedChange(deletedItems, this))
         }
-    }
-
-    fun updateList(newList: MutableList<ListItem>) {
-        items.replaceAll(newList)
     }
 
     fun initList(items: ListItemSortedList) {
@@ -381,18 +396,7 @@ class ListManager(
         return isChildOf(items[otherPosition])
     }
 
-    //    private fun MutableList<ListItem>.sortAndUpdateItems(
-    //        newList: MutableList<ListItem> = items,
-    //        initSortingPositions: Boolean = false,
-    //        adapter: RecyclerView.Adapter<*>,
-    //    ) {
-    //        val sortedList =
-    //            SORTERS[preferences.listItemSorting.value]?.sort(newList, initSortingPositions)
-    //        this.updateList(sortedList ?: newList.toMutableList(), adapter)
-    //    }
-
     companion object {
-        private val SORTERS = mapOf(ListItemSorting.autoSortByChecked to CheckedSorter())
         private const val TAG = "ListManager"
     }
 }

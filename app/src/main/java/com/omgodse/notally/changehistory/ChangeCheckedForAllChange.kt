@@ -8,11 +8,11 @@ class ChangeCheckedForAllChange(
     private val listManager: ListManager,
 ) : Change {
     override fun redo() {
-        listManager.checkByIds(checked, changedIds)
+        listManager.checkByIds(checked, changedIds, true)
     }
 
     override fun undo() {
-        listManager.checkByIds(!checked, changedIds)
+        listManager.checkByIds(!checked, changedIds, true)
     }
 
     override fun toString(): String {
