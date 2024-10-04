@@ -339,6 +339,7 @@ class ListManager(
     fun initList(items: ListItemSortedList) {
         this.items = items
         this.items.forEachIndexed { index, item -> item.id = index }
+        this.items.initializeChildren()
         nextItemId = this.items.size()
         Log.d(TAG, "initList:\n${this.items.toReadableString()}")
     }
@@ -375,6 +376,7 @@ class ListManager(
             when {
                 position == 0 -> false
                 (position - 1).isBeforeChildItemOfOtherParent -> true
+                newItem.isChild && items.findParent(newItem) == null -> true
                 else -> null
             }
         items.add(newItem, forceIsChild)

@@ -85,6 +85,14 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         }
     }
 
+    fun initializeChildren() {
+        this.forEach {
+            if (it.isChild) {
+                updateChildInParent(it.order!!, it)
+            }
+        }
+    }
+
     private fun updateChildInParent(position: Int, item: ListItem) {
         var childIndex: Int? = null
         var parentInfo = findParent(item)

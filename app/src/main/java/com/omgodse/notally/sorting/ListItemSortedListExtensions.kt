@@ -42,7 +42,8 @@ fun ListItemSortedList.moveItemRange(
                 movedItem
             }
     itemsToMove
-        .reversed() // start with children on bottom
+        //        .reversed() // TODO: for test this is needed, but in real app use this is wrong ->
+        // faulty test?
         .forEach { listItem -> this.updateItemAt(this.findById(listItem.id)!!.first, listItem) }
     itemsToMove.forEach {
         if (forceIsChild != null) {

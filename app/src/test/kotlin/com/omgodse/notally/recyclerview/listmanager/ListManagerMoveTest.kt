@@ -290,7 +290,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
         val newPosition = listManager.simulateDrag(0, items.lastIndex)
         items.printList("After move 0 to ${items.lastIndex}")
-
+        // TODO: test is faulty?
         items.assertOrder("D", "E", "F", "A", "B", "C")
         "A".assertChildren("B", "C")
         "D".assertChildren()
