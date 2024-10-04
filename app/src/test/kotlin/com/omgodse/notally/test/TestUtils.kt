@@ -123,16 +123,10 @@ fun ListDeleteChange.assert(position: Int, deletedItem: ListItem?) {
 
 fun ChangeCheckedForAllChange.assert(
     checked: Boolean,
-    changedPositions: Collection<Int>,
-    changedPositionsAfterSort: Collection<Int>,
+    changedPositions: Collection<Int>
 ) {
     assertEquals("checked", checked, this.checked)
-    assertEquals("changedPositions", changedPositions, this.changedPositions)
-    assertEquals(
-        "changedPositionsAfterSort",
-        changedPositionsAfterSort,
-        this.changedPositionsAfterSort,
-    )
+    assertEquals("changedIds", changedPositions, this.changedIds)
 }
 
 fun DeleteCheckedChange.assert(itemsBeforeDelete: List<ListItem>) {

@@ -263,38 +263,26 @@ class ListManager(
 
     fun changeCheckedForAll(checked: Boolean, pushChange: Boolean = true) {
         val parentIds = mutableListOf<Int>()
-        val changedPositions = mutableListOf<Int>()
-        items.reversed().forEachIndexed { position, item ->
+        val changedIds = mutableListOf<Int>()
+        items
+            .reversed() // has to be reversed, otherwise the sorting is in the wrong order
+            .forEachIndexed { position, item ->
             if (!item.isChild) {
                 parentIds.add(item.id)
-                changedPositions.add(position)
-                changedPositions.addAll(item.children.indices.map { position + it + 1 })
+            }
+            if (item.checked != checked) {
+                changedIds.add(item.id)
             }
         }
         parentIds.forEach {
             val (position, _) = items.findById(it)!!
-            val newPosition =
-                changeChecked(position, checked, pushChange = false, recalcChildrenPositions = true)
-//            changedPositionsAfterSort.add(newPosition)
+            changeChecked(position, checked, pushChange = false, recalcChildrenPositions = true)
         }
-        val changedPositionsAfterSort = mutableListOf<Int>()
-        parentIds.forEach {
-            val (position, parent) = items.findById(it)!!
-            changedPositionsAfterSort.add(position)
-            changedPositionsAfterSort.addAll(parent.children.indices.map { position + it + 1 })
-        }
-//        val (changedPositions, changedPositionsAfterSort) = check(checked, positionsInOrder, recalcParentPositions = true)
-//        val (changedPositions, changedPositionsAfterSort) = check(
-//            checked,
-//            items.indices.toList(),
-//            recalcParentPositions = false
-//        )
         if (pushChange) {
             changeHistory.push(
                 ChangeCheckedForAllChange(
                     checked,
-                    changedPositions,
-                    changedPositionsAfterSort,
+                    changedIds,
                     this,
                 )
             )
@@ -311,24 +299,14 @@ class ListManager(
         recalcParentPositions: Boolean = false
     ): Pair<List<Int>, List<Int>> {
         return items.setChecked(positions, checked, recalcParentPositions)
-        //        val changedPositions = mutableListOf<Int>()
-        //        items.beginBatchedUpdates()
-        //        positions.forEach {
-        //            val item = items[it]
-        //            if (item.checked != checked) {
-        //                changedPositions.add(it)
-        ////                items.setCheckedAndNotify(it, checked)
-        //                if (item.checked != checked) {
-        //                    item.checked = checked
-        ////                    this.updateItemAt(position, item)
-        //                }
-        //            }
-        //        }
-        //        val changedItems = changedPositions.map { items[it] }.toMutableList()
-        //        items.endBatchedUpdates()
-        //        val changedPositionsAfterSort = changedItems.map { items.indexOf(it)
-        // }.toMutableList()
-        //        return Pair(changedPositions, changedPositionsAfterSort)
+    }
+
+    fun checkByIds(
+        checked: Boolean,
+        ids: Collection<Int>,
+        recalcParentPositions: Boolean = false
+    ): Pair<List<Int>, List<Int>> {
+        return check(checked, ids.map { items.findById(it)!!.first }, recalcParentPositions)
     }
 
     fun changeIsChild(position: Int, isChild: Boolean, pushChange: Boolean = true) {

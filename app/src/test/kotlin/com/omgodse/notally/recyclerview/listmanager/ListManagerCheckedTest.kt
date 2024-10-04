@@ -184,11 +184,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(true, true, true, true, true, true)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            true,
-            listOf(0, 1, 2, 3, 4, 5), // TODO: optimize so that only unchecked items are changed (here: listOf(0, 2, 4, 5))
-            listOf(5, 4, 3, 2, 1, 0),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(true, listOf(5, 4, 2, 0))
     }
 
     @Test
@@ -202,11 +198,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(false, false, false, false, false, false)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            false,
-            listOf(0, 1, 2, 4, 5),
-            listOf(5, 4, 3, 1, 0),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(false, listOf(3, 2, 1))
     }
 
     @Test
@@ -220,11 +212,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(true, true, true, true, true, true)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            true,
-            listOf(1, 2, 3, 4, 5),
-            listOf(4, 3, 5, 4, 1),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(true, listOf(5, 4, 1))
     }
 
     @Test
@@ -238,11 +226,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(false, false, false, false, false, false)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            false,
-            listOf(1, 2, 3, 4, 5),
-            listOf(1, 0, 5, 4, 1),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(false, listOf(3, 2, 0))
     }
 
     // endregion

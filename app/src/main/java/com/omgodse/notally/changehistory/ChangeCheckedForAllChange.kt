@@ -4,24 +4,18 @@ import com.omgodse.notally.recyclerview.ListManager
 
 class ChangeCheckedForAllChange(
     internal val checked: Boolean,
-    internal val changedPositions: Collection<Int>,
-    internal val changedPositionsAfterSort: Collection<Int>,
+    internal val changedIds: Collection<Int>,
     private val listManager: ListManager,
 ) : Change {
     override fun redo() {
-        listManager.check(checked, changedPositions)
-//        listManager.changeCheckedForAll(checked,pushChange = false)
+        listManager.checkByIds(checked, changedIds)
     }
 
     override fun undo() {
-        listManager.check(!checked, changedPositionsAfterSort)
+        listManager.checkByIds(!checked, changedIds)
     }
 
     override fun toString(): String {
-        return "ChangeCheckedForAllChange checked: $checked changedPositions: ${
-            changedPositions.joinToString(
-                ","
-            )
-        } changedPositionsAfterSort: ${changedPositionsAfterSort.joinToString(",")}"
+        return "ChangeCheckedForAllChange checked: $checked changedIds: ${changedIds.joinToString(",")}"
     }
 }
