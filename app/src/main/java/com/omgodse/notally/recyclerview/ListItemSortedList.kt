@@ -9,7 +9,7 @@ class ListItemSortedList(callback: Callback<ListItem>) :
     override fun updateItemAt(index: Int, item: ListItem?) {
         updateChildStatus(item, index)
         super.updateItemAt(index, item)
-        if(item?.isChild == false){
+        if (item?.isChild == false) {
             item.children = item.children.map { findById(it.id)!!.second }.toMutableList()
         }
     }
@@ -57,7 +57,7 @@ class ListItemSortedList(callback: Callback<ListItem>) :
                 item.isChild = isChild
             }
             if (item.isChild) {
-                updateChildInParent(item.sortingPosition!!, item)
+                updateChildInParent(item.order!!, item)
             }
         }
         add(item) // TODO: can skip the isChild update in other method

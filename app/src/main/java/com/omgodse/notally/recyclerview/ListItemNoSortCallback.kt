@@ -12,7 +12,7 @@ class ListItemNoSortCallback(adapter: RecyclerView.Adapter<*>?) :
             item1 == null && item2 == null -> 0
             item1 == null && item2 != null -> -1
             item1 != null && item2 == null -> 1
-            else -> item1!!.sortingPosition!!.compareTo(item2!!.sortingPosition!!)
+            else -> item1!!.order!!.compareTo(item2!!.order!!)
         }
     }
 

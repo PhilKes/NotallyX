@@ -65,12 +65,12 @@ open class ListManagerTestBase {
             sortCallback.setList(items)
         }
         items.addAll(
-            createListItem("A", id = 0, sortingPosition = 0),
-            createListItem("B", id = 1, sortingPosition = 1),
-            createListItem("C", id = 2, sortingPosition = 2),
-            createListItem("D", id = 3, sortingPosition = 3),
-            createListItem("E", id = 4, sortingPosition = 4),
-            createListItem("F", id = 5, sortingPosition = 5),
+            createListItem("A", id = 0, order = 0),
+            createListItem("B", id = 1, order = 1),
+            createListItem("C", id = 2, order = 2),
+            createListItem("D", id = 3, order = 3),
+            createListItem("E", id = 4, order = 4),
+            createListItem("F", id = 5, order = 5),
         )
         listManager.initList(items)
         `when`(preferences.listItemSorting).thenReturn(BetterLiveData(sorting))
@@ -97,7 +97,7 @@ open class ListManagerTestBase {
     }
 
     protected fun String.assertSortingPosition(expected: Int) {
-        assertEquals("sortingPosition", expected, items.find { it.body == this }!!.sortingPosition)
+        assertEquals("order", expected, items.find { it.body == this }!!.order)
     }
 
     protected fun String.assertPosition(expected: Int) {

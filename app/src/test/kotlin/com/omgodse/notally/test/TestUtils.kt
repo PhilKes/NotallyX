@@ -23,11 +23,11 @@ fun createListItem(
     body: String,
     checked: Boolean = false,
     isChild: Boolean = false,
-    sortingPosition: Int? = null,
+    order: Int? = null,
     children: MutableList<ListItem> = mutableListOf(),
     id: Int = -1,
 ): ListItem {
-    return ListItem(body, checked, isChild, sortingPosition, children, id)
+    return ListItem(body, checked, isChild, order, children, id)
 }
 
 fun mockAndroidLog() {
@@ -75,9 +75,7 @@ fun ListItemSortedList.assertOrder(vararg itemBodies: String) {
 }
 
 fun ListItemSortedList.assertIds(vararg itemIds: Int) {
-    itemIds.forEachIndexed { position, s ->
-        assertEquals("id", s, get(position).id)
-    }
+    itemIds.forEachIndexed { position, s -> assertEquals("id", s, get(position).id) }
 }
 
 fun ListItemSortedList.assertChecked(vararg checked: Boolean) {
@@ -125,8 +123,8 @@ fun ListAddChange.assert(position: Int, newItem: ListItem) {
     assertEquals("newItem", newItem, this.itemBeforeInsert)
 }
 
-fun ListDeleteChange.assert(sortingPosition: Int, deletedItem: ListItem?) {
-    assertEquals("sortingPosition", sortingPosition, this.sortingPosition)
+fun ListDeleteChange.assert(order: Int, deletedItem: ListItem?) {
+    assertEquals("order", order, this.itemOrder)
     assertEquals("deletedItem", deletedItem, this.deletedItem)
 }
 

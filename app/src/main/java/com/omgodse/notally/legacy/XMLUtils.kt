@@ -119,7 +119,7 @@ object XMLUtils {
         var body = String()
         var checked = false
         var isChild = false
-        var sortingPosition: Int? = null
+        var order: Int? = null
 
         // TODO: migration required?
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
@@ -128,7 +128,7 @@ object XMLUtils {
                     "text" -> body = parser.nextText()
                     "checked" -> checked = parser.nextText()?.toBoolean() ?: false
                     "isChild" -> isChild = parser.nextText()?.toBoolean() ?: false
-                    "sortingPosition" -> sortingPosition = parser.nextText()?.toInt()
+                    "order" -> order = parser.nextText()?.toInt()
                 }
             } else if (parser.eventType == XmlPullParser.END_TAG) {
                 if (parser.name == rootTag) {
@@ -137,7 +137,7 @@ object XMLUtils {
             }
         }
 
-        return ListItem(body, checked, isChild, sortingPosition, mutableListOf())
+        return ListItem(body, checked, isChild, order, mutableListOf())
     }
 
     private fun parseSpan(parser: XmlPullParser): SpanRepresentation {

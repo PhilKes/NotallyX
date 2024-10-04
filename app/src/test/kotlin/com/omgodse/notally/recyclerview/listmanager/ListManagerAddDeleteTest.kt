@@ -56,7 +56,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `add checked item with correct sortingPosition`() {
+    fun `add checked item with correct order`() {
         setSorting(ListItemSorting.noAutoSort)
         val itemToAdd = ListItem("Test", true, false, null, mutableListOf())
         val newItem = itemToAdd.clone() as ListItem
@@ -70,7 +70,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `add checked item with correct sortingPosition when auto-sort enabled`() {
+    fun `add checked item with correct order when auto-sort enabled`() {
         setSorting(ListItemSorting.autoSortByChecked)
         val itemToAdd = ListItem("Test", true, false, null, mutableListOf())
         val newItem = itemToAdd.clone() as ListItem

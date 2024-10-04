@@ -23,7 +23,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `changeChecked unchecks item and updates sortingPosition`() {
+    fun `changeChecked unchecks item and updates order`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeChecked(0, true)
         listManager.changeChecked(0, checked = false, pushChange = true)

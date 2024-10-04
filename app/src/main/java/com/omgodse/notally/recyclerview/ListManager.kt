@@ -54,8 +54,8 @@ class ListManager(
             if (newItem.id == -1) {
                 newItem.id = nextItemId++
             }
-            items.addToSortingPositions(insertPosition until items.size(), 1)
-            newItem.sortingPosition = insertPosition
+            items.shiftItemOrders(insertPosition until items.size(), 1)
+            newItem.order = insertPosition
 
             val forceIsChild =
                 when {
@@ -110,7 +110,7 @@ class ListManager(
             }
         }
         if (item != null && pushChange) {
-            changeHistory.push(ListDeleteChange(item.sortingPosition!!, item, this))
+            changeHistory.push(ListDeleteChange(item.order!!, item, this))
         }
         return item
     }
@@ -122,7 +122,13 @@ class ListManager(
         pushChange: Boolean = true,
         allowFocusChange: Boolean = true,
     ): ListItem? {
-        return delete(items.findById(itemId)!!.first, force, childrenToDelete, pushChange, allowFocusChange)
+        return delete(
+            items.findById(itemId)!!.first,
+            force,
+            childrenToDelete,
+            pushChange,
+            allowFocusChange,
+        )
     }
 
     /** @return position of the moved item afterwards */
@@ -221,11 +227,7 @@ class ListManager(
         }
     }
 
-    fun changeChecked(
-        position: Int,
-        checked: Boolean,
-        pushChange: Boolean = true
-    ) {
+    fun changeChecked(position: Int, checked: Boolean, pushChange: Boolean = true) {
         val item = items[position]
         if (item.checked == checked) {
             return
@@ -240,11 +242,7 @@ class ListManager(
         }
     }
 
-    fun changeCheckedById(
-        id: Int,
-        checked: Boolean,
-        pushChange: Boolean = true,
-    ) {
+    fun changeCheckedById(id: Int, checked: Boolean, pushChange: Boolean = true) {
         changeChecked(items.findById(id)!!.first, checked, pushChange)
     }
 
@@ -346,9 +344,8 @@ class ListManager(
                 // since DeleteCheckedChange uses listManager.add, which already adds the children
                 // from
                 // parent.children list
-                !(item.isChild && itemsToDelete.any { parent ->
-                    parent.children.any { it.id == item.id }
-                })
+                !(item.isChild &&
+                    itemsToDelete.any { parent -> parent.children.any { it.id == item.id } })
             }
         items.endBatchedUpdates()
         if (pushChange) {

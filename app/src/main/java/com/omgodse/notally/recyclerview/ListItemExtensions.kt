@@ -4,10 +4,10 @@ import androidx.recyclerview.widget.SortedList
 import com.omgodse.notally.room.ListItem
 
 fun ListItemSortedList.deleteItem(item: ListItem) {
-    val itemsBySortPosition = this.toMutableList().sortedBy { it.sortingPosition }
+    val itemsBySortPosition = this.toMutableList().sortedBy { it.order }
     val positionOfDeletedItem = itemsBySortPosition.indexOfFirst { it.id == item.id }
     for (i in positionOfDeletedItem + 1..itemsBySortPosition.lastIndex) {
-        itemsBySortPosition[i].sortingPosition = itemsBySortPosition[i].sortingPosition!! - 1
+        itemsBySortPosition[i].order = itemsBySortPosition[i].order!! - 1
     }
     val position = this.findById(item.id)!!.first
     this.removeItemAt(position)
@@ -26,16 +26,16 @@ fun ListItemSortedList.moveItemRange(
     val insertPosition = if (fromIndex < toIndex) toIndex - itemCount + 1 else toIndex
 
     if (fromIndex < toIndex) {
-        this.addToSortingPositions(fromIndex + itemCount until toIndex + 1, -itemCount)
+        this.shiftItemOrders(fromIndex + itemCount until toIndex + 1, -itemCount)
     } else {
-        this.addToSortingPositions(toIndex until fromIndex, itemCount)
+        this.shiftItemOrders(toIndex until fromIndex, itemCount)
     }
 
     val itemsToMove = (0 until itemCount).map { this.removeItemAt(fromIndex) }
 
     itemsToMove.forEachIndexed { index, item ->
         val movedItem = item.clone() as ListItem
-        movedItem.sortingPosition = insertPosition + index
+        movedItem.order = insertPosition + index
         this.add(movedItem, forceIsChild)
     }
 
@@ -52,16 +52,16 @@ fun ListItemSortedList.deleteItem(
     val item = this[position]
     val deletedItem = this[position].clone() as ListItem
     val children = childrenToDelete ?: item.children
-    this.addToSortingPositions(position + children.size until this.size(), -(children.size + 1))
+    this.shiftItemOrders(position + children.size until this.size(), -(children.size + 1))
     (item + children).indices.forEach { this.removeItemAt(position) }
     this.endBatchedUpdates()
     return deletedItem
 }
 
-fun ListItemSortedList.addToSortingPositions(positionRange: IntRange, valueToAdd: Int) {
+fun ListItemSortedList.shiftItemOrders(positionRange: IntRange, valueToAdd: Int) {
     this.forEach {
-        if (it.sortingPosition!! in positionRange) {
-            it.sortingPosition = it.sortingPosition!! + valueToAdd
+        if (it.order!! in positionRange) {
+            it.order = it.order!! + valueToAdd
         }
     }
 }
@@ -175,9 +175,9 @@ fun ListItemSortedList.setChecked(
     val (_, changedPositionsAfterSort) = this.setChecked(listOf(position), checked, false)
     if (recalcChildrenPositions) {
         val children = if (checked) item.children.reversed() else item.children
-//        children.forEach { child ->
-//            this.recalculatePositionOfItemAt(this.findById(child.id)!!.first)
-//        }
+        //        children.forEach { child ->
+        //            this.recalculatePositionOfItemAt(this.findById(child.id)!!.first)
+        //        }
         recalcPositions(children.map { it.id })
     }
     //    this.endBatchedUpdates()
@@ -208,17 +208,14 @@ fun ListItemSortedList.setChecked(
  *
  * @return The position of the checked item afterwards
  */
-fun ListItemSortedList.setCheckedWithChildren(
-    position: Int,
-    checked: Boolean
-): Int {
+fun ListItemSortedList.setCheckedWithChildren(position: Int, checked: Boolean): Int {
     val parent = this[position]
-    val positionsWithChildren = (position..position + parent.children.size)
-        .reversed() // children have to be checked first for correct sorting
-        .toList()
+    val positionsWithChildren =
+        (position..position + parent.children.size)
+            .reversed() // children have to be checked first for correct sorting
+            .toList()
 
-    val (_, changedPositionsAfterSort) =
-        this.setChecked(positionsWithChildren, checked, true)
+    val (_, changedPositionsAfterSort) = this.setChecked(positionsWithChildren, checked, true)
     return changedPositionsAfterSort.reversed()[0]
 }
 
@@ -240,13 +237,11 @@ operator fun ListItem.plus(list: List<ListItem>): List<ListItem> {
 }
 
 fun ListItemSortedList.toReadableString(): String {
-    return map { "${it.toString()} sortingPosition: ${it.sortingPosition} id: ${it.id}" }
-        .joinToString("\n")
+    return map { "${it.toString()} order: ${it.order} id: ${it.id}" }.joinToString("\n")
 }
 
 fun Collection<ListItem>.toReadableString(): String {
-    return map { "${it.toString()} uncheckedPos: ${it.sortingPosition} id: ${it.id}" }
-        .joinToString("\n")
+    return map { "${it.toString()} uncheckedPos: ${it.order} id: ${it.id}" }.joinToString("\n")
 }
 
 fun ListItemSortedList.findParent(childItem: ListItem): Pair<Int, ListItem>? {
@@ -276,17 +271,19 @@ private fun ListItemSortedList.updatePositions(
     changedPositions.forEach {
         val updatedItem = updatedItems[it]
         val newPosition = this.indexOfFirst { item -> item.id == updatedItem.id }!!
-        if (!updatedItem.isChild){
-            idsOfChildren.addAll(updatedItem.children
-                .reversed() // start recalculations from the lowest child upwards
-                .map { it.id })
+        if (!updatedItem.isChild) {
+            idsOfChildren.addAll(
+                updatedItem.children
+                    .reversed() // start recalculations from the lowest child upwards
+                    .map { it.id }
+            )
         }
         this.updateItemAt(newPosition, updatedItem)
     }
     if (recalcChildrenPositions) {
-//        idsOfChildren.forEach { childId ->
-//            this.recalculatePositionOfItemAt(this.findById(childId)!!.first)
-//        }
+        //        idsOfChildren.forEach { childId ->
+        //            this.recalculatePositionOfItemAt(this.findById(childId)!!.first)
+        //        }
         recalcPositions(idsOfChildren)
     }
 
@@ -299,7 +296,5 @@ private fun ListItemSortedList.updatePositions(
 }
 
 fun ListItemSortedList.recalcPositions(itemIds: Collection<Int>) {
-    itemIds.forEach { id ->
-        this.recalculatePositionOfItemAt(this.findById(id)!!.first)
-    }
+    itemIds.forEach { id -> this.recalculatePositionOfItemAt(this.findById(id)!!.first) }
 }

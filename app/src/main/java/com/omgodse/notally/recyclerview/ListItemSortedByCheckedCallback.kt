@@ -31,7 +31,7 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
                 val parent1 = items.findParent(item1)!!.second
                 val parent2 = items.findParent(item2)!!.second
                 if (parent1.id == parent2.id) {
-                    return item1.sortingPosition!!.compareTo(item2.sortingPosition!!)
+                    return item1.order!!.compareTo(item2.order!!)
                 }
                 return compare(parent1, parent2)
             }
@@ -71,11 +71,10 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
             item1.isChild && !item2.isChild && item2.checked -> -1
             item1.isChild && !item2.isChild && !item2.checked -> 1
 
-            item1.checked == item2.checked ->
-                item1.sortingPosition!!.compareTo(item2!!.sortingPosition!!)
+            item1.checked == item2.checked -> item1.order!!.compareTo(item2!!.order!!)
 
             //            item1.isChild && item2.isChild ->
-            // item1.sortingPosition!!.compareTo(item2!!.sortingPosition!!)
+            // item1.order!!.compareTo(item2!!.order!!)
 
             // if a parent is compared with a children compare the 2 parents instead
             //            item1!!.isChild && !item2!!.isChild -> {

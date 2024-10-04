@@ -13,7 +13,7 @@ class DeleteCheckedChange(
     }
 
     override fun undo() {
-        deletedItems.forEach { listManager.add(it.sortingPosition!!, it) }
+        deletedItems.forEach { listManager.add(it.order!!, it) }
     }
 
     override fun toString(): String {
