@@ -3,9 +3,9 @@ package com.omgodse.notally.legacy
 import android.app.Application
 import android.content.Context
 import android.content.SharedPreferences
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Folder
-import com.omgodse.notally.room.Label
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Folder
+import com.omgodse.notally.model.Label
 import java.io.File
 
 // Backwards compatibility from v3.2 to v3.3

@@ -21,9 +21,9 @@ import com.omgodse.notally.databinding.DialogInputBinding
 import com.omgodse.notally.databinding.FragmentNotesBinding
 import com.omgodse.notally.miscellaneous.Constants
 import com.omgodse.notally.miscellaneous.add
+import com.omgodse.notally.model.Label
 import com.omgodse.notally.recyclerview.ItemListener
 import com.omgodse.notally.recyclerview.adapter.LabelAdapter
-import com.omgodse.notally.room.Label
 import com.omgodse.notally.viewmodels.BaseNoteModel
 
 class Labels : Fragment(), ItemListener {

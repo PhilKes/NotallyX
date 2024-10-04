@@ -17,7 +17,7 @@ import com.omgodse.notally.audio.LocalBinder
 import com.omgodse.notally.databinding.ActivityPlayAudioBinding
 import com.omgodse.notally.miscellaneous.IO
 import com.omgodse.notally.miscellaneous.add
-import com.omgodse.notally.room.Audio
+import com.omgodse.notally.model.Audio
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

@@ -4,8 +4,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.omgodse.notally.databinding.RecyclerImageBinding
+import com.omgodse.notally.model.Image
 import com.omgodse.notally.recyclerview.viewholder.ImageVH
-import com.omgodse.notally.room.Image
 import java.io.File
 
 class ImageAdapter(private val mediaRoot: File?, val items: ArrayList<Image>) :

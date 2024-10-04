@@ -1,12 +1,12 @@
 package com.omgodse.notally.legacy
 
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Color
-import com.omgodse.notally.room.Folder
-import com.omgodse.notally.room.Label
-import com.omgodse.notally.room.ListItem
-import com.omgodse.notally.room.SpanRepresentation
-import com.omgodse.notally.room.Type
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.Folder
+import com.omgodse.notally.model.Label
+import com.omgodse.notally.model.ListItem
+import com.omgodse.notally.model.SpanRepresentation
+import com.omgodse.notally.model.Type
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream

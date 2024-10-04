@@ -13,8 +13,8 @@ import com.omgodse.notally.activities.ConfigureWidget
 import com.omgodse.notally.activities.MakeList
 import com.omgodse.notally.activities.TakeNote
 import com.omgodse.notally.miscellaneous.Constants
+import com.omgodse.notally.model.NotallyDatabase
 import com.omgodse.notally.preferences.Preferences
-import com.omgodse.notally.room.NotallyDatabase
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope

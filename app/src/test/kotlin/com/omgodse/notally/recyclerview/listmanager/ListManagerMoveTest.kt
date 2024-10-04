@@ -2,7 +2,7 @@ package com.omgodse.notally.recyclerview.listmanager
 
 import com.omgodse.notally.changehistory.ListMoveChange
 import com.omgodse.notally.preferences.ListItemSorting
-import com.omgodse.notally.recyclerview.lastIndex
+import com.omgodse.notally.sorting.lastIndex
 import com.omgodse.notally.test.assert
 import com.omgodse.notally.test.assertOrder
 import com.omgodse.notally.test.createListItem
@@ -145,27 +145,27 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     // endregion
 
-    // region revertMove
+    // region undoMove
 
     @Test
-    fun `revertMove parent without children`() {
+    fun `undoMove parent without children`() {
         setSorting(ListItemSorting.noAutoSort)
         val newPosition = listManager.move(1, 4)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
-        listManager.revertMove(newPosition, 1, itemBeforeMove)
+        listManager.undoMove(newPosition, 1, itemBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
     }
 
     @Test
-    fun `revertMove parent with children into other parent`() {
+    fun `undoMove parent with children into other parent`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(2, true, false)
         val newPosition = listManager.move(1, 3)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
-        listManager.revertMove(newPosition, 1, itemBeforeMove)
+        listManager.undoMove(newPosition, 1, itemBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "B".assertChildren("C")
@@ -173,7 +173,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `revertMove move parent with children to bottom`() {
+    fun `undoMove move parent with children to bottom`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
@@ -181,7 +181,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("After move 0 to ${items.lastIndex}")
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
-        listManager.revertMove(newPosition, 0, itemBeforeMove)
+        listManager.undoMove(newPosition, 0, itemBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "A".assertChildren("B", "C")
@@ -189,7 +189,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `revertMove parent with children to top`() {
+    fun `undoMove parent with children to top`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
@@ -198,7 +198,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("After move 3 to 0")
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
-        listManager.revertMove(newPosition, 3, itemBeforeMove)
+        listManager.undoMove(newPosition, 3, itemBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "A".assertChildren("B")
@@ -206,13 +206,13 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `revertMove child to other parent`() {
+    fun `undoMove child to other parent`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(3, true, false)
         val newPosition = listManager.move(3, 1)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
-        listManager.revertMove(newPosition, 3, itemBeforeMove)
+        listManager.undoMove(newPosition, 3, itemBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "C".assertChildren("D")
@@ -220,7 +220,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `revertMove child above other child`() {
+    fun `undoMove child above other child`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
@@ -230,20 +230,20 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("After move 5 to 3")
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
-        listManager.revertMove(newPosition, 5, itemBeforeMove)
+        listManager.undoMove(newPosition, 5, itemBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "C".assertChildren("D", "E", "F")
     }
 
     @Test
-    fun `revertMove child to top`() {
+    fun `undoMove child to top`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(3, true, false)
         val newPosition = listManager.move(3, 0)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
-        listManager.revertMove(newPosition, 3, itemBeforeMove)
+        listManager.undoMove(newPosition, 3, itemBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "C".assertChildren("D")

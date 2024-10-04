@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.model.ListItem
 
 /** ItemTouchHelper.Callback that allows dragging ListItem with its children. */
 class DragCallback(private val elevation: Float, private val listManager: ListManager) :
@@ -32,6 +32,9 @@ class DragCallback(private val elevation: Float, private val listManager: ListMa
     override fun onMove(view: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
         val from = viewHolder.adapterPosition
         val to = target.adapterPosition
+        if(from == -1 || to == -1){
+            return false
+        }
         if (positionFrom == null) {
             draggedItem = listManager.getItem(from).clone() as ListItem
         }

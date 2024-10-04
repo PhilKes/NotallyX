@@ -8,11 +8,11 @@ import com.omgodse.notally.changehistory.ListCheckedChange
 import com.omgodse.notally.changehistory.ListDeleteChange
 import com.omgodse.notally.changehistory.ListIsChildChange
 import com.omgodse.notally.changehistory.ListMoveChange
-import com.omgodse.notally.recyclerview.ListItemSortedList
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.recyclerview.find
-import com.omgodse.notally.recyclerview.toReadableString
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.sorting.ListItemSortedList
+import com.omgodse.notally.sorting.find
+import com.omgodse.notally.sorting.toReadableString
 import io.mockk.every
 import io.mockk.mockkStatic
 import org.junit.Assert.assertEquals

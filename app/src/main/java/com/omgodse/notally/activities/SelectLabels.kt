@@ -13,8 +13,8 @@ import com.omgodse.notally.R
 import com.omgodse.notally.databinding.ActivityLabelBinding
 import com.omgodse.notally.databinding.DialogInputBinding
 import com.omgodse.notally.miscellaneous.add
+import com.omgodse.notally.model.Label
 import com.omgodse.notally.recyclerview.adapter.SelectableLabelAdapter
-import com.omgodse.notally.room.Label
 import com.omgodse.notally.viewmodels.LabelModel
 
 class SelectLabels : AppCompatActivity() {

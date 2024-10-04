@@ -9,10 +9,10 @@ import androidx.work.WorkerParameters
 import com.omgodse.notally.miscellaneous.Export
 import com.omgodse.notally.miscellaneous.IO
 import com.omgodse.notally.miscellaneous.Operations
+import com.omgodse.notally.model.Converters
+import com.omgodse.notally.model.NotallyDatabase
 import com.omgodse.notally.preferences.AutoBackup
 import com.omgodse.notally.preferences.Preferences
-import com.omgodse.notally.room.Converters
-import com.omgodse.notally.room.NotallyDatabase
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.zip.ZipOutputStream

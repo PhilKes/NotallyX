@@ -1,11 +1,11 @@
-package com.omgodse.notally.room.dao
+package com.omgodse.notally.model.dao
 
 import androidx.room.Dao
 import androidx.room.Transaction
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Label
-import com.omgodse.notally.room.LabelsInBaseNote
-import com.omgodse.notally.room.NotallyDatabase
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Label
+import com.omgodse.notally.model.LabelsInBaseNote
+import com.omgodse.notally.model.NotallyDatabase
 
 @Dao
 abstract class CommonDao(private val database: NotallyDatabase) {

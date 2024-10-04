@@ -1,8 +1,8 @@
 package com.omgodse.notally.recyclerview.listmanager
 
 import com.omgodse.notally.preferences.ListItemSorting
-import com.omgodse.notally.recyclerview.lastIndex
-import com.omgodse.notally.recyclerview.map
+import com.omgodse.notally.sorting.lastIndex
+import com.omgodse.notally.sorting.map
 import com.omgodse.notally.test.assertChecked
 import com.omgodse.notally.test.assertIds
 import com.omgodse.notally.test.assertOrder

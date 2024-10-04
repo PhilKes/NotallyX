@@ -11,13 +11,13 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.omgodse.notally.R
 import com.omgodse.notally.databinding.ActivityConfigureWidgetBinding
 import com.omgodse.notally.miscellaneous.IO
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Header
+import com.omgodse.notally.model.NotallyDatabase
 import com.omgodse.notally.preferences.Preferences
 import com.omgodse.notally.preferences.View
 import com.omgodse.notally.recyclerview.ItemListener
 import com.omgodse.notally.recyclerview.adapter.BaseNoteAdapter
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Header
-import com.omgodse.notally.room.NotallyDatabase
 import com.omgodse.notally.viewmodels.BaseNoteModel
 import com.omgodse.notally.widget.WidgetProvider
 import java.util.Collections

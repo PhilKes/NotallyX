@@ -1,7 +1,8 @@
-package com.omgodse.notally.recyclerview
+package com.omgodse.notally.sorting
 
-import androidx.recyclerview.widget.SortedList
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.model.ListItem
+import com.omgodse.notally.model.findChild
+import com.omgodse.notally.model.plus
 
 fun ListItemSortedList.deleteItem(item: ListItem) {
     val itemsBySortPosition = this.toMutableList().sortedBy { it.order }
@@ -66,62 +67,6 @@ fun ListItemSortedList.shiftItemOrders(positionRange: IntRange, valueToAdd: Int)
     }
 }
 
-fun <T, R> SortedList<T>.map(transform: (T) -> R): List<R> {
-    return (0 until this.size()).map { transform.invoke(this[it]) }
-}
-
-fun <T> SortedList<T>.forEach(function: (item: T) -> Unit) {
-    return (0 until this.size()).forEach { function.invoke(this[it]) }
-}
-
-fun <T> SortedList<T>.forEachIndexed(function: (idx: Int, item: T) -> Unit) {
-    for (i in 0 until this.size()) {
-        function.invoke(i, this[i])
-    }
-}
-
-fun <T> SortedList<T>.filter(function: (item: T) -> Boolean): List<T> {
-    val list = mutableListOf<T>()
-    for (i in 0 until this.size()) {
-        if (function.invoke(this[i])) {
-            list.add(this[i])
-        }
-    }
-    return list.toList()
-}
-
-fun <T> SortedList<T>.find(function: (item: T) -> Boolean): T? {
-    for (i in 0 until this.size()) {
-        if (function.invoke(this[i])) {
-            return this[i]
-        }
-    }
-    return null
-}
-
-fun <T> SortedList<T>.indexOfFirst(function: (item: T) -> Boolean): Int? {
-    for (i in 0 until this.size()) {
-        if (function.invoke(this[i])) {
-            return i
-        }
-    }
-    return null
-}
-
-val <T> SortedList<T>.lastIndex: Int
-    get() = this.size() - 1
-
-val <T> SortedList<T>.indices: IntRange
-    get() = (0 until this.size())
-
-fun <T> SortedList<T>.isNotEmpty(): Boolean {
-    return size() > 0
-}
-
-fun <T> SortedList<T>.isEmpty(): Boolean {
-    return size() == 0
-}
-
 fun ListItemSortedList.toMutableList(): MutableList<ListItem> {
     return this.indices.map { this[it] }.toMutableList()
 }
@@ -175,8 +120,9 @@ fun ListItemSortedList.setChecked(
     val (_, changedPositionsAfterSort) = this.setChecked(listOf(position), checked, false)
     if (recalcChildrenPositions) {
         val children = if (checked) item.children.reversed() else item.children
-        //        children.forEach { child ->
-        //            this.recalculatePositionOfItemAt(this.findById(child.id)!!.first)
+        //        children.com.omgodse.notally.recyclerview.forEach { child ->
+        //
+        // this.recalculatePositionOfItemAt(this.com.omgodse.notally.recyclerview.findById(child.id)!!.first)
         //        }
         recalcPositions(children.map { it.id })
     }
@@ -219,29 +165,13 @@ fun ListItemSortedList.setCheckedWithChildren(position: Int, checked: Boolean): 
     return changedPositionsAfterSort.reversed()[0]
 }
 
-fun List<ListItem>.areAllChecked(except: ListItem? = null): Boolean {
-    return this.none { !it.checked && it != except }
-}
-
 fun ListItemSortedList.findById(id: Int): Pair<Int, ListItem>? {
     val position = this.indexOfFirst { it.id == id } ?: return null
     return Pair(position, this[position])
 }
 
-fun MutableList<ListItem>.containsId(id: Int): Boolean {
-    return this.any { it.id == id }
-}
-
-operator fun ListItem.plus(list: List<ListItem>): List<ListItem> {
-    return mutableListOf(this) + list
-}
-
 fun ListItemSortedList.toReadableString(): String {
-    return map { "${it.toString()} order: ${it.order} id: ${it.id}" }.joinToString("\n")
-}
-
-fun Collection<ListItem>.toReadableString(): String {
-    return map { "${it.toString()} uncheckedPos: ${it.order} id: ${it.id}" }.joinToString("\n")
+    return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
 }
 
 fun ListItemSortedList.findParent(childItem: ListItem): Pair<Int, ListItem>? {
@@ -251,10 +181,6 @@ fun ListItemSortedList.findParent(childItem: ListItem): Pair<Int, ListItem>? {
         }
     }
     return null
-}
-
-fun ListItem.findChild(childId: Int): ListItem? {
-    return this.children.find { child -> child.id == childId }
 }
 
 fun ListItemSortedList.reversed(): List<ListItem> {
@@ -281,8 +207,9 @@ private fun ListItemSortedList.updatePositions(
         this.updateItemAt(newPosition, updatedItem)
     }
     if (recalcChildrenPositions) {
-        //        idsOfChildren.forEach { childId ->
-        //            this.recalculatePositionOfItemAt(this.findById(childId)!!.first)
+        //        idsOfChildren.com.omgodse.notally.recyclerview.forEach { childId ->
+        //
+        // this.recalculatePositionOfItemAt(this.com.omgodse.notally.recyclerview.findById(childId)!!.first)
         //        }
         recalcPositions(idsOfChildren)
     }
@@ -297,4 +224,60 @@ private fun ListItemSortedList.updatePositions(
 
 fun ListItemSortedList.recalcPositions(itemIds: Collection<Int>) {
     itemIds.forEach { id -> this.recalculatePositionOfItemAt(this.findById(id)!!.first) }
+}
+
+fun <R> ListItemSortedList.map(transform: (ListItem) -> R): List<R> {
+    return (0 until this.size()).map { transform.invoke(this[it]) }
+}
+
+fun ListItemSortedList.forEach(function: (item: ListItem) -> Unit) {
+    return (0 until this.size()).forEach { function.invoke(this[it]) }
+}
+
+fun ListItemSortedList.forEachIndexed(function: (idx: Int, item: ListItem) -> Unit) {
+    for (i in 0 until this.size()) {
+        function.invoke(i, this[i])
+    }
+}
+
+fun ListItemSortedList.filter(function: (item: ListItem) -> Boolean): List<ListItem> {
+    val list = mutableListOf<ListItem>()
+    for (i in 0 until this.size()) {
+        if (function.invoke(this[i])) {
+            list.add(this[i])
+        }
+    }
+    return list.toList()
+}
+
+fun ListItemSortedList.find(function: (item: ListItem) -> Boolean): ListItem? {
+    for (i in 0 until this.size()) {
+        if (function.invoke(this[i])) {
+            return this[i]
+        }
+    }
+    return null
+}
+
+fun ListItemSortedList.indexOfFirst(function: (item: ListItem) -> Boolean): Int? {
+    for (i in 0 until this.size()) {
+        if (function.invoke(this[i])) {
+            return i
+        }
+    }
+    return null
+}
+
+val ListItemSortedList.lastIndex: Int
+    get() = this.size() - 1
+
+val ListItemSortedList.indices: IntRange
+    get() = (0 until this.size())
+
+fun ListItemSortedList.isNotEmpty(): Boolean {
+    return size() > 0
+}
+
+fun ListItemSortedList.isEmpty(): Boolean {
+    return size() == 0
 }

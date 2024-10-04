@@ -1,8 +1,8 @@
 package com.omgodse.notally.changehistory
 
+import com.omgodse.notally.model.ListItem
+import com.omgodse.notally.model.toReadableString
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.recyclerview.toReadableString
-import com.omgodse.notally.room.ListItem
 
 class DeleteCheckedChange(
     internal val deletedItems: List<ListItem>,

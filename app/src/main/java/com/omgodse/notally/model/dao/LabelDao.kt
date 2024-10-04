@@ -1,11 +1,11 @@
-package com.omgodse.notally.room.dao
+package com.omgodse.notally.model.dao
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.omgodse.notally.room.Label
+import com.omgodse.notally.model.Label
 
 @Dao
 interface LabelDao {

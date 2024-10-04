@@ -4,7 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import com.omgodse.notally.R
-import com.omgodse.notally.room.Folder
+import com.omgodse.notally.model.Folder
 
 class Search : NotallyFragment() {
 

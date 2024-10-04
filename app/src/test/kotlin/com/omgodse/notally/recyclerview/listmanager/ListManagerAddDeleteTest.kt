@@ -3,8 +3,8 @@ package com.omgodse.notally.recyclerview.listmanager
 import com.omgodse.notally.changehistory.DeleteCheckedChange
 import com.omgodse.notally.changehistory.ListAddChange
 import com.omgodse.notally.changehistory.ListDeleteChange
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.preferences.ListItemSorting
-import com.omgodse.notally.room.ListItem
 import com.omgodse.notally.test.assert
 import com.omgodse.notally.test.assertChildren
 import com.omgodse.notally.test.assertOrder

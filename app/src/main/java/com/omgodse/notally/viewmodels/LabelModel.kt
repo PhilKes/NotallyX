@@ -2,8 +2,8 @@ package com.omgodse.notally.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.omgodse.notally.room.Label
-import com.omgodse.notally.room.NotallyDatabase
+import com.omgodse.notally.model.Label
+import com.omgodse.notally.model.NotallyDatabase
 
 class LabelModel(app: Application) : AndroidViewModel(app) {
 

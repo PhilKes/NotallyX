@@ -35,12 +35,12 @@ import com.omgodse.notally.databinding.DialogColorBinding
 import com.omgodse.notally.miscellaneous.Operations
 import com.omgodse.notally.miscellaneous.add
 import com.omgodse.notally.miscellaneous.applySpans
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.Folder
+import com.omgodse.notally.model.Type
 import com.omgodse.notally.recyclerview.ItemListener
 import com.omgodse.notally.recyclerview.adapter.ColorAdapter
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Color
-import com.omgodse.notally.room.Folder
-import com.omgodse.notally.room.Type
 import com.omgodse.notally.viewmodels.BaseNoteModel
 import java.io.File
 import kotlinx.coroutines.launch

@@ -1,7 +1,7 @@
 package com.omgodse.notally.changehistory
 
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.room.ListItem
 
 class ListAddChange(
     position: Int,

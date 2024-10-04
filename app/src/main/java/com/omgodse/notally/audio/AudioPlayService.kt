@@ -6,7 +6,7 @@ import android.media.MediaPlayer
 import android.os.IBinder
 import com.omgodse.notally.miscellaneous.IO
 import com.omgodse.notally.miscellaneous.Operations
-import com.omgodse.notally.room.Audio
+import com.omgodse.notally.model.Audio
 import java.io.File
 
 class AudioPlayService : Service() {

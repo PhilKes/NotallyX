@@ -7,15 +7,15 @@ import com.omgodse.notally.R
 import com.omgodse.notally.changehistory.ChangeHistory
 import com.omgodse.notally.miscellaneous.add
 import com.omgodse.notally.miscellaneous.setOnNextAction
+import com.omgodse.notally.model.Type
 import com.omgodse.notally.preferences.ListItemSorting
 import com.omgodse.notally.preferences.Preferences
-import com.omgodse.notally.recyclerview.ListItemNoSortCallback
-import com.omgodse.notally.recyclerview.ListItemSortedByCheckedCallback
-import com.omgodse.notally.recyclerview.ListItemSortedList
 import com.omgodse.notally.recyclerview.ListManager
 import com.omgodse.notally.recyclerview.adapter.MakeListAdapter
-import com.omgodse.notally.recyclerview.toMutableList
-import com.omgodse.notally.room.Type
+import com.omgodse.notally.sorting.ListItemNoSortCallback
+import com.omgodse.notally.sorting.ListItemSortedByCheckedCallback
+import com.omgodse.notally.sorting.ListItemSortedList
+import com.omgodse.notally.sorting.toMutableList
 import com.omgodse.notally.widget.WidgetProvider
 
 class MakeList : NotallyActivity(Type.LIST) {

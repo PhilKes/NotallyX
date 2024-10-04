@@ -3,7 +3,7 @@ package com.omgodse.notally.recyclerview.viewholder
 import android.text.format.DateUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.omgodse.notally.databinding.RecyclerAudioBinding
-import com.omgodse.notally.room.Audio
+import com.omgodse.notally.model.Audio
 import java.text.DateFormat
 
 class AudioVH(

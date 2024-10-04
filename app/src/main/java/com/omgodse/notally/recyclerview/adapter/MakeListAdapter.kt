@@ -7,9 +7,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.omgodse.notally.databinding.RecyclerListItemBinding
 import com.omgodse.notally.preferences.Preferences
 import com.omgodse.notally.recyclerview.DragCallback
-import com.omgodse.notally.recyclerview.ListItemSortedList
 import com.omgodse.notally.recyclerview.ListManager
 import com.omgodse.notally.recyclerview.viewholder.MakeListVH
+import com.omgodse.notally.sorting.ListItemSortedList
 
 class MakeListAdapter(
     private val textSize: String,

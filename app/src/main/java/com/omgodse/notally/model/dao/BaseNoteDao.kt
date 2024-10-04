@@ -1,4 +1,4 @@
-package com.omgodse.notally.room.dao
+package com.omgodse.notally.model.dao
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
@@ -9,13 +9,13 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
-import com.omgodse.notally.room.Audio
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Color
-import com.omgodse.notally.room.Folder
-import com.omgodse.notally.room.Image
-import com.omgodse.notally.room.LabelsInBaseNote
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.model.Audio
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.Folder
+import com.omgodse.notally.model.Image
+import com.omgodse.notally.model.LabelsInBaseNote
+import com.omgodse.notally.model.ListItem
 
 @Dao
 interface BaseNoteDao {
@@ -104,7 +104,7 @@ interface BaseNoteDao {
      *
      * Take for example, a request for all base notes having the label 'Important' The base notes
      * which instead have the label 'Unimportant' will also be returned. To prevent this, we use
-     * [Transformations.map] and filter the result accordingly.
+     * [Transformations.map] and com.omgodse.notally.recyclerview.filter the result accordingly.
      */
     fun getBaseNotesByLabel(label: String): LiveData<List<BaseNote>> {
         val result = getBaseNotesByLabel(label, Folder.NOTES)

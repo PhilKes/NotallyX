@@ -7,12 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.omgodse.notally.databinding.RecyclerBaseNoteBinding
 import com.omgodse.notally.databinding.RecyclerHeaderBinding
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Header
+import com.omgodse.notally.model.Item
 import com.omgodse.notally.recyclerview.ItemListener
 import com.omgodse.notally.recyclerview.viewholder.BaseNoteVH
 import com.omgodse.notally.recyclerview.viewholder.HeaderVH
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Header
-import com.omgodse.notally.room.Item
 import java.io.File
 
 class BaseNoteAdapter(

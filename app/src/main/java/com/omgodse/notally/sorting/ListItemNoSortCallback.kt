@@ -1,9 +1,10 @@
-package com.omgodse.notally.recyclerview
+package com.omgodse.notally.sorting
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedListAdapterCallback
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.model.ListItem
 
+/** Sort algorithm that only sorts by [ListItem.order] */
 class ListItemNoSortCallback(adapter: RecyclerView.Adapter<*>?) :
     SortedListAdapterCallback<ListItem>(adapter) {
 
