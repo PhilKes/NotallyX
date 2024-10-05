@@ -1,6 +1,5 @@
 package com.omgodse.notally.sorting
 
-import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedListAdapterCallback
 import com.omgodse.notally.model.ListItem
@@ -80,42 +79,11 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
 
     override fun areContentsTheSame(oldItem: ListItem?, newItem: ListItem?): Boolean {
         val b = oldItem == newItem
-        Log.d(TAG, "areContentsTheSame: $b old: $oldItem\tnew:$newItem")
         return b
     }
 
     override fun areItemsTheSame(item1: ListItem?, item2: ListItem?): Boolean {
         val b = item1?.id == item2?.id
-        Log.d(TAG, "areItemsTheSame: $b old: $item1\tnew:$item2")
         return b
-    }
-
-    override fun onInserted(position: Int, count: Int) {
-        Log.d(TAG, "onInserted: pos: $position count: $count")
-        super.onInserted(position, count)
-    }
-
-    override fun onRemoved(position: Int, count: Int) {
-        Log.d(TAG, "onRemoved: pos: $position count: $count")
-        super.onRemoved(position, count)
-    }
-
-    override fun onMoved(fromPosition: Int, toPosition: Int) {
-        Log.d(TAG, "onMoved: from: $fromPosition to: $toPosition")
-        super.onMoved(fromPosition, toPosition)
-    }
-
-    override fun onChanged(position: Int, count: Int) {
-        Log.d(TAG, "onChanged: ")
-        super.onChanged(position, count)
-    }
-
-    override fun onChanged(position: Int, count: Int, payload: Any?) {
-        Log.d(TAG, "onChanged: pos: $position count: $count")
-        super.onChanged(position, count, payload)
-    }
-
-    companion object {
-        private const val TAG = "ListItemSortedByCheckedCallback"
     }
 }

@@ -29,7 +29,15 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         add(item)
     }
 
-    fun forceItemIsChild(item: ListItem, newValue: Boolean) {
+    fun forceItemIsChild(item: ListItem, newValue: Boolean, resetBefore: Boolean = false) {
+        if (resetBefore) {
+            if (item.isChild) {
+                // In this case it was already a child and moved to other position,
+                // therefore reset the child association
+                removeChildFromParent(item)
+                item.isChild = false
+            }
+        }
         if (item.isChild != newValue) {
             if (!item.isChild) {
                 item.children.clear()

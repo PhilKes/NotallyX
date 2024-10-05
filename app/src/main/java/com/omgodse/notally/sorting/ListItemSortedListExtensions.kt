@@ -41,22 +41,18 @@ fun ListItemSortedList.moveItemRange(
                 movedItem.order = insertPosition + index
                 movedItem
             }
-    itemsToMove
-        //        .reversed() // TODO: for test this is needed, but in real app use this is wrong ->
-        // faulty test?
-        .forEach { listItem -> this.updateItemAt(this.findById(listItem.id)!!.first, listItem) }
+    itemsToMove.forEach { listItem ->
+        this.updateItemAt(this.findById(listItem.id)!!.first, listItem)
+    }
     itemsToMove.forEach {
         if (forceIsChild != null) {
-            val item = this.findById(it.id)!!.second
-            if (forceIsChild) {
-                // In this case it was already a child and moved to other positions,
-                // therefore reset the child association
-                this.removeChildFromParent(item)
-                item.isChild = false
-            }
-            this.forceItemIsChild(item, forceIsChild)
+            val (_, item) = this.findById(it.id)!!
+            this.forceItemIsChild(item, forceIsChild, resetBefore = true)
         }
     }
+    this.recalcPositions(
+        itemsToMove.reversed().map { it.id }
+    ) // make sure children are at correct positions
     this.endBatchedUpdates()
     val newPosition = this.indexOfFirst { it.id == itemsToMove[0].id }!!
     return newPosition
@@ -239,7 +235,7 @@ private fun ListItemSortedList.updatePositions(
     return changedPositionsAfterSort
 }
 
-fun ListItemSortedList.recalcPositions(itemIds: Collection<Int>) {
+fun ListItemSortedList.recalcPositions(itemIds: Collection<Int> = this.map { it.id }) {
     itemIds.forEach { id -> this.recalculatePositionOfItemAt(this.findById(id)!!.first) }
 }
 

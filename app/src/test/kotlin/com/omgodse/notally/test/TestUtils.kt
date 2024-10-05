@@ -9,7 +9,7 @@ import com.omgodse.notally.changehistory.ListDeleteChange
 import com.omgodse.notally.changehistory.ListIsChildChange
 import com.omgodse.notally.changehistory.ListMoveChange
 import com.omgodse.notally.model.ListItem
-import com.omgodse.notally.recyclerview.ListManager
+import com.omgodse.notally.recyclerview.DragCallback
 import com.omgodse.notally.sorting.ListItemSortedList
 import com.omgodse.notally.sorting.find
 import com.omgodse.notally.sorting.toReadableString
@@ -38,23 +38,25 @@ fun mockAndroidLog() {
     every { Log.e(any(), any()) } returns 0
 }
 
-fun ListManager.simulateDrag(positionFrom: Int, positionTo: Int): Int? {
-    val item = this.getItem(positionFrom).clone() as ListItem
-    val itemCount = item.children.size + 1
-    var newPosition: Int? = positionTo
+fun DragCallback.simulateDrag(positionFrom: Int, positionTo: Int, itemCount: Int) {
+    this.reset()
+    var from = positionFrom
     if (positionFrom < positionTo) {
-        for (i in positionFrom..positionTo - itemCount) {
-            newPosition = this.move(i, i + itemCount, false, false)
+        for (i in positionFrom until positionTo) {
+            val moved = this.move(from, i + 1)
+            if (moved) {
+                from = i + 1 - itemCount + 1
+            }
         }
     } else {
         for (i in positionFrom downTo positionTo + 1) {
-            newPosition = this.move(i, i - 1, false, false)
+            val moved = this.move(from, i - 1)
+            if (moved) {
+                from = i - 1
+            }
         }
     }
-    if (newPosition != null) {
-        this.finishMove(positionFrom, positionTo, newPosition, item, true, true)
-    }
-    return newPosition
+    this.onDragEnd()
 }
 
 fun ListItemSortedList.printList(text: String? = null) {

@@ -8,6 +8,7 @@ import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.preferences.BetterLiveData
 import com.omgodse.notally.preferences.ListItemSorting
 import com.omgodse.notally.preferences.Preferences
+import com.omgodse.notally.recyclerview.DragCallback
 import com.omgodse.notally.recyclerview.ListManager
 import com.omgodse.notally.recyclerview.viewholder.MakeListVH
 import com.omgodse.notally.sorting.ListItemNoSortCallback
@@ -34,6 +35,7 @@ open class ListManagerTestBase {
     protected lateinit var changeHistory: ChangeHistory
     protected lateinit var makeListVH: MakeListVH
     protected lateinit var preferences: Preferences
+    protected lateinit var dragCallback: DragCallback
 
     protected lateinit var items: ListItemSortedList
 
@@ -73,6 +75,7 @@ open class ListManagerTestBase {
             createListItem("F", id = 5, order = 5),
         )
         listManager.initList(items)
+        dragCallback = DragCallback(1.0f, listManager)
         `when`(preferences.listItemSorting).thenReturn(BetterLiveData(sorting))
     }
 
@@ -107,6 +110,11 @@ open class ListManagerTestBase {
     protected fun String.assertIsParent() {
         assertFalse(items.find { it.body == this }!!.isChild)
     }
+
+    protected val String.itemCount: Int
+        get() {
+            return items.find { it.body == this }!!.itemCount
+        }
 
     protected fun ListManager.addWithChildren(
         position: Int = items.size(),

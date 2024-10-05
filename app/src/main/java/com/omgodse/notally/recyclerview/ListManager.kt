@@ -136,6 +136,7 @@ class ListManager(
         positionTo: Int,
         pushChange: Boolean = true,
         updateChildren: Boolean = true,
+        isDrag: Boolean = false,
     ): Int? {
         val itemTo = items[positionTo]
         val itemFrom = items[positionFrom]
@@ -147,9 +148,11 @@ class ListManager(
         val checkChildPosition = if (positionTo < positionFrom) positionTo - 1 else positionTo
         val forceIsChild =
             when {
+                isDrag ->
+                    if (itemFrom.isChild && checkChildPosition.isBeforeChildItem) true else null
                 positionTo == 0 && itemFrom.isChild -> false
-                updateChildren && checkChildPosition.isBeforeChildItemOfOtherParent -> true
                 itemFrom.isChild -> true // if child is moved parent could change
+                updateChildren && checkChildPosition.isBeforeChildItemOfOtherParent -> true
                 else -> null
             }
 
@@ -166,6 +169,7 @@ class ListManager(
             positionTo,
             newPosition,
             itemBeforeMove,
+            updateIsChild = false,
             updateChildren = false,
             pushChange,
         )
@@ -177,15 +181,22 @@ class ListManager(
         positionTo: Int,
         newPosition: Int,
         itemBeforeMove: ListItem,
+        updateIsChild: Boolean,
         updateChildren: Boolean,
         pushChange: Boolean,
     ) {
-        if (updateChildren) {
+        if (updateIsChild) {
             if (newPosition.isBeforeChildItemOfOtherParent) {
                 items.setIsChild(newPosition, true, true)
             } else if (newPosition == 0) {
                 items.setIsChild(newPosition, false)
             }
+        }
+        if (updateChildren) {
+            val item = items[newPosition]
+            val forceValue = item.isChild
+            items.forceItemIsChild(item, forceValue, resetBefore = true)
+            items.updateItemAt(items.findById(item.id)!!.first, item)
         }
         if (pushChange) {
             changeHistory.push(
@@ -398,6 +409,14 @@ class ListManager(
             }
             val item = items[this]
             return item.isNextItemChild(this) && !items[this + item.itemCount].isChildOf(this)
+        }
+
+    private val Int.isBeforeChildItem: Boolean
+        get() {
+            if (this < 0 || this > items.lastIndex - 1) {
+                return false
+            }
+            return items[this + 1].isChild
         }
 
     private fun ListItem.isNextItemChild(position: Int): Boolean {
