@@ -1,16 +1,13 @@
-package com.omgodse.notally.room
+package com.omgodse.notally.model
 
 data class ListItem(
     var body: String,
     var checked: Boolean,
     var isChild: Boolean,
-    var sortingPosition: Int?,
+    var order: Int?,
     var children: MutableList<ListItem>,
     var id: Int = -1,
 ) : Cloneable {
-    //    public override fun clone(): Any {
-    //        return ListItem(body, checked, isChild, sortingPosition, children.toMutableList(), id)
-    //    }
 
     public override fun clone(): Any {
         // Deep clone!
@@ -18,7 +15,7 @@ data class ListItem(
             body,
             checked,
             isChild,
-            sortingPosition,
+            order,
             children.map { it.clone() as ListItem }.toMutableList(),
             id,
         )

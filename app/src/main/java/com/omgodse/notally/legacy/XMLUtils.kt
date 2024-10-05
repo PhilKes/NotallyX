@@ -1,12 +1,12 @@
 package com.omgodse.notally.legacy
 
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Color
-import com.omgodse.notally.room.Folder
-import com.omgodse.notally.room.Label
-import com.omgodse.notally.room.ListItem
-import com.omgodse.notally.room.SpanRepresentation
-import com.omgodse.notally.room.Type
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.Folder
+import com.omgodse.notally.model.Label
+import com.omgodse.notally.model.ListItem
+import com.omgodse.notally.model.SpanRepresentation
+import com.omgodse.notally.model.Type
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -119,7 +119,7 @@ object XMLUtils {
         var body = String()
         var checked = false
         var isChild = false
-        var sortingPosition: Int? = null
+        var order: Int? = null
 
         // TODO: migration required?
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
@@ -128,7 +128,7 @@ object XMLUtils {
                     "text" -> body = parser.nextText()
                     "checked" -> checked = parser.nextText()?.toBoolean() ?: false
                     "isChild" -> isChild = parser.nextText()?.toBoolean() ?: false
-                    "sortingPosition" -> sortingPosition = parser.nextText()?.toInt()
+                    "order" -> order = parser.nextText()?.toInt()
                 }
             } else if (parser.eventType == XmlPullParser.END_TAG) {
                 if (parser.name == rootTag) {
@@ -137,7 +137,7 @@ object XMLUtils {
             }
         }
 
-        return ListItem(body, checked, isChild, sortingPosition, mutableListOf())
+        return ListItem(body, checked, isChild, order, mutableListOf())
     }
 
     private fun parseSpan(parser: XmlPullParser): SpanRepresentation {

@@ -6,7 +6,6 @@ import com.omgodse.notally.preferences.ListItemSorting
 import com.omgodse.notally.test.assert
 import com.omgodse.notally.test.assertChecked
 import com.omgodse.notally.test.assertOrder
-import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class ListManagerCheckedTest : ListManagerTestBase() {
@@ -16,22 +15,22 @@ class ListManagerCheckedTest : ListManagerTestBase() {
     @Test
     fun `changeChecked checks item`() {
         setSorting(ListItemSorting.noAutoSort)
-        val positionAfter = listManager.changeChecked(0, checked = true, pushChange = true)
+        listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
         "A".assertSortingPosition(0)
-        (changeHistory.lookUp() as ListCheckedChange).assert(true, 0, 0)
+        (changeHistory.lookUp() as ListCheckedChange).assert(true, 0)
     }
 
     @Test
-    fun `changeChecked unchecks item and updates sortingPosition`() {
+    fun `changeChecked unchecks item and updates order`() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeChecked(0, true)
         listManager.changeChecked(0, checked = false, pushChange = true)
 
         "A".assertIsNotChecked()
         "A".assertSortingPosition(0)
-        (changeHistory.lookUp() as ListCheckedChange).assert(false, 0, 0)
+        (changeHistory.lookUp() as ListCheckedChange).assert(false, 0)
     }
 
     @Test
@@ -39,11 +38,10 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeChecked(0, true)
 
-        val positionAfter = listManager.changeChecked(0, checked = true, pushChange = true)
+        listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
         "A".assertSortingPosition(0)
-        assertEquals(0, positionAfter)
     }
 
     @Test
@@ -51,13 +49,14 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(1, true)
 
-        val positionAfter = listManager.changeChecked(1, checked = true, pushChange = true)
+        listManager.changeChecked(1, checked = true, pushChange = true)
 
-        "A".assertIsNotChecked()
+        "A".assertIsChecked()
         "A".assertChildren("B")
         "B".assertIsChecked()
+        "A".assertSortingPosition(0)
         "B".assertSortingPosition(1)
-        (changeHistory.lookUp() as ListCheckedChange).assert(true, 1, 1)
+        (changeHistory.lookUp() as ListCheckedChange).assert(true, 1)
     }
 
     @Test
@@ -66,7 +65,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
 
-        val positionAfter = listManager.changeChecked(0, checked = true, pushChange = true)
+        listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
         "B".assertIsChecked()
@@ -75,7 +74,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "A".assertSortingPosition(0)
         "B".assertSortingPosition(1)
         "C".assertSortingPosition(2)
-        (changeHistory.lookUp() as ListCheckedChange).assert(true, 0, 0)
+        (changeHistory.lookUp() as ListCheckedChange).assert(true, 0)
     }
 
     @Test
@@ -85,11 +84,12 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         listManager.changeChecked(1, checked = true, pushChange = true)
 
-        "A".assertIsNotChecked()
+        "A".assertIsChecked()
         "A".assertChildren("B")
         "B".assertIsChecked()
+        "A".assertSortingPosition(0)
         "B".assertSortingPosition(1)
-        (changeHistory.lookUp() as ListCheckedChange).assert(true, 1, 1)
+        (changeHistory.lookUp() as ListCheckedChange).assert(true, 1)
     }
 
     @Test
@@ -110,7 +110,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "A".assertPosition(3)
         "B".assertPosition(4)
         "C".assertPosition(5)
-        (changeHistory.lookUp() as ListCheckedChange).assert(true, 0, 3)
+        (changeHistory.lookUp() as ListCheckedChange).assert(true, 0)
     }
 
     @Test
@@ -132,7 +132,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "A".assertPosition(0)
         "B".assertPosition(1)
         "C".assertPosition(2)
-        (changeHistory.lookUp() as ListCheckedChange).assert(false, 3, 0)
+        (changeHistory.lookUp() as ListCheckedChange).assert(false, 0)
     }
 
     @Test
@@ -150,7 +150,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "C".assertIsNotChecked()
         "A".assertChildren("B", "C")
         items.assertOrder("Parent1", "Child1", "Child2", "A", "B", "C")
-        (changeHistory.lookUp() as ListCheckedChange).assert(false, 6, 3)
+        (changeHistory.lookUp() as ListCheckedChange).assert(false, 0)
     }
 
     @Test
@@ -162,12 +162,12 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         listManager.changeChecked(4, checked = false, pushChange = true)
 
-        items.assertOrder("A", "B", "C", "E", "F", "D")
+        items.assertOrder("A", "B", "C", "D", "E", "F")
         "B".assertIsNotChecked()
         "C".assertIsNotChecked()
         "D".assertIsChecked()
         "B".assertChildren("C", "D")
-        (changeHistory.lookUp() as ListCheckedChange).assert(false, 3, 1)
+        (changeHistory.lookUp() as ListCheckedChange).assert(false, 2)
     }
 
     // endregion
@@ -184,11 +184,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(true, true, true, true, true, true)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            true,
-            listOf(0, 2, 4, 5),
-            listOf(0, 2, 4, 5),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(true, listOf(5, 4, 2, 0))
     }
 
     @Test
@@ -202,11 +198,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(false, false, false, false, false, false)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            false,
-            listOf(1, 2, 3),
-            listOf(1, 2, 3),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(false, listOf(3, 2, 1))
     }
 
     @Test
@@ -220,11 +212,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(true, true, true, true, true, true)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            true,
-            listOf(0, 1, 2),
-            listOf(1, 4, 5),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(true, listOf(5, 4, 1))
     }
 
     @Test
@@ -238,11 +226,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(false, false, false, false, false, false)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(
-            false,
-            listOf(3, 4, 5),
-            listOf(0, 2, 3),
-        )
+        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(false, listOf(3, 2, 0))
     }
 
     // endregion

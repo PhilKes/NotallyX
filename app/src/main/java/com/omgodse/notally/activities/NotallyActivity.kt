@@ -34,15 +34,15 @@ import com.omgodse.notally.miscellaneous.Constants
 import com.omgodse.notally.miscellaneous.Operations
 import com.omgodse.notally.miscellaneous.add
 import com.omgodse.notally.miscellaneous.displayFormattedTimestamp
+import com.omgodse.notally.model.Audio
+import com.omgodse.notally.model.Folder
+import com.omgodse.notally.model.Image
+import com.omgodse.notally.model.Type
 import com.omgodse.notally.preferences.Preferences
 import com.omgodse.notally.preferences.TextSize
 import com.omgodse.notally.recyclerview.adapter.AudioAdapter
 import com.omgodse.notally.recyclerview.adapter.ErrorAdapter
 import com.omgodse.notally.recyclerview.adapter.PreviewImageAdapter
-import com.omgodse.notally.room.Audio
-import com.omgodse.notally.room.Folder
-import com.omgodse.notally.room.Image
-import com.omgodse.notally.room.Type
 import com.omgodse.notally.viewmodels.NotallyModel
 import com.omgodse.notally.widget.WidgetProvider
 import kotlinx.coroutines.Dispatchers
@@ -318,7 +318,7 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         val body =
             when (type) {
                 Type.NOTE -> model.body
-                Type.LIST -> Operations.getBody(model.items!!.toMutableList())
+                Type.LIST -> Operations.getBody(model.items.toMutableList())
             }
         Operations.shareNote(this, model.title, body)
     }

@@ -16,12 +16,12 @@ import com.omgodse.notally.activities.MakeList
 import com.omgodse.notally.activities.TakeNote
 import com.omgodse.notally.databinding.FragmentNotesBinding
 import com.omgodse.notally.miscellaneous.Constants
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Item
+import com.omgodse.notally.model.Type
 import com.omgodse.notally.preferences.View as ViewPref
 import com.omgodse.notally.recyclerview.ItemListener
 import com.omgodse.notally.recyclerview.adapter.BaseNoteAdapter
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Item
-import com.omgodse.notally.room.Type
 import com.omgodse.notally.viewmodels.BaseNoteModel
 
 abstract class NotallyFragment : Fragment(), ItemListener {

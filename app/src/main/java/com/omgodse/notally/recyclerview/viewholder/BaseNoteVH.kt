@@ -22,14 +22,14 @@ import com.omgodse.notally.miscellaneous.Operations
 import com.omgodse.notally.miscellaneous.applySpans
 import com.omgodse.notally.miscellaneous.displayFormattedTimestamp
 import com.omgodse.notally.miscellaneous.dp
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.Image
+import com.omgodse.notally.model.ListItem
+import com.omgodse.notally.model.SpanRepresentation
+import com.omgodse.notally.model.Type
 import com.omgodse.notally.preferences.TextSize
 import com.omgodse.notally.recyclerview.ItemListener
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Color
-import com.omgodse.notally.room.Image
-import com.omgodse.notally.room.ListItem
-import com.omgodse.notally.room.SpanRepresentation
-import com.omgodse.notally.room.Type
 import java.io.File
 
 class BaseNoteVH(

@@ -3,7 +3,7 @@ package com.omgodse.notally.recyclerview.viewholder
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
 import com.omgodse.notally.databinding.RecyclerHeaderBinding
-import com.omgodse.notally.room.Header
+import com.omgodse.notally.model.Header
 
 class HeaderVH(private val binding: RecyclerHeaderBinding) : RecyclerView.ViewHolder(binding.root) {
 

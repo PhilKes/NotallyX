@@ -1,7 +1,7 @@
-package com.omgodse.notally.recyclerview
+package com.omgodse.notally.sorting
 
 import androidx.recyclerview.widget.SortedList
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.model.ListItem
 
 class ListItemSortedList(callback: Callback<ListItem>) :
     SortedList<ListItem>(ListItem::class.java, callback) {
@@ -9,15 +9,8 @@ class ListItemSortedList(callback: Callback<ListItem>) :
     override fun updateItemAt(index: Int, item: ListItem?) {
         updateChildStatus(item, index)
         super.updateItemAt(index, item)
-    }
-
-    private fun updateChildStatus(item: ListItem?, index: Int) {
-        val wasChild = this[index].isChild
-        if (!wasChild && item?.isChild == true) {
-            updateChildInParent(index, item)
-        } else if (wasChild && item?.isChild == false) {
-            // Child becomes parent
-            separateChildrenFromParent(item)
+        if (item?.isChild == false) {
+            item.children = item.children.map { findById(it.id)!!.second }.toMutableList()
         }
     }
 
@@ -27,6 +20,44 @@ class ListItemSortedList(callback: Callback<ListItem>) :
             updateChildInParent(position, item)
         }
         return position
+    }
+
+    fun add(item: ListItem, isChild: Boolean?) {
+        if (isChild != null) {
+            forceItemIsChild(item, isChild)
+        }
+        add(item)
+    }
+
+    fun forceItemIsChild(item: ListItem, newValue: Boolean, resetBefore: Boolean = false) {
+        if (resetBefore) {
+            if (item.isChild) {
+                // In this case it was already a child and moved to other position,
+                // therefore reset the child association
+                removeChildFromParent(item)
+                item.isChild = false
+            }
+        }
+        if (item.isChild != newValue) {
+            if (!item.isChild) {
+                item.children.clear()
+            } else {
+                removeChildFromParent(item)
+            }
+            item.isChild = newValue
+        }
+        if (item.isChild) {
+            updateChildInParent(item.order!!, item)
+        }
+    }
+
+    override fun removeItemAt(index: Int): ListItem {
+        val item = this[index]
+        val removedItem = super.removeItemAt(index)
+        if (item?.isChild == true) {
+            removeChildFromParent(item)
+        }
+        return removedItem
     }
 
     private fun separateChildrenFromParent(item: ListItem) {
@@ -45,37 +76,28 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         }
     }
 
-    fun add(item: ListItem, isChild: Boolean?) {
-        if (isChild != null) {
-            if (item.isChild != isChild) {
-                if (!item.isChild && isChild) {
-                    item.children.clear()
-                }
-                item.isChild = isChild
-            }
-        }
-        add(item)
-    }
-
-    override fun remove(item: ListItem?): Boolean {
+    private fun updateChildStatus(item: ListItem?, index: Int) {
+        val wasChild = this[index].isChild
         if (item?.isChild == true) {
-            removeChildFromParent(item)
+            updateChildInParent(index, item)
+        } else if (wasChild && item?.isChild == false) {
+            // Child becomes parent
+            separateChildrenFromParent(item)
         }
-        return super.remove(item)
     }
 
-    override fun removeItemAt(index: Int): ListItem {
-        val item = this[index]
-        if (item?.isChild == true) {
-            removeChildFromParent(item)
-        }
-        return super.removeItemAt(index)
-    }
-
-    private fun removeChildFromParent(item: ListItem) {
+    fun removeChildFromParent(item: ListItem) {
         findParent(item)?.let { (_, parent) ->
             val childIndex = parent.children.indexOfFirst { child -> child.id == item.id }
             parent.children.removeAt(childIndex)
+        }
+    }
+
+    fun initializeChildren() {
+        this.forEach {
+            if (it.isChild) {
+                updateChildInParent(it.order!!, it)
+            }
         }
     }
 
@@ -97,22 +119,8 @@ class ListItemSortedList(callback: Callback<ListItem>) :
         item.children.clear()
     }
 
-    //    override fun updateItemAt(position: Int, newItem: ListItem?) {
-    //        // Retrieve the existing item to maintain the children
-    //        val oldItem = this[position]
-    //
-    //        // Only transfer children if the new item is not a child itself
-    //        if (oldItem.children.isNotEmpty() && newItem?.isChild == false) {
-    //            newItem.children.clear() // Clear existing children if necessary
-    //            newItem.children.addAll(oldItem.children) // Transfer children
-    //        }
-    //
-    //        // Call the parent method to perform the actual update
-    //        super.updateItemAt(position, newItem)
-    //    }
-
     /** @return position of the found item and its difference to index */
-    fun findLastIsNotChild(index: Int): Int? {
+    private fun findLastIsNotChild(index: Int): Int? {
         var position = index
         while (this[position].isChild) {
             if (position < 0) {
@@ -121,9 +129,5 @@ class ListItemSortedList(callback: Callback<ListItem>) :
             position--
         }
         return position
-    }
-
-    override fun recalculatePositionOfItemAt(index: Int) {
-        super.recalculatePositionOfItemAt(index)
     }
 }

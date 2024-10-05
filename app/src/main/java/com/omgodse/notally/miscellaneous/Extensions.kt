@@ -22,8 +22,8 @@ import android.widget.TextView
 import com.omgodse.notally.activities.TakeNote
 import com.omgodse.notally.changehistory.ChangeHistory
 import com.omgodse.notally.changehistory.EditTextChange
+import com.omgodse.notally.model.SpanRepresentation
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.room.SpanRepresentation
 import java.util.Date
 import kotlin.math.roundToInt
 import org.ocpsoft.prettytime.PrettyTime

@@ -2,8 +2,8 @@ package com.omgodse.notally
 
 import androidx.lifecycle.MutableLiveData
 import com.omgodse.notally.image.Event
+import com.omgodse.notally.model.BaseNote
 import com.omgodse.notally.preferences.BetterLiveData
-import com.omgodse.notally.room.BaseNote
 
 class ActionMode {
 

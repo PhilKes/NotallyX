@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.model.ListItem
 
 /** ItemTouchHelper.Callback that allows dragging ListItem with its children. */
 class DragCallback(private val elevation: Float, private val listManager: ListManager) :
@@ -32,10 +32,17 @@ class DragCallback(private val elevation: Float, private val listManager: ListMa
     override fun onMove(view: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
         val from = viewHolder.adapterPosition
         val to = target.adapterPosition
+        if (from == -1 || to == -1) {
+            return false
+        }
+        return move(from, to)
+    }
+
+    internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
             draggedItem = listManager.getItem(from).clone() as ListItem
         }
-        val swapped = listManager.move(from, to, false, false)
+        val swapped = listManager.move(from, to, false, false, isDrag = true)
         if (swapped != null) {
             if (positionFrom == null) {
                 positionFrom = from
@@ -87,12 +94,9 @@ class DragCallback(private val elevation: Float, private val listManager: ListMa
         childViewHolders.forEach { animateFadeIn(it) }
     }
 
-    private fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
+    internal fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
         Log.d(TAG, "onDragStart")
-        positionFrom = null
-        positionTo = null
-        newPosition = null
-        draggedItem = null
+        reset()
 
         val item = listManager.getItem(viewHolder.adapterPosition)
         if (!item.isChild) {
@@ -106,7 +110,14 @@ class DragCallback(private val elevation: Float, private val listManager: ListMa
         }
     }
 
-    private fun onDragEnd() {
+    internal fun reset() {
+        positionFrom = null
+        positionTo = null
+        newPosition = null
+        draggedItem = null
+    }
+
+    internal fun onDragEnd() {
         Log.d(TAG, "onDragEnd: from: $positionFrom to: $positionTo")
         if (positionFrom == positionTo) {
             return
@@ -118,8 +129,9 @@ class DragCallback(private val elevation: Float, private val listManager: ListMa
                 positionTo!!,
                 newPosition!!,
                 draggedItem!!,
-                true,
-                true,
+                updateIsChild = true,
+                updateChildren = true,
+                pushChange = true,
             )
         }
     }

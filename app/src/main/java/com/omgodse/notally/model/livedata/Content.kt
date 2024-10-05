@@ -1,8 +1,8 @@
-package com.omgodse.notally.room.livedata
+package com.omgodse.notally.model.livedata
 
 import androidx.lifecycle.LiveData
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Item
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Item
 
 /**
  * The instance of LiveData returned by Room only listens for changes while the fragment observing

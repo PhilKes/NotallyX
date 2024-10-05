@@ -1,9 +1,10 @@
 package com.omgodse.notally.recyclerview.listmanager
 
 import com.omgodse.notally.preferences.ListItemSorting
-import com.omgodse.notally.recyclerview.lastIndex
-import com.omgodse.notally.recyclerview.map
+import com.omgodse.notally.sorting.lastIndex
+import com.omgodse.notally.sorting.map
 import com.omgodse.notally.test.assertChecked
+import com.omgodse.notally.test.assertIds
 import com.omgodse.notally.test.assertOrder
 import org.junit.Test
 
@@ -143,6 +144,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         "Parent4".assertChildren("Child2")
         "Parent5".assertChildren()
         "Parent6".assertChildren("Child3", "Child4")
+        items.assertIds(9, 6, 7, 10, 11, 0, 1, 8, 2, 3, 4, 5, 13, 14, 15, 12)
         listOf("A", "B", "C", "D", "E", "F").forEach { it.assertChildren() }
     }
 
@@ -241,7 +243,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         //        changeHistory.undo()
         listManager.changeChecked(4, false)
         listManager.delete(0, true)
-        listManager.addWithChildren(6, "Parent6", "Child4")
+        listManager.addWithChildren(1, "Parent6", "Child4")
         //        listManager.changeCheckedForAll(false)
         //        listManager.deleteCheckedItems()
         val bodiesAfterAdd = items.map { it.body }.toTypedArray()
@@ -249,10 +251,9 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         items.assertOrder(*bodiesAfterAdd)
         items.assertChecked(*checkedValues)
         "Parent6".assertChildren("Child4")
-        "Parent4".assertChildren("Child2", "Child3")
+        "Parent".assertChildren()
 
         while (changeHistory.canUndo()) {
-            println(changeHistory.lookUp().toString())
             changeHistory.undo()
         }
         items.assertOrder("A", "B", "C", "D", "E", "F")
@@ -265,6 +266,6 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         items.assertOrder(*bodiesAfterAdd)
         items.assertChecked(*checkedValues)
         "Parent6".assertChildren("Child4")
-        "Parent4".assertChildren("Child2", "Child3")
+        "Parent".assertChildren()
     }
 }

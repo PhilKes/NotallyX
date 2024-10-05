@@ -1,7 +1,7 @@
 package com.omgodse.notally.miscellaneous
 
 import android.app.Application
-import com.omgodse.notally.room.NotallyDatabase
+import com.omgodse.notally.model.NotallyDatabase
 import java.io.File
 import java.io.FileInputStream
 import java.util.zip.ZipEntry

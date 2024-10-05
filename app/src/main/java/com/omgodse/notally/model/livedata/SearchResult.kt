@@ -1,11 +1,11 @@
-package com.omgodse.notally.room.livedata
+package com.omgodse.notally.model.livedata
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.Folder
-import com.omgodse.notally.room.Item
-import com.omgodse.notally.room.dao.BaseNoteDao
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.Folder
+import com.omgodse.notally.model.Item
+import com.omgodse.notally.model.dao.BaseNoteDao
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch

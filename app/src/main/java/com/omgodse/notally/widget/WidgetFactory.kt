@@ -9,11 +9,11 @@ import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.omgodse.notally.R
 import com.omgodse.notally.miscellaneous.displayFormattedTimestamp
+import com.omgodse.notally.model.BaseNote
+import com.omgodse.notally.model.NotallyDatabase
+import com.omgodse.notally.model.Type
 import com.omgodse.notally.preferences.Preferences
 import com.omgodse.notally.preferences.TextSize
-import com.omgodse.notally.room.BaseNote
-import com.omgodse.notally.room.NotallyDatabase
-import com.omgodse.notally.room.Type
 
 class WidgetFactory(private val app: Application, private val id: Long) :
     RemoteViewsService.RemoteViewsFactory {

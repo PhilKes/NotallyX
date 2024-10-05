@@ -11,7 +11,7 @@ open class ListEditTextChange(
     private val textAfter: String,
     private val listener: TextWatcher,
     private val listManager: ListManager,
-) : ListValueChange<String>(textAfter, textBefore, position) {
+) : ListPositionValueChange<String>(textAfter, textBefore, position) {
     private val cursorPosition = editText.selectionStart
 
     override fun update(position: Int, value: String, isUndo: Boolean) {

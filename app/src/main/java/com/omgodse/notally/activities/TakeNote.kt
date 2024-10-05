@@ -23,7 +23,7 @@ import com.omgodse.notally.R
 import com.omgodse.notally.miscellaneous.add
 import com.omgodse.notally.miscellaneous.createTextWatcherWithHistory
 import com.omgodse.notally.miscellaneous.setOnNextAction
-import com.omgodse.notally.room.Type
+import com.omgodse.notally.model.Type
 
 class TakeNote : NotallyActivity(Type.NOTE) {
 

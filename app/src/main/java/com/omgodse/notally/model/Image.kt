@@ -1,4 +1,4 @@
-package com.omgodse.notally.room
+package com.omgodse.notally.model
 
 import kotlinx.parcelize.Parcelize
 

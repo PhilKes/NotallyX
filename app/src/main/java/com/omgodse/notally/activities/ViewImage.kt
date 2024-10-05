@@ -17,10 +17,10 @@ import com.omgodse.notally.databinding.ActivityViewImageBinding
 import com.omgodse.notally.miscellaneous.Constants
 import com.omgodse.notally.miscellaneous.IO
 import com.omgodse.notally.miscellaneous.add
+import com.omgodse.notally.model.Converters
+import com.omgodse.notally.model.Image
+import com.omgodse.notally.model.NotallyDatabase
 import com.omgodse.notally.recyclerview.adapter.ImageAdapter
-import com.omgodse.notally.room.Converters
-import com.omgodse.notally.room.Image
-import com.omgodse.notally.room.NotallyDatabase
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

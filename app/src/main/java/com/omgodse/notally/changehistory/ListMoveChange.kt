@@ -1,7 +1,7 @@
 package com.omgodse.notally.changehistory
 
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.room.ListItem
 
 class ListMoveChange(
     positionFrom: Int,
@@ -15,7 +15,7 @@ class ListMoveChange(
     }
 
     override fun undo() {
-        listManager.revertMove(positionAfter, position, itemBeforeMove)
+        listManager.undoMove(positionAfter, position, itemBeforeMove)
     }
 
     override fun toString(): String {

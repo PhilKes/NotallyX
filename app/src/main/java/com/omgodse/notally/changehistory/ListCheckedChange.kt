@@ -2,18 +2,14 @@ package com.omgodse.notally.changehistory
 
 import com.omgodse.notally.recyclerview.ListManager
 
-class ListCheckedChange(
-    checked: Boolean,
-    position: Int,
-    positionAfter: Int,
-    private val listManager: ListManager,
-) : ListBooleanChange(checked, position, positionAfter) {
+class ListCheckedChange(checked: Boolean, itemId: Int, private val listManager: ListManager) :
+    ListIdValueChange<Boolean>(checked, !checked, itemId) {
 
-    override fun update(position: Int, value: Boolean, isUndo: Boolean) {
-        listManager.changeChecked(position, value, pushChange = false)
+    override fun update(itemId: Int, value: Boolean, isUndo: Boolean) {
+        listManager.changeCheckedById(itemId, value, pushChange = false)
     }
 
     override fun toString(): String {
-        return "CheckedChange pos: $position positionAfter: $positionAfter isChecked: $newValue"
+        return "CheckedChange id: $itemId isChecked: $newValue"
     }
 }

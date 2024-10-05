@@ -3,7 +3,7 @@ package com.omgodse.notally.fragments
 import androidx.lifecycle.LiveData
 import com.omgodse.notally.R
 import com.omgodse.notally.miscellaneous.Constants
-import com.omgodse.notally.room.Item
+import com.omgodse.notally.model.Item
 
 class DisplayLabel : NotallyFragment() {
 

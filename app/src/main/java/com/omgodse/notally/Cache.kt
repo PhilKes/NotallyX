@@ -1,6 +1,6 @@
 package com.omgodse.notally
 
-import com.omgodse.notally.room.BaseNote
+import com.omgodse.notally.model.BaseNote
 
 object Cache {
 

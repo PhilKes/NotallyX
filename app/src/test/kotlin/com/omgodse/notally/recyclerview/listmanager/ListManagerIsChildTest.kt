@@ -17,7 +17,7 @@ class ListManagerIsChildTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B")
         "A".assertChildren("B")
-        (changeHistory.lookUp() as ListIsChildChange).assert(true, 1, 1)
+        (changeHistory.lookUp() as ListIsChildChange).assert(true, 1)
     }
 
     @Test
@@ -29,7 +29,7 @@ class ListManagerIsChildTest : ListManagerTestBase() {
 
         "A".assertIsParent()
         "B".assertIsParent()
-        (changeHistory.lookUp() as ListIsChildChange).assert(false, 1, 1)
+        (changeHistory.lookUp() as ListIsChildChange).assert(false, 1)
     }
 
     @Test
@@ -42,7 +42,7 @@ class ListManagerIsChildTest : ListManagerTestBase() {
 
         "A".assertChildren()
         "B".assertChildren("C")
-        (changeHistory.lookUp() as ListIsChildChange).assert(false, 1, 1)
+        (changeHistory.lookUp() as ListIsChildChange).assert(false, 1)
     }
 
     // endregion

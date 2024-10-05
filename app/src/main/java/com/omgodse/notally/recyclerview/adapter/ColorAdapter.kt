@@ -4,9 +4,9 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.omgodse.notally.databinding.RecyclerColorBinding
+import com.omgodse.notally.model.Color
 import com.omgodse.notally.recyclerview.ItemListener
 import com.omgodse.notally.recyclerview.viewholder.ColorVH
-import com.omgodse.notally.room.Color
 
 class ColorAdapter(private val listener: ItemListener) : RecyclerView.Adapter<ColorVH>() {
 

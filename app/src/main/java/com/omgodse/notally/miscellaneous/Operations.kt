@@ -17,9 +17,9 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import com.omgodse.notally.BuildConfig
 import com.omgodse.notally.R
 import com.omgodse.notally.databinding.LabelBinding
+import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.preferences.TextSize
-import com.omgodse.notally.room.Color
-import com.omgodse.notally.room.ListItem
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter

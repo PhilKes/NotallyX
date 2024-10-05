@@ -11,9 +11,9 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.content.ContextCompat
 import com.omgodse.notally.miscellaneous.IO
-import com.omgodse.notally.room.Attachment
-import com.omgodse.notally.room.Audio
-import com.omgodse.notally.room.Image
+import com.omgodse.notally.model.Attachment
+import com.omgodse.notally.model.Audio
+import com.omgodse.notally.model.Image
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope

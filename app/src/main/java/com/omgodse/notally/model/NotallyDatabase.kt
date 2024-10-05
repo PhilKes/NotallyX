@@ -1,4 +1,4 @@
-package com.omgodse.notally.room
+package com.omgodse.notally.model
 
 import android.app.Application
 import androidx.room.Database
@@ -8,9 +8,9 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.omgodse.notally.room.dao.BaseNoteDao
-import com.omgodse.notally.room.dao.CommonDao
-import com.omgodse.notally.room.dao.LabelDao
+import com.omgodse.notally.model.dao.BaseNoteDao
+import com.omgodse.notally.model.dao.CommonDao
+import com.omgodse.notally.model.dao.LabelDao
 
 @TypeConverters(Converters::class)
 @Database(entities = [BaseNote::class, Label::class], version = 4)

@@ -13,10 +13,10 @@ import com.omgodse.notally.databinding.RecyclerListItemBinding
 import com.omgodse.notally.miscellaneous.createListTextWatcherWithHistory
 import com.omgodse.notally.miscellaneous.layout.SwipeLayout.SwipeActionsListener
 import com.omgodse.notally.miscellaneous.setOnNextAction
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.preferences.ListItemSorting
 import com.omgodse.notally.preferences.TextSize
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.room.ListItem
 
 class MakeListVH(
     val binding: RecyclerListItemBinding,

@@ -1,22 +1,22 @@
 package com.omgodse.notally.changehistory
 
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.room.ListItem
 
 class ListDeleteChange(
-    position: Int,
+    internal val itemOrder: Int,
     internal val deletedItem: ListItem,
     private val listManager: ListManager,
-) : ListChange(position) {
+) : Change {
     override fun redo() {
-        listManager.delete(position, pushChange = false)
+        listManager.deleteById(deletedItem.id, pushChange = false)
     }
 
     override fun undo() {
-        listManager.add(position, deletedItem, pushChange = false)
+        listManager.add(itemOrder, deletedItem, pushChange = false)
     }
 
     override fun toString(): String {
-        return "DeleteChange at $position"
+        return "DeleteChange id: ${deletedItem.id} itemOrder: $itemOrder deletedItem: $deletedItem"
     }
 }

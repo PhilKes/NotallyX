@@ -4,17 +4,18 @@ import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import com.omgodse.notally.changehistory.ChangeHistory
+import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.preferences.BetterLiveData
 import com.omgodse.notally.preferences.ListItemSorting
 import com.omgodse.notally.preferences.Preferences
-import com.omgodse.notally.recyclerview.ListItemNoSortCallback
-import com.omgodse.notally.recyclerview.ListItemSortedByCheckedCallback
-import com.omgodse.notally.recyclerview.ListItemSortedList
+import com.omgodse.notally.recyclerview.DragCallback
 import com.omgodse.notally.recyclerview.ListManager
-import com.omgodse.notally.recyclerview.find
-import com.omgodse.notally.recyclerview.indexOfFirst
 import com.omgodse.notally.recyclerview.viewholder.MakeListVH
-import com.omgodse.notally.room.ListItem
+import com.omgodse.notally.sorting.ListItemNoSortCallback
+import com.omgodse.notally.sorting.ListItemSortedByCheckedCallback
+import com.omgodse.notally.sorting.ListItemSortedList
+import com.omgodse.notally.sorting.find
+import com.omgodse.notally.sorting.indexOfFirst
 import com.omgodse.notally.test.assertChildren
 import com.omgodse.notally.test.createListItem
 import com.omgodse.notally.test.mockAndroidLog
@@ -34,6 +35,7 @@ open class ListManagerTestBase {
     protected lateinit var changeHistory: ChangeHistory
     protected lateinit var makeListVH: MakeListVH
     protected lateinit var preferences: Preferences
+    protected lateinit var dragCallback: DragCallback
 
     protected lateinit var items: ListItemSortedList
 
@@ -65,14 +67,15 @@ open class ListManagerTestBase {
             sortCallback.setList(items)
         }
         items.addAll(
-            createListItem("A", id = 0, sortingPosition = 0),
-            createListItem("B", id = 1, sortingPosition = 1),
-            createListItem("C", id = 2, sortingPosition = 2),
-            createListItem("D", id = 3, sortingPosition = 3),
-            createListItem("E", id = 4, sortingPosition = 4),
-            createListItem("F", id = 5, sortingPosition = 5),
+            createListItem("A", id = 0, order = 0),
+            createListItem("B", id = 1, order = 1),
+            createListItem("C", id = 2, order = 2),
+            createListItem("D", id = 3, order = 3),
+            createListItem("E", id = 4, order = 4),
+            createListItem("F", id = 5, order = 5),
         )
         listManager.initList(items)
+        dragCallback = DragCallback(1.0f, listManager)
         `when`(preferences.listItemSorting).thenReturn(BetterLiveData(sorting))
     }
 
@@ -97,7 +100,7 @@ open class ListManagerTestBase {
     }
 
     protected fun String.assertSortingPosition(expected: Int) {
-        assertEquals("sortingPosition", expected, items.find { it.body == this }!!.sortingPosition)
+        assertEquals("order", expected, items.find { it.body == this }!!.order)
     }
 
     protected fun String.assertPosition(expected: Int) {
@@ -107,6 +110,11 @@ open class ListManagerTestBase {
     protected fun String.assertIsParent() {
         assertFalse(items.find { it.body == this }!!.isChild)
     }
+
+    protected val String.itemCount: Int
+        get() {
+            return items.find { it.body == this }!!.itemCount
+        }
 
     protected fun ListManager.addWithChildren(
         position: Int = items.size(),
