@@ -82,17 +82,13 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         setContentView(binding.root)
 
         lifecycleScope.launch {
-            if (model.isFirstInstance) {
-                val persistedId = savedInstanceState?.getLong("id")
-                val selectedId = intent.getLongExtra(Constants.SelectedBaseNote, 0L)
-                val id = persistedId ?: selectedId
-                model.setState(id)
+            val persistedId = savedInstanceState?.getLong("id")
+            val selectedId = intent.getLongExtra(Constants.SelectedBaseNote, 0L)
+            val id = persistedId ?: selectedId
+            model.setState(id)
 
-                if (model.isNewNote && intent.action == Intent.ACTION_SEND) {
-                    handleSharedNote()
-                }
-
-                model.isFirstInstance = false
+            if (model.isNewNote && intent.action == Intent.ACTION_SEND) {
+                handleSharedNote()
             }
 
             setupToolbar()

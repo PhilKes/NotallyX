@@ -55,7 +55,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     val textSize = Preferences.getInstance(app).textSize.value
 
     var isNewNote = true
-    var isFirstInstance = true
 
     var type = Type.NOTE
 
