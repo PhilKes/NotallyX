@@ -1,0 +1,11 @@
+#!/bin/sh
+./gradlew ktfmtPrecommit
+if [ $? -ne 0 ]; then
+    echo "Kotlin formatting failed. Please fix the issues."
+    exit 1
+fi
+    git add .
+
+echo "Kotlin files formatted and changes staged."
+exit 0
+

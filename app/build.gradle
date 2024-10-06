@@ -1,3 +1,5 @@
+import com.ncorti.ktfmt.gradle.tasks.KtfmtFormatTask
+
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
@@ -54,9 +56,23 @@ ktfmt {
     kotlinLangStyle()
 }
 
-tasks.withType(Test).configureEach {
-//    dependsOn 'ktfmtFormat'
+tasks.register('ktfmtPrecommit', KtfmtFormatTask) {
+    source = project.fileTree(rootDir)
+    include("**/*.kt")
 }
+
+tasks.register('installLocalGitHooks', Copy) {
+    def scriptsDir = new File(rootProject.rootDir, '.scripts/')
+    def hooksDir = new File(rootProject.rootDir, '.git/hooks')
+    from(scriptsDir) {
+        include 'pre-commit', 'pre-commit.bat'
+    }
+    into { hooksDir }
+    inputs.files(file("${scriptsDir}/pre-commit"), file("${scriptsDir}/pre-commit.bat"))
+    outputs.dir(hooksDir)
+    fileMode 0775
+}
+preBuild.dependsOn installLocalGitHooks
 
 dependencies {
     testImplementation 'junit:junit:4.12'
