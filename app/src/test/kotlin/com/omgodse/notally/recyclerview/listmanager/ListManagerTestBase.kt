@@ -66,7 +66,7 @@ open class ListManagerTestBase {
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)
         }
-        items.addAll(
+        items.init(
             createListItem("A", id = 0, order = 0),
             createListItem("B", id = 1, order = 1),
             createListItem("C", id = 2, order = 2),

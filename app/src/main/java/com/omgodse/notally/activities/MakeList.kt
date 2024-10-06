@@ -109,7 +109,7 @@ class MakeList : NotallyActivity(Type.LIST) {
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)
         }
-        items.addAll(model.items)
+        items.init(model.items)
         adapter.setList(items)
         binding.RecyclerView.adapter = adapter
         listManager.adapter = adapter

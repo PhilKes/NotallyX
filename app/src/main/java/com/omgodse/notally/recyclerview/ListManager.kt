@@ -25,7 +25,6 @@ import com.omgodse.notally.sorting.deleteItem
 import com.omgodse.notally.sorting.filter
 import com.omgodse.notally.sorting.findById
 import com.omgodse.notally.sorting.findParent
-import com.omgodse.notally.sorting.forEachIndexed
 import com.omgodse.notally.sorting.isNotEmpty
 import com.omgodse.notally.sorting.lastIndex
 import com.omgodse.notally.sorting.moveItemRange
@@ -349,8 +348,6 @@ class ListManager(
 
     fun initList(items: ListItemSortedList) {
         this.items = items
-        this.items.forEachIndexed { index, item -> item.id = index }
-        this.items.initializeChildren()
         nextItemId = this.items.size()
         Log.d(TAG, "initList:\n${this.items.toReadableString()}")
     }
