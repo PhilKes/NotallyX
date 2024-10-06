@@ -10,6 +10,9 @@
         name="images"
         path="/Images" />
     <external-media-path
+        name="files"
+        path="/Files" />
+    <external-media-path
         name="audios"
         path="/Audios" />
 </paths>

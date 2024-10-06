@@ -20,6 +20,8 @@ object IO {
 
     fun getExternalAudioDirectory(app: Application) = getExternalDirectory(app, "Audios")
 
+    fun getExternalFilesDirectory(app: Application) = getExternalDirectory(app, "Files")
+
     private fun getExternalDirectory(app: Application, name: String): File? {
         var file: File? = null
 

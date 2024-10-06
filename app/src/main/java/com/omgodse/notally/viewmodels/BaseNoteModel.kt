@@ -29,9 +29,9 @@ import com.omgodse.notally.model.Audio
 import com.omgodse.notally.model.BaseNote
 import com.omgodse.notally.model.Color
 import com.omgodse.notally.model.Converters
+import com.omgodse.notally.model.FileAttachment
 import com.omgodse.notally.model.Folder
 import com.omgodse.notally.model.Header
-import com.omgodse.notally.model.Image
 import com.omgodse.notally.model.Item
 import com.omgodse.notally.model.Label
 import com.omgodse.notally.model.NotallyDatabase
@@ -48,6 +48,7 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.text.DateFormat
 import java.util.UUID
+import java.util.concurrent.atomic.AtomicInteger
 import java.util.zip.ZipFile
 import java.util.zip.ZipOutputStream
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -98,7 +99,8 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     val preferences = Preferences.getInstance(app)
 
-    val mediaRoot = IO.getExternalImagesDirectory(app)
+    val imageRoot = IO.getExternalImagesDirectory(app)
+    val fileRoot = IO.getExternalFilesDirectory(app)
     private val audioRoot = IO.getExternalAudioDirectory(app)
 
     val importingBackup = MutableLiveData<BackupProgress>()
@@ -179,14 +181,14 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 delay(1000)
 
                 val images =
-                    baseNoteDao.getAllImages().flatMap { string -> Converters.jsonToImages(string) }
+                    baseNoteDao.getAllImages().flatMap { string -> Converters.jsonToFiles(string) }
                 val audios =
                     baseNoteDao.getAllAudios().flatMap { string -> Converters.jsonToAudios(string) }
                 val total = images.size + audios.size
 
                 images.forEachIndexed { index, image ->
                     try {
-                        Export.backupFile(zipStream, mediaRoot, "Images", image.name)
+                        Export.backupFile(zipStream, imageRoot, "Images", image.localName)
                     } catch (exception: Exception) {
                         Operations.log(app, exception)
                     } finally {
@@ -276,28 +278,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     baseNotes.fold(0) { acc, baseNote ->
                         acc + baseNote.images.size + baseNote.audios.size
                     }
-                var current = 1
-
-                // Don't let a single image bring down the entire backup
+                var current = AtomicInteger(1)
                 baseNotes.forEach { baseNote ->
-                    baseNote.images.forEach { image ->
-                        try {
-                            val entry = zipFile.getEntry("Images/${image.name}")
-                            if (entry != null) {
-                                val extension = image.name.substringAfterLast(".")
-                                val name = "${UUID.randomUUID()}.$extension"
-                                val file = File(mediaRoot, name)
-                                image.name = name
-                                val imageStream = zipFile.getInputStream(entry)
-                                IO.copyStreamToFile(imageStream, file)
-                            }
-                        } catch (exception: Exception) {
-                            Operations.log(app, exception)
-                        } finally {
-                            importingBackup.postValue(BackupProgress(true, current, total, false))
-                            current++
-                        }
-                    }
+                    importFiles(baseNote.images, "Images", zipFile, current, total)
+                    importFiles(baseNote.files, "Files", zipFile, current, total)
                     baseNote.audios.forEach { audio ->
                         try {
                             val entry = zipFile.getEntry("Audios/${audio.name}")
@@ -311,8 +295,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                         } catch (exception: Exception) {
                             Operations.log(app, exception)
                         } finally {
-                            importingBackup.postValue(BackupProgress(true, current, total, false))
-                            current++
+                            importingBackup.postValue(
+                                BackupProgress(true, current.get(), total, false)
+                            )
+                            current.getAndIncrement()
                         }
                     }
                 }
@@ -321,6 +307,33 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
 
             finishImporting(backupDir)
+        }
+    }
+
+    private fun importFiles(
+        files: List<FileAttachment>,
+        subFolder: String,
+        zipFile: ZipFile,
+        current: AtomicInteger,
+        total: Int,
+    ) {
+        files.forEach { file ->
+            try {
+                val entry = zipFile.getEntry("$subFolder/${file.localName}")
+                if (entry != null) {
+                    val extension = file.localName.substringAfterLast(".")
+                    val name = "${UUID.randomUUID()}.$extension"
+                    val newFile = File(imageRoot, name)
+                    file.localName = name
+                    val imageStream = zipFile.getInputStream(entry)
+                    IO.copyStreamToFile(imageStream, newFile)
+                }
+            } catch (exception: Exception) {
+                Operations.log(app, exception)
+            } finally {
+                importingBackup.postValue(BackupProgress(true, current.get(), total, false))
+                current.getAndIncrement()
+            }
         }
     }
 
@@ -359,7 +372,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val imagesIndex = cursor.getColumnIndex("images")
         val images =
             if (imagesIndex != -1) {
-                Converters.jsonToImages(cursor.getString(imagesIndex))
+                Converters.jsonToFiles(cursor.getString(imagesIndex))
+            } else emptyList()
+
+        val filesIndex = cursor.getColumnIndex("files")
+        val files =
+            if (filesIndex != -1) {
+                Converters.jsonToFiles(cursor.getString(filesIndex))
             } else emptyList()
 
         val audiosIndex = cursor.getColumnIndex("audios")
@@ -381,6 +400,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             spans,
             items,
             images,
+            files,
             audios,
         )
     }
@@ -521,13 +541,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun deleteAllBaseNotes() {
         viewModelScope.launch {
             val ids: LongArray
-            val images = ArrayList<Image>()
+            val images = ArrayList<FileAttachment>()
             val audios = ArrayList<Audio>()
             withContext(Dispatchers.IO) {
                 ids = baseNoteDao.getDeletedNoteIds()
                 val imageStrings = baseNoteDao.getDeletedNoteImages()
                 val audioStrings = baseNoteDao.getDeletedNoteAudios()
-                imageStrings.flatMapTo(images) { json -> Converters.jsonToImages(json) }
+                imageStrings.flatMapTo(images) { json -> Converters.jsonToFiles(json) }
                 audioStrings.flatMapTo(audios) { json -> Converters.jsonToAudios(json) }
                 baseNoteDao.deleteFrom(Folder.DELETED)
             }

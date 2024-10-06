@@ -18,7 +18,7 @@ import com.omgodse.notally.miscellaneous.Constants
 import com.omgodse.notally.miscellaneous.IO
 import com.omgodse.notally.miscellaneous.add
 import com.omgodse.notally.model.Converters
-import com.omgodse.notally.model.Image
+import com.omgodse.notally.model.FileAttachment
 import com.omgodse.notally.model.NotallyDatabase
 import com.omgodse.notally.recyclerview.adapter.ImageAdapter
 import java.io.File
@@ -30,22 +30,22 @@ import kotlinx.coroutines.withContext
 
 class ViewImage : AppCompatActivity() {
 
-    private var currentImage: Image? = null
-    private lateinit var deletedImages: ArrayList<Image>
+    private var currentImage: FileAttachment? = null
+    private lateinit var deletedImages: ArrayList<FileAttachment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityViewImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val savedList = savedInstanceState?.getParcelableArrayList<Image>(DELETED_IMAGES)
+        val savedList = savedInstanceState?.getParcelableArrayList<FileAttachment>(DELETED_IMAGES)
         deletedImages = savedList ?: ArrayList()
 
         val result = Intent()
         result.putExtra(DELETED_IMAGES, deletedImages)
         setResult(RESULT_OK, result)
 
-        val savedImage = savedInstanceState?.getParcelable<Image>(CURRENT_IMAGE)
+        val savedImage = savedInstanceState?.getParcelable<FileAttachment>(CURRENT_IMAGE)
         if (savedImage != null) {
             currentImage = savedImage
         }
@@ -63,8 +63,8 @@ class ViewImage : AppCompatActivity() {
             val id = intent.getLongExtra(Constants.SelectedBaseNote, 0)
 
             val json = withContext(Dispatchers.IO) { database.getBaseNoteDao().getImages(id) }
-            val original = Converters.jsonToImages(json)
-            val images = ArrayList<Image>(original.size)
+            val original = Converters.jsonToFiles(json)
+            val images = ArrayList<FileAttachment>(original.size)
             original.filterNotTo(images) { image -> deletedImages.contains(image) }
 
             val mediaRoot = IO.getExternalImagesDirectory(application)
@@ -133,9 +133,9 @@ class ViewImage : AppCompatActivity() {
         }
     }
 
-    private fun share(image: Image) {
+    private fun share(image: FileAttachment) {
         val mediaRoot = IO.getExternalImagesDirectory(application)
-        val file = if (mediaRoot != null) File(mediaRoot, image.name) else null
+        val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
         if (file != null && file.exists()) {
             val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
 
@@ -154,9 +154,9 @@ class ViewImage : AppCompatActivity() {
         }
     }
 
-    private fun saveToDevice(image: Image) {
+    private fun saveToDevice(image: FileAttachment) {
         val mediaRoot = IO.getExternalImagesDirectory(application)
-        val file = if (mediaRoot != null) File(mediaRoot, image.name) else null
+        val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
         if (file != null && file.exists()) {
             val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
             intent.type = image.mimeType
@@ -173,7 +173,7 @@ class ViewImage : AppCompatActivity() {
             withContext(Dispatchers.IO) {
                 val mediaRoot = IO.getExternalImagesDirectory(application)
                 val file =
-                    if (mediaRoot != null) File(mediaRoot, requireNotNull(currentImage).name)
+                    if (mediaRoot != null) File(mediaRoot, requireNotNull(currentImage).localName)
                     else null
                 if (file != null && file.exists()) {
                     val output = contentResolver.openOutputStream(uri) as FileOutputStream

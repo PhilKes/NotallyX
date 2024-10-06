@@ -12,8 +12,8 @@ import androidx.sqlite.db.SupportSQLiteQuery
 import com.omgodse.notally.model.Audio
 import com.omgodse.notally.model.BaseNote
 import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.FileAttachment
 import com.omgodse.notally.model.Folder
-import com.omgodse.notally.model.Image
 import com.omgodse.notally.model.LabelsInBaseNote
 import com.omgodse.notally.model.ListItem
 
@@ -48,6 +48,8 @@ interface BaseNoteDao {
 
     @Query("SELECT images FROM BaseNote") fun getAllImages(): List<String>
 
+    @Query("SELECT files FROM BaseNote") fun getAllFiles(): List<String>
+
     @Query("SELECT audios FROM BaseNote") fun getAllAudios(): List<String>
 
     @Query("SELECT id FROM BaseNote WHERE folder = 'DELETED'")
@@ -75,7 +77,10 @@ interface BaseNoteDao {
     suspend fun updateItems(id: Long, items: List<ListItem>)
 
     @Query("UPDATE BaseNote SET images = :images WHERE id = :id")
-    suspend fun updateImages(id: Long, images: List<Image>)
+    suspend fun updateImages(id: Long, images: List<FileAttachment>)
+
+    @Query("UPDATE BaseNote SET files = :files WHERE id = :id")
+    suspend fun updateFiles(id: Long, files: List<FileAttachment>)
 
     @Query("UPDATE BaseNote SET audios = :audios WHERE id = :id")
     suspend fun updateAudios(id: Long, audios: List<Audio>)

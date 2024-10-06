@@ -33,8 +33,8 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
                 val formatter =
                     SimpleDateFormat("yyyyMMdd HHmmss '(Notally Backup)'", Locale.ENGLISH)
                 val name = formatter.format(System.currentTimeMillis())
-                val file = requireNotNull(folder.createFile("application/zip", name))
-                val outputStream = requireNotNull(app.contentResolver.openOutputStream(file.uri))
+                val zipFile = requireNotNull(folder.createFile("application/zip", name))
+                val outputStream = requireNotNull(app.contentResolver.openOutputStream(zipFile.uri))
 
                 val zipStream = ZipOutputStream(outputStream)
 
@@ -44,15 +44,28 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
                 Export.backupDatabase(app, zipStream)
 
                 val imageRoot = IO.getExternalImagesDirectory(app)
+                val fileRoot = IO.getExternalFilesDirectory(app)
                 val audioRoot = IO.getExternalAudioDirectory(app)
                 database
                     .getBaseNoteDao()
                     .getAllImages()
                     .asSequence()
-                    .flatMap { string -> Converters.jsonToImages(string) }
+                    .flatMap { string -> Converters.jsonToFiles(string) }
                     .forEach { image ->
                         try {
-                            Export.backupFile(zipStream, imageRoot, "Images", image.name)
+                            Export.backupFile(zipStream, imageRoot, "Images", image.localName)
+                        } catch (exception: Exception) {
+                            Operations.log(app, exception)
+                        }
+                    }
+                database
+                    .getBaseNoteDao()
+                    .getAllFiles()
+                    .asSequence()
+                    .flatMap { string -> Converters.jsonToFiles(string) }
+                    .forEach { file ->
+                        try {
+                            Export.backupFile(zipStream, fileRoot, "Files", file.localName)
                         } catch (exception: Exception) {
                             Operations.log(app, exception)
                         }
