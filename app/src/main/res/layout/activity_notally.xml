@@ -53,7 +53,7 @@
                 android:paddingStart="24dp"
                 android:paddingTop="2dp"
                 android:paddingEnd="24dp"
-                android:paddingBottom="16dp"
+                android:paddingBottom="6dp"
                 android:text="@string/date"
                 android:textAppearance="?attr/textAppearanceBody2"
                 android:textColor="?android:textColorHint" />
@@ -61,10 +61,11 @@
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/FilesPreview"
-                android:padding="8dp"
+                android:paddingBottom="8dp"
+                android:layout_marginStart="20dp"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:scrollbars="horizontal"/>
+                />
 
             <View
                 android:layout_width="match_parent"

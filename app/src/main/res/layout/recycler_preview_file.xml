@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.chip.Chip xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/FileName"
     android:visibility="visible"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
     android:gravity="center"
     android:clickable="true"
+    android:layout_marginEnd="6dp"
+    app:chipStartPadding="8dp"
+    app:textStartPadding="2dp"
+    app:chipIcon="@drawable/text_file"
+    app:chipMinHeight="40dp"
     android:text="@string/cant_load_file"
-    android:padding="6dp"
-    android:drawablePadding="4dp"
-    android:textAppearance="?attr/textAppearanceBody1"
-    android:background="@drawable/file_attachment_background"
-    />
+    android:textAppearance="?attr/textAppearanceBody2" />

@@ -198,10 +198,18 @@ class BaseNoteVH(
             binding.FileView.visibility = View.VISIBLE
 
             val firstFile = files[0]
-            //            val file = if (mediaRoot != null) File(mediaRoot, firstFile.localName)
-            // else null
             binding.FileView.text = firstFile.originalName
-            binding.FileViewMore.visibility = if (files.size > 1) View.VISIBLE else View.GONE
+            if (files.size > 1) {
+                binding.FileViewMore.text =
+                    binding.FileViewMore.context.resources.getQuantityString(
+                        R.plurals.more_files,
+                        files.size - 1,
+                        files.size - 1,
+                    )
+                binding.FileViewMore.visibility = View.VISIBLE
+            } else {
+                binding.FileViewMore.visibility = View.GONE
+            }
         } else {
             binding.FileView.visibility = View.GONE
             binding.FileViewMore.visibility = View.GONE

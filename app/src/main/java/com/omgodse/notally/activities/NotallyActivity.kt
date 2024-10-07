@@ -47,9 +47,9 @@ import com.omgodse.notally.recyclerview.adapter.PreviewFileAdapter
 import com.omgodse.notally.recyclerview.adapter.PreviewImageAdapter
 import com.omgodse.notally.viewmodels.NotallyModel
 import com.omgodse.notally.widget.WidgetProvider
+import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
 
 abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
 

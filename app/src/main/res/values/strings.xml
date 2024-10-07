@@ -177,6 +177,11 @@
         <item quantity="other">Can’t add %d files</item>
     </plurals>
 
+    <plurals name="more_files">
+        <item quantity="one">…%d more file</item>
+        <item quantity="other">…%d more files</item>
+    </plurals>
+
     <!-- Audio -->
     <string name="play">Play</string>
     <string name="stop">Stop</string>
