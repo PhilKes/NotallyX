@@ -166,8 +166,16 @@
     </plurals>
 
     <!-- Files -->
+    <string name="adding_files">Adding files</string>
     <string name="deleting_files">Deleting files</string>
     <string name="delete_file">Delete file \'%s\'?</string>
+    <string name="error_while_renaming_file">Error while renaming file</string>
+    <string name="cant_load_file">Can’t load file. It may have been moved or deleted</string>
+
+    <plurals name="cant_add_files">
+        <item quantity="one">Can’t add %d file</item>
+        <item quantity="other">Can’t add %d files</item>
+    </plurals>
 
     <!-- Audio -->
     <string name="play">Play</string>

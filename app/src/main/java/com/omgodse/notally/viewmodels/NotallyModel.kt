@@ -160,10 +160,17 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         val unknownError = app.getString(R.string.unknown_error)
         val invalidImage = app.getString(R.string.invalid_image)
         val formatNotSupported = app.getString(R.string.image_format_not_supported)
-        val errorWhileRenaming = app.getString(R.string.error_while_renaming_image)
+        val errorWhileRenaming =
+            app.getString(
+                if (fileType == FileType.IMAGE) {
+                    R.string.error_while_renaming_image
+                } else {
+                    R.string.error_while_renaming_file
+                }
+            )
 
         viewModelScope.launch {
-            addingFiles.value = FileProgress(true, 0, uris.size)
+            addingFiles.value = FileProgress(true, 0, uris.size, fileType)
 
             val successes = ArrayList<FileAttachment>()
             val errors = ArrayList<FileError>()
@@ -203,10 +210,15 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                                         } else {
                                             // I don't expect this error to ever happen but just in
                                             // case
-                                            errors.add(FileError(displayName, errorWhileRenaming))
+                                            errors.add(
+                                                FileError(displayName, errorWhileRenaming, fileType)
+                                            )
                                         }
-                                    } else errors.add(FileError(displayName, formatNotSupported))
-                                } else errors.add(FileError(displayName, invalidImage))
+                                    } else
+                                        errors.add(
+                                            FileError(displayName, formatNotSupported, fileType)
+                                        )
+                                } else errors.add(FileError(displayName, invalidImage, fileType))
                             }
 
                             FileType.ANY -> {
@@ -224,20 +236,20 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                                     )
                                 } else {
                                     // I don't expect this error to ever happen but just in case
-                                    errors.add(FileError(displayName, errorWhileRenaming))
+                                    errors.add(FileError(displayName, errorWhileRenaming, fileType))
                                 }
                             }
                         }
                     } catch (exception: Exception) {
-                        errors.add(FileError(displayName, unknownError))
+                        errors.add(FileError(displayName, unknownError, fileType))
                         Operations.log(app, exception)
                     }
                 }
 
-                addingFiles.value = FileProgress(true, index + 1, uris.size)
+                addingFiles.value = FileProgress(true, index + 1, uris.size, fileType)
             }
 
-            addingFiles.value = FileProgress(false, 0, 0)
+            addingFiles.value = FileProgress(false, 0, 0, fileType)
 
             if (successes.isNotEmpty()) {
                 val copy =

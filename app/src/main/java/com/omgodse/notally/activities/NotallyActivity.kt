@@ -47,9 +47,9 @@ import com.omgodse.notally.recyclerview.adapter.PreviewFileAdapter
 import com.omgodse.notally.recyclerview.adapter.PreviewImageAdapter
 import com.omgodse.notally.viewmodels.NotallyModel
 import com.omgodse.notally.widget.WidgetProvider
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
 
@@ -211,7 +211,7 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         menu.add(R.string.add_images, R.drawable.add_images) {
             checkNotificationPermission { selectImages() }
         }
-        menu.add(R.string.attach_file, R.drawable.add_images) {
+        menu.add(R.string.attach_file, R.drawable.text_file) {
             checkNotificationPermission { selectFiles() }
         }
 
@@ -283,22 +283,22 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         } else recordAudio()
     }
 
-    private fun checkNotificationPermission(onSucces: () -> Unit) {
+    private fun checkNotificationPermission(onSuccess: () -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val permission = Manifest.permission.POST_NOTIFICATIONS
             if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
                 if (shouldShowRequestPermissionRationale(permission)) {
                     MaterialAlertDialogBuilder(this)
                         .setMessage(R.string.please_grant_notally_notification)
-                        .setNegativeButton(R.string.cancel) { _, _ -> onSucces() }
+                        .setNegativeButton(R.string.cancel) { _, _ -> onSuccess() }
                         .setPositiveButton(R.string.continue_) { _, _ ->
                             requestPermissions(arrayOf(permission), REQUEST_NOTIFICATION_PERMISSION)
                         }
-                        .setOnDismissListener { onSucces() }
+                        .setOnDismissListener { onSuccess() }
                         .show()
                 } else requestPermissions(arrayOf(permission), REQUEST_NOTIFICATION_PERMISSION)
-            } else onSucces()
-        } else onSucces()
+            } else onSuccess()
+        } else onSuccess()
     }
 
     private fun recordAudio() {
@@ -418,28 +418,6 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
             adapter.submitList(list)
             binding.ImagePreview.isVisible = list.isNotEmpty()
         }
-
-        val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
-        val dialog =
-            MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.adding_images)
-                .setView(dialogBinding.root)
-                .setCancelable(false)
-                .create()
-
-        model.addingFiles.observe(this) { progress ->
-            if (progress.inProgress) {
-                dialog.show()
-                dialogBinding.ProgressBar.max = progress.total
-                dialogBinding.ProgressBar.setProgressCompat(progress.current, true)
-                dialogBinding.Count.text =
-                    getString(R.string.count, progress.current, progress.total)
-            } else dialog.dismiss()
-        }
-
-        model.eventBus.observe(this) { event ->
-            event.handle { errors -> displayFileErrors(errors) }
-        }
     }
 
     private fun setupFiles() {
@@ -501,8 +479,13 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
             recyclerView.scrollIndicators =
                 View.SCROLL_INDICATOR_TOP or View.SCROLL_INDICATOR_BOTTOM
         }
-
-        val title = resources.getQuantityString(R.plurals.cant_add_images, errors.size, errors.size)
+        val message =
+            if (errors.isNotEmpty() && errors[0].fileType == NotallyModel.FileType.IMAGE) {
+                R.plurals.cant_add_images
+            } else {
+                R.plurals.cant_add_files
+            }
+        val title = resources.getQuantityString(message, errors.size, errors.size)
         MaterialAlertDialogBuilder(this)
             .setTitle(title)
             .setView(recyclerView)
@@ -562,8 +545,39 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
         setupImages()
         setupFiles()
         setupAudios()
+        setupProgressDialog()
 
         binding.root.isSaveFromParentEnabled = false
+    }
+
+    private fun setupProgressDialog() {
+        val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
+        val dialog =
+            MaterialAlertDialogBuilder(this)
+                .setView(dialogBinding.root)
+                .setCancelable(false)
+                .create()
+
+        model.addingFiles.observe(this) { progress ->
+            if (progress.inProgress) {
+                dialog.setTitle(
+                    if (progress.fileType == NotallyModel.FileType.IMAGE) {
+                        R.string.adding_images
+                    } else {
+                        R.string.adding_files
+                    }
+                )
+                dialog.show()
+                dialogBinding.ProgressBar.max = progress.total
+                dialogBinding.ProgressBar.setProgressCompat(progress.current, true)
+                dialogBinding.Count.text =
+                    getString(R.string.count, progress.current, progress.total)
+            } else dialog.dismiss()
+        }
+
+        model.eventBus.observe(this) { event ->
+            event.handle { errors -> displayFileErrors(errors) }
+        }
     }
 
     private fun bindPinned(item: MenuItem) {

@@ -7,7 +7,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:clickable="true"
-    android:text="test123123.pdf"
+    android:text="@string/cant_load_file"
     android:padding="6dp"
     android:drawablePadding="4dp"
     android:textAppearance="?attr/textAppearanceBody1"

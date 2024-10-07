@@ -77,6 +77,7 @@
                 android:padding="5dp"
                 android:drawablePadding="4dp"
                 android:layout_marginStart="11dp"
+                android:text="@string/cant_load_file"
                 android:textAppearance="?attr/textAppearanceCaption"
                 android:background="@drawable/file_attachment_background"
                 app:layout_constraintStart_toStartOf="parent"
