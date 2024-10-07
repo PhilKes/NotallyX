@@ -1,10 +1,13 @@
 package com.omgodse.notally.viewmodels
 
 import android.app.Application
+import android.content.ContentResolver
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.graphics.Typeface
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -13,6 +16,7 @@ import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.text.getSpans
 import androidx.documentfile.provider.DocumentFile
@@ -23,16 +27,16 @@ import com.omgodse.notally.AttachmentDeleteService
 import com.omgodse.notally.Cache
 import com.omgodse.notally.R
 import com.omgodse.notally.image.Event
-import com.omgodse.notally.image.ImageError
-import com.omgodse.notally.image.ImageProgress
+import com.omgodse.notally.image.FileError
+import com.omgodse.notally.image.FileProgress
 import com.omgodse.notally.miscellaneous.IO
 import com.omgodse.notally.miscellaneous.Operations
 import com.omgodse.notally.miscellaneous.applySpans
 import com.omgodse.notally.model.Audio
 import com.omgodse.notally.model.BaseNote
 import com.omgodse.notally.model.Color
+import com.omgodse.notally.model.FileAttachment
 import com.omgodse.notally.model.Folder
-import com.omgodse.notally.model.Image
 import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.model.NotallyDatabase
 import com.omgodse.notally.model.SpanRepresentation
@@ -71,14 +75,16 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     var body: Editable = SpannableStringBuilder()
 
     val items = ArrayList<ListItem>()
-    val images = BetterLiveData<List<Image>>(emptyList())
+    val images = BetterLiveData<List<FileAttachment>>(emptyList())
+    val files = BetterLiveData<List<FileAttachment>>(emptyList())
     val audios = BetterLiveData<List<Audio>>(emptyList())
 
-    val addingImages = MutableLiveData<ImageProgress>()
-    val eventBus = MutableLiveData<Event<List<ImageError>>>()
+    val addingFiles = MutableLiveData<FileProgress>()
+    val eventBus = MutableLiveData<Event<List<FileError>>>()
 
     var imageRoot = IO.getExternalImagesDirectory(app)
     var audioRoot = IO.getExternalAudioDirectory(app)
+    var filesRoot = IO.getExternalFilesDirectory(app)
 
     fun addAudio() {
         viewModelScope.launch {
@@ -130,73 +136,139 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun addImages(uris: Array<Uri>) {
+        /*
+        Regenerate because the directory may have been deleted between the time of activity creation
+        and image addition
+         */
+        imageRoot = IO.getExternalImagesDirectory(app)
+        requireNotNull(imageRoot) { "imageRoot is null" }
+        addFiles(uris, imageRoot!!, FileType.IMAGE)
+    }
+
+    fun addFiles(uris: Array<Uri>) {
+        /*
+        Regenerate because the directory may have been deleted between the time of activity creation
+        and image addition
+         */
+        filesRoot = IO.getExternalFilesDirectory(app)
+        requireNotNull(filesRoot) { "filesRoot is null" }
+        addFiles(uris, filesRoot!!, FileType.ANY)
+    }
+
+    private fun addFiles(uris: Array<Uri>, directory: File, fileType: FileType) {
         val unknownName = app.getString(R.string.unknown_name)
         val unknownError = app.getString(R.string.unknown_error)
         val invalidImage = app.getString(R.string.invalid_image)
         val formatNotSupported = app.getString(R.string.image_format_not_supported)
-        val errorWhileRenaming = app.getString(R.string.error_while_renaming_image)
+        val errorWhileRenaming =
+            app.getString(
+                if (fileType == FileType.IMAGE) {
+                    R.string.error_while_renaming_image
+                } else {
+                    R.string.error_while_renaming_file
+                }
+            )
 
         viewModelScope.launch {
-            addingImages.value = ImageProgress(true, 0, uris.size)
+            addingFiles.value = FileProgress(true, 0, uris.size, fileType)
 
-            val successes = ArrayList<Image>()
-            val errors = ArrayList<ImageError>()
+            val successes = ArrayList<FileAttachment>()
+            val errors = ArrayList<FileError>()
 
             uris.forEachIndexed { index, uri ->
                 withContext(Dispatchers.IO) {
                     val document = requireNotNull(DocumentFile.fromSingleUri(app, uri))
                     val displayName = document.name ?: unknownName
                     try {
-                        /*
-                        Regenerate because the directory may have been deleted between the time of activity creation
-                        and image addition
-                         */
-                        imageRoot = IO.getExternalImagesDirectory(app)
-                        requireNotNull(imageRoot) { "externalRoot is null" }
 
                         /*
                         If we have reached this point, an SD card (emulated or real) exists and externalRoot
                         is not null. externalRoot.exists() can be false if the folder `Images` has been deleted after
                         the previous line, but externalRoot itself can't be null
                         */
-                        val temp = File(imageRoot, "Temp")
+                        val temp = File(directory, "Temp")
 
                         val inputStream = requireNotNull(app.contentResolver.openInputStream(uri))
                         IO.copyStreamToFile(inputStream, temp)
 
-                        val options = BitmapFactory.Options()
-                        options.inJustDecodeBounds = true
-                        BitmapFactory.decodeFile(temp.path, options)
-                        val mimeType = options.outMimeType
+                        val originalName = app.getFileName(uri)
+                        when (fileType) {
+                            FileType.IMAGE -> {
+                                val options = BitmapFactory.Options()
+                                options.inJustDecodeBounds = true
+                                BitmapFactory.decodeFile(temp.path, options)
+                                val mimeType = options.outMimeType
 
-                        if (mimeType != null) {
-                            val extension = getExtensionForMimeType(mimeType)
-                            if (extension != null) {
-                                val name = "${UUID.randomUUID()}.$extension"
+                                if (mimeType != null) {
+                                    val extension = getExtensionForMimeType(mimeType)
+                                    if (extension != null) {
+                                        val name = "${UUID.randomUUID()}.$extension"
+                                        if (IO.renameFile(temp, name)) {
+                                            successes.add(
+                                                FileAttachment(name, originalName ?: name, mimeType)
+                                            )
+                                        } else {
+                                            // I don't expect this error to ever happen but just in
+                                            // case
+                                            errors.add(
+                                                FileError(displayName, errorWhileRenaming, fileType)
+                                            )
+                                        }
+                                    } else
+                                        errors.add(
+                                            FileError(displayName, formatNotSupported, fileType)
+                                        )
+                                } else errors.add(FileError(displayName, invalidImage, fileType))
+                            }
+
+                            FileType.ANY -> {
+                                val mimeType =
+                                    app.contentResolver.getType(uri) ?: "application/octet-stream"
+                                val fileExtension =
+                                    MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
+                                        ?: ""
+                                val extension =
+                                    if (fileExtension.isNotEmpty()) ".${fileExtension}" else ""
+                                val name = "${UUID.randomUUID()}${extension}"
                                 if (IO.renameFile(temp, name)) {
-                                    successes.add(Image(name, mimeType))
+                                    successes.add(
+                                        FileAttachment(name, originalName ?: name, mimeType)
+                                    )
                                 } else {
                                     // I don't expect this error to ever happen but just in case
-                                    errors.add(ImageError(displayName, errorWhileRenaming))
+                                    errors.add(FileError(displayName, errorWhileRenaming, fileType))
                                 }
-                            } else errors.add(ImageError(displayName, formatNotSupported))
-                        } else errors.add(ImageError(displayName, invalidImage))
+                            }
+                        }
                     } catch (exception: Exception) {
-                        errors.add(ImageError(displayName, unknownError))
+                        errors.add(FileError(displayName, unknownError, fileType))
                         Operations.log(app, exception)
                     }
                 }
 
-                addingImages.value = ImageProgress(true, index + 1, uris.size)
+                addingFiles.value = FileProgress(true, index + 1, uris.size, fileType)
             }
 
-            addingImages.value = ImageProgress(false, 0, 0)
+            addingFiles.value = FileProgress(false, 0, 0, fileType)
 
             if (successes.isNotEmpty()) {
-                val copy = ArrayList(images.value)
+                val copy =
+                    when (fileType) {
+                        FileType.IMAGE -> ArrayList(images.value)
+                        FileType.ANY -> ArrayList(files.value)
+                    }
                 copy.addAll(successes)
-                images.value = copy
-                updateImages()
+                when (fileType) {
+                    FileType.IMAGE -> {
+                        images.value = copy
+                        updateImages()
+                    }
+
+                    FileType.ANY -> {
+                        files.value = copy
+                        updateFiles()
+                    }
+                }
             }
 
             if (errors.isNotEmpty()) {
@@ -205,12 +277,39 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun deleteImages(list: ArrayList<Image>) {
+    private fun Context.getFileName(uri: Uri): String? =
+        when (uri.scheme) {
+            ContentResolver.SCHEME_CONTENT -> getContentFileName(uri)
+            else -> uri.path?.let(::File)?.name
+        }
+
+    private fun Context.getContentFileName(uri: Uri): String? =
+        runCatching {
+                contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                    cursor.moveToFirst()
+                    return@use cursor
+                        .getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
+                        .let(cursor::getString)
+                }
+            }
+            .getOrNull()
+
+    fun deleteImages(list: ArrayList<FileAttachment>) {
         viewModelScope.launch {
             val copy = ArrayList(images.value)
             copy.removeAll(list)
             images.value = copy
             updateImages()
+            AttachmentDeleteService.start(app, list)
+        }
+    }
+
+    fun deleteFiles(list: ArrayList<FileAttachment>) {
+        viewModelScope.launch {
+            val copy = ArrayList(files.value)
+            copy.removeAll(list)
+            files.value = copy
+            updateFiles()
             AttachmentDeleteService.start(app, list)
         }
     }
@@ -253,6 +352,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 items.addAll(baseNote.items)
 
                 images.value = baseNote.images
+                files.value = baseNote.files
                 audios.value = baseNote.audios
             } else {
                 createBaseNote()
@@ -268,7 +368,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     suspend fun deleteBaseNote() {
         withContext(Dispatchers.IO) { baseNoteDao.delete(id) }
         WidgetProvider.sendBroadcast(app, longArrayOf(id))
-        val attachments = ArrayList(images.value + audios.value)
+        val attachments = ArrayList(images.value + files.value + audios.value)
         if (attachments.isNotEmpty()) {
             AttachmentDeleteService.start(app, attachments)
         }
@@ -280,6 +380,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     private suspend fun updateImages() {
         withContext(Dispatchers.IO) { baseNoteDao.updateImages(id, images.value) }
+    }
+
+    private suspend fun updateFiles() {
+        withContext(Dispatchers.IO) { baseNoteDao.updateFiles(id, files.value) }
     }
 
     private suspend fun updateAudios() {
@@ -303,6 +407,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             spans,
             items,
             images.value,
+            files.value,
             audios.value,
         )
     }
@@ -363,5 +468,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             }
         }
         return representations
+    }
+
+    enum class FileType {
+        IMAGE,
+        ANY,
     }
 }

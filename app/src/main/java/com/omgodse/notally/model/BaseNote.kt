@@ -17,6 +17,7 @@ data class BaseNote(
     val body: String,
     val spans: List<SpanRepresentation>,
     val items: List<ListItem>,
-    val images: List<Image>,
+    val images: List<FileAttachment>,
+    val files: List<FileAttachment>,
     val audios: List<Audio>,
 ) : Item

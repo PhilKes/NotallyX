@@ -4,10 +4,10 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.omgodse.notally.databinding.ErrorBinding
-import com.omgodse.notally.image.ImageError
+import com.omgodse.notally.image.FileError
 import com.omgodse.notally.recyclerview.viewholder.ErrorVH
 
-class ErrorAdapter(private val items: List<ImageError>) : RecyclerView.Adapter<ErrorVH>() {
+class ErrorAdapter(private val items: List<FileError>) : RecyclerView.Adapter<ErrorVH>() {
 
     override fun getItemCount() = items.size
 

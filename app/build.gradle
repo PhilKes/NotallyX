@@ -72,7 +72,7 @@ tasks.register('installLocalGitHooks', Copy) {
     outputs.dir(hooksDir)
     fileMode 0775
 }
-preBuild.dependsOn installLocalGitHooks
+//preBuild.dependsOn installLocalGitHooks // TODO: only format changed .kt files
 
 dependencies {
     testImplementation 'junit:junit:4.12'
@@ -102,4 +102,5 @@ dependencies {
     testImplementation "org.mockito:mockito-core:5.13.0"
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.4.0"
     testImplementation "io.mockk:mockk:1.13.12"
+    testImplementation "org.json:json:20180813"
 }

@@ -24,7 +24,7 @@ import com.omgodse.notally.miscellaneous.displayFormattedTimestamp
 import com.omgodse.notally.miscellaneous.dp
 import com.omgodse.notally.model.BaseNote
 import com.omgodse.notally.model.Color
-import com.omgodse.notally.model.Image
+import com.omgodse.notally.model.FileAttachment
 import com.omgodse.notally.model.ListItem
 import com.omgodse.notally.model.SpanRepresentation
 import com.omgodse.notally.model.Type
@@ -70,7 +70,7 @@ class BaseNoteVH(
         binding.root.isChecked = checked
     }
 
-    fun bind(baseNote: BaseNote, mediaRoot: File?, checked: Boolean) {
+    fun bind(baseNote: BaseNote, imageRoot: File?, fileRoot: File?, checked: Boolean) {
         updateCheck(checked)
 
         when (baseNote.type) {
@@ -80,7 +80,8 @@ class BaseNoteVH(
 
         binding.Date.displayFormattedTimestamp(baseNote.timestamp, dateFormat)
         setColor(baseNote.color)
-        setImages(baseNote.images, mediaRoot)
+        setImages(baseNote.images, imageRoot)
+        setFiles(baseNote.files, fileRoot)
 
         binding.Title.text = baseNote.title
         binding.Title.isVisible = baseNote.title.isNotEmpty()
@@ -147,13 +148,13 @@ class BaseNoteVH(
         }
     }
 
-    private fun setImages(images: List<Image>, mediaRoot: File?) {
+    private fun setImages(images: List<FileAttachment>, mediaRoot: File?) {
         if (images.isNotEmpty()) {
             binding.ImageView.visibility = View.VISIBLE
             binding.Message.visibility = View.GONE
 
             val image = images[0]
-            val file = if (mediaRoot != null) File(mediaRoot, image.name) else null
+            val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
 
             Glide.with(binding.ImageView)
                 .load(file)
@@ -189,6 +190,29 @@ class BaseNoteVH(
             binding.ImageView.visibility = View.GONE
             binding.Message.visibility = View.GONE
             Glide.with(binding.ImageView).clear(binding.ImageView)
+        }
+    }
+
+    private fun setFiles(files: List<FileAttachment>, mediaRoot: File?) {
+        if (files.isNotEmpty()) {
+            binding.FileView.visibility = View.VISIBLE
+
+            val firstFile = files[0]
+            binding.FileView.text = firstFile.originalName
+            if (files.size > 1) {
+                binding.FileViewMore.text =
+                    binding.FileViewMore.context.resources.getQuantityString(
+                        R.plurals.more_files,
+                        files.size - 1,
+                        files.size - 1,
+                    )
+                binding.FileViewMore.visibility = View.VISIBLE
+            } else {
+                binding.FileViewMore.visibility = View.GONE
+            }
+        } else {
+            binding.FileView.visibility = View.GONE
+            binding.FileViewMore.visibility = View.GONE
         }
     }
 

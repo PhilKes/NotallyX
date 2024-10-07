@@ -105,7 +105,8 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                 maxItems,
                 maxLines,
                 maxTitle,
-                model.mediaRoot,
+                model.imageRoot,
+                model.fileRoot,
                 this,
             )
         adapter?.registerAdapterDataObserver(

@@ -12,23 +12,25 @@ object Converters {
     @TypeConverter fun jsonToLabels(json: String) = JSONArray(json).iterable<String>().toList()
 
     @TypeConverter
-    fun imagesToJson(images: List<Image>): String {
+    fun filesToJson(files: List<FileAttachment>): String {
         val objects =
-            images.map { image ->
+            files.map { file ->
                 val jsonObject = JSONObject()
-                jsonObject.put("name", image.name)
-                jsonObject.put("mimeType", image.mimeType)
+                jsonObject.put("localName", file.localName)
+                jsonObject.put("originalName", file.originalName)
+                jsonObject.put("mimeType", file.mimeType)
             }
         return JSONArray(objects).toString()
     }
 
     @TypeConverter
-    fun jsonToImages(json: String): List<Image> {
+    fun jsonToFiles(json: String): List<FileAttachment> {
         val iterable = JSONArray(json).iterable<JSONObject>()
         return iterable.map { jsonObject ->
-            val name = jsonObject.getString("name")
+            val localName = getSafeLocalName(jsonObject)
+            val originalName = getSafeOriginalName(jsonObject)
             val mimeType = jsonObject.getString("mimeType")
-            Image(name, mimeType)
+            FileAttachment(localName, originalName, mimeType)
         }
     }
 
@@ -112,6 +114,22 @@ object Converters {
                 jsonObject.put("end", representation.end)
             }
         return JSONArray(objects)
+    }
+
+    private fun getSafeLocalName(jsonObject: JSONObject): String {
+        return try {
+            jsonObject.getString("localName")
+        } catch (e: JSONException) {
+            jsonObject.getString("name")
+        }
+    }
+
+    private fun getSafeOriginalName(jsonObject: JSONObject): String {
+        return try {
+            jsonObject.getString("originalName")
+        } catch (e: JSONException) {
+            getSafeLocalName(jsonObject).substringAfterLast("/")
+        }
     }
 
     private fun JSONObject.getSafeBoolean(name: String): Boolean {

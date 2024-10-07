@@ -51,7 +51,8 @@ class ConfigureWidget : AppCompatActivity(), ItemListener {
         val maxTitle = preferences.maxTitle
         val textSize = preferences.textSize.value
         val dateFormat = preferences.dateFormat.value
-        val mediaRoot = IO.getExternalImagesDirectory(application)
+        val imagesRoot = IO.getExternalImagesDirectory(application)
+        val filesRoot = IO.getExternalFilesDirectory(application)
 
         adapter =
             BaseNoteAdapter(
@@ -61,7 +62,8 @@ class ConfigureWidget : AppCompatActivity(), ItemListener {
                 maxItems,
                 maxLines,
                 maxTitle,
-                mediaRoot,
+                imagesRoot,
+                filesRoot,
                 this,
             )
 

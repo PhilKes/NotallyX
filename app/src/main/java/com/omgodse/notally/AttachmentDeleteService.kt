@@ -11,9 +11,10 @@ import android.os.Build
 import android.os.IBinder
 import androidx.core.content.ContextCompat
 import com.omgodse.notally.miscellaneous.IO
+import com.omgodse.notally.miscellaneous.isImage
 import com.omgodse.notally.model.Attachment
 import com.omgodse.notally.model.Audio
-import com.omgodse.notally.model.Image
+import com.omgodse.notally.model.FileAttachment
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -36,7 +37,7 @@ class AttachmentDeleteService : Service() {
             val channel =
                 NotificationChannel(
                     channelId,
-                    "Backups and Images",
+                    "Backups and Files",
                     NotificationManager.IMPORTANCE_DEFAULT,
                 )
             manager.createNotificationChannel(channel)
@@ -64,6 +65,7 @@ class AttachmentDeleteService : Service() {
             withContext(Dispatchers.IO) {
                 val imageRoot = IO.getExternalImagesDirectory(application)
                 val audioRoot = IO.getExternalAudioDirectory(application)
+                val fileRoot = IO.getExternalFilesDirectory(application)
                 do {
                     val attachments = channel.receive()
                     attachments.forEachIndexed { index, attachment ->
@@ -72,9 +74,10 @@ class AttachmentDeleteService : Service() {
                                 is Audio ->
                                     if (audioRoot != null) File(audioRoot, attachment.name)
                                     else null
-                                is Image ->
-                                    if (imageRoot != null) File(imageRoot, attachment.name)
-                                    else null
+                                is FileAttachment -> {
+                                    val root = if (attachment.isImage) imageRoot else fileRoot
+                                    if (root != null) File(root, attachment.localName) else null
+                                }
                             }
                         if (file != null && file.exists()) {
                             file.delete()

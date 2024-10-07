@@ -22,6 +22,7 @@ import android.widget.TextView
 import com.omgodse.notally.activities.TakeNote
 import com.omgodse.notally.changehistory.ChangeHistory
 import com.omgodse.notally.changehistory.EditTextChange
+import com.omgodse.notally.model.FileAttachment
 import com.omgodse.notally.model.SpanRepresentation
 import com.omgodse.notally.recyclerview.ListManager
 import java.util.Date
@@ -194,6 +195,11 @@ fun EditText.createTextWatcherWithHistory(
                 )
             )
         }
+    }
+
+val FileAttachment.isImage: Boolean
+    get() {
+        return mimeType.startsWith("image/")
     }
 
 private fun formatTimestamp(timestamp: Long, dateFormat: String): String {
