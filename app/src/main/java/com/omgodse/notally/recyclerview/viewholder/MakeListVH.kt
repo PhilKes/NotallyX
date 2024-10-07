@@ -68,7 +68,7 @@ class MakeListVH(
     }
 
     fun focusEditText(
-        selectionStart: Int = binding.EditText.text.length,
+        selectionStart: Int = binding.EditText.text!!.length,
         inputMethodManager: InputMethodManager,
     ) {
         binding.EditText.requestFocus()

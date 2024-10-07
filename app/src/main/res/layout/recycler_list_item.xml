@@ -53,7 +53,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp" />
 
-        <EditText
+        <com.omgodse.notally.miscellaneous.EditTextAutoClearFocus
             android:id="@+id/EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
