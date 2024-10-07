@@ -98,6 +98,13 @@ interface BaseNoteDao {
         updateItems(id, items)
     }
 
+    /** see [updateChecked] */
+    suspend fun updateChecked(id: Long, positions: List<Int>, checked: Boolean) {
+        val items = requireNotNull(get(id)).items
+        positions.forEach { position -> items[position].checked = checked }
+        updateItems(id, items)
+    }
+
     /**
      * Since we store the labels as a JSON Array, it is not possible to perform operations on it.
      * Thus, we use the 'Like' query which can return false positives sometimes.

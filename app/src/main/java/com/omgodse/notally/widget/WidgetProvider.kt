@@ -13,7 +13,11 @@ import com.omgodse.notally.activities.ConfigureWidget
 import com.omgodse.notally.activities.MakeList
 import com.omgodse.notally.activities.TakeNote
 import com.omgodse.notally.miscellaneous.Constants
+import com.omgodse.notally.model.BaseNote
 import com.omgodse.notally.model.NotallyDatabase
+import com.omgodse.notally.model.dao.BaseNoteDao
+import com.omgodse.notally.model.findChildrenPositions
+import com.omgodse.notally.model.findParentPosition
 import com.omgodse.notally.preferences.Preferences
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -36,25 +40,65 @@ class WidgetProvider : AppWidgetProvider() {
             }
             ACTION_OPEN_NOTE -> openActivity(context, intent, TakeNote::class.java)
             ACTION_OPEN_LIST -> openActivity(context, intent, MakeList::class.java)
-            ACTION_CHECKED_CHANGED -> {
-                val noteId = intent.getLongExtra(Constants.SelectedBaseNote, 0)
-                val position = intent.getIntExtra(EXTRA_POSITION, 0)
-                val checked = intent.getBooleanExtra(RemoteViews.EXTRA_CHECKED, false)
+            ACTION_CHECKED_CHANGED -> checkChanged(intent, context)
+        }
+    }
 
-                val database =
-                    NotallyDatabase.getDatabase(context.applicationContext as Application)
-                val pendingResult = goAsync()
-                GlobalScope.launch {
-                    withContext(Dispatchers.IO) {
-                        try {
-                            database.getBaseNoteDao().updateChecked(noteId, position, checked)
-                        } finally {
-                            updateWidgets(context, longArrayOf(noteId))
-                            pendingResult.finish()
-                        }
+    @OptIn(DelicateCoroutinesApi::class)
+    private fun checkChanged(intent: Intent, context: Context) {
+        val noteId = intent.getLongExtra(Constants.SelectedBaseNote, 0)
+        val position = intent.getIntExtra(EXTRA_POSITION, 0)
+        val checked = intent.getBooleanExtra(RemoteViews.EXTRA_CHECKED, false)
+        val database = NotallyDatabase.getDatabase(context.applicationContext as Application)
+        val pendingResult = goAsync()
+        GlobalScope.launch {
+            withContext(Dispatchers.IO) {
+                try {
+                    val baseNoteDao = database.getBaseNoteDao()
+                    val note = baseNoteDao.get(noteId)!!
+                    val item = note.items[position]
+                    if (item.isChild) {
+                        changeChildChecked(note, position, checked, baseNoteDao, noteId)
+                    } else {
+                        val childrenPositions = note.items.findChildrenPositions(position)
+                        baseNoteDao.updateChecked(noteId, childrenPositions + position, checked)
                     }
+                } finally {
+                    updateWidgets(context, longArrayOf(noteId))
+                    pendingResult.finish()
                 }
             }
+        }
+    }
+
+    private suspend fun changeChildChecked(
+        note: BaseNote,
+        childPosition: Int,
+        checked: Boolean,
+        baseNoteDao: BaseNoteDao,
+        noteId: Long,
+    ) {
+        val parentPosition = note.items.findParentPosition(childPosition)!!
+        val parent = note.items[parentPosition]
+        val childrenPositions = note.items.findChildrenPositions(parentPosition)
+        if (parent.checked != checked) {
+            if (checked) {
+                // If the last unchecked child is being checked also check parent
+                if (childrenPositions.none { !note.items[it].checked && it != childPosition }) {
+                    baseNoteDao.updateChecked(noteId, listOf(childPosition, parentPosition), true)
+                } else {
+                    baseNoteDao.updateChecked(noteId, childPosition, true)
+                }
+            } else {
+                if (parent.checked) {
+                    // If any child is unchecked the parent is unchecked too
+                    baseNoteDao.updateChecked(noteId, listOf(childPosition, parentPosition), false)
+                } else {
+                    baseNoteDao.updateChecked(noteId, childPosition, false)
+                }
+            }
+        } else {
+            baseNoteDao.updateChecked(noteId, childPosition, false)
         }
     }
 

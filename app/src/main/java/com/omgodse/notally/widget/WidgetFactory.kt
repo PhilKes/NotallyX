@@ -55,99 +55,99 @@ class WidgetFactory(private val app: Application, private val id: Long) :
     }
 
     private fun getNoteView(note: BaseNote): RemoteViews {
-        val view = RemoteViews(app.packageName, R.layout.widget_note)
+        return RemoteViews(app.packageName, R.layout.widget_note).apply {
+            setTextViewTextSize(
+                R.id.Title,
+                TypedValue.COMPLEX_UNIT_SP,
+                TextSize.getDisplayTitleSize(preferences.textSize.value),
+            )
+            if (note.title.isNotEmpty()) {
+                setTextViewText(R.id.Title, note.title)
+                setViewVisibility(R.id.Title, View.VISIBLE)
+            } else setViewVisibility(R.id.Title, View.GONE)
 
-        view.setTextViewTextSize(
-            R.id.Title,
-            TypedValue.COMPLEX_UNIT_SP,
-            TextSize.getDisplayTitleSize(preferences.textSize.value),
-        )
-        if (note.title.isNotEmpty()) {
-            view.setTextViewText(R.id.Title, note.title)
-            view.setViewVisibility(R.id.Title, View.VISIBLE)
-        } else view.setViewVisibility(R.id.Title, View.GONE)
+            val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
 
-        val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
+            setTextViewTextSize(R.id.Date, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
+            displayFormattedTimestamp(R.id.Date, note.timestamp, preferences.dateFormat.value)
 
-        view.setTextViewTextSize(R.id.Date, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
-        view.displayFormattedTimestamp(R.id.Date, note.timestamp, preferences.dateFormat.value)
+            setTextViewTextSize(R.id.Note, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
+            if (note.body.isNotEmpty()) {
+                setTextViewText(R.id.Note, note.body)
+                setViewVisibility(R.id.Note, View.VISIBLE)
+            } else setViewVisibility(R.id.Note, View.GONE)
 
-        view.setTextViewTextSize(R.id.Note, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
-        if (note.body.isNotEmpty()) {
-            view.setTextViewText(R.id.Note, note.body)
-            view.setViewVisibility(R.id.Note, View.VISIBLE)
-        } else view.setViewVisibility(R.id.Note, View.GONE)
-
-        val intent = Intent(WidgetProvider.ACTION_OPEN_NOTE)
-        view.setOnClickFillInIntent(R.id.LinearLayout, intent)
-
-        return view
+            val intent = Intent(WidgetProvider.ACTION_OPEN_NOTE)
+            setOnClickFillInIntent(R.id.LinearLayout, intent)
+        }
     }
 
     private fun getListHeaderView(list: BaseNote): RemoteViews {
-        val view = RemoteViews(app.packageName, R.layout.widget_list_header)
+        return RemoteViews(app.packageName, R.layout.widget_list_header).apply {
+            setTextViewTextSize(
+                R.id.Title,
+                TypedValue.COMPLEX_UNIT_SP,
+                TextSize.getDisplayTitleSize(preferences.textSize.value),
+            )
+            if (list.title.isNotEmpty()) {
+                setTextViewText(R.id.Title, list.title)
+                setViewVisibility(R.id.Title, View.VISIBLE)
+            } else setViewVisibility(R.id.Title, View.GONE)
 
-        view.setTextViewTextSize(
-            R.id.Title,
-            TypedValue.COMPLEX_UNIT_SP,
-            TextSize.getDisplayTitleSize(preferences.textSize.value),
-        )
-        if (list.title.isNotEmpty()) {
-            view.setTextViewText(R.id.Title, list.title)
-            view.setViewVisibility(R.id.Title, View.VISIBLE)
-        } else view.setViewVisibility(R.id.Title, View.GONE)
+            val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
 
-        val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
+            setTextViewTextSize(R.id.Date, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
+            displayFormattedTimestamp(R.id.Date, list.timestamp, preferences.dateFormat.value)
 
-        view.setTextViewTextSize(R.id.Date, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
-        view.displayFormattedTimestamp(R.id.Date, list.timestamp, preferences.dateFormat.value)
-
-        val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
-        view.setOnClickFillInIntent(R.id.LinearLayout, intent)
-
-        return view
+            val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
+            setOnClickFillInIntent(R.id.LinearLayout, intent)
+        }
     }
 
     private fun getListItemView(index: Int, list: BaseNote): RemoteViews {
-        val view = RemoteViews(app.packageName, R.layout.widget_list_item)
-
         val item = list.items[index]
-
-        view.setTextViewTextSize(
-            R.id.CheckBox,
-            TypedValue.COMPLEX_UNIT_SP,
-            TextSize.getDisplayBodySize(preferences.textSize.value),
-        )
-        view.setTextViewText(R.id.CheckBox, item.body)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            view.setCompoundButtonChecked(R.id.CheckBox, item.checked)
-            val intent = Intent(WidgetProvider.ACTION_CHECKED_CHANGED)
-            intent.putExtra(WidgetProvider.EXTRA_POSITION, index)
-            val response = RemoteViews.RemoteResponse.fromFillInIntent(intent)
-            view.setOnCheckedChangeResponse(R.id.CheckBox, response)
-        } else {
-            val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
-            if (item.checked) {
-                view.setTextViewCompoundDrawablesRelative(
-                    R.id.CheckBox,
-                    R.drawable.checkbox_fill,
-                    0,
-                    0,
-                    0,
-                )
-            } else
-                view.setTextViewCompoundDrawablesRelative(
-                    R.id.CheckBox,
-                    R.drawable.checkbox_outline,
-                    0,
-                    0,
-                    0,
-                )
-            view.setOnClickFillInIntent(R.id.CheckBox, intent)
+        val view =
+            if (item.isChild) {
+                // Since RemoteViews.view.setViewLayoutMargin is only available with API Level >= 31
+                // use other layout that uses marginStart to indent child
+                RemoteViews(app.packageName, R.layout.widget_list_child_item)
+            } else {
+                RemoteViews(app.packageName, R.layout.widget_list_item)
+            }
+        return view.apply {
+            setTextViewTextSize(
+                R.id.CheckBox,
+                TypedValue.COMPLEX_UNIT_SP,
+                TextSize.getDisplayBodySize(preferences.textSize.value),
+            )
+            setTextViewText(R.id.CheckBox, item.body)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setCompoundButtonChecked(R.id.CheckBox, item.checked)
+                val intent = Intent(WidgetProvider.ACTION_CHECKED_CHANGED)
+                intent.putExtra(WidgetProvider.EXTRA_POSITION, index)
+                val response = RemoteViews.RemoteResponse.fromFillInIntent(intent)
+                setOnCheckedChangeResponse(R.id.CheckBox, response)
+            } else {
+                val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
+                if (item.checked) {
+                    setTextViewCompoundDrawablesRelative(
+                        R.id.CheckBox,
+                        R.drawable.checkbox_fill,
+                        0,
+                        0,
+                        0,
+                    )
+                } else
+                    setTextViewCompoundDrawablesRelative(
+                        R.id.CheckBox,
+                        R.drawable.checkbox_outline,
+                        0,
+                        0,
+                        0,
+                    )
+                setOnClickFillInIntent(R.id.CheckBox, intent)
+            }
         }
-
-        return view
     }
 
     override fun getViewTypeCount() = 3
