@@ -72,7 +72,7 @@ tasks.register('installLocalGitHooks', Copy) {
     outputs.dir(hooksDir)
     fileMode 0775
 }
-preBuild.dependsOn installLocalGitHooks
+//preBuild.dependsOn installLocalGitHooks // TODO: only format changed .kt files
 
 dependencies {
     testImplementation 'junit:junit:4.12'
