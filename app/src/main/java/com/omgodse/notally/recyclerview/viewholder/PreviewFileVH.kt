@@ -8,11 +8,12 @@ import com.omgodse.notally.model.FileAttachment
 class PreviewFileVH(
     private val binding: RecyclerPreviewFileBinding,
     onClick: (position: Int) -> Unit,
+    onLongClick: (position: Int) -> Boolean,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
         binding.FileName.setOnClickListener { onClick(adapterPosition) }
-        // TODO: On long click allow to delete file attachment
+        binding.FileName.setOnLongClickListener { onLongClick(adapterPosition) }
     }
 
     fun bind(fileAttachment: FileAttachment) {

@@ -494,6 +494,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         actionMode.selectedNotes.onEachIndexed { index, entry ->
             ids[index] = entry.key
             attachments.addAll(entry.value.images)
+            attachments.addAll(entry.value.files)
             attachments.addAll(entry.value.audios)
         }
         actionMode.close(false)
@@ -507,17 +508,21 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             val ids: LongArray
             val images = ArrayList<FileAttachment>()
+            val files = ArrayList<FileAttachment>()
             val audios = ArrayList<Audio>()
             withContext(Dispatchers.IO) {
                 ids = baseNoteDao.getDeletedNoteIds()
                 val imageStrings = baseNoteDao.getDeletedNoteImages()
+                val fileStrings = baseNoteDao.getDeletedNoteFiles()
                 val audioStrings = baseNoteDao.getDeletedNoteAudios()
                 imageStrings.flatMapTo(images) { json -> Converters.jsonToFiles(json) }
+                fileStrings.flatMapTo(files) { json -> Converters.jsonToFiles(json) }
                 audioStrings.flatMapTo(audios) { json -> Converters.jsonToAudios(json) }
                 baseNoteDao.deleteFrom(Folder.DELETED)
             }
-            val attachments = ArrayList<Attachment>(images.size + audios.size)
+            val attachments = ArrayList<Attachment>(images.size + files.size + audios.size)
             attachments.addAll(images)
+            attachments.addAll(files)
             attachments.addAll(audios)
             informOtherComponents(attachments, ids)
         }

@@ -443,24 +443,34 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
     }
 
     private fun setupFiles() {
-        val adapter = PreviewFileAdapter { fileAttachment ->
-            if (model.filesRoot == null) {
-                return@PreviewFileAdapter
-            }
-            val intent =
-                Intent(Intent.ACTION_VIEW).apply {
-                    val file = File(model.filesRoot, fileAttachment.localName)
-                    val uri =
-                        FileProvider.getUriForFile(
-                            this@NotallyActivity,
-                            "${packageName}.provider",
-                            file,
-                        )
-                    setDataAndType(uri, fileAttachment.mimeType)
-                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        val adapter =
+            PreviewFileAdapter({ fileAttachment ->
+                if (model.filesRoot == null) {
+                    return@PreviewFileAdapter
                 }
-            startActivity(intent)
-        }
+                val intent =
+                    Intent(Intent.ACTION_VIEW).apply {
+                        val file = File(model.filesRoot, fileAttachment.localName)
+                        val uri =
+                            FileProvider.getUriForFile(
+                                this@NotallyActivity,
+                                "${packageName}.provider",
+                                file,
+                            )
+                        setDataAndType(uri, fileAttachment.mimeType)
+                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    }
+                startActivity(intent)
+            }) { fileAttachment ->
+                MaterialAlertDialogBuilder(this)
+                    .setMessage(getString(R.string.delete_file, fileAttachment.originalName))
+                    .setNegativeButton(R.string.cancel, null)
+                    .setPositiveButton(R.string.delete) { _, _ ->
+                        model.deleteFiles(arrayListOf(fileAttachment))
+                    }
+                    .show()
+                return@PreviewFileAdapter true
+            }
 
         binding.FilesPreview.setHasFixedSize(true)
         binding.FilesPreview.adapter = adapter
@@ -469,29 +479,14 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
             LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         model.files.observe(this) { list ->
             adapter.submitList(list)
-            binding.FilesPreview.isVisible = list.isNotEmpty()
-        }
-
-        val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
-        val dialog =
-            MaterialAlertDialogBuilder(this)
-                .setTitle(R.string.adding_images)
-                .setView(dialogBinding.root)
-                .setCancelable(false)
-                .create()
-
-        model.addingFiles.observe(this) { progress ->
-            if (progress.inProgress) {
-                dialog.show()
-                dialogBinding.ProgressBar.max = progress.total
-                dialogBinding.ProgressBar.setProgressCompat(progress.current, true)
-                dialogBinding.Count.text =
-                    getString(R.string.count, progress.current, progress.total)
-            } else dialog.dismiss()
-        }
-
-        model.eventBus.observe(this) { event ->
-            event.handle { errors -> displayFileErrors(errors) }
+            val visible = list.isNotEmpty()
+            binding.FilesPreview.isVisible = visible
+            if (visible) {
+                binding.FilesPreview.post {
+                    binding.FilesPreview.scrollToPosition(adapter.itemCount)
+                    binding.FilesPreview.requestLayout()
+                }
+            }
         }
     }
 

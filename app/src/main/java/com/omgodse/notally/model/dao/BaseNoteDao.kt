@@ -58,6 +58,9 @@ interface BaseNoteDao {
     @Query("SELECT images FROM BaseNote WHERE folder = 'DELETED'")
     suspend fun getDeletedNoteImages(): List<String>
 
+    @Query("SELECT files FROM BaseNote WHERE folder = 'DELETED'")
+    suspend fun getDeletedNoteFiles(): List<String>
+
     @Query("SELECT audios FROM BaseNote WHERE folder = 'DELETED'")
     suspend fun getDeletedNoteAudios(): List<String>
 

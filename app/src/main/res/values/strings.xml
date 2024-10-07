@@ -165,6 +165,10 @@
         <item quantity="other">Can’t add %d images</item>
     </plurals>
 
+    <!-- Files -->
+    <string name="deleting_files">Deleting files</string>
+    <string name="delete_file">Delete file \'%s\'?</string>
+
     <!-- Audio -->
     <string name="play">Play</string>
     <string name="stop">Stop</string>

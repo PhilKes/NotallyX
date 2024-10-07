@@ -292,6 +292,16 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun deleteFiles(list: ArrayList<FileAttachment>) {
+        viewModelScope.launch {
+            val copy = ArrayList(files.value)
+            copy.removeAll(list)
+            files.value = copy
+            updateFiles()
+            AttachmentDeleteService.start(app, list)
+        }
+    }
+
     private fun getExtensionForMimeType(type: String): String? {
         return when (type) {
             "image/png" -> "png"
@@ -346,7 +356,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     suspend fun deleteBaseNote() {
         withContext(Dispatchers.IO) { baseNoteDao.delete(id) }
         WidgetProvider.sendBroadcast(app, longArrayOf(id))
-        val attachments = ArrayList(images.value + audios.value)
+        val attachments = ArrayList(images.value + files.value + audios.value)
         if (attachments.isNotEmpty()) {
             AttachmentDeleteService.start(app, attachments)
         }
