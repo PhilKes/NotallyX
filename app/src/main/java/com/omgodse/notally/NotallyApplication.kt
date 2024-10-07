@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.omgodse.notally.backup.AutoBackupWorker
 import com.omgodse.notally.preferences.Preferences
 import com.omgodse.notally.preferences.Theme
 import java.util.concurrent.TimeUnit
