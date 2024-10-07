@@ -128,7 +128,7 @@ object Converters {
         return try {
             jsonObject.getString("originalName")
         } catch (e: JSONException) {
-            getSafeLocalName(jsonObject)
+            getSafeLocalName(jsonObject).substringAfterLast("/")
         }
     }
 
