@@ -47,8 +47,10 @@ class SelectLabelsActivity : AppCompatActivity() {
     }
 
     private fun setupToolbar() {
-        binding.Toolbar.setNavigationOnClickListener { finish() }
-        binding.Toolbar.menu.add(R.string.add_label, R.drawable.add) { addLabel() }
+        binding.Toolbar.apply {
+            setNavigationOnClickListener { finish() }
+            menu.add(R.string.add_label, R.drawable.add) { addLabel() }
+        }
     }
 
     private fun addLabel() {
@@ -75,10 +77,10 @@ class SelectLabelsActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView() {
-        val adapter = SelectableLabelAdapter(selectedLabels)
-        adapter.onChecked = { position, checked ->
+        val labelAdapter = SelectableLabelAdapter(selectedLabels)
+        labelAdapter.onChecked = { position, checked ->
             if (position != -1) {
-                val label = adapter.currentList[position]
+                val label = labelAdapter.currentList[position]
                 if (checked) {
                     if (!selectedLabels.contains(label)) {
                         selectedLabels.add(label)
@@ -87,12 +89,16 @@ class SelectLabelsActivity : AppCompatActivity() {
             }
         }
 
-        binding.RecyclerView.setHasFixedSize(true)
-        binding.RecyclerView.adapter = adapter
-        binding.RecyclerView.addItemDecoration(DividerItemDecoration(this, RecyclerView.VERTICAL))
+        binding.RecyclerView.apply {
+            setHasFixedSize(true)
+            adapter = labelAdapter
+            addItemDecoration(
+                DividerItemDecoration(this@SelectLabelsActivity, RecyclerView.VERTICAL)
+            )
+        }
 
         model.labels.observe(this) { labels ->
-            adapter.submitList(labels)
+            labelAdapter.submitList(labels)
             if (labels.isEmpty()) {
                 binding.EmptyState.visibility = View.VISIBLE
             } else binding.EmptyState.visibility = View.INVISIBLE

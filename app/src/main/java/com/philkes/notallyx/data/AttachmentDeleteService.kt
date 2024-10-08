@@ -31,30 +31,31 @@ class AttachmentDeleteService : Service() {
 
     override fun onCreate() {
         val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val builder = Notification.Builder(application)
+        val builder =
+            Notification.Builder(application).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channelId = "com.philkes.fileUpdates"
+                    val channel =
+                        NotificationChannel(
+                            channelId,
+                            "Backups and Files",
+                            NotificationManager.IMPORTANCE_DEFAULT,
+                        )
+                    manager.createNotificationChannel(channel)
+                    setChannelId(channelId)
+                }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "com.philkes.fileUpdates"
-            val channel =
-                NotificationChannel(
-                    channelId,
-                    "Backups and Files",
-                    NotificationManager.IMPORTANCE_DEFAULT,
-                )
-            manager.createNotificationChannel(channel)
-            builder.setChannelId(channelId)
-        }
+                setContentTitle(getString(R.string.deleting_images))
+                setSmallIcon(R.drawable.notification_delete)
+                setProgress(0, 0, true)
+                setOnlyAlertOnce(true)
 
-        builder.setContentTitle(getString(R.string.deleting_images))
-        builder.setSmallIcon(R.drawable.notification_delete)
-        builder.setProgress(0, 0, true)
-        builder.setOnlyAlertOnce(true)
-
-        /*
-        Prevent user from dismissing notification in Android 13 (33) and above
-        https://developer.android.com/guide/components/foreground-services#user-dismiss-notification
-         */
-        builder.setOngoing(true)
+                /*
+                Prevent user from dismissing notification in Android 13 (33) and above
+                https://developer.android.com/guide/components/foreground-services#user-dismiss-notification
+                 */
+                setOngoing(true)
+            }
 
         /*
         On Android 12 (31) and above, the system waits 10 seconds before showing the notification.

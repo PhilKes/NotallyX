@@ -55,9 +55,11 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
     }
 
     private fun updateEditText() {
-        binding.EnterBody.removeTextChangedListener(enterBodyTextWatcher)
-        binding.EnterBody.text = model.body
-        binding.EnterBody.addTextChangedListener(enterBodyTextWatcher)
+        binding.EnterBody.apply {
+            removeTextChangedListener(enterBodyTextWatcher)
+            text = model.body
+            addTextChangedListener(enterBodyTextWatcher)
+        }
     }
 
     private fun setupEditor() {
@@ -75,29 +77,31 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     // ActionMode implementation
                     try {
                         if (menu != null) {
-                            menu.add(R.string.bold, 0) {
-                                applySpan(StyleSpan(Typeface.BOLD))
-                                mode?.finish()
-                            }
-                            menu.add(R.string.link, 0) {
-                                applySpan(URLSpan(null))
-                                mode?.finish()
-                            }
-                            menu.add(R.string.italic, 0) {
-                                applySpan(StyleSpan(Typeface.ITALIC))
-                                mode?.finish()
-                            }
-                            menu.add(R.string.monospace, 0) {
-                                applySpan(TypefaceSpan("monospace"))
-                                mode?.finish()
-                            }
-                            menu.add(R.string.strikethrough, 0) {
-                                applySpan(StrikethroughSpan())
-                                mode?.finish()
-                            }
-                            menu.add(R.string.clear_formatting, 0) {
-                                removeSpans()
-                                mode?.finish()
+                            menu.apply {
+                                add(R.string.bold, 0) {
+                                    applySpan(StyleSpan(Typeface.BOLD))
+                                    mode?.finish()
+                                }
+                                add(R.string.link, 0) {
+                                    applySpan(URLSpan(null))
+                                    mode?.finish()
+                                }
+                                add(R.string.italic, 0) {
+                                    applySpan(StyleSpan(Typeface.ITALIC))
+                                    mode?.finish()
+                                }
+                                add(R.string.monospace, 0) {
+                                    applySpan(TypefaceSpan("monospace"))
+                                    mode?.finish()
+                                }
+                                add(R.string.strikethrough, 0) {
+                                    applySpan(StrikethroughSpan())
+                                    mode?.finish()
+                                }
+                                add(R.string.clear_formatting, 0) {
+                                    removeSpans()
+                                    mode?.finish()
+                                }
                             }
                         }
                     } catch (exception: Exception) {

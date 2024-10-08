@@ -31,40 +31,47 @@ class AudioRecordService : Service() {
 
     override fun onCreate() {
         manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        builder = Notification.Builder(this)
+        builder =
+            Notification.Builder(this).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    val channelId = "com.philkes.audio"
+                    val channel =
+                        NotificationChannel(
+                            channelId,
+                            "Audio Recordings",
+                            NotificationManager.IMPORTANCE_HIGH,
+                        )
+                    manager.createNotificationChannel(channel)
+                    setChannelId(channelId)
+                }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channelId = "com.philkes.audio"
-            val channel =
-                NotificationChannel(
-                    channelId,
-                    "Audio Recordings",
-                    NotificationManager.IMPORTANCE_HIGH,
-                )
-            manager.createNotificationChannel(channel)
-            builder.setChannelId(channelId)
-        }
+                setSmallIcon(R.drawable.record_audio)
+                setOnlyAlertOnce(true)
 
-        builder.setSmallIcon(R.drawable.record_audio)
-        builder.setOnlyAlertOnce(true)
+                /*
+                Prevent user from dismissing notification in Android 13 (33) and above
+                https://developer.android.com/guide/components/foreground-services#user-dismiss-notification
+                 */
+                setOngoing(true)
 
-        /*
-        Prevent user from dismissing notification in Android 13 (33) and above
-        https://developer.android.com/guide/components/foreground-services#user-dismiss-notification
-         */
-        builder.setOngoing(true)
+                /*
+                On Android 12 (31) and above, the system waits 10 seconds before showing the notification.
+                https://developer.android.com/guide/components/foreground-services#notification-immediate
+                 */
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
+                }
 
-        /*
-        On Android 12 (31) and above, the system waits 10 seconds before showing the notification.
-        https://developer.android.com/guide/components/foreground-services#notification-immediate
-         */
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            builder.setForegroundServiceBehavior(Notification.FOREGROUND_SERVICE_IMMEDIATE)
-        }
-
-        val intent = Intent(this, RecordAudioActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        builder.setContentIntent(pendingIntent)
+                val intent = Intent(this@AudioRecordService, RecordAudioActivity::class.java)
+                val pendingIntent =
+                    PendingIntent.getActivity(
+                        this@AudioRecordService,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_IMMUTABLE,
+                    )
+                setContentIntent(pendingIntent)
+            }
 
         startForeground(2, buildNotification())
 
@@ -73,13 +80,15 @@ class AudioRecordService : Service() {
                 MediaRecorder(this)
             } else MediaRecorder()
 
-        recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
-        recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
-        recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+        recorder.apply {
+            setAudioSource(MediaRecorder.AudioSource.MIC)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
 
-        val output = IO.getTempAudioFile(this)
-        recorder.setOutputFile(output.path)
-        recorder.prepare()
+            val output = IO.getTempAudioFile(this@AudioRecordService)
+            setOutputFile(output.path)
+            prepare()
+        }
     }
 
     override fun onDestroy() {

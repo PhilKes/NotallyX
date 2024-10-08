@@ -188,52 +188,55 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
     protected open fun setupToolbar() {
         binding.Toolbar.setNavigationOnClickListener { finish() }
 
-        val menu = binding.Toolbar.menu
-        val pin =
-            menu.add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { item ->
-                pin(item)
+        binding.Toolbar.menu.apply {
+            val pin =
+                add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { item ->
+                    pin(item)
+                }
+            bindPinned(pin)
+
+            val undo =
+                add(R.string.undo, R.drawable.undo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                    changeHistory.undo()
+                }
+            val redo =
+                add(R.string.redo, R.drawable.redo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                    changeHistory.redo()
+                }
+
+            initActionManager(undo, redo)
+
+            undo.isEnabled = changeHistory.canUndo()
+            redo.isEnabled = changeHistory.canRedo()
+
+            add(R.string.share, R.drawable.share) { share() }
+            add(R.string.labels, R.drawable.label) { label() }
+            add(R.string.add_images, R.drawable.add_images) {
+                checkNotificationPermission { selectImages() }
             }
-        bindPinned(pin)
-
-        val undo =
-            menu.add(R.string.undo, R.drawable.undo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                changeHistory.undo()
-            }
-        val redo =
-            menu.add(R.string.redo, R.drawable.redo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                changeHistory.redo()
+            add(R.string.attach_file, R.drawable.text_file) {
+                checkNotificationPermission { selectFiles() }
             }
 
-        initActionManager(undo, redo)
-
-        undo.isEnabled = changeHistory.canUndo()
-        redo.isEnabled = changeHistory.canRedo()
-
-        menu.add(R.string.share, R.drawable.share) { share() }
-        menu.add(R.string.labels, R.drawable.label) { label() }
-        menu.add(R.string.add_images, R.drawable.add_images) {
-            checkNotificationPermission { selectImages() }
-        }
-        menu.add(R.string.attach_file, R.drawable.text_file) {
-            checkNotificationPermission { selectFiles() }
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            menu.add(R.string.record_audio, R.drawable.record_audio) { checkAudioPermission() }
-        }
-
-        when (model.folder) {
-            Folder.NOTES -> {
-                menu.add(R.string.delete, R.drawable.delete) { delete() }
-                menu.add(R.string.archive, R.drawable.archive) { archive() }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                add(R.string.record_audio, R.drawable.record_audio) { checkAudioPermission() }
             }
-            Folder.DELETED -> {
-                menu.add(R.string.restore, R.drawable.restore) { restore() }
-                menu.add(R.string.delete_forever, R.drawable.delete) { deleteForever() }
-            }
-            Folder.ARCHIVED -> {
-                menu.add(R.string.delete, R.drawable.delete) { delete() }
-                menu.add(R.string.unarchive, R.drawable.unarchive) { restore() }
+
+            when (model.folder) {
+                Folder.NOTES -> {
+                    add(R.string.delete, R.drawable.delete) { delete() }
+                    add(R.string.archive, R.drawable.archive) { archive() }
+                }
+
+                Folder.DELETED -> {
+                    add(R.string.restore, R.drawable.restore) { restore() }
+                    add(R.string.delete_forever, R.drawable.delete) { deleteForever() }
+                }
+
+                Folder.ARCHIVED -> {
+                    add(R.string.delete, R.drawable.delete) { delete() }
+                    add(R.string.unarchive, R.drawable.unarchive) { restore() }
+                }
             }
         }
     }
@@ -325,22 +328,26 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
 
     private fun selectImages() {
         if (model.imageRoot != null) {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "image/*"
-            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            val intent =
+                Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "image/*"
+                    putExtra(Intent.EXTRA_LOCAL_ONLY, true)
+                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                }
             startActivityForResult(intent, REQUEST_ADD_IMAGES)
         } else Toast.makeText(this, R.string.insert_an_sd_card_images, Toast.LENGTH_LONG).show()
     }
 
     private fun selectFiles() {
         if (model.filesRoot != null) {
-            val intent = Intent(Intent.ACTION_GET_CONTENT)
-            intent.type = "*/*"
-            intent.putExtra(Intent.EXTRA_LOCAL_ONLY, true)
-            intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            val intent =
+                Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "*/*"
+                    putExtra(Intent.EXTRA_LOCAL_ONLY, true)
+                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                }
             startActivityForResult(intent, REQUEST_ATTACH_FILES)
         } else Toast.makeText(this, R.string.insert_an_sd_card_files, Toast.LENGTH_LONG).show()
     }
@@ -394,15 +401,17 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
     }
 
     private fun setupImages() {
-        val adapter =
+        val imageAdapter =
             PreviewImageAdapter(model.imageRoot) { position ->
-                val intent = Intent(this, ViewImageActivity::class.java)
-                intent.putExtra(ViewImageActivity.POSITION, position)
-                intent.putExtra(Constants.SelectedBaseNote, model.id)
+                val intent =
+                    Intent(this, ViewImageActivity::class.java).apply {
+                        putExtra(ViewImageActivity.POSITION, position)
+                        putExtra(Constants.SelectedBaseNote, model.id)
+                    }
                 startActivityForResult(intent, REQUEST_VIEW_IMAGES)
             }
 
-        adapter.registerAdapterDataObserver(
+        imageAdapter.registerAdapterDataObserver(
             object : RecyclerView.AdapterDataObserver() {
 
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
@@ -411,20 +420,21 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
             }
         )
 
-        binding.ImagePreview.setHasFixedSize(true)
-        binding.ImagePreview.adapter = adapter
-        binding.ImagePreview.layoutManager =
-            LinearLayoutManager(this, RecyclerView.HORIZONTAL, false)
-        PagerSnapHelper().attachToRecyclerView(binding.ImagePreview)
+        binding.ImagePreview.apply {
+            setHasFixedSize(true)
+            adapter = imageAdapter
+            layoutManager = LinearLayoutManager(this@EditActivity, RecyclerView.HORIZONTAL, false)
+            PagerSnapHelper().attachToRecyclerView(this)
+        }
 
         model.images.observe(this) { list ->
-            adapter.submitList(list)
+            imageAdapter.submitList(list)
             binding.ImagePreview.isVisible = list.isNotEmpty()
         }
     }
 
     private fun setupFiles() {
-        val adapter =
+        val fileAdapter =
             PreviewFileAdapter({ fileAttachment ->
                 if (model.filesRoot == null) {
                     return@PreviewFileAdapter
@@ -457,35 +467,39 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
                 return@PreviewFileAdapter true
             }
 
-        binding.FilesPreview.setHasFixedSize(true)
-        binding.FilesPreview.adapter = adapter
-
-        binding.FilesPreview.layoutManager =
-            LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.FilesPreview.apply {
+            setHasFixedSize(true)
+            adapter = fileAdapter
+            layoutManager =
+                LinearLayoutManager(this@EditActivity, LinearLayoutManager.HORIZONTAL, false)
+        }
         model.files.observe(this) { list ->
-            adapter.submitList(list)
+            fileAdapter.submitList(list)
             val visible = list.isNotEmpty()
-            binding.FilesPreview.isVisible = visible
-            if (visible) {
-                binding.FilesPreview.post {
-                    binding.FilesPreview.scrollToPosition(adapter.itemCount)
-                    binding.FilesPreview.requestLayout()
+            binding.FilesPreview.apply {
+                isVisible = visible
+                if (visible) {
+                    post {
+                        scrollToPosition(fileAdapter.itemCount)
+                        requestLayout()
+                    }
                 }
             }
         }
     }
 
     private fun displayFileErrors(errors: List<FileError>) {
-        val recyclerView = RecyclerView(this)
-        recyclerView.layoutParams =
-            LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
-        recyclerView.adapter = ErrorAdapter(errors)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        val recyclerView =
+            RecyclerView(this).apply {
+                layoutParams = LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT)
+                adapter = ErrorAdapter(errors)
+                layoutManager = LinearLayoutManager(this@EditActivity)
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            recyclerView.scrollIndicators =
-                View.SCROLL_INDICATOR_TOP or View.SCROLL_INDICATOR_BOTTOM
-        }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    scrollIndicators = View.SCROLL_INDICATOR_TOP or View.SCROLL_INDICATOR_BOTTOM
+                }
+            }
+
         val message =
             if (errors.isNotEmpty() && errors[0].fileType == NotallyModel.FileType.IMAGE) {
                 R.plurals.cant_add_images
@@ -575,10 +589,11 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
                     }
                 )
                 dialog.show()
-                dialogBinding.ProgressBar.max = progress.total
-                dialogBinding.ProgressBar.setProgressCompat(progress.current, true)
-                dialogBinding.Count.text =
-                    getString(R.string.count, progress.current, progress.total)
+                dialogBinding.apply {
+                    ProgressBar.max = progress.total
+                    ProgressBar.setProgressCompat(progress.current, true)
+                    Count.text = getString(R.string.count, progress.current, progress.total)
+                }
             } else dialog.dismiss()
         }
 

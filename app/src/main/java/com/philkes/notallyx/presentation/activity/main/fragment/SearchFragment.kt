@@ -22,14 +22,15 @@ class SearchFragment : NotallyFragment() {
                 Folder.ARCHIVED -> R.id.Archived
             }
 
-        binding?.ChipGroup?.check(checked)
-
-        binding?.ChipGroup?.setOnCheckedChangeListener { _, checkedId ->
-            when (checkedId) {
-                R.id.Notes -> model.folder = Folder.NOTES
-                R.id.Deleted -> model.folder = Folder.DELETED
-                R.id.Archived -> model.folder = Folder.ARCHIVED
+        binding?.ChipGroup?.apply {
+            setOnCheckedChangeListener { _, checkedId ->
+                when (checkedId) {
+                    R.id.Notes -> model.folder = Folder.NOTES
+                    R.id.Deleted -> model.folder = Folder.DELETED
+                    R.id.Archived -> model.folder = Folder.ARCHIVED
+                }
             }
+            check(checked)
         }
     }
 

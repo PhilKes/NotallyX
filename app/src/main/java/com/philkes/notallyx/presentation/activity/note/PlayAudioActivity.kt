@@ -91,9 +91,11 @@ class PlayAudioActivity : AppCompatActivity() {
     private fun setupToolbar(binding: ActivityPlayAudioBinding) {
         binding.Toolbar.setNavigationOnClickListener { onBackPressed() }
 
-        binding.Toolbar.menu.add(R.string.share, R.drawable.share) { share() }
-        binding.Toolbar.menu.add(R.string.save_to_device, R.drawable.save) { saveToDevice() }
-        binding.Toolbar.menu.add(R.string.delete, R.drawable.delete) { delete() }
+        binding.Toolbar.menu.apply {
+            add(R.string.share, R.drawable.share) { share() }
+            add(R.string.save_to_device, R.drawable.save) { saveToDevice() }
+            add(R.string.delete, R.drawable.delete) { delete() }
+        }
     }
 
     private fun share() {
@@ -102,9 +104,11 @@ class PlayAudioActivity : AppCompatActivity() {
         if (file != null && file.exists()) {
             val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
 
-            val intent = Intent(Intent.ACTION_SEND)
-            intent.type = "audio/mp4"
-            intent.putExtra(Intent.EXTRA_STREAM, uri)
+            val intent =
+                Intent(Intent.ACTION_SEND).apply {
+                    type = "audio/mp4"
+                    putExtra(Intent.EXTRA_STREAM, uri)
+                }
 
             val chooser = Intent.createChooser(intent, null)
             startActivity(chooser)
@@ -128,9 +132,11 @@ class PlayAudioActivity : AppCompatActivity() {
         val audioRoot = IO.getExternalAudioDirectory(application)
         val file = if (audioRoot != null) File(audioRoot, audio.name) else null
         if (file != null && file.exists()) {
-            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-            intent.type = "audio/mp4"
-            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            val intent =
+                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    type = "audio/mp4"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                }
 
             val formatter = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT)
             val title = formatter.format(audio.timestamp)

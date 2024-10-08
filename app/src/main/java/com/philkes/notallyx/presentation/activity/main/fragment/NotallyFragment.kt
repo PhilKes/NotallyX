@@ -26,7 +26,7 @@ import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 
 abstract class NotallyFragment : Fragment(), ItemListener {
 
-    private var adapter: BaseNoteAdapter? = null
+    private var notesAdapter: BaseNoteAdapter? = null
     internal var binding: FragmentNotesBinding? = null
 
     internal val model: BaseNoteModel by activityViewModels()
@@ -34,7 +34,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        adapter = null
+        notesAdapter = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -58,7 +58,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
     // See [RecyclerView.ViewHolder.getAdapterPosition]
     override fun onClick(position: Int) {
         if (position != -1) {
-            adapter?.currentList?.get(position)?.let { item ->
+            notesAdapter?.currentList?.get(position)?.let { item ->
                 if (item is BaseNote) {
                     if (model.actionMode.isEnabled()) {
                         handleNoteSelection(item.id, position, item)
@@ -75,7 +75,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
 
     override fun onLongClick(position: Int) {
         if (position != -1) {
-            adapter?.currentList?.get(position)?.let { item ->
+            notesAdapter?.currentList?.get(position)?.let { item ->
                 if (item is BaseNote) {
                     handleNoteSelection(item.id, position, item)
                 }
@@ -87,30 +87,27 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         if (model.actionMode.selectedNotes.contains(id)) {
             model.actionMode.remove(id)
         } else model.actionMode.add(id, baseNote)
-        adapter?.notifyItemChanged(position, 0)
+        notesAdapter?.notifyItemChanged(position, 0)
     }
 
     private fun setupAdapter() {
-        val textSize = model.preferences.textSize.value
-        val maxItems = model.preferences.maxItems
-        val maxLines = model.preferences.maxLines
-        val maxTitle = model.preferences.maxTitle
-        val dateFormat = model.preferences.dateFormat.value
 
-        adapter =
-            BaseNoteAdapter(
-                model.actionMode.selectedIds,
-                dateFormat,
-                textSize,
-                maxItems,
-                maxLines,
-                maxTitle,
-                model.imageRoot,
-                this,
-            )
-        adapter?.registerAdapterDataObserver(
+        notesAdapter =
+            with(model.preferences) {
+                BaseNoteAdapter(
+                    model.actionMode.selectedIds,
+                    dateFormat.value,
+                    textSize.value,
+                    maxItems,
+                    maxLines,
+                    maxTitle,
+                    model.imageRoot,
+                    this@NotallyFragment,
+                )
+            }
+
+        notesAdapter?.registerAdapterDataObserver(
             object : RecyclerView.AdapterDataObserver() {
-
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                     if (itemCount > 0) {
                         binding?.RecyclerView?.scrollToPosition(positionStart)
@@ -118,21 +115,23 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                 }
             }
         )
-        binding?.RecyclerView?.adapter = adapter
-        binding?.RecyclerView?.setHasFixedSize(true)
+        binding?.RecyclerView?.apply {
+            adapter = notesAdapter
+            setHasFixedSize(true)
+        }
     }
 
     private fun setupObserver() {
         getObservable().observe(viewLifecycleOwner) { list ->
-            adapter?.submitList(list)
+            notesAdapter?.submitList(list)
             binding?.ImageView?.isVisible = list.isEmpty()
         }
 
         model.actionMode.closeListener.observe(viewLifecycleOwner) { event ->
             event.handle { ids ->
-                adapter?.currentList?.forEachIndexed { index, item ->
+                notesAdapter?.currentList?.forEachIndexed { index, item ->
                     if (item is BaseNote && ids.contains(item.id)) {
-                        adapter?.notifyItemChanged(index, 0)
+                        notesAdapter?.notifyItemChanged(index, 0)
                     }
                 }
             }

@@ -15,7 +15,9 @@ class SelectableLabelVH(
     }
 
     fun bind(value: String, checked: Boolean) {
-        binding.root.text = value
-        binding.root.isChecked = checked
+        binding.root.apply {
+            text = value
+            isChecked = checked
+        }
     }
 }

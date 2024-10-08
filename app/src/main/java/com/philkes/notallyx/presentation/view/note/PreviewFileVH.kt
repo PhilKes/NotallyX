@@ -12,13 +12,17 @@ class PreviewFileVH(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
-        binding.FileName.setOnClickListener { onClick(adapterPosition) }
-        binding.FileName.setOnLongClickListener { onLongClick(adapterPosition) }
+        binding.FileName.apply {
+            setOnClickListener { onClick(adapterPosition) }
+            setOnLongClickListener { onLongClick(adapterPosition) }
+        }
     }
 
     fun bind(fileAttachment: FileAttachment) {
-        binding.FileName.text = fileAttachment.originalName
-        binding.FileName.setChipIconResource(getIconForMimeType(fileAttachment.mimeType))
+        binding.FileName.apply {
+            text = fileAttachment.originalName
+            setChipIconResource(getIconForMimeType(fileAttachment.mimeType))
+        }
     }
 
     private fun getIconForMimeType(mimeType: String): Int {

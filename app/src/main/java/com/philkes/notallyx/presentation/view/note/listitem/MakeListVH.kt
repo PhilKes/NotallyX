@@ -28,19 +28,21 @@ class MakeListVH(
 
     init {
         val body = TextSize.getEditBodySize(textSize)
-        binding.EditText.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
+        binding.EditText.apply {
+            setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
-        binding.EditText.setOnNextAction {
-            val position = adapterPosition + 1
-            listManager.add(position)
-        }
+            setOnNextAction {
+                val position = adapterPosition + 1
+                listManager.add(position)
+            }
 
-        editTextWatcher =
-            binding.EditText.createListTextWatcherWithHistory(listManager, this::getAdapterPosition)
-        binding.EditText.addTextChangedListener(editTextWatcher)
+            editTextWatcher =
+                createListTextWatcherWithHistory(listManager, this@MakeListVH::getAdapterPosition)
+            addTextChangedListener(editTextWatcher)
 
-        binding.EditText.setOnFocusChangeListener { _, hasFocus ->
-            binding.Delete.visibility = if (hasFocus) VISIBLE else INVISIBLE
+            setOnFocusChangeListener { _, hasFocus ->
+                binding.Delete.visibility = if (hasFocus) VISIBLE else INVISIBLE
+            }
         }
 
         binding.DragHandle.setOnTouchListener { _, event ->
@@ -70,60 +72,70 @@ class MakeListVH(
         selectionStart: Int = binding.EditText.text!!.length,
         inputMethodManager: InputMethodManager,
     ) {
-        binding.EditText.requestFocus()
-        binding.EditText.setSelection(selectionStart)
-        inputMethodManager.showSoftInput(binding.EditText, InputMethodManager.SHOW_IMPLICIT)
+        binding.EditText.apply {
+            requestFocus()
+            setSelection(selectionStart)
+            inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+        }
     }
 
     private fun updateDeleteButton(item: ListItem) {
-        binding.Delete.visibility = if (item.checked) VISIBLE else INVISIBLE
-        binding.Delete.setOnClickListener { listManager.delete(adapterPosition) }
+        binding.Delete.apply {
+            visibility = if (item.checked) VISIBLE else INVISIBLE
+            setOnClickListener { listManager.delete(adapterPosition) }
+        }
     }
 
     private fun updateEditText(item: ListItem) {
-        binding.EditText.removeTextChangedListener(editTextWatcher)
-        binding.EditText.setText(item.body)
-        binding.EditText.isEnabled = !item.checked
-        binding.EditText.addTextChangedListener(editTextWatcher)
-        binding.EditText.setOnKeyListener { _, keyCode, event ->
-            if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_DEL) {
-                // TODO: when there are multiple checked items above it does not jump to the last
-                // unchecked item but always re-adds a new item
-                listManager.delete(adapterPosition, false)
+        binding.EditText.apply {
+            removeTextChangedListener(editTextWatcher)
+            setText(item.body)
+            isEnabled = !item.checked
+            addTextChangedListener(editTextWatcher)
+            setOnKeyListener { _, keyCode, event ->
+                if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_DEL) {
+                    // TODO: when there are multiple checked items above it does not jump to the
+                    // last
+                    // unchecked item but always re-adds a new item
+                    listManager.delete(adapterPosition, false)
+                }
+                true
             }
-            true
         }
     }
 
     private fun updateCheckBox(item: ListItem) {
-        binding.CheckBox.setOnCheckedChangeListener(null)
-        binding.CheckBox.isChecked = item.checked
-        binding.CheckBox.setOnCheckedChangeListener { _, isChecked ->
-            listManager.changeChecked(adapterPosition, isChecked)
+        binding.CheckBox.apply {
+            setOnCheckedChangeListener(null)
+            isChecked = item.checked
+            setOnCheckedChangeListener { _, isChecked ->
+                listManager.changeChecked(adapterPosition, isChecked)
+            }
         }
     }
 
     private fun updateSwipe(open: Boolean, canSwipe: Boolean) {
-        binding.SwipeLayout.setOnActionsListener(null)
-        val swipeActionListener =
-            object : SwipeActionsListener {
-                override fun onOpen(direction: Int, isContinuous: Boolean) {
-                    listManager.changeIsChild(adapterPosition, true)
-                }
+        binding.SwipeLayout.apply {
+            setOnActionsListener(null)
+            val swipeActionListener =
+                object : SwipeActionsListener {
+                    override fun onOpen(direction: Int, isContinuous: Boolean) {
+                        listManager.changeIsChild(adapterPosition, true)
+                    }
 
-                override fun onClose() {
-                    listManager.changeIsChild(adapterPosition, false)
+                    override fun onClose() {
+                        listManager.changeIsChild(adapterPosition, false)
+                    }
                 }
+            isEnabledSwipe = canSwipe
+            post {
+                if (open) {
+                    openLeft(false)
+                } else {
+                    close(false)
+                }
+                setOnActionsListener(swipeActionListener)
             }
-
-        binding.SwipeLayout.isEnabledSwipe = canSwipe
-        binding.SwipeLayout.post {
-            if (open) {
-                binding.SwipeLayout.openLeft(false)
-            } else {
-                binding.SwipeLayout.close(false)
-            }
-            binding.SwipeLayout.setOnActionsListener(swipeActionListener)
         }
     }
 }

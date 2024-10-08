@@ -12,19 +12,20 @@ import java.io.File
 class ImageVH(private val binding: RecyclerImageBinding) : RecyclerView.ViewHolder(binding.root) {
 
     init {
-        binding.SSIV.setDoubleTapZoomDpi(320)
-        binding.SSIV.setDoubleTapZoomDuration(200)
-        binding.SSIV.setDoubleTapZoomStyle(SubsamplingScaleImageView.ZOOM_FOCUS_CENTER)
-        binding.SSIV.orientation = SubsamplingScaleImageView.ORIENTATION_USE_EXIF
+        binding.SSIV.apply {
+            setDoubleTapZoomDpi(320)
+            setDoubleTapZoomDuration(200)
+            setDoubleTapZoomStyle(SubsamplingScaleImageView.ZOOM_FOCUS_CENTER)
+            orientation = SubsamplingScaleImageView.ORIENTATION_USE_EXIF
+            setOnImageEventListener(
+                object : DefaultOnImageEventListener() {
 
-        binding.SSIV.setOnImageEventListener(
-            object : DefaultOnImageEventListener() {
-
-                override fun onImageLoadError(e: Exception?) {
-                    binding.Message.visibility = View.VISIBLE
+                    override fun onImageLoadError(e: Exception?) {
+                        binding.Message.visibility = View.VISIBLE
+                    }
                 }
-            }
-        )
+            )
+        }
     }
 
     fun bind(file: File?) {

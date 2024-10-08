@@ -32,32 +32,34 @@ class EditListActivity : EditActivity(Type.LIST) {
 
     override fun setupToolbar() {
         super.setupToolbar()
-        binding.Toolbar.menu.add(
-            1,
-            R.string.delete_checked_items,
-            R.drawable.delete_all,
-            MenuItem.SHOW_AS_ACTION_IF_ROOM,
-        ) {
-            listManager.deleteCheckedItems()
-        }
-        binding.Toolbar.menu.add(
-            1,
-            R.string.check_all_items,
-            R.drawable.checkbox_fill,
-            MenuItem.SHOW_AS_ACTION_IF_ROOM,
-        ) {
-            listManager.changeCheckedForAll(true)
-        }
-        binding.Toolbar.menu.add(
-            1,
-            R.string.uncheck_all_items,
-            R.drawable.checkbox,
-            MenuItem.SHOW_AS_ACTION_IF_ROOM,
-        ) {
-            listManager.changeCheckedForAll(false)
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            binding.Toolbar.menu.setGroupDividerEnabled(true)
+        binding.Toolbar.menu.apply {
+            add(
+                1,
+                R.string.delete_checked_items,
+                R.drawable.delete_all,
+                MenuItem.SHOW_AS_ACTION_IF_ROOM,
+            ) {
+                listManager.deleteCheckedItems()
+            }
+            add(
+                1,
+                R.string.check_all_items,
+                R.drawable.checkbox_fill,
+                MenuItem.SHOW_AS_ACTION_IF_ROOM,
+            ) {
+                listManager.changeCheckedForAll(true)
+            }
+            add(
+                1,
+                R.string.uncheck_all_items,
+                R.drawable.checkbox,
+                MenuItem.SHOW_AS_ACTION_IF_ROOM,
+            ) {
+                listManager.changeCheckedForAll(false)
+            }
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                setGroupDividerEnabled(true)
+            }
         }
     }
 

@@ -41,34 +41,34 @@ class SettingsFragment : Fragment() {
     private val model: BaseNoteModel by activityViewModels()
 
     private fun setupBinding(binding: FragmentSettingsBinding) {
-        model.preferences.view.observe(viewLifecycleOwner) { value ->
-            binding.View.setup(com.philkes.notallyx.presentation.view.misc.View, value)
-        }
+        model.preferences.apply {
+            view.observe(viewLifecycleOwner) { value ->
+                binding.View.setup(com.philkes.notallyx.presentation.view.misc.View, value)
+            }
 
-        model.preferences.theme.observe(viewLifecycleOwner) { value ->
-            binding.Theme.setup(Theme, value)
-        }
+            theme.observe(viewLifecycleOwner) { value -> binding.Theme.setup(Theme, value) }
 
-        model.preferences.dateFormat.observe(viewLifecycleOwner) { value ->
-            binding.DateFormat.setup(DateFormat, value)
-        }
+            dateFormat.observe(viewLifecycleOwner) { value ->
+                binding.DateFormat.setup(DateFormat, value)
+            }
 
-        model.preferences.textSize.observe(viewLifecycleOwner) { value ->
-            binding.TextSize.setup(TextSize, value)
-        }
+            textSize.observe(viewLifecycleOwner) { value ->
+                binding.TextSize.setup(TextSize, value)
+            }
 
-        model.preferences.listItemSorting.observe(viewLifecycleOwner) { value ->
-            binding.CheckedListItemSorting.setup(ListItemSorting, value)
-        }
+            listItemSorting.observe(viewLifecycleOwner) { value ->
+                binding.CheckedListItemSorting.setup(ListItemSorting, value)
+            }
 
-        binding.MaxItems.setup(MaxItems, model.preferences.maxItems)
+            binding.MaxItems.setup(MaxItems, maxItems)
 
-        binding.MaxLines.setup(MaxLines, model.preferences.maxLines)
+            binding.MaxLines.setup(MaxLines, maxLines)
 
-        binding.MaxTitle.setup(MaxTitle, model.preferences.maxTitle)
+            binding.MaxTitle.setup(MaxTitle, maxTitle)
 
-        model.preferences.autoBackup.observe(viewLifecycleOwner) { value ->
-            binding.AutoBackup.setup(AutoBackup, value)
+            autoBackup.observe(viewLifecycleOwner) { value ->
+                binding.AutoBackup.setup(AutoBackup, value)
+            }
         }
 
         binding.ImportBackup.setOnClickListener { importBackup() }
@@ -112,18 +112,22 @@ class SettingsFragment : Fragment() {
     }
 
     private fun exportBackup() {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        intent.type = "application/zip"
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.putExtra(Intent.EXTRA_TITLE, "NotallyX Backup")
+        val intent =
+            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                type = "application/zip"
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, "NotallyX Backup")
+            }
         startActivityForResult(intent, REQUEST_EXPORT_BACKUP)
     }
 
     private fun importBackup() {
-        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-        intent.type = "*/*"
-        intent.putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/zip", "text/xml"))
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
+        val intent =
+            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                type = "*/*"
+                putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/zip", "text/xml"))
+                addCategory(Intent.CATEGORY_OPENABLE)
+            }
         startActivityForResult(intent, REQUEST_IMPORT_BACKUP)
     }
 
@@ -139,13 +143,16 @@ class SettingsFragment : Fragment() {
         liveData.observe(viewLifecycleOwner) { progress ->
             if (progress.inProgress) {
                 if (progress.indeterminate) {
-                    dialogBinding.ProgressBar.isIndeterminate = true
-                    dialogBinding.Count.setText(R.string.calculating)
+                    dialogBinding.apply {
+                        ProgressBar.isIndeterminate = true
+                        Count.setText(R.string.calculating)
+                    }
                 } else {
-                    dialogBinding.ProgressBar.max = progress.total
-                    dialogBinding.ProgressBar.setProgressCompat(progress.current, true)
-                    dialogBinding.Count.text =
-                        getString(R.string.count, progress.current, progress.total)
+                    dialogBinding.apply {
+                        ProgressBar.max = progress.total
+                        ProgressBar.setProgressCompat(progress.current, true)
+                        Count.text = getString(R.string.count, progress.current, progress.total)
+                    }
                 }
                 dialog.show()
             } else dialog.dismiss()
@@ -153,12 +160,14 @@ class SettingsFragment : Fragment() {
     }
 
     private fun sendEmailWithLog() {
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
 
-        // TODO: replace with github issue create link?
-        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("omgodseapps@gmail.com"))
-        intent.putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
+                // TODO: replace with github issue create link?
+                putExtra(Intent.EXTRA_EMAIL, arrayOf("omgodseapps@gmail.com"))
+                putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
+            }
 
         val app = requireContext().applicationContext as Application
         val log = Operations.getLog(app)
@@ -266,12 +275,12 @@ class SettingsFragment : Fragment() {
     private fun PreferenceSeekbarBinding.setup(info: SeekbarInfo, initialValue: Int) {
         Title.setText(info.title)
 
-        Slider.valueTo = info.max.toFloat()
-        Slider.valueFrom = info.min.toFloat()
-
-        Slider.value = initialValue.toFloat()
-
-        Slider.addOnChangeListener { _, value, _ -> model.savePreference(info, value.toInt()) }
+        Slider.apply {
+            valueTo = info.max.toFloat()
+            valueFrom = info.min.toFloat()
+            value = initialValue.toFloat()
+            addOnChangeListener { _, value, _ -> model.savePreference(info, value.toInt()) }
+        }
     }
 
     private fun openLink(link: String) {

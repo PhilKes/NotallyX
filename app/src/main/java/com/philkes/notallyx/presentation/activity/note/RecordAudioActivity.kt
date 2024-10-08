@@ -31,7 +31,6 @@ class RecordAudioActivity : AppCompatActivity() {
 
         connection =
             object : ServiceConnection {
-
                 override fun onServiceConnected(name: ComponentName, binder: IBinder) {
                     service = (binder as LocalBinder<AudioRecordService>).getService()
                     updateUI(binding, requireNotNull(service))

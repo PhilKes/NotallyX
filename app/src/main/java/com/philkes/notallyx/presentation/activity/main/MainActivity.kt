@@ -97,31 +97,31 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupMenu() {
-        val menu = binding.NavigationView.menu
-        menu.add(0, R.id.Notes, 0, R.string.notes).setCheckable(true).setIcon(R.drawable.home)
-        menu.add(1, R.id.Labels, 0, R.string.labels).setCheckable(true).setIcon(R.drawable.label)
-        menu.add(2, R.id.Deleted, 0, R.string.deleted).setCheckable(true).setIcon(R.drawable.delete)
-        menu
-            .add(2, R.id.Archived, 0, R.string.archived)
-            .setCheckable(true)
-            .setIcon(R.drawable.archive)
-        menu
-            .add(3, R.id.Settings, 0, R.string.settings)
-            .setCheckable(true)
-            .setIcon(R.drawable.settings)
+        binding.NavigationView.menu.apply {
+            add(0, R.id.Notes, 0, R.string.notes).setCheckable(true).setIcon(R.drawable.home)
+            add(1, R.id.Labels, 0, R.string.labels).setCheckable(true).setIcon(R.drawable.label)
+            add(2, R.id.Deleted, 0, R.string.deleted).setCheckable(true).setIcon(R.drawable.delete)
+            add(2, R.id.Archived, 0, R.string.archived)
+                .setCheckable(true)
+                .setIcon(R.drawable.archive)
+            add(3, R.id.Settings, 0, R.string.settings)
+                .setCheckable(true)
+                .setIcon(R.drawable.settings)
+        }
     }
 
     private fun setupActionMode() {
         binding.ActionMode.setNavigationOnClickListener { model.actionMode.close(true) }
 
-        val transition = MaterialFade()
-        transition.secondaryAnimatorProvider = null
-
-        transition.excludeTarget(binding.NavHostFragment, true)
-        transition.excludeChildren(binding.NavHostFragment, true)
-        transition.excludeTarget(binding.TakeNote, true)
-        transition.excludeTarget(binding.MakeList, true)
-        transition.excludeTarget(binding.NavigationView, true)
+        val transition =
+            MaterialFade().apply {
+                secondaryAnimatorProvider = null
+                excludeTarget(binding.NavHostFragment, true)
+                excludeChildren(binding.NavHostFragment, true)
+                excludeTarget(binding.TakeNote, true)
+                excludeTarget(binding.MakeList, true)
+                excludeTarget(binding.NavigationView, true)
+            }
 
         model.actionMode.enabled.observe(this) { enabled ->
             TransitionManager.beginDelayedTransition(binding.RelativeLayout, transition)
@@ -189,16 +189,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun createExportMenu(menu: Menu): MenuItem {
-        val export = menu.addSubMenu(R.string.export)
-        export.setIcon(R.drawable.export)
-        export.item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-
-        export.add("PDF").onClick { exportToPDF() }
-        export.add("TXT").onClick { exportToTXT() }
-        export.add("JSON").onClick { exportToJSON() }
-        export.add("HTML").onClick { exportToHTML() }
-
-        return export.item
+        return menu
+            .addSubMenu(R.string.export)
+            .apply {
+                setIcon(R.drawable.export)
+                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
+                add("PDF").onClick { exportToPDF() }
+                add("TXT").onClick { exportToTXT() }
+                add("JSON").onClick { exportToJSON() }
+                add("HTML").onClick { exportToHTML() }
+            }
+            .item
     }
 
     fun MenuItem.onClick(function: () -> Unit) {
@@ -234,11 +235,11 @@ class MainActivity : AppCompatActivity() {
                 }
             )
 
-        val dialogBinding = DialogColorBinding.inflate(layoutInflater)
-        dialogBinding.RecyclerView.adapter = colorAdapter
-
-        dialog.setView(dialogBinding.root)
-        dialog.show()
+        DialogColorBinding.inflate(layoutInflater).apply {
+            RecyclerView.adapter = colorAdapter
+            dialog.setView(root)
+            dialog.show()
+        }
     }
 
     private fun deleteForever() {
@@ -342,28 +343,34 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun viewFile(uri: Uri, mimeType: String) {
-        val intent = Intent(Intent.ACTION_VIEW)
-        intent.setDataAndType(uri, mimeType)
-        intent.flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        val intent =
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
 
         val chooser = Intent.createChooser(intent, getString(R.string.view_note))
         startActivity(chooser)
     }
 
     private fun shareFile(uri: Uri, mimeType: String) {
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = mimeType
-        intent.putExtra(Intent.EXTRA_STREAM, uri)
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = mimeType
+                putExtra(Intent.EXTRA_STREAM, uri)
+            }
 
         val chooser = Intent.createChooser(intent, null)
         startActivity(chooser)
     }
 
     private fun saveFileToDevice(file: File, mimeType: String) {
-        val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
-        intent.type = mimeType
-        intent.addCategory(Intent.CATEGORY_OPENABLE)
-        intent.putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension)
+        val intent =
+            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                type = mimeType
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension)
+            }
 
         model.currentFile = file
         startActivityForResult(intent, REQUEST_EXPORT_FILE)
@@ -415,12 +422,16 @@ class MainActivity : AppCompatActivity() {
 
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         if (destination.id == R.id.Search) {
-            binding.EnterSearchKeyword.visibility = View.VISIBLE
-            binding.EnterSearchKeyword.requestFocus()
-            inputManager.showSoftInput(binding.EnterSearchKeyword, InputMethodManager.SHOW_IMPLICIT)
+            binding.EnterSearchKeyword.apply {
+                visibility = View.VISIBLE
+                requestFocus()
+                inputManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+            }
         } else {
-            binding.EnterSearchKeyword.visibility = View.GONE
-            inputManager.hideSoftInputFromWindow(binding.EnterSearchKeyword.windowToken, 0)
+            binding.EnterSearchKeyword.apply {
+                visibility = View.GONE
+                inputManager.hideSoftInputFromWindow(this.windowToken, 0)
+            }
         }
     }
 
@@ -439,9 +450,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupSearch() {
-        binding.EnterSearchKeyword.setText(model.keyword)
-        binding.EnterSearchKeyword.doAfterTextChanged { text ->
-            model.keyword = requireNotNull(text).trim().toString()
+        binding.EnterSearchKeyword.apply {
+            setText(model.keyword)
+            doAfterTextChanged { text -> model.keyword = requireNotNull(text).trim().toString() }
         }
     }
 

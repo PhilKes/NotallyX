@@ -21,16 +21,18 @@ class AudioPlayService : Service() {
 
     override fun onCreate() {
         super.onCreate()
-        player = MediaPlayer()
-        player.setOnPreparedListener { setState(PREPARED) }
-        player.setOnCompletionListener { setState(COMPLETED) }
-        player.setOnSeekCompleteListener { setState(stateBeforeSeeking) }
-        player.setOnErrorListener { _, what, extra ->
-            errorType = what
-            errorCode = extra
-            setState(ERROR)
-            return@setOnErrorListener true
-        }
+        player =
+            MediaPlayer().apply {
+                setOnPreparedListener { setState(PREPARED) }
+                setOnCompletionListener { setState(COMPLETED) }
+                setOnSeekCompleteListener { setState(stateBeforeSeeking) }
+                setOnErrorListener { _, what, extra ->
+                    errorType = what
+                    errorCode = extra
+                    setState(ERROR)
+                    return@setOnErrorListener true
+                }
+            }
     }
 
     override fun onDestroy() {

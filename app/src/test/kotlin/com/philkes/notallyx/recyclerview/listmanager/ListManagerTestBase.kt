@@ -9,12 +9,12 @@ import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.note.listitem.DragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.view.note.listitem.MakeListVH
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.indexOfFirst
-import com.philkes.notallyx.recyclerview.viewholder.MakeListVH
 import com.philkes.notallyx.test.assertChildren
 import com.philkes.notallyx.test.createListItem
 import com.philkes.notallyx.test.mockAndroidLog

@@ -46,32 +46,28 @@ class ConfigureWidgetActivity : AppCompatActivity(), ItemListener {
 
         val preferences = Preferences.getInstance(application)
 
-        val maxItems = preferences.maxItems
-        val maxLines = preferences.maxLines
-        val maxTitle = preferences.maxTitle
-        val textSize = preferences.textSize.value
-        val dateFormat = preferences.dateFormat.value
-        val imagesRoot = IO.getExternalImagesDirectory(application)
-
         adapter =
-            BaseNoteAdapter(
-                Collections.emptySet(),
-                dateFormat,
-                textSize,
-                maxItems,
-                maxLines,
-                maxTitle,
-                imagesRoot,
-                this,
-            )
+            with(preferences) {
+                BaseNoteAdapter(
+                    Collections.emptySet(),
+                    dateFormat.value,
+                    textSize.value,
+                    maxItems,
+                    maxLines,
+                    maxTitle,
+                    IO.getExternalImagesDirectory(application),
+                    this@ConfigureWidgetActivity,
+                )
+            }
 
-        binding.RecyclerView.adapter = adapter
-        binding.RecyclerView.setHasFixedSize(true)
-
-        binding.RecyclerView.layoutManager =
-            if (preferences.view.value == View.grid) {
-                StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
-            } else LinearLayoutManager(this)
+        binding.RecyclerView.apply {
+            adapter = this@ConfigureWidgetActivity.adapter
+            setHasFixedSize(true)
+            layoutManager =
+                if (preferences.view.value == View.grid) {
+                    StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
+                } else LinearLayoutManager(this@ConfigureWidgetActivity)
+        }
 
         val database = NotallyDatabase.getDatabase(application)
 

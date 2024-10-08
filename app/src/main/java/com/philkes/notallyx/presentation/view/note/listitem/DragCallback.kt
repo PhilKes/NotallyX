@@ -88,9 +88,11 @@ class DragCallback(private val elevation: Float, private val listManager: ListMa
     }
 
     override fun clearView(recyclerView: RecyclerView, viewHolder: ViewHolder) {
-        viewHolder.itemView.translationX = 0f
-        viewHolder.itemView.translationY = 0f
-        viewHolder.itemView.elevation = 0f
+        viewHolder.itemView.apply {
+            translationX = 0f
+            translationY = 0f
+            elevation = 0f
+        }
         childViewHolders.forEach { animateFadeIn(it) }
     }
 

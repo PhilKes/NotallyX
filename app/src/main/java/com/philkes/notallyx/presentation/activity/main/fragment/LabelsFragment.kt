@@ -28,7 +28,7 @@ import com.philkes.notallyx.utils.add
 
 class LabelsFragment : Fragment(), ItemListener {
 
-    private var adapter: LabelAdapter? = null
+    private var labelAdapter: LabelAdapter? = null
     private var binding: FragmentNotesBinding? = null
 
     private val model: BaseNoteModel by activityViewModels()
@@ -36,20 +36,21 @@ class LabelsFragment : Fragment(), ItemListener {
     override fun onDestroyView() {
         super.onDestroyView()
         binding = null
-        adapter = null
+        labelAdapter = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter = LabelAdapter(this)
+        labelAdapter = LabelAdapter(this)
 
-        binding?.RecyclerView?.setHasFixedSize(true)
-        binding?.RecyclerView?.adapter = adapter
-        binding?.RecyclerView?.layoutManager = LinearLayoutManager(requireContext())
-        val itemDecoration = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
-        binding?.RecyclerView?.addItemDecoration(itemDecoration)
-
-        binding?.RecyclerView?.setPadding(0, 0, 0, 0)
-        binding?.ImageView?.setImageResource(R.drawable.label)
+        binding?.RecyclerView?.apply {
+            setHasFixedSize(true)
+            adapter = labelAdapter
+            layoutManager = LinearLayoutManager(requireContext())
+            val itemDecoration = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
+            addItemDecoration(itemDecoration)
+            setPadding(0, 0, 0, 0)
+            binding?.ImageView?.setImageResource(R.drawable.label)
+        }
 
         setupObserver()
     }
@@ -69,7 +70,7 @@ class LabelsFragment : Fragment(), ItemListener {
     }
 
     override fun onClick(position: Int) {
-        adapter?.currentList?.get(position)?.let { value ->
+        labelAdapter?.currentList?.get(position)?.let { value ->
             val bundle = Bundle()
             bundle.putString(Constants.SelectedLabel, value)
             findNavController().navigate(R.id.LabelsToDisplayLabel, bundle)
@@ -77,7 +78,7 @@ class LabelsFragment : Fragment(), ItemListener {
     }
 
     override fun onLongClick(position: Int) {
-        adapter?.currentList?.get(position)?.let { value ->
+        labelAdapter?.currentList?.get(position)?.let { value ->
             MenuDialog(requireContext())
                 .add(R.string.edit) { displayEditLabelDialog(value) }
                 .add(R.string.delete) { confirmDeletion(value) }
@@ -87,7 +88,7 @@ class LabelsFragment : Fragment(), ItemListener {
 
     private fun setupObserver() {
         model.labels.observe(viewLifecycleOwner) { labels ->
-            adapter?.submitList(labels)
+            labelAdapter?.submitList(labels)
             binding?.ImageView?.isVisible = labels.isEmpty()
         }
     }
