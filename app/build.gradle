@@ -18,7 +18,7 @@ android {
         targetSdk 33
         versionCode 57
         versionName "6.0-RC2"
-        resConfigs 'en', 'ca', 'cs', 'da', 'de', 'el', 'es', 'fr', 'hu', 'in', 'it', 'ja', 'my', 'nb', 'nl', 'nn', 'pl', 'pt-rBR', 'pt-rPT', 'ro', 'ru', 'sk', 'sv', 'tl', 'tr', 'uk', 'vi', 'zh-rCN'
+        resourceConfigurations += ['en', 'ca', 'cs', 'da', 'de', 'el', 'es', 'fr', 'hu', 'in', 'it', 'ja', 'my', 'nb', 'nl', 'nn', 'pl', 'pt-rBR', 'pt-rPT', 'ro', 'ru', 'sk', 'sv', 'tl', 'tr', 'uk', 'vi', 'zh-rCN']
         vectorDrawables.generatedDensities = []
     }
 
