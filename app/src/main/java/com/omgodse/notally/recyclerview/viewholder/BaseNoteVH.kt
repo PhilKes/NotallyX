@@ -22,6 +22,7 @@ import com.omgodse.notally.miscellaneous.Operations
 import com.omgodse.notally.miscellaneous.applySpans
 import com.omgodse.notally.miscellaneous.displayFormattedTimestamp
 import com.omgodse.notally.miscellaneous.dp
+import com.omgodse.notally.miscellaneous.getQuantityString
 import com.omgodse.notally.model.BaseNote
 import com.omgodse.notally.model.Color
 import com.omgodse.notally.model.FileAttachment
@@ -46,23 +47,25 @@ class BaseNoteVH(
         val title = TextSize.getDisplayTitleSize(textSize)
         val body = TextSize.getDisplayBodySize(textSize)
 
-        binding.Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, title)
-        binding.Date.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
-        binding.Note.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
+        binding.apply {
+            Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, title)
+            Date.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
+            Note.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
-        binding.LinearLayout.children.forEach { view ->
-            view as TextView
-            view.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
-        }
+            LinearLayout.children.forEach { view ->
+                view as TextView
+                view.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
+            }
 
-        binding.Title.maxLines = maxTitle
-        binding.Note.maxLines = maxLines
+            Title.maxLines = maxTitle
+            Note.maxLines = maxLines
 
-        binding.root.setOnClickListener { listener.onClick(adapterPosition) }
+            root.setOnClickListener { listener.onClick(adapterPosition) }
 
-        binding.root.setOnLongClickListener {
-            listener.onLongClick(adapterPosition)
-            return@setOnLongClickListener true
+            root.setOnLongClickListener {
+                listener.onLongClick(adapterPosition)
+                return@setOnLongClickListener true
+            }
         }
     }
 
@@ -70,7 +73,7 @@ class BaseNoteVH(
         binding.root.isChecked = checked
     }
 
-    fun bind(baseNote: BaseNote, imageRoot: File?, fileRoot: File?, checked: Boolean) {
+    fun bind(baseNote: BaseNote, imageRoot: File?, checked: Boolean) {
         updateCheck(checked)
 
         when (baseNote.type) {
@@ -81,98 +84,109 @@ class BaseNoteVH(
         binding.Date.displayFormattedTimestamp(baseNote.timestamp, dateFormat)
         setColor(baseNote.color)
         setImages(baseNote.images, imageRoot)
-        setFiles(baseNote.files, fileRoot)
+        setFiles(baseNote.files)
 
-        binding.Title.text = baseNote.title
-        binding.Title.isVisible = baseNote.title.isNotEmpty()
+        binding.Title.apply {
+            text = baseNote.title
+            isVisible = baseNote.title.isNotEmpty()
+        }
 
         Operations.bindLabels(binding.LabelGroup, baseNote.labels, textSize)
 
         if (isEmpty(baseNote)) {
-            binding.Title.setText(getEmptyMessage(baseNote))
-            binding.Title.visibility = View.VISIBLE
+            binding.Title.apply {
+                setText(getEmptyMessage(baseNote))
+                visibility = View.VISIBLE
+            }
         }
     }
 
     private fun bindNote(body: String, spans: List<SpanRepresentation>) {
         binding.LinearLayout.visibility = View.GONE
 
-        binding.Note.text = body.applySpans(spans)
-        binding.Note.isVisible = body.isNotEmpty()
+        binding.Note.apply {
+            text = body.applySpans(spans)
+            isVisible = body.isNotEmpty()
+        }
     }
 
     private fun bindList(items: List<ListItem>) {
-        binding.Note.visibility = View.GONE
-
-        if (items.isEmpty()) {
-            binding.LinearLayout.visibility = View.GONE
-        } else {
-            binding.LinearLayout.visibility = View.VISIBLE
-
-            val filteredList = items.take(maxItems)
-            binding.LinearLayout.children.forEachIndexed { index, view ->
-                if (view.id != R.id.ItemsRemaining) {
-                    if (index < filteredList.size) {
-                        val item = filteredList[index]
-                        view as TextView
-                        view.text = item.body
-                        handleChecked(view, item.checked)
-                        view.visibility = View.VISIBLE
-                        if (item.isChild) {
-                            val layoutParams = view.layoutParams as LinearLayout.LayoutParams
-                            layoutParams.marginStart = 150.dp
-                            view.layoutParams = layoutParams
-                        }
-                    } else view.visibility = View.GONE
+        binding.apply {
+            Note.visibility = View.GONE
+            if (items.isEmpty()) {
+                LinearLayout.visibility = View.GONE
+            } else {
+                LinearLayout.visibility = View.VISIBLE
+                val filteredList = items.take(maxItems)
+                LinearLayout.children.forEachIndexed { index, view ->
+                    if (view.id != R.id.ItemsRemaining) {
+                        if (index < filteredList.size) {
+                            val item = filteredList[index]
+                            (view as TextView).apply {
+                                text = item.body
+                                handleChecked(this, item.checked)
+                                visibility = View.VISIBLE
+                                if (item.isChild) {
+                                    val layoutParams = layoutParams as LinearLayout.LayoutParams
+                                    layoutParams.marginStart = 150.dp
+                                    setLayoutParams(layoutParams)
+                                }
+                            }
+                        } else view.visibility = View.GONE
+                    }
                 }
-            }
 
-            if (items.size > maxItems) {
-                binding.ItemsRemaining.visibility = View.VISIBLE
-                binding.ItemsRemaining.text = (items.size - maxItems).toString()
-            } else binding.ItemsRemaining.visibility = View.GONE
+                if (items.size > maxItems) {
+                    ItemsRemaining.apply {
+                        visibility = View.VISIBLE
+                        text = (items.size - maxItems).toString()
+                    }
+                } else ItemsRemaining.visibility = View.GONE
+            }
         }
     }
 
     private fun setColor(color: Color) {
-        val context = binding.root.context
-
-        if (color == Color.DEFAULT) {
-            val stroke = ContextCompat.getColorStateList(context, R.color.chip_stroke)
-            binding.root.setStrokeColor(stroke)
-            binding.root.setCardBackgroundColor(0)
-        } else {
-            binding.root.strokeColor = 0
-            val colorInt = Operations.extractColor(color, context)
-            binding.root.setCardBackgroundColor(colorInt)
+        binding.root.apply {
+            if (color == Color.DEFAULT) {
+                val stroke = ContextCompat.getColorStateList(context, R.color.chip_stroke)
+                setStrokeColor(stroke)
+                setCardBackgroundColor(0)
+            } else {
+                strokeColor = 0
+                val colorInt = Operations.extractColor(color, context)
+                setCardBackgroundColor(colorInt)
+            }
         }
     }
 
     private fun setImages(images: List<FileAttachment>, mediaRoot: File?) {
-        if (images.isNotEmpty()) {
-            binding.ImageView.visibility = View.VISIBLE
-            binding.Message.visibility = View.GONE
 
-            val image = images[0]
-            val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
+        binding.apply {
+            if (images.isNotEmpty()) {
+                ImageView.visibility = View.VISIBLE
+                Message.visibility = View.GONE
 
-            Glide.with(binding.ImageView)
-                .load(file)
-                .centerCrop()
-                .transition(DrawableTransitionOptions.withCrossFade())
-                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                .listener(
-                    object : RequestListener<Drawable> {
+                val image = images[0]
+                val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
 
-                        override fun onLoadFailed(
-                            e: GlideException?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            isFirstResource: Boolean,
-                        ): Boolean {
-                            binding.Message.visibility = View.VISIBLE
-                            return false
-                        }
+                Glide.with(ImageView)
+                    .load(file)
+                    .centerCrop()
+                    .transition(DrawableTransitionOptions.withCrossFade())
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .listener(
+                        object : RequestListener<Drawable> {
+
+                            override fun onLoadFailed(
+                                e: GlideException?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                isFirstResource: Boolean,
+                            ): Boolean {
+                                Message.visibility = View.VISIBLE
+                                return false
+                            }
 
                             override fun onResourceReady(
                                 resource: Drawable?,
@@ -206,35 +220,32 @@ class BaseNoteVH(
         }
     }
 
-    private fun setFiles(files: List<FileAttachment>, mediaRoot: File?) {
-        if (files.isNotEmpty()) {
-            binding.FileView.visibility = View.VISIBLE
-
-            val firstFile = files[0]
-            binding.FileView.text = firstFile.originalName
-            if (files.size > 1) {
-                binding.FileViewMore.text =
-                    binding.FileViewMore.context.resources.getQuantityString(
-                        R.plurals.more_files,
-                        files.size - 1,
-                        files.size - 1,
-                    )
-                binding.FileViewMore.visibility = View.VISIBLE
+    private fun setFiles(files: List<FileAttachment>) {
+        binding.apply {
+            if (files.isNotEmpty()) {
+                FileView.visibility = View.VISIBLE
+                FileView.text = files[0].originalName
+                if (files.size > 1) {
+                    FileViewMore.apply {
+                        text = getQuantityString(R.plurals.more_files, files.size - 1)
+                        visibility = View.VISIBLE
+                    }
+                } else {
+                    FileViewMore.visibility = View.GONE
+                }
             } else {
-                binding.FileViewMore.visibility = View.GONE
+                FileView.visibility = View.GONE
+                FileViewMore.visibility = View.GONE
             }
-        } else {
-            binding.FileView.visibility = View.GONE
-            binding.FileViewMore.visibility = View.GONE
         }
     }
 
     private fun isEmpty(baseNote: BaseNote): Boolean {
-        return when (baseNote.type) {
-            Type.NOTE ->
-                baseNote.title.isBlank() && baseNote.body.isBlank() && baseNote.images.isEmpty()
-            Type.LIST ->
-                baseNote.title.isBlank() && baseNote.items.isEmpty() && baseNote.images.isEmpty()
+        return with(baseNote) {
+            when (type) {
+                Type.NOTE -> title.isBlank() && body.isBlank() && images.isEmpty()
+                Type.LIST -> title.isBlank() && items.isEmpty() && images.isEmpty()
+            }
         }
     }
 

@@ -197,6 +197,14 @@ fun EditText.createTextWatcherWithHistory(
         }
     }
 
+fun View.getQuantityString(id: Int, quantity: Int): String {
+    return context.resources.getQuantityString(id, quantity, quantity)
+}
+
+fun View.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {
+    return context.resources.getQuantityString(id, quantity, *formatArgs)
+}
+
 val FileAttachment.isImage: Boolean
     get() {
         return mimeType.startsWith("image/")
