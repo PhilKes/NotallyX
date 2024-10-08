@@ -1,7 +1,4 @@
 package com.philkes.notallyx.data.dao
-
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -16,6 +13,9 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.LabelsInBaseNote
 import com.philkes.notallyx.data.model.ListItem
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
+
 
 @Dao
 interface BaseNoteDao {
@@ -117,13 +117,14 @@ interface BaseNoteDao {
      * Since we store the labels as a JSON Array, it is not possible to perform operations on it.
      * Thus, we use the 'Like' query which can return false positives sometimes.
      *
-     * Take for example, a request for all base notes having the label 'Important' The base notes
-     * which instead have the label 'Unimportant' will also be returned. To prevent this, we use
-     * [Transformations.map] and com.philkes.notallyx.recyclerview.filter the result accordingly.
+     * For example, a request for all base notes having the label 'Important' will also return
+     * base notes with the label 'Unimportant'. To prevent this, we use the extension function
+     * `map` directly on the LiveData to filter the results accordingly.
      */
+
     fun getBaseNotesByLabel(label: String): LiveData<List<BaseNote>> {
         val result = getBaseNotesByLabel(label, Folder.NOTES)
-        return Transformations.map(result) { list ->
+        return result.map { list ->
             list.filter { baseNote -> baseNote.labels.contains(label) }
         }
     }
@@ -143,7 +144,7 @@ interface BaseNoteDao {
 
     fun getBaseNotesByKeyword(keyword: String, folder: Folder): LiveData<List<BaseNote>> {
         val result = getBaseNotesByKeywordImpl(keyword, folder)
-        return Transformations.map(result) { list ->
+        return result.map { list ->
             list.filter { baseNote -> matchesKeyword(baseNote, keyword) }
         }
     }
