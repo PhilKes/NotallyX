@@ -8,8 +8,8 @@
 
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="com.omgodse.notally.activities.TakeNote"
-            android:targetPackage="com.omgodse.notally" />
+            android:targetClass="com.philkes.notallyx.presentation.activity.note.EditNoteActivity"
+            android:targetPackage="com.philkes.notallyx" />
 
     </shortcut>
 
@@ -20,8 +20,8 @@
 
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="com.omgodse.notally.activities.MakeList"
-            android:targetPackage="com.omgodse.notally" />
+            android:targetClass="com.philkes.notallyx.presentation.activity.note.EditListActivity"
+            android:targetPackage="com.philkes.notallyx" />
 
     </shortcut>
 

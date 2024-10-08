@@ -63,7 +63,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Сохранено на устройстве</string>
-    <string name="saved_to_notally">Сохранено в Notally</string>
+    <string name="saved_to_notally">Сохранено в NotallyX</string>
     <string name="empty_note">Пустая заметка</string>
     <string name="empty_list">Пустой список</string>
     <string name="cant_open_link">Невозможно открыть ссылку</string>

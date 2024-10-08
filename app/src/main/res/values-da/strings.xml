@@ -60,7 +60,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Gemt på enheden</string>
-    <string name="saved_to_notally">Gemt i Notally</string>
+    <string name="saved_to_notally">Gemt i NotallyX</string>
     <string name="empty_note">Tom note</string>
     <string name="empty_list">Tom liste</string>
     <string name="cant_open_link">Kan ikke åbne link</string>

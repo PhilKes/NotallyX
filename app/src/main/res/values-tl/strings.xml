@@ -58,7 +58,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Nakasalba sa device</string>
-    <string name="saved_to_notally">Nakasalba sa Notally</string>
+    <string name="saved_to_notally">Nakasalba sa NotallyX</string>
     <string name="empty_note">Walang laman na tala</string>
     <string name="empty_list">Walang laman na listahan</string>
     <string name="cant_open_link">Hindi mabuksan ang link</string>

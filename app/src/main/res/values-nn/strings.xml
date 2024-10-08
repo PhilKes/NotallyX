@@ -65,7 +65,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Lagra til eininga</string>
-    <string name="saved_to_notally">Lagra i Notally</string>
+    <string name="saved_to_notally">Lagra i NotallyX</string>
     <string name="empty_note">Tomt notat</string>
     <string name="empty_list">Tom liste</string>
 
@@ -138,7 +138,7 @@
     <string name="unknown_name">Ukjend namn</string>
     <string name="unknown_error">Ukjend feil</string>
     <string name="insert_an_sd_card_images">Sett inn eit SD-kort for å legga til bilete</string>
-    <string name="please_grant_notally_notification">Gi Notally tillating til å senda varsel. Dette brukas for å visa fremdrifta viss handlinger som å sletta bilete eller importera sikkerheitskopier tar tid</string>
+    <string name="please_grant_notally_notification">Gi NotallyX tillating til å senda varsel. Dette brukas for å visa fremdrifta viss handlinger som å sletta bilete eller importera sikkerheitskopier tar tid</string>
 
     <plurals name="cant_add_images">
         <item quantity="one">Kan ikkje legga til %d bilete</item>

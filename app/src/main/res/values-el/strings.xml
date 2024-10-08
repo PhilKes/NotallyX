@@ -61,7 +61,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Αποθηκεύτηκε στην συσκευή</string>
-    <string name="saved_to_notally">Αποθηκεύτηκε στο Notally</string>
+    <string name="saved_to_notally">Αποθηκεύτηκε στο NotallyX</string>
     <string name="empty_note">Κενή σημείωση</string>
     <string name="empty_list">Κενή λίστα</string>
     <string name="cant_open_link">Αδύνατο το άνοιγμα συνδέσμου</string>

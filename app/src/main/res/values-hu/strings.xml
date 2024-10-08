@@ -58,7 +58,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Elmentve az eszközre</string>
-    <string name="saved_to_notally">Elmentve a Notally -ban</string>
+    <string name="saved_to_notally">Elmentve a NotallyX -ban</string>
     <string name="empty_note">Üres jegyzet</string>
     <string name="empty_list">Üres lista</string>
     <string name="cant_open_link">A hivatkozás nem nyitható meg</string>

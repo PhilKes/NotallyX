@@ -66,7 +66,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Shranjeno v napravo</string>
-    <string name="saved_to_notally">Shranjeno v Notally</string>
+    <string name="saved_to_notally">Shranjeno v NotallyX</string>
     <string name="empty_note">Prazen zapisek</string>
     <string name="empty_list">Prazen seznam</string>
     <string name="select_labels">Izberi oznake</string>
@@ -141,7 +141,7 @@
     <string name="unknown_name">Neznano ime</string>
     <string name="unknown_error">Neznana napaka</string>
     <string name="insert_an_sd_card_images">Za dodajanje slik vstavite kartico SD</string>
-    <string name="please_grant_notally_notification">Prosimo dovolite aplikaciji Notally da vas obvešča o napredku operacij kot sta brisanje slik in uvažanje varnostnih kopij.</string>
+    <string name="please_grant_notally_notification">Prosimo dovolite aplikaciji NotallyX da vas obvešča o napredku operacij kot sta brisanje slik in uvažanje varnostnih kopij.</string>
 
     <plurals name="cant_add_images">
         <item quantity="one">%d slika ni bila dodana.</item>

@@ -63,7 +63,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Salvata sul dispositivo</string>
-    <string name="saved_to_notally">Salvata su Notally</string>
+    <string name="saved_to_notally">Salvata su NotallyX</string>
     <string name="empty_note">Nota vuota</string>
     <string name="empty_list">Lista vuota</string>
     <string name="cant_open_link">Impossibile aprire il link</string>

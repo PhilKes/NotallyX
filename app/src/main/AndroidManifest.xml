@@ -12,15 +12,15 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
 
     <application
-        android:name=".NotallyApplication"
+        android:name=".NotallyXApplication"
         android:allowBackup="true"
         android:appCategory="productivity"
         android:dataExtractionRules="@xml/data_rules"
         android:fullBackupContent="@xml/backup_content"
-        android:icon="@mipmap/notally"
+        android:icon="@mipmap/notallyx"
         android:label="@string/app_name"
         android:localeConfig="@xml/locales"
-        android:roundIcon="@mipmap/notally_round"
+        android:roundIcon="@mipmap/notallyx_round"
         android:theme="@style/AppTheme">
 
         <provider
@@ -36,7 +36,7 @@
         </provider>
 
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".presentation.activity.main.MainActivity"
             android:exported="true"
             android:theme="@style/MainActivity">
 
@@ -52,11 +52,11 @@
         </activity>
 
         <activity
-            android:name=".activities.MakeList"
+            android:name=".presentation.activity.note.EditListActivity"
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".activities.TakeNote"
+            android:name=".presentation.activity.note.EditNoteActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize">
 
@@ -68,18 +68,18 @@
 
         </activity>
 
-        <activity android:name=".activities.ViewImage" />
+        <activity android:name=".presentation.activity.note.ViewImageActivity" />
 
-        <activity android:name=".activities.SelectLabels" />
+        <activity android:name=".presentation.activity.note.SelectLabelsActivity" />
 
         <activity
-            android:name=".activities.RecordAudio"
+            android:name=".presentation.activity.note.RecordAudioActivity"
             android:launchMode="singleTask" />
 
-        <activity android:name=".activities.PlayAudio" />
+        <activity android:name=".presentation.activity.note.PlayAudioActivity" />
 
         <activity
-            android:name=".activities.ConfigureWidget"
+            android:name=".presentation.activity.ConfigureWidgetActivity"
             android:exported="false">
 
             <intent-filter>
@@ -89,7 +89,7 @@
         </activity>
 
         <receiver
-            android:name=".widget.WidgetProvider"
+            android:name=".presentation.widget.WidgetProvider"
             android:exported="false"
             android:label="@string/single_note_or_list">
 
@@ -104,21 +104,21 @@
         </receiver>
 
         <service
-            android:name=".widget.WidgetService"
+            android:name=".presentation.widget.WidgetService"
             android:permission="android.permission.BIND_REMOTEVIEWS" />
 
         <service
-            android:name=".AttachmentDeleteService"
+            android:name=".data.AttachmentDeleteService"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
         <service
-            android:name=".audio.AudioRecordService"
+            android:name=".utils.audio.AudioRecordService"
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
         <service
-            android:name=".audio.AudioPlayService"
+            android:name=".utils.audio.AudioPlayService"
             android:exported="false" />
 
     </application>

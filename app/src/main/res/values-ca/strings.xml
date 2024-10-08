@@ -58,7 +58,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Desat al dispositiu</string>
-    <string name="saved_to_notally">Desat a Notally</string>
+    <string name="saved_to_notally">Desat a NotallyX</string>
     <string name="empty_note">Nota buida</string>
     <string name="empty_list">Llista buida</string>
     <string name="cant_open_link">No es pot obrir l\'enllaç</string>

@@ -56,7 +56,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Sparad till enhet</string>
-    <string name="saved_to_notally">Sparad till Notally</string>
+    <string name="saved_to_notally">Sparad till NotallyX</string>
     <string name="empty_note">Tom anteckning</string>
     <string name="empty_list">Tom lista</string>
     <string name="cant_open_link">Kan inte öppna länken</string>
