@@ -71,10 +71,8 @@ class MakeList : NotallyActivity(Type.LIST) {
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { listManager.moveFocusToNext(-1) }
 
-        if (model.isNewNote) {
-            if (model.items.isEmpty()) {
-                listManager.add(pushChange = false)
-            }
+        if (model.isNewNote || model.items.isEmpty()) {
+            listManager.add(pushChange = false)
         }
     }
 
