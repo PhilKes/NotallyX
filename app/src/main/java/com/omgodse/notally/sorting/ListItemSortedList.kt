@@ -103,7 +103,7 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
         }
     }
 
-    fun removeChildFromParent(item: ListItem) {
+    private fun removeChildFromParent(item: ListItem) {
         findParent(item)?.let { (_, parent) ->
             val childIndex = parent.children.indexOfFirst { child -> child.id == item.id }
             parent.children.removeAt(childIndex)
@@ -119,9 +119,10 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
     private fun initChildren(list: List<ListItem>) {
         var parent: ListItem? = null
         list.forEach { item ->
-            if (item.isChild) {
+            if (item.isChild && parent != null) {
                 parent!!.children.add(item)
             } else {
+                item.isChild = false
                 parent = item
             }
         }

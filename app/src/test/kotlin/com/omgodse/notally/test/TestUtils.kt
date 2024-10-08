@@ -16,6 +16,7 @@ import com.omgodse.notally.sorting.toReadableString
 import io.mockk.every
 import io.mockk.mockkStatic
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.mockito.Mockito
 
@@ -87,6 +88,7 @@ fun ListItemSortedList.assertChecked(vararg checked: Boolean) {
 }
 
 fun ListItem.assertChildren(vararg childrenBodies: String) {
+    assertFalse("isChild", this.isChild)
     if (childrenBodies.isNotEmpty()) {
         childrenBodies.forEachIndexed { index, s ->
             assertEquals("Child at position $index", s, children[index].body)

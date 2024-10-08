@@ -39,7 +39,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "D", "E", "C", "F")
         "A".assertChildren("B", "D", "E", "C")
-        "D".assertChildren()
+        "D".assertIsChild()
         assertEquals(2, newPosition)
         (changeHistory.lookUp() as ListMoveChange).assert(3, 2, 2, " D(E)")
     }
