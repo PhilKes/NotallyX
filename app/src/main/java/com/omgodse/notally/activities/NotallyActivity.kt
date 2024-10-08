@@ -2,6 +2,7 @@ package com.omgodse.notally.activities
 
 import android.Manifest
 import android.app.Activity
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
@@ -438,7 +439,11 @@ abstract class NotallyActivity(private val type: Type) : AppCompatActivity() {
                         setDataAndType(uri, fileAttachment.mimeType)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
-                startActivity(intent)
+                try {
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    startActivity(Intent.createChooser(intent, null))
+                }
             }) { fileAttachment ->
                 MaterialAlertDialogBuilder(this)
                     .setMessage(getString(R.string.delete_file, fileAttachment.originalName))
