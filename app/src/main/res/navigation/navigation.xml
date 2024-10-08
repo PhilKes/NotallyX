@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/Notes"
-        android:name="com.omgodse.notally.fragments.Notes"
+        android:name="com.philkes.notallyx.fragments.Notes"
         android:label="@string/app_name">
 
         <action
@@ -19,7 +19,7 @@
 
     <fragment
         android:id="@+id/Labels"
-        android:name="com.omgodse.notally.fragments.Labels"
+        android:name="com.philkes.notallyx.fragments.Labels"
         android:label="@string/labels">
 
         <action
@@ -34,26 +34,26 @@
 
     <fragment
         android:id="@+id/Deleted"
-        android:name="com.omgodse.notally.fragments.Deleted"
+        android:name="com.philkes.notallyx.fragments.Deleted"
         android:label="@string/deleted" />
 
     <fragment
         android:id="@+id/Archived"
-        android:name="com.omgodse.notally.fragments.Archived"
+        android:name="com.philkes.notallyx.fragments.Archived"
         android:label="@string/archived" />
 
     <fragment
         android:id="@+id/Settings"
-        android:name="com.omgodse.notally.fragments.Settings"
+        android:name="com.philkes.notallyx.fragments.Settings"
         android:label="@string/settings" />
 
     <fragment
         android:id="@+id/Search"
-        android:name="com.omgodse.notally.fragments.Search" />
+        android:name="com.philkes.notallyx.fragments.Search" />
 
     <fragment
         android:id="@+id/DisplayLabel"
-        android:name="com.omgodse.notally.fragments.DisplayLabel"
+        android:name="com.philkes.notallyx.fragments.DisplayLabel"
         android:label="{SelectedLabel}" />
 
 </navigation>

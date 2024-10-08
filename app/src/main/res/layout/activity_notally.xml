@@ -27,7 +27,7 @@
             android:orientation="vertical"
             android:paddingBottom="16dp">
 
-            <com.omgodse.notally.image.AspectRatioRecyclerView
+            <com.philkes.notallyx.image.AspectRatioRecyclerView
                 android:id="@+id/ImagePreview"
                 android:layout_width="match_parent"
                 android:layout_height="0dp" />
@@ -72,7 +72,7 @@
                 android:layout_height="1dp"
                 android:background="?android:attr/listDivider" />
 
-            <com.omgodse.notally.OverflowEditText
+            <com.philkes.notallyx.OverflowEditText
                 android:id="@+id/EnterBody"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

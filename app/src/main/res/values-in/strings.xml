@@ -62,7 +62,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Disimpan ke perangkat</string>
-    <string name="saved_to_notally">Disimpan ke Notally</string>
+    <string name="saved_to_notally">Disimpan ke NotallyX</string>
     <string name="empty_note">Catatan kosong</string>
     <string name="empty_list">Daftar kosong</string>
     <string name="cant_open_link">Tidak bisa membuka tautan</string>

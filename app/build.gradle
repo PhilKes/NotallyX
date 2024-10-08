@@ -10,10 +10,10 @@ plugins {
 
 android {
     compileSdk 34
-    namespace 'com.omgodse.notally'
+    namespace 'com.philkes.notallyx'
 
     defaultConfig {
-        applicationId 'com.omgodse.notally'
+        applicationId 'com.philkes.notallyx'
         minSdk 21
         targetSdk 33
         versionCode 56

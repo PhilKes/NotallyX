@@ -67,7 +67,7 @@
 
     <!-- Miscellaneous -->
     <string name="saved_to_device">Auf dem Gerät gespeichert</string>
-    <string name="saved_to_notally">In Notally gespeichert</string>
+    <string name="saved_to_notally">In NotallyX gespeichert</string>
     <string name="empty_note">Leere Notiz</string>
     <string name="empty_list">Leere Liste</string>
     <string name="select_labels">Label auswählen</string>
@@ -145,7 +145,7 @@
     <string name="unknown_name">Unbekannter Name</string>
     <string name="unknown_error">Unbekannter Fehler</string>
     <string name="insert_an_sd_card_images">SD-Karte einlegen, um Bilder hinzuzufügen</string>
-    <string name="please_grant_notally_notification">Bitte erteile Notally die Berechtigung, Benachrichtigungen zu senden. Dies wird verwendet, um den Fortschritt anzuzeigen, wenn Vorgänge wie das Löschen von Bildern oder das Importieren von Sicherungen Zeit in Anspruch nehmen</string>
+    <string name="please_grant_notally_notification">Bitte erteile NotallyX die Berechtigung, Benachrichtigungen zu senden. Dies wird verwendet, um den Fortschritt anzuzeigen, wenn Vorgänge wie das Löschen von Bildern oder das Importieren von Sicherungen Zeit in Anspruch nehmen</string>
 
     <plurals name="cant_add_images">
         <item quantity="one">Kann %d Bild nicht hinzufügen</item>

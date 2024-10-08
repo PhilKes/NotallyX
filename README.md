@@ -1,7 +1,15 @@
-### Background
-Notally was created because I wanted to make something that was beautiful and at the same time, useful. It's extremely light, there are minimal dependencies and lines of code.
+## NotallyX
 
-### Features
+[Notally](https://github.com/OmGodse/Notally), but eXtended.
+
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="250"/>
+
+### Additional Features
+* Order Tasks with Subtasks
+* Attach any file to a note (also included in backups)
+* Many minor improvements such as removing all checked tasks from the context menu, smoother navigation
+
+### Included Features from the original Notally App
 * Widgets
 * Auto backup
 * Adjustable text size
@@ -13,23 +21,22 @@ Notally was created because I wanted to make something that was beautiful and at
 * Create rich text notes with support for bold, italics, mono space and strike-through
 * Add clickable links to notes with support for phone numbers, email addresses and web urls
 
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" alt="Get it on Google Play"  height="70"/>](https://play.google.com/store/apps/details?id=com.omgodse.notally)
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="70"/>](https://f-droid.org/packages/com.omgodse.notally/)
+### Releases
+Currently the App is only released on Github, see [NotallyX/Releases](https://github.com/PhilKes/NotallyX/releases)
+
+In the future I might also publish new versions on the Google Play Store under the NotallyX name.
 
 ### Translations
-All translations are crowd sourced. To contribute, follow these [guidelines](https://m2.material.io/design/communication/writing.html) and email me or open a pull request.
+All translations are crowd sourced. To contribute, follow these [guidelines](https://m2.material.io/design/communication/writing.html) and open a pull request.
 
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="250"/>
 
-### Hall of fame
-* [Top 20 Android Apps 2021!](https://www.youtube.com/watch?v=bwz13aM0qJk)
-* [De-Googling Any Android Phone! (Google Apps Alternatives)](https://www.youtube.com/watch?v=RQUEgwgV99I)
-* [The BEST Private Notetaking Apps Explained](https://www.youtube.com/watch?v=BJw5tKPP1PY)
-* [Notally](https://www.noteapps.ca/notally/)
-* [The 9 Best Simple Note-Taking Apps for Android](https://www.makeuseof.com/simple-note-apps-android/)
+### Contributing
+If you find any bugs or want to propose a new Feature/Enhancement, feel free to [create a new Issue](https://github.com/PhilKes/NotallyX/issues/new)
 
-### Copycats
-Clones of Notally keep popping up on the Play Store. They are not licensed under GPL3 and usually change a few colors, include ads, etc. Please [report them](https://support.google.com/googleplay/android-developer/contact/takedown) and [inform me](mailto:omgodseapps@gmail.com) if you find a new one.
+If you would like to contribute code yourself, just grab any open issue (that has no other developer assigned yet) and start working.
+The project is a default Android project written in Kotlin.
+Before submitting your proposed changes as a Pull-Request, make sure all tests are still working, and run `./gradlew ktfmtFormat` for common formatting.
 
-* https://play.google.com/store/apps/details?id=com.sladjan.notes
-* https://play.google.com/store/apps/details?id=com.sladjan.notespro
+### Attribution
+The original Notally project was developed by [OmGodse](https://github.com/OmGodse) under the [GPL 3.0 License](https://github.com/OmGodse/Notally/blob/master/LICENSE.md)
+In accordance to GPL 3.0, this project is licensed under the same [GPL 3.0 License](https://github.com/PhilKes/NotallyX/blob/master/LICENSE.md)
