@@ -152,6 +152,11 @@
         <item quantity="other">Kann %d Bilder nicht hinzufügen</item>
     </plurals>
 
+    <plurals name="more_images">
+        <item quantity="one">…%d weiteres Bild</item>
+        <item quantity="other">…%d weitere Bilder</item>
+    </plurals>
+
     <!-- Files -->
     <plurals name="more_files">
         <item quantity="one">…%d weitere Datei</item>

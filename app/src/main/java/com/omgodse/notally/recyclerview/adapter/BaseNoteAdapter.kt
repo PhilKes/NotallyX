@@ -23,7 +23,6 @@ class BaseNoteAdapter(
     private val maxLines: Int,
     private val maxTitle: Int,
     private val imageRoot: File?,
-    private val fileRoot: File?,
     private val listener: ItemListener,
 ) : ListAdapter<Item, RecyclerView.ViewHolder>(DiffCallback) {
 
@@ -38,12 +37,7 @@ class BaseNoteAdapter(
         when (val item = getItem(position)) {
             is Header -> (holder as HeaderVH).bind(item)
             is BaseNote ->
-                (holder as BaseNoteVH).bind(
-                    item,
-                    imageRoot,
-                    fileRoot,
-                    selectedIds.contains(item.id),
-                )
+                (holder as BaseNoteVH).bind(item, imageRoot, selectedIds.contains(item.id))
         }
     }
 
