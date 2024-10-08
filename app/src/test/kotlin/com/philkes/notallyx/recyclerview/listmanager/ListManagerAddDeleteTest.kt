@@ -1,16 +1,16 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.changehistory.DeleteCheckedChange
-import com.philkes.notallyx.changehistory.ListAddChange
-import com.philkes.notallyx.changehistory.ListDeleteChange
-import com.philkes.notallyx.model.ListItem
-import com.philkes.notallyx.preferences.ListItemSorting
+import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.test.assert
 import com.philkes.notallyx.test.assertChildren
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.createListItem
 import com.philkes.notallyx.test.find
 import com.philkes.notallyx.test.printList
+import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
+import com.philkes.notallyx.utils.changehistory.ListAddChange
+import com.philkes.notallyx.utils.changehistory.ListDeleteChange
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull

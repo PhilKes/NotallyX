@@ -1,8 +1,8 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.preferences.ListItemSorting
-import com.philkes.notallyx.sorting.lastIndex
-import com.philkes.notallyx.sorting.map
+import com.philkes.notallyx.presentation.view.misc.ListItemSorting
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.lastIndex
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.map
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertIds
 import com.philkes.notallyx.test.assertOrder

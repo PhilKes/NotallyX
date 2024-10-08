@@ -19,7 +19,7 @@
         android:gravity="center"
         android:textAppearance="?attr/textAppearanceBody2" />
 
-    <com.philkes.notallyx.audio.AudioControlView
+    <com.philkes.notallyx.presentation.view.note.audio.AudioControlView
         android:id="@+id/AudioControlView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -52,7 +52,7 @@
             android:layout_marginEnd="8dp"
             android:textAppearance="?attr/textAppearanceCaption" />
 
-    </com.philkes.notallyx.audio.AudioControlView>
+    </com.philkes.notallyx.presentation.view.note.audio.AudioControlView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/Play"

@@ -1,11 +1,11 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.changehistory.ChangeCheckedForAllChange
-import com.philkes.notallyx.changehistory.ListCheckedChange
-import com.philkes.notallyx.preferences.ListItemSorting
+import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.test.assert
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
+import com.philkes.notallyx.utils.changehistory.ChangeCheckedForAllChange
+import com.philkes.notallyx.utils.changehistory.ListCheckedChange
 import org.junit.Test
 
 class ListManagerCheckedTest : ListManagerTestBase() {

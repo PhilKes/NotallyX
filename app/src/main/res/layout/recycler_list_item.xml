@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     >
 
-    <com.philkes.notallyx.miscellaneous.layout.SwipeLayout
+    <com.philkes.notallyx.presentation.view.misc.SwipeLayout
         android:id="@+id/SwipeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -53,7 +53,7 @@
             android:minWidth="0dp"
             android:minHeight="0dp" />
 
-        <com.philkes.notallyx.miscellaneous.EditTextAutoClearFocus
+        <com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
             android:id="@+id/EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -68,7 +68,7 @@
             android:layout_marginEnd="40dp"
             android:textAppearance="?attr/textAppearanceBody1" />
     </RelativeLayout>
-    </com.philkes.notallyx.miscellaneous.layout.SwipeLayout>
+    </com.philkes.notallyx.presentation.view.misc.SwipeLayout>
 
     <ImageButton
         android:id="@+id/Delete"

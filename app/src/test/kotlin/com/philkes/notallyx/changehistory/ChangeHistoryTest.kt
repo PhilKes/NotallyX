@@ -1,6 +1,8 @@
 package com.philkes.notallyx.changehistory
 
 import com.philkes.notallyx.test.mockAndroidLog
+import com.philkes.notallyx.utils.changehistory.Change
+import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows

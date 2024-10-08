@@ -1,6 +1,10 @@
 package com.philkes.notallyx.sorting
 
 import androidx.recyclerview.widget.RecyclerView
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
 import com.philkes.notallyx.test.assertChildren
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.createListItem

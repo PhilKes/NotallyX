@@ -5,9 +5,8 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.philkes.notallyx.backup.AutoBackupWorker
-import com.philkes.notallyx.preferences.Preferences
-import com.philkes.notallyx.preferences.Theme
+import com.philkes.notallyx.presentation.view.misc.Theme
+import com.philkes.notallyx.utils.backup.AutoBackupWorker
 import java.util.concurrent.TimeUnit
 
 class NotallyXApplication : Application() {
