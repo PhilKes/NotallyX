@@ -174,22 +174,35 @@ class BaseNoteVH(
                             return false
                         }
 
-                        override fun onResourceReady(
-                            resource: Drawable?,
-                            model: Any?,
-                            target: Target<Drawable>?,
-                            dataSource: DataSource?,
-                            isFirstResource: Boolean,
-                        ): Boolean {
-                            return false
+                            override fun onResourceReady(
+                                resource: Drawable?,
+                                model: Any?,
+                                target: Target<Drawable>?,
+                                dataSource: DataSource?,
+                                isFirstResource: Boolean,
+                            ): Boolean {
+                                return false
+                            }
                         }
+                    )
+                    .into(ImageView)
+                if (images.size > 1) {
+                    Space.visibility = View.GONE
+                    ImageViewMore.apply {
+                        text = getQuantityString(R.plurals.more_images, images.size - 1)
+                        visibility = View.VISIBLE
                     }
-                )
-                .into(binding.ImageView)
-        } else {
-            binding.ImageView.visibility = View.GONE
-            binding.Message.visibility = View.GONE
-            Glide.with(binding.ImageView).clear(binding.ImageView)
+                } else {
+                    ImageViewMore.visibility = View.GONE
+                    Space.visibility = View.VISIBLE
+                }
+            } else {
+                Space.visibility = View.VISIBLE
+                ImageView.visibility = View.GONE
+                Message.visibility = View.GONE
+                ImageViewMore.visibility = View.GONE
+                Glide.with(ImageView).clear(ImageView)
+            }
         }
     }
 

@@ -33,11 +33,29 @@
             app:layout_constraintDimensionRatio="4:3"
             app:layout_constraintTop_toTopOf="parent" />
 
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/ImageViewMore"
+            style="@style/Preview"
+            android:visibility="visible"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="top"
+            android:clickable="false"
+            android:layout_marginStart="6dp"
+            android:textAppearance="?attr/textAppearanceCaption"
+            android:stateListAnimator="@null"
+            app:chipStartPadding="8dp"
+            app:textStartPadding="2dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/ImageView"
+            />
+
         <Space
             android:id="@+id/Space"
             android:layout_width="match_parent"
             android:layout_height="16dp"
-            app:layout_constraintTop_toBottomOf="@id/ImageView" />
+            app:layout_constraintTop_toBottomOf="@id/ImageViewMore" />
 
         <TextView
             android:id="@+id/Title"
@@ -82,6 +100,7 @@
                 app:textStartPadding="2dp"
                 app:chipIcon="@drawable/text_file"
                 app:chipIconSize="10pt"
+                android:stateListAnimator="@null"
                 android:text="@string/cant_load_file"
                 android:textAppearance="?attr/textAppearanceCaption"
                 app:layout_constraintStart_toStartOf="parent"
@@ -95,7 +114,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="top"
                 android:clickable="false"
-                android:text="..."
+                android:stateListAnimator="@null"
                 android:layout_marginStart="6dp"
                 android:textAppearance="?attr/textAppearanceCaption"
                 app:chipStartPadding="8dp"
@@ -186,6 +205,7 @@
             android:id="@+id/LabelGroup"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:stateListAnimator="@null"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:paddingBottom="16dp"
