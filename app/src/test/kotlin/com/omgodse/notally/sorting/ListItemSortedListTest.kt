@@ -1,6 +1,7 @@
 package com.omgodse.notally.sorting
 
 import androidx.recyclerview.widget.RecyclerView
+import com.omgodse.notally.test.assertChildren
 import com.omgodse.notally.test.assertOrder
 import com.omgodse.notally.test.createListItem
 import org.junit.Assert.assertEquals
@@ -98,9 +99,30 @@ open class ListItemSortedListTest {
         assertOrders(3, 4, 5, 0, 1, 2)
     }
 
+    @Test
+    fun `init with first item is child`() {
+        items.init(
+            createListItem("A", id = 0, order = 0, isChild = true),
+            createListItem("B", id = 1, order = 1),
+            createListItem("C", id = 2, order = 2),
+            createListItem("D", id = 3, order = 3, isChild = true),
+            createListItem("E", id = 4, order = 4, isChild = true),
+            createListItem("F", id = 5, order = 5),
+        )
+
+        items.assertOrder("A", "B", "C", "D", "E", "F")
+        "A".assertChildren()
+        "C".assertChildren("D", "E")
+        assertOrders(0, 1, 2, 3, 4, 5)
+    }
+
     private fun assertOrders(vararg orders: Int) {
         for (idx in 0 until orders.size) {
             assertEquals(orders[idx], items[idx].order)
         }
+    }
+
+    private fun String.assertChildren(vararg childrenBodies: String) {
+        items.find { it.body == this }!!.assertChildren(*childrenBodies)
     }
 }

@@ -93,6 +93,9 @@ fun ListItemSortedList.setIsChild(
     isChild: Boolean,
     forceOnChildren: Boolean = false,
 ) {
+    if (position == 0 && isChild) {
+        return
+    }
     if (forceOnChildren) {
         this.setIsChild((position..position + this[position].children.size).toList(), isChild)
     } else {

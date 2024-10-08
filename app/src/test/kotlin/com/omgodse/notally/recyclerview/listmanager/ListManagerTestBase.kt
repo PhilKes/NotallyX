@@ -111,6 +111,10 @@ open class ListManagerTestBase {
         assertFalse(items.find { it.body == this }!!.isChild)
     }
 
+    protected fun String.assertIsChild() {
+        assertTrue(items.find { it.body == this }!!.isChild)
+    }
+
     protected val String.itemCount: Int
         get() {
             return items.find { it.body == this }!!.itemCount
