@@ -5,6 +5,7 @@ import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
+import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.TextView.INVISIBLE
 import android.widget.TextView.VISIBLE
 import androidx.recyclerview.widget.ItemTouchHelper
@@ -104,13 +105,20 @@ class MakeListVH(
         }
     }
 
+    private var checkBoxListener: OnCheckedChangeListener? = null
+
     private fun updateCheckBox(item: ListItem) {
+        if (checkBoxListener == null) {
+            checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
+                buttonView!!.setOnCheckedChangeListener(null)
+                listManager.changeChecked(adapterPosition, isChecked)
+                buttonView.setOnCheckedChangeListener(checkBoxListener)
+            }
+        }
         binding.CheckBox.apply {
             setOnCheckedChangeListener(null)
             isChecked = item.checked
-            setOnCheckedChangeListener { _, isChecked ->
-                listManager.changeChecked(adapterPosition, isChecked)
-            }
+            setOnCheckedChangeListener(checkBoxListener)
         }
     }
 
