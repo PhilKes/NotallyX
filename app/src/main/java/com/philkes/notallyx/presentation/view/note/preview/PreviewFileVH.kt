@@ -1,4 +1,4 @@
-package com.philkes.notallyx.presentation.view.note
+package com.philkes.notallyx.presentation.view.note.preview
 
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.R

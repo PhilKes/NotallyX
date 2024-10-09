@@ -25,7 +25,7 @@ import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
 import com.philkes.notallyx.presentation.view.misc.TextSize
-import com.philkes.notallyx.presentation.view.note.listitem.ItemListener
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.applySpans
 import com.philkes.notallyx.utils.displayFormattedTimestamp
@@ -40,7 +40,7 @@ class BaseNoteVH(
     private val maxItems: Int,
     maxLines: Int,
     maxTitle: Int,
-    listener: ItemListener,
+    listener: ListItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {

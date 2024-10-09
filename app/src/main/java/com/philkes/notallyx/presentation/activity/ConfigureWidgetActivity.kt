@@ -16,7 +16,7 @@ import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.databinding.ActivityConfigureWidgetBinding
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
 import com.philkes.notallyx.presentation.view.misc.View
-import com.philkes.notallyx.presentation.view.note.listitem.ItemListener
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.IO
@@ -25,7 +25,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ConfigureWidgetActivity : AppCompatActivity(), ItemListener {
+class ConfigureWidgetActivity : AppCompatActivity(), ListItemListener {
 
     private lateinit var adapter: BaseNoteAdapter
     private val id by lazy {

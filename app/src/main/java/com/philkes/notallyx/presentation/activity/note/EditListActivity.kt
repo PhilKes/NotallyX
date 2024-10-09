@@ -7,8 +7,8 @@ import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
-import com.philkes.notallyx.presentation.view.note.listitem.MakeListAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
@@ -20,7 +20,7 @@ import com.philkes.notallyx.utils.setOnNextAction
 
 class EditListActivity : EditActivity(Type.LIST) {
 
-    private lateinit var adapter: MakeListAdapter
+    private lateinit var adapter: ListItemAdapter
     private lateinit var items: ListItemSortedList
 
     private lateinit var listManager: ListManager
@@ -94,7 +94,7 @@ class EditListActivity : EditActivity(Type.LIST) {
                 getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager,
             )
         adapter =
-            MakeListAdapter(
+            ListItemAdapter(
                 model.textSize,
                 elevation,
                 Preferences.getInstance(application),

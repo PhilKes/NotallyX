@@ -7,9 +7,9 @@ import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
-import com.philkes.notallyx.presentation.view.note.listitem.DragCallback
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
-import com.philkes.notallyx.presentation.view.note.listitem.MakeListVH
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
@@ -33,9 +33,9 @@ open class ListManagerTestBase {
     protected lateinit var adapter: RecyclerView.Adapter<*>
     protected lateinit var inputMethodManager: InputMethodManager
     protected lateinit var changeHistory: ChangeHistory
-    protected lateinit var makeListVH: MakeListVH
+    protected lateinit var listItemVH: ListItemVH
     protected lateinit var preferences: Preferences
-    protected lateinit var dragCallback: DragCallback
+    protected lateinit var listItemDragCallback: ListItemDragCallback
 
     protected lateinit var items: ListItemSortedList
 
@@ -48,12 +48,12 @@ open class ListManagerTestBase {
         adapter = mock(RecyclerView.Adapter::class.java)
         inputMethodManager = mock(InputMethodManager::class.java)
         changeHistory = ChangeHistory() {}
-        makeListVH = mock(MakeListVH::class.java)
+        listItemVH = mock(ListItemVH::class.java)
         preferences = mock(Preferences::class.java)
         listManager = ListManager(recyclerView, changeHistory, preferences, inputMethodManager)
-        listManager.adapter = adapter as RecyclerView.Adapter<MakeListVH>
+        listManager.adapter = adapter as RecyclerView.Adapter<ListItemVH>
         // Prepare view holder
-        `when`(recyclerView.findViewHolderForAdapterPosition(anyInt())).thenReturn(makeListVH)
+        `when`(recyclerView.findViewHolderForAdapterPosition(anyInt())).thenReturn(listItemVH)
     }
 
     protected fun setSorting(sorting: String) {
@@ -75,7 +75,7 @@ open class ListManagerTestBase {
             createListItem("F", id = 5, order = 5),
         )
         listManager.initList(items)
-        dragCallback = DragCallback(1.0f, listManager)
+        listItemDragCallback = ListItemDragCallback(1.0f, listManager)
         `when`(preferences.listItemSorting).thenReturn(BetterLiveData(sorting))
     }
 

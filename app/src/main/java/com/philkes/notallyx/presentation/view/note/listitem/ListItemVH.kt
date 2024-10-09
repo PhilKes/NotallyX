@@ -18,7 +18,7 @@ import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.utils.createListTextWatcherWithHistory
 import com.philkes.notallyx.utils.setOnNextAction
 
-class MakeListVH(
+class ListItemVH(
     val binding: RecyclerListItemBinding,
     val listManager: ListManager,
     touchHelper: ItemTouchHelper,
@@ -38,7 +38,7 @@ class MakeListVH(
             }
 
             editTextWatcher =
-                createListTextWatcherWithHistory(listManager, this@MakeListVH::getAdapterPosition)
+                createListTextWatcherWithHistory(listManager, this@ListItemVH::getAdapterPosition)
             addTextChangedListener(editTextWatcher)
 
             setOnFocusChangeListener { _, hasFocus ->
