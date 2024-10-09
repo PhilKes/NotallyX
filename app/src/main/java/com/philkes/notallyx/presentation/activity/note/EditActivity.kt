@@ -416,20 +416,39 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
 
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                     binding.ImagePreview.scrollToPosition(positionStart)
+                    binding.ImagePreviewPosition.text =
+                        "${positionStart + 1}/${imageAdapter.itemCount}"
                 }
             }
         )
-
         binding.ImagePreview.apply {
             setHasFixedSize(true)
             adapter = imageAdapter
             layoutManager = LinearLayoutManager(this@EditActivity, RecyclerView.HORIZONTAL, false)
-            PagerSnapHelper().attachToRecyclerView(this)
+
+            val pagerSnapHelper = PagerSnapHelper()
+            pagerSnapHelper.attachToRecyclerView(this)
+            addOnScrollListener(
+                object : RecyclerView.OnScrollListener() {
+                    override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
+                        super.onScrollStateChanged(recyclerView, newState)
+                        if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                            val snappedView = pagerSnapHelper.findSnapView(layoutManager)
+                            if (snappedView != null) {
+                                val position = recyclerView.getChildAdapterPosition(snappedView)
+                                binding.ImagePreviewPosition.text =
+                                    "${position + 1}/${imageAdapter.itemCount}"
+                            }
+                        }
+                    }
+                }
+            )
         }
 
         model.images.observe(this) { list ->
             imageAdapter.submitList(list)
             binding.ImagePreview.isVisible = list.isNotEmpty()
+            binding.ImagePreviewPosition.isVisible = list.size > 1
         }
     }
 
