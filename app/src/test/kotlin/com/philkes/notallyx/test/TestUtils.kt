@@ -2,7 +2,7 @@ package com.philkes.notallyx.test
 
 import android.util.Log
 import com.philkes.notallyx.data.model.ListItem
-import com.philkes.notallyx.presentation.view.note.listitem.DragCallback
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableString
@@ -39,7 +39,7 @@ fun mockAndroidLog() {
     every { Log.e(any(), any()) } returns 0
 }
 
-fun DragCallback.simulateDrag(positionFrom: Int, positionTo: Int, itemCount: Int) {
+fun ListItemDragCallback.simulateDrag(positionFrom: Int, positionTo: Int, itemCount: Int) {
     this.reset()
     var from = positionFrom
     if (positionFrom < positionTo) {

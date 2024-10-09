@@ -1,4 +1,4 @@
-package com.philkes.notallyx.presentation.view.note
+package com.philkes.notallyx.presentation.view.note.preview
 
 import android.graphics.drawable.Drawable
 import android.view.View

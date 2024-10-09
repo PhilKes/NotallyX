@@ -39,7 +39,7 @@ import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
-import com.philkes.notallyx.presentation.view.note.listitem.ItemListener
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.add
@@ -224,7 +224,7 @@ class MainActivity : AppCompatActivity() {
 
         val colorAdapter =
             ColorAdapter(
-                object : ItemListener {
+                object : ListItemListener {
                     override fun onClick(position: Int) {
                         dialog.dismiss()
                         val color = Color.entries[position]

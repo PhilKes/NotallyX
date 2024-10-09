@@ -38,9 +38,9 @@ import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
-import com.philkes.notallyx.presentation.view.note.PreviewFileAdapter
-import com.philkes.notallyx.presentation.view.note.PreviewImageAdapter
 import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
+import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
+import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError

@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.philkes.notallyx.databinding.RecyclerLabelBinding
 import com.philkes.notallyx.presentation.view.misc.StringDiffCallback
-import com.philkes.notallyx.presentation.view.note.listitem.ItemListener
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 
-class LabelAdapter(private val listener: ItemListener) :
+class LabelAdapter(private val listener: ListItemListener) :
     ListAdapter<String, LabelVH>(StringDiffCallback()) {
 
     override fun onBindViewHolder(holder: LabelVH, position: Int) {

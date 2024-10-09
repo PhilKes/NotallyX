@@ -1,6 +1,6 @@
 package com.philkes.notallyx.presentation.view.note.listitem
 
-interface ItemListener {
+interface ListItemListener {
 
     fun onClick(position: Int)
 
