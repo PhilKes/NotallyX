@@ -27,10 +27,38 @@
             android:orientation="vertical"
             android:paddingBottom="16dp">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ImageLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent">
+
             <com.philkes.notallyx.presentation.view.misc.AspectRatioRecyclerView
                 android:id="@+id/ImagePreview"
                 android:layout_width="match_parent"
-                android:layout_height="0dp" />
+                android:layout_height="0dp"
+                app:layout_constraintTop_toTopOf="parent"
+                />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ImagePreviewPosition"
+                    style="@style/Preview"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:gravity="top"
+                    android:stateListAnimator="@null"
+                    android:textAppearance="?attr/textAppearanceCaption"
+                    android:visibility="visible"
+                    app:chipIcon="@drawable/add_images"
+                    app:chipStartPadding="8dp"
+                    app:layout_constraintEnd_toEndOf="@id/ImagePreview"
+                    app:layout_constraintTop_toTopOf="@id/ImagePreview"
+                    app:textStartPadding="2dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
+                    />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
             <EditText
                 android:id="@+id/EnterTitle"

@@ -201,17 +201,14 @@ class BaseNoteVH(
                     )
                     .into(ImageView)
                 if (images.size > 1) {
-                    Space.visibility = View.GONE
                     ImageViewMore.apply {
-                        text = getQuantityString(R.plurals.more_images, images.size - 1)
+                        text = images.size.toString()
                         visibility = View.VISIBLE
                     }
                 } else {
                     ImageViewMore.visibility = View.GONE
-                    Space.visibility = View.VISIBLE
                 }
             } else {
-                Space.visibility = View.VISIBLE
                 ImageView.visibility = View.GONE
                 Message.visibility = View.GONE
                 ImageViewMore.visibility = View.GONE

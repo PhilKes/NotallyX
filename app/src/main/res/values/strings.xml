@@ -165,11 +165,6 @@
         <item quantity="other">Can’t add %d images</item>
     </plurals>
 
-    <plurals name="more_images">
-        <item quantity="one">…%d more image</item>
-        <item quantity="other">…%d more images</item>
-    </plurals>
-
     <!-- Files -->
     <string name="adding_files">Adding files</string>
     <string name="deleting_files">Deleting files</string>
