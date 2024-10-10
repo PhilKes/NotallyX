@@ -47,7 +47,7 @@ class ListManager(
 
     private var nextItemId: Int = 0
     private lateinit var items: ListItemSortedList
-    internal lateinit var adapter: RecyclerView.Adapter<MakeListVH>
+    internal lateinit var adapter: RecyclerView.Adapter<ListItemVH>
 
     fun add(
         position: Int = items.size(),
@@ -69,7 +69,7 @@ class ListManager(
         val positionAfterAdd = items.findById(item.id)!!.first
         recyclerView.post {
             val viewHolder =
-                recyclerView.findViewHolderForAdapterPosition(positionAfterAdd) as MakeListVH?
+                recyclerView.findViewHolderForAdapterPosition(positionAfterAdd) as ListItemVH?
             if (!item.checked && viewHolder != null) {
                 viewHolder.focusEditText(inputMethodManager = inputMethodManager)
             }
@@ -316,7 +316,7 @@ class ListManager(
     }
 
     fun moveFocusToNext(position: Int) {
-        val viewHolder = recyclerView.findViewHolderForAdapterPosition(position + 1) as MakeListVH?
+        val viewHolder = recyclerView.findViewHolderForAdapterPosition(position + 1) as ListItemVH?
         if (viewHolder != null) {
             if (viewHolder.binding.CheckBox.isChecked) {
                 moveFocusToNext(position + 1)

@@ -1,4 +1,4 @@
-package com.philkes.notallyx.presentation.view.note
+package com.philkes.notallyx.presentation.view.note.preview
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
