@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.widget
 
 import android.app.Application
 import android.content.Intent
+import android.graphics.Paint
 import android.os.Build
 import android.util.TypedValue
 import android.view.View
@@ -121,6 +122,15 @@ class WidgetFactory(private val app: Application, private val id: Long) :
                 TextSize.getDisplayBodySize(preferences.textSize.value),
             )
             setTextViewText(R.id.CheckBox, item.body)
+            setInt(
+                R.id.CheckBox,
+                "setPaintFlags",
+                if (item.checked) {
+                    Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
+                } else {
+                    Paint.ANTI_ALIAS_FLAG
+                },
+            )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 setCompoundButtonChecked(R.id.CheckBox, item.checked)
                 val intent = Intent(WidgetProvider.ACTION_CHECKED_CHANGED)
