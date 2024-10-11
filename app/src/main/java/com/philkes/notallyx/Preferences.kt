@@ -6,6 +6,7 @@ import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
+import com.philkes.notallyx.presentation.view.misc.BiometricLock
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.ListInfo
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
@@ -42,6 +43,8 @@ class Preferences private constructor(app: Application) {
     val autoBackupPath = BetterLiveData(getTextPref(AutoBackup))
     var autoBackupPeriodDays = BetterLiveData(getSeekbarPref(AutoBackupPeriodDays))
     var autoBackupMax = getSeekbarPref(AutoBackupMax)
+
+    val biometricLock = BetterLiveData(getListPref(BiometricLock))
 
     private fun getListPref(info: ListInfo) =
         requireNotNull(preferences.getString(info.key, info.defaultValue))
@@ -107,6 +110,7 @@ class Preferences private constructor(app: Application) {
             DateFormat -> dateFormat.postValue(getListPref(info))
             TextSize -> textSize.postValue(getListPref(info))
             ListItemSorting -> listItemSorting.postValue(getListPref(info))
+            BiometricLock -> biometricLock.postValue(getListPref(info))
         }
     }
 
