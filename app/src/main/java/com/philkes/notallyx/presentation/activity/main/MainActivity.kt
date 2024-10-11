@@ -1,9 +1,15 @@
 package com.philkes.notallyx.presentation.activity.main
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
+import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import android.hardware.biometrics.BiometricPrompt
+import android.hardware.biometrics.BiometricPrompt.AuthenticationCallback
 import android.net.Uri
 import android.os.Bundle
+import android.os.CancellationSignal
 import android.print.PostPDFGenerator
 import android.transition.TransitionManager
 import android.view.Menu
@@ -29,6 +35,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.platform.MaterialFade
+import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
@@ -39,6 +46,8 @@ import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
+import com.philkes.notallyx.presentation.view.misc.BiometricLock.disabled
+import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
@@ -46,6 +55,7 @@ import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.applySpans
 import com.philkes.notallyx.utils.movedToResId
+import com.philkes.notallyx.utils.checkForBiometrics
 import java.io.File
 import kotlinx.coroutines.launch
 
@@ -67,8 +77,48 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(configuration)
     }
 
+    @SuppressLint("NewApi")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val preferences = Preferences.getInstance(this.application)
+        if (preferences.biometricLock.value == enabled && this.checkForBiometrics()) {
+            val promptInfo =
+                BiometricPrompt.Builder(this)
+                    .setTitle("Biometric login for my app")
+                    .setSubtitle("Log in using your biometric credential")
+                    .setAllowedAuthenticators(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+                    .build()
+            promptInfo.authenticate(
+                getCancellationSignal(),
+                this.mainExecutor,
+                object : AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(
+                        result: BiometricPrompt.AuthenticationResult?
+                    ) {
+                        super.onAuthenticationSucceeded(result)
+                        setupMainActivity()
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                    }
+                },
+            )
+        } else {
+            preferences.biometricLock.value = disabled
+            setupMainActivity()
+        }
+    }
+
+    private fun getCancellationSignal(): CancellationSignal {
+        val cancellationSignal = CancellationSignal()
+        cancellationSignal.setOnCancelListener {
+            Toast.makeText(this, "Fingerprint Authentication Cancelled", Toast.LENGTH_SHORT).show()
+        }
+        return cancellationSignal
+    }
+
+    private fun setupMainActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

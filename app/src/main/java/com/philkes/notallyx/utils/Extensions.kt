@@ -1,7 +1,14 @@
 package com.philkes.notallyx.utils
 
+import android.app.KeyguardManager
+import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Typeface
+import android.hardware.biometrics.BiometricManager
+import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import android.os.Build
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
@@ -22,6 +29,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.RemoteViews
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
@@ -270,6 +278,41 @@ fun Folder.movedToResId(): Int {
 
 fun RadioGroup.checkedTag(): Any {
     return this.findViewById<RadioButton?>(this.checkedRadioButtonId).tag
+}
+
+fun Context.checkForBiometrics(): Boolean {
+    var canAuthenticate = true
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < 29) {
+            val keyguardManager: KeyguardManager =
+                this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+            val packageManager: PackageManager = this.packageManager
+            if (!packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
+                canAuthenticate = false
+            }
+            if (!keyguardManager.isKeyguardSecure) {
+                canAuthenticate = false
+            }
+        } else if (Build.VERSION.SDK_INT < 30) {
+            val biometricManager: BiometricManager =
+                this.getSystemService(BiometricManager::class.java)
+            if (biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_SUCCESS) {
+                canAuthenticate = false
+            }
+        } else {
+            val biometricManager: BiometricManager =
+                this.getSystemService(BiometricManager::class.java)
+            if (
+                biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL) !=
+                    BiometricManager.BIOMETRIC_SUCCESS
+            ) {
+                canAuthenticate = false
+            }
+        }
+    } else {
+        canAuthenticate = false
+    }
+    return canAuthenticate
 }
 
 private fun formatTimestamp(timestamp: Long, dateFormat: String): String {

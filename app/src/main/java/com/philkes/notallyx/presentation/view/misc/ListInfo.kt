@@ -179,3 +179,19 @@ enum class SortDirection(val textResId: Int, val iconResId: Int) {
     ASC(R.string.ascending, R.drawable.arrow_upward),
     DESC(R.string.descending, R.drawable.arrow_downward),
 }
+
+object BiometricLock : ListInfo {
+    const val enabled = "enabled"
+    const val disabled = "disabled"
+
+    override val title = R.string.biometric_lock
+    override val key = "biometricLock"
+    override val defaultValue = disabled
+
+    override fun getEntryValues() = arrayOf(enabled, disabled)
+
+    override fun getEntries(context: Context): Array<String> {
+        val ids = arrayOf(R.string.enabled, R.string.disabled)
+        return convertToValues(ids, context)
+    }
+}

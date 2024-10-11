@@ -5,7 +5,9 @@ import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,6 +26,8 @@ import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
+import com.philkes.notallyx.presentation.view.misc.BiometricLock
+import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
 import com.philkes.notallyx.presentation.view.misc.DateFormat
@@ -40,6 +44,7 @@ import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
+import com.philkes.notallyx.utils.checkForBiometrics
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 import com.philkes.notallyx.utils.checkedTag
 
@@ -88,6 +93,10 @@ class SettingsFragment : Fragment() {
                 binding.AutoBackupPeriodDays.setup(AutoBackupPeriodDays, value)
                 scheduleAutoBackup(value.toLong(), requireContext())
             }
+
+            biometricLock.observe(viewLifecycleOwner) { value ->
+                binding.BiometricLock.setup(BiometricLock, value)
+            }
         }
 
         binding.ImportBackup.setOnClickListener { importBackup() }
@@ -119,12 +128,24 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
+        if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_FIRST_USER) {
             intent?.data?.let { uri ->
                 when (requestCode) {
                     REQUEST_IMPORT_BACKUP -> model.importBackup(uri)
                     REQUEST_EXPORT_BACKUP -> model.exportBackup(uri)
                     REQUEST_CHOOSE_FOLDER -> model.setAutoBackupPath(uri)
+                }
+                return
+            }
+            when (requestCode) {
+                REQUEST_SETUP_BIOMETRICS -> {
+                    model.savePreference(BiometricLock, enabled)
+                    Toast.makeText(
+                            requireContext(),
+                            R.string.biometrics_setup_success,
+                            Toast.LENGTH_LONG,
+                        )
+                        .show()
                 }
             }
         }
@@ -331,6 +352,56 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun PreferenceBinding.setup(info: BiometricLock, value: String) {
+        Title.setText(info.title)
+
+        val entries = info.getEntries(requireContext())
+        val entryValues = info.getEntryValues()
+
+        val checked = entryValues.indexOf(value)
+        val displayValue = entries[checked]
+
+        Value.text = displayValue
+
+        root.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(info.title)
+                .setSingleChoiceItems(entries, checked) { dialog, which ->
+                    dialog.cancel()
+                    val newValue = entryValues[which]
+                    if (newValue == enabled) {
+                        if (!requireContext().checkForBiometrics()) {
+                            showBiometricsNotSetupDialog()
+                        } else {
+                            model.savePreference(info, newValue)
+                        }
+                    } else {
+                        model.savePreference(info, newValue)
+                    }
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun showBiometricsNotSetupDialog() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage("Biometrics are not setup for your device yet")
+            .setNegativeButton("Cancel") { _, _ -> }
+            .setPositiveButton("Setup") { _, _ ->
+                val intent =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        Intent(Settings.ACTION_BIOMETRIC_ENROLL)
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        Intent(Settings.ACTION_FINGERPRINT_ENROLL)
+                    } else {
+                        Intent(Settings.ACTION_SECURITY_SETTINGS)
+                    }
+                startActivityForResult(intent, REQUEST_SETUP_BIOMETRICS)
+            }
+            .show()
+    }
+
     private fun PreferenceBinding.setup(info: AutoBackup, value: String) {
         Title.setText(info.title)
 
@@ -379,5 +450,6 @@ class SettingsFragment : Fragment() {
         private const val REQUEST_IMPORT_BACKUP = 20
         private const val REQUEST_EXPORT_BACKUP = 21
         private const val REQUEST_CHOOSE_FOLDER = 22
+        private const val REQUEST_SETUP_BIOMETRICS = 23
     }
 }
