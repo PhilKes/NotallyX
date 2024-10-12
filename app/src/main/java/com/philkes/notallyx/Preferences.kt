@@ -3,6 +3,8 @@ package com.philkes.notallyx
 import android.app.Application
 import android.preference.PreferenceManager
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
+import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
+import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.ListInfo
@@ -37,7 +39,9 @@ class Preferences private constructor(app: Application) {
     var maxLines = getSeekbarPref(MaxLines)
     var maxTitle = getSeekbarPref(MaxTitle)
 
-    val autoBackup = BetterLiveData(getTextPref(AutoBackup))
+    val autoBackupPath = BetterLiveData(getTextPref(AutoBackup))
+    var autoBackupPeriodDays = BetterLiveData(getSeekbarPref(AutoBackupPeriodDays))
+    var autoBackupMax = getSeekbarPref(AutoBackupMax)
 
     private fun getListPref(info: ListInfo) =
         requireNotNull(preferences.getString(info.key, info.defaultValue))
@@ -88,6 +92,9 @@ class Preferences private constructor(app: Application) {
             MaxItems -> maxItems = getSeekbarPref(MaxItems)
             MaxLines -> maxLines = getSeekbarPref(MaxLines)
             MaxTitle -> maxTitle = getSeekbarPref(MaxTitle)
+            AutoBackupMax -> autoBackupMax = getSeekbarPref(AutoBackupMax)
+            AutoBackupPeriodDays ->
+                autoBackupPeriodDays.postValue(getSeekbarPref(AutoBackupPeriodDays))
         }
     }
 
@@ -107,7 +114,7 @@ class Preferences private constructor(app: Application) {
         editor.putString(info.key, value)
         editor.commit()
         when (info) {
-            AutoBackup -> autoBackup.postValue(getTextPref(info))
+            AutoBackup -> autoBackupPath.postValue(getTextPref(info))
         }
     }
 

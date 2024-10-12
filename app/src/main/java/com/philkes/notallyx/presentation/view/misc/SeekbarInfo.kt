@@ -45,3 +45,25 @@ object MaxTitle : SeekbarInfo {
     override val min = 1
     override val max = 10
 }
+
+object AutoBackupMax : SeekbarInfo {
+
+    override val title = R.string.max_backups
+
+    override val key = "maxBackups"
+    override val defaultValue = 3
+
+    override val min = 1
+    override val max = 10
+}
+
+object AutoBackupPeriodDays : SeekbarInfo {
+
+    override val title = R.string.backup_period_days
+
+    override val key = "autoBackupPeriodDays"
+    override val defaultValue = 1
+
+    override val min = 1
+    override val max = 31
+}

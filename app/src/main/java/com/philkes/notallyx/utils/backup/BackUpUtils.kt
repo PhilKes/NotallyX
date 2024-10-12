@@ -1,12 +1,17 @@
 package com.philkes.notallyx.utils.backup
 
 import android.app.Application
+import android.content.Context
 import androidx.lifecycle.MutableLiveData
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.utils.IO
 import com.philkes.notallyx.utils.Operations
 import java.io.OutputStream
+import java.util.concurrent.TimeUnit
 import java.util.zip.ZipOutputStream
 
 fun doBackup(
@@ -71,4 +76,12 @@ fun doBackup(
         }
 
     zipStream.close()
+}
+
+fun scheduleAutoBackup(periodInDays: Long, context: Context) {
+    val request =
+        PeriodicWorkRequest.Builder(AutoBackupWorker::class.java, periodInDays, TimeUnit.DAYS)
+            .build()
+    WorkManager.getInstance(context)
+        .enqueueUniquePeriodicWork("Auto Backup", ExistingPeriodicWorkPolicy.UPDATE, request)
 }

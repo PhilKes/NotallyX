@@ -119,6 +119,8 @@
     <!-- Backup -->
     <string name="backup">Backup</string>
     <string name="auto_backup">Auto backup</string>
+    <string name="max_backups">Amount of backups to keep</string>
+    <string name="backup_period_days">Auto backup period in days</string>
     <string name="tap_to_set_up">Tap to set up</string>
     <string name="notes_will_be">Notes will be backed up to your phone’s internal storage everyday.\n\nThis may not work if you have power saving mode enabled</string>
     <string name="choose_folder">Choose folder</string>
@@ -133,6 +135,11 @@
 
     <string name="export_backup">Export backup</string>
     <string name="import_backup">Import backup</string>
+
+    <string name="auto_backup_period">Auto backup period</string>
+    <string name="daily">Daily</string>
+    <string name="weekly">Weekly</string>
+    <string name="monthly">Monthly</string>
 
     <string name="about">About</string>
     <string name="libraries">Libraries</string>

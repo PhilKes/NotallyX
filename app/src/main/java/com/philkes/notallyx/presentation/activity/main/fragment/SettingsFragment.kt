@@ -22,6 +22,8 @@ import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
+import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
+import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.ListInfo
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
@@ -35,6 +37,7 @@ import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
+import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 
 class SettingsFragment : Fragment() {
 
@@ -66,8 +69,15 @@ class SettingsFragment : Fragment() {
 
             binding.MaxTitle.setup(MaxTitle, maxTitle)
 
-            autoBackup.observe(viewLifecycleOwner) { value ->
+            binding.AutoBackupMax.setup(AutoBackupMax, autoBackupMax)
+
+            autoBackupPath.observe(viewLifecycleOwner) { value ->
                 binding.AutoBackup.setup(AutoBackup, value)
+            }
+
+            autoBackupPeriodDays.observe(viewLifecycleOwner) { value ->
+                binding.AutoBackupPeriodDays.setup(AutoBackupPeriodDays, value)
+                scheduleAutoBackup(value.toLong(), requireContext())
             }
         }
 
