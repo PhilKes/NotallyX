@@ -41,6 +41,7 @@ class WidgetProvider : AppWidgetProvider() {
             ACTION_OPEN_NOTE -> openActivity(context, intent, EditNoteActivity::class.java)
             ACTION_OPEN_LIST -> openActivity(context, intent, EditListActivity::class.java)
             ACTION_CHECKED_CHANGED -> checkChanged(intent, context)
+            ACTION_SELECT_NOTE -> openActivity(context, intent, ConfigureWidgetActivity::class.java)
         }
     }
 
@@ -114,9 +115,12 @@ class WidgetProvider : AppWidgetProvider() {
 
     private fun openActivity(context: Context, originalIntent: Intent, clazz: Class<*>) {
         val id = originalIntent.getLongExtra(Constants.SelectedBaseNote, 0)
+        val widgetId = originalIntent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
         val intent = Intent(context, clazz)
         intent.putExtra(Constants.SelectedBaseNote, id)
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+        intent.data = originalIntent.data
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         context.startActivity(intent)
     }
 
@@ -148,14 +152,14 @@ class WidgetProvider : AppWidgetProvider() {
             // embedded
             val intent = Intent(context, WidgetService::class.java)
             intent.putExtra(Constants.SelectedBaseNote, noteId)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
             embedIntentExtras(intent)
 
             val view = RemoteViews(context.packageName, R.layout.widget)
             view.setRemoteAdapter(R.id.ListView, intent)
             view.setEmptyView(R.id.ListView, R.id.Empty)
 
-            val selectNote = getSelectNoteIntent(context, id)
-            view.setOnClickPendingIntent(R.id.Empty, selectNote)
+            view.setOnClickFillInIntent(R.id.Empty, getSelectNoteIntent(id))
 
             val openNote = getOpenNoteIntent(context, noteId)
             view.setPendingIntentTemplate(R.id.ListView, openNote)
@@ -171,13 +175,11 @@ class WidgetProvider : AppWidgetProvider() {
             app.sendBroadcast(intent)
         }
 
-        // Each widget has it's own intent since the widget id is embedded
-        private fun getSelectNoteIntent(context: Context, id: Int): PendingIntent {
-            val intent = Intent(context, ConfigureWidgetActivity::class.java)
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
-            embedIntentExtras(intent)
-            val flags = PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            return PendingIntent.getActivity(context, 0, intent, flags)
+        fun getSelectNoteIntent(id: Int): Intent {
+            return Intent(ACTION_SELECT_NOTE).apply {
+                putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
+                data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+            }
         }
 
         private fun getOpenNoteIntent(context: Context, noteId: Long): PendingIntent {
@@ -201,6 +203,7 @@ class WidgetProvider : AppWidgetProvider() {
 
         const val ACTION_OPEN_NOTE = "com.philkes.notallyx.ACTION_OPEN_NOTE"
         const val ACTION_OPEN_LIST = "com.philkes.notallyx.ACTION_OPEN_LIST"
+        const val ACTION_SELECT_NOTE = "com.philkes.notallyx.ACTION_SELECT_NOTE"
 
         const val ACTION_CHECKED_CHANGED = "com.philkes.notallyx.ACTION_CHECKED_CHANGED"
         const val EXTRA_POSITION = "com.philkes.notallyx.EXTRA_POSITION"
