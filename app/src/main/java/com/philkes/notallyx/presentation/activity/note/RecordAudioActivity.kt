@@ -6,24 +6,24 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.ActivityRecordAudioBinding
+import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.utils.IO
 import com.philkes.notallyx.utils.audio.AudioRecordService
 import com.philkes.notallyx.utils.audio.LocalBinder
 import com.philkes.notallyx.utils.audio.Status
 
 @RequiresApi(24)
-class RecordAudioActivity : AppCompatActivity() {
+class RecordAudioActivity : LockedActivity<ActivityRecordAudioBinding>() {
 
     private var service: AudioRecordService? = null
     private lateinit var connection: ServiceConnection
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityRecordAudioBinding.inflate(layoutInflater)
+        binding = ActivityRecordAudioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val intent = Intent(this, AudioRecordService::class.java)
