@@ -72,6 +72,14 @@
             android:id="@+id/AutoBackup"
             layout="@layout/preference" />
 
+        <include
+            android:id="@+id/AutoBackupPeriodDays"
+            layout="@layout/preference_seekbar" />
+
+        <include
+            android:id="@+id/AutoBackupMax"
+            layout="@layout/preference_seekbar" />
+
         <TextView
             android:id="@+id/ImportBackup"
             style="@style/Preference"

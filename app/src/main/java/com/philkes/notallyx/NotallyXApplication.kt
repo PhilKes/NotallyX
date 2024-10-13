@@ -2,12 +2,8 @@ package com.philkes.notallyx
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.PeriodicWorkRequest
-import androidx.work.WorkManager
 import com.philkes.notallyx.presentation.view.misc.Theme
-import com.philkes.notallyx.utils.backup.AutoBackupWorker
-import java.util.concurrent.TimeUnit
+import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 
 class NotallyXApplication : Application() {
 
@@ -27,10 +23,6 @@ class NotallyXApplication : Application() {
                     )
             }
         }
-
-        val request =
-            PeriodicWorkRequest.Builder(AutoBackupWorker::class.java, 12, TimeUnit.HOURS).build()
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork("Auto Backup", ExistingPeriodicWorkPolicy.KEEP, request)
+        scheduleAutoBackup(preferences.autoBackupPeriodDays.value.toLong(), this)
     }
 }
