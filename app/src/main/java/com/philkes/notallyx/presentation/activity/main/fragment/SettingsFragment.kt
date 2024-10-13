@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.hardware.biometrics.BiometricManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -12,6 +13,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -26,10 +28,10 @@ import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
-import com.philkes.notallyx.presentation.view.misc.BiometricLock
-import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
+import com.philkes.notallyx.presentation.view.misc.BiometricLock
+import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.ListInfo
 import com.philkes.notallyx.presentation.view.misc.MaxItems
@@ -44,9 +46,10 @@ import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
-import com.philkes.notallyx.utils.checkForBiometrics
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 import com.philkes.notallyx.utils.checkedTag
+import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
+import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 
 class SettingsFragment : Fragment() {
 
@@ -128,7 +131,7 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (resultCode == Activity.RESULT_OK || resultCode == Activity.RESULT_FIRST_USER) {
+        if (resultCode == Activity.RESULT_OK) {
             intent?.data?.let { uri ->
                 when (requestCode) {
                     REQUEST_IMPORT_BACKUP -> model.importBackup(uri)
@@ -137,17 +140,9 @@ class SettingsFragment : Fragment() {
                 }
                 return
             }
-            when (requestCode) {
-                REQUEST_SETUP_BIOMETRICS -> {
-                    model.savePreference(BiometricLock, enabled)
-                    Toast.makeText(
-                            requireContext(),
-                            R.string.biometrics_setup_success,
-                            Toast.LENGTH_LONG,
-                        )
-                        .show()
-                }
-            }
+        }
+        when (requestCode) {
+            REQUEST_SETUP_BIOMETRICS -> showEnableBiometricLock()
         }
     }
 
@@ -370,10 +365,12 @@ class SettingsFragment : Fragment() {
                     dialog.cancel()
                     val newValue = entryValues[which]
                     if (newValue == enabled) {
-                        if (!requireContext().checkForBiometrics()) {
-                            showBiometricsNotSetupDialog()
-                        } else {
-                            model.savePreference(info, newValue)
+                        when (requireContext().canAuthenticateWithBiometrics()) {
+                            BiometricManager.BIOMETRIC_SUCCESS -> showEnableBiometricLock()
+                            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
+                                showNoBiometricsSupportToast()
+                            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
+                                showBiometricsNotSetupDialog()
                         }
                     } else {
                         model.savePreference(info, newValue)
@@ -384,11 +381,38 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun showEnableBiometricLock() {
+        showBiometricOrPinPrompt(
+            REQUEST_SETUP_BIOMETRICS,
+            R.string.enable_lock_title,
+            {
+                model.savePreference(BiometricLock, enabled)
+                showBiometricsEnabledToast()
+            },
+        ) {
+            showBiometricsNotSetupDialog()
+        }
+    }
+
+    private fun showNoBiometricsSupportToast() {
+        ContextCompat.getMainExecutor(requireContext()).execute {
+            Toast.makeText(requireContext(), R.string.biometrics_setup_success, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
+    private fun showBiometricsEnabledToast() {
+        ContextCompat.getMainExecutor(requireContext()).execute {
+            Toast.makeText(requireContext(), R.string.biometrics_setup_success, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
     private fun showBiometricsNotSetupDialog() {
         MaterialAlertDialogBuilder(requireContext())
-            .setMessage("Biometrics are not setup for your device yet")
-            .setNegativeButton("Cancel") { _, _ -> }
-            .setPositiveButton("Setup") { _, _ ->
+            .setMessage(R.string.biometrics_not_setup)
+            .setNegativeButton(R.string.cancel) { _, _ -> }
+            .setPositiveButton(R.string.tap_to_set_up) { _, _ ->
                 val intent =
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                         Intent(Settings.ACTION_BIOMETRIC_ENROLL)

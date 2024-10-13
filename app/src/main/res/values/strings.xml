@@ -241,4 +241,11 @@
     <string name="please_grant_notally_audio">Please grant NotallyX the permission to record audio. Recordings never leave your device</string>
     <string name="insert_an_sd_card_audio">Insert an SD card to record audio</string>
     <string name="something_went_wrong_audio">Something went wrong. The audio recording may have been moved or deleted.\n\nError : (%1$d, %2$d)</string>
+
+    <!-- Lock -->
+    <string name="enable_lock_title">Enable lock via Biometric/PIN</string>
+    <string name="unlock">Unlock via Biometric/PIN</string>
+    <string name="biometrics_no_support">No biometric features available on this device</string>
+    <string name="biometrics_not_setup">Biometrics/PIN are not setup for your device yet</string>
+
 </resources>

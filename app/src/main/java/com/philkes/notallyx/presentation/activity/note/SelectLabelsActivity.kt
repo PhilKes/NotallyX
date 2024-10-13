@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -13,14 +12,14 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.databinding.ActivityLabelBinding
 import com.philkes.notallyx.databinding.DialogInputBinding
+import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.view.main.SelectableLabelAdapter
 import com.philkes.notallyx.presentation.viewmodel.LabelModel
 import com.philkes.notallyx.utils.add
 
-class SelectLabelsActivity : AppCompatActivity() {
+class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
 
     private val model: LabelModel by viewModels()
-    private lateinit var binding: ActivityLabelBinding
 
     private lateinit var selectedLabels: ArrayList<String>
 

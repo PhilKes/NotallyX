@@ -7,13 +7,13 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.ActivityPlayAudioBinding
+import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.utils.IO
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.audio.AudioPlayService
@@ -26,13 +26,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class PlayAudioActivity : AppCompatActivity() {
+class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
 
     private var service: AudioPlayService? = null
     private lateinit var connection: ServiceConnection
 
     private lateinit var audio: Audio
-    private lateinit var binding: ActivityPlayAudioBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

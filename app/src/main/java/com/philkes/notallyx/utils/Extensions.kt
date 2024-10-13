@@ -267,7 +267,6 @@ val FileAttachment.isImage: Boolean
     get() {
         return mimeType.startsWith("image/")
     }
-
 fun Folder.movedToResId(): Int {
     return when (this) {
         Folder.DELETED -> R.plurals.deleted_selected_notes
@@ -279,40 +278,30 @@ fun Folder.movedToResId(): Int {
 fun RadioGroup.checkedTag(): Any {
     return this.findViewById<RadioButton?>(this.checkedRadioButtonId).tag
 }
-
-fun Context.checkForBiometrics(): Boolean {
+fun Context.canAuthenticateWithBiometrics(): Int {
     var canAuthenticate = true
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if (Build.VERSION.SDK_INT < 29) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             val keyguardManager: KeyguardManager =
                 this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
             val packageManager: PackageManager = this.packageManager
             if (!packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
-                canAuthenticate = false
+                return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
             }
             if (!keyguardManager.isKeyguardSecure) {
-                canAuthenticate = false
+                return BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
             }
-        } else if (Build.VERSION.SDK_INT < 30) {
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
             val biometricManager: BiometricManager =
                 this.getSystemService(BiometricManager::class.java)
-            if (biometricManager.canAuthenticate() != BiometricManager.BIOMETRIC_SUCCESS) {
-                canAuthenticate = false
-            }
+            return biometricManager.canAuthenticate()
         } else {
             val biometricManager: BiometricManager =
                 this.getSystemService(BiometricManager::class.java)
-            if (
-                biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL) !=
-                    BiometricManager.BIOMETRIC_SUCCESS
-            ) {
-                canAuthenticate = false
-            }
+            return biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
         }
-    } else {
-        canAuthenticate = false
     }
-    return canAuthenticate
+    return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
 }
 
 private fun formatTimestamp(timestamp: Long, dateFormat: String): String {

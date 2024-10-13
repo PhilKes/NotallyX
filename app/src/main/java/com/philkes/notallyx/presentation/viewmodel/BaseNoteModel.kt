@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.core.database.getLongOrNull
 import androidx.core.text.toHtml
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
@@ -18,6 +19,9 @@ import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.AttachmentDeleteService
 import com.philkes.notallyx.data.NotallyDatabase
+import com.philkes.notallyx.data.dao.BaseNoteDao
+import com.philkes.notallyx.data.dao.CommonDao
+import com.philkes.notallyx.data.dao.LabelDao
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
@@ -61,20 +65,20 @@ import org.json.JSONObject
 
 class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
-    private val database = NotallyDatabase.getDatabase(app)
-    private val labelDao = database.getLabelDao()
-    private val commonDao = database.getCommonDao()
-    private val baseNoteDao = database.getBaseNoteDao()
+    private lateinit var database: NotallyDatabase
+    private lateinit var labelDao: LabelDao
+    private lateinit var commonDao: CommonDao
+    private lateinit var baseNoteDao: BaseNoteDao
 
     private val labelCache = HashMap<String, Content>()
 
     var currentFile: File? = null
 
-    val labels = labelDao.getAll()
-    private val allNotes = baseNoteDao.getAll()
-    val baseNotes = Content(baseNoteDao.getFrom(Folder.NOTES), ::transform)
-    val deletedNotes = Content(baseNoteDao.getFrom(Folder.DELETED), ::transform)
-    val archivedNotes = Content(baseNoteDao.getFrom(Folder.ARCHIVED), ::transform)
+    lateinit var labels: LiveData<List<String>>
+    private lateinit var allNotes: LiveData<List<BaseNote>>
+    lateinit var baseNotes: Content
+    lateinit var deletedNotes: Content
+    lateinit var archivedNotes: Content
 
     var folder = Folder.NOTES
         set(value) {
@@ -92,7 +96,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
         }
 
-    val searchResults = SearchResult(viewModelScope, baseNoteDao, ::transform)
+    lateinit var searchResults: SearchResult
 
     private val pinned = Header(app.getString(R.string.pinned))
     private val others = Header(app.getString(R.string.others))
@@ -109,6 +113,24 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val actionMode = ActionMode()
 
     init {
+        init()
+    }
+
+    fun init() {
+        database = NotallyDatabase.getDatabase(app)
+        baseNoteDao = database.getBaseNoteDao()
+        labelDao = database.getLabelDao()
+        commonDao = database.getCommonDao()
+
+        labels = labelDao.getAll()
+        allNotes = baseNoteDao.getAll()
+
+        baseNotes = Content(baseNoteDao.getFrom(Folder.NOTES), ::transform)
+        deletedNotes = Content(baseNoteDao.getFrom(Folder.DELETED), ::transform)
+        archivedNotes = Content(baseNoteDao.getFrom(Folder.ARCHIVED), ::transform)
+
+        allNotes.observeForever { list -> Cache.list = list }
+        searchResults = SearchResult(viewModelScope, baseNoteDao, ::transform)
         viewModelScope.launch {
             val previousNotes = Migrations.getPreviousNotes(app)
             val previousLabels = Migrations.getPreviousLabels(app)
@@ -121,7 +143,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 }
             }
         }
-        allNotes.observeForever { list -> Cache.list = list }
     }
 
     fun getNotesByLabel(label: String): Content {

@@ -3,7 +3,6 @@ package com.philkes.notallyx.presentation.activity
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -25,7 +24,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ConfigureWidgetActivity : AppCompatActivity(), ListItemListener {
+class ConfigureWidgetActivity : LockedActivity<ActivityConfigureWidgetBinding>(), ListItemListener {
 
     private lateinit var adapter: BaseNoteAdapter
     private val id by lazy {
@@ -37,7 +36,7 @@ class ConfigureWidgetActivity : AppCompatActivity(), ListItemListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityConfigureWidgetBinding.inflate(layoutInflater)
+        binding = ActivityConfigureWidgetBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val result = Intent()
