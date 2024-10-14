@@ -14,9 +14,10 @@ import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.view.misc.TextSize
+import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getSelectNoteIntent
 import com.philkes.notallyx.utils.displayFormattedTimestamp
 
-class WidgetFactory(private val app: Application, private val id: Long) :
+class WidgetFactory(private val app: Application, private val id: Long, private val widgetId: Int) :
     RemoteViewsService.RemoteViewsFactory {
 
     private var baseNote: BaseNote? = null
@@ -80,6 +81,8 @@ class WidgetFactory(private val app: Application, private val id: Long) :
 
             val intent = Intent(WidgetProvider.ACTION_OPEN_NOTE)
             setOnClickFillInIntent(R.id.LinearLayout, intent)
+
+            setOnClickFillInIntent(R.id.ChangeNote, getSelectNoteIntent(widgetId))
         }
     }
 
@@ -102,6 +105,8 @@ class WidgetFactory(private val app: Application, private val id: Long) :
 
             val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
             setOnClickFillInIntent(R.id.LinearLayout, intent)
+
+            setOnClickFillInIntent(R.id.ChangeNote, getSelectNoteIntent(widgetId))
         }
     }
 
