@@ -36,5 +36,5 @@ class SearchFragment : NotallyFragment() {
 
     override fun getBackground() = R.drawable.search
 
-    override fun getObservable() = model.searchResults
+    override fun getObservable() = model.searchResults!!
 }

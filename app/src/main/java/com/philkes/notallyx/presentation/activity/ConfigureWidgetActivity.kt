@@ -73,13 +73,15 @@ class ConfigureWidgetActivity : LockedActivity<ActivityConfigureWidgetBinding>()
         val pinned = Header(getString(R.string.pinned))
         val others = Header(getString(R.string.others))
 
-        lifecycleScope.launch {
-            val notes =
-                withContext(Dispatchers.IO) {
-                    val raw = database.getBaseNoteDao().getAllNotes()
-                    BaseNoteModel.transform(raw, pinned, others)
-                }
-            adapter.submitList(notes)
+        database.observe(this) {
+            lifecycleScope.launch {
+                val notes =
+                    withContext(Dispatchers.IO) {
+                        val raw = it.getBaseNoteDao().getAllNotes()
+                        BaseNoteModel.transform(raw, pinned, others)
+                    }
+                adapter.submitList(notes)
+            }
         }
     }
 

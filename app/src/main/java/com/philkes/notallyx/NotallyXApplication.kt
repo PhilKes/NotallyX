@@ -16,7 +16,7 @@ class NotallyXApplication : Application() {
     private lateinit var preferences: Preferences
     private var unlockReceiver: UnlockReceiver? = null
 
-    var needUnlock = true
+    var isLocked = true
 
     override fun onCreate() {
         super.onCreate()
@@ -47,6 +47,5 @@ class NotallyXApplication : Application() {
             }
         }
         preferences.biometricLock.observeForever(biometricLockObserver)
-
     }
 }

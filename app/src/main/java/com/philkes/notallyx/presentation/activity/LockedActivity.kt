@@ -50,17 +50,19 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == REQUEST_BIOMETRIC_AUTHENTICATION && resultCode == Activity.RESULT_OK) {
-            notallyXApplication.needUnlock = false
+            notallyXApplication.isLocked = false
             show()
         }
     }
 
     open fun showLockScreen() {
         showBiometricOrPinPrompt(
+            true,
+            preferences.iv!!,
             REQUEST_BIOMETRIC_AUTHENTICATION,
             R.string.unlock,
-            {
-                notallyXApplication.needUnlock = false
+            onSuccess = {
+                notallyXApplication.isLocked = false
                 show()
             },
         ) {
@@ -80,7 +82,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         val keyguardManager: KeyguardManager =
             this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            (keyguardManager.isDeviceLocked || notallyXApplication.needUnlock)
+            (keyguardManager.isDeviceLocked || notallyXApplication.isLocked)
         } else {
             false
         }
