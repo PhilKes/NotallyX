@@ -1,5 +1,6 @@
 package com.philkes.notallyx.presentation.activity.main.fragment
 
+import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,10 +13,16 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
+import com.google.android.material.snackbar.Snackbar
+import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.FragmentNotesBinding
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FOLDER_FROM
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FOLDER_TO
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.Constants
@@ -23,6 +30,7 @@ import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
 import com.philkes.notallyx.presentation.view.misc.View as ViewPref
 import com.philkes.notallyx.presentation.view.note.listitem.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.utils.movedToResId
 
 abstract class NotallyFragment : Fragment(), ItemListener {
 
@@ -78,6 +86,32 @@ abstract class NotallyFragment : Fragment(), ItemListener {
             notesAdapter?.currentList?.get(position)?.let { item ->
                 if (item is BaseNote) {
                     handleNoteSelection(item.id, position, item)
+                }
+            }
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK) {
+            if (requestCode == REQUEST_NOTE_EDIT) {
+                // If a note has been moved inside of EditActivity
+                // present snackbar to undo it
+                val id = data?.getLongExtra(NOTE_ID, -1)
+                if (id != null) {
+                    val folderFrom = Folder.valueOf(data.getStringExtra(FOLDER_FROM)!!)
+                    val folderTo = Folder.valueOf(data.getStringExtra(FOLDER_TO)!!)
+                    Snackbar.make(
+                            binding!!.root,
+                            resources.getQuantityString(folderTo.movedToResId(), 1, 1),
+                            Snackbar.LENGTH_SHORT,
+                        )
+                        .apply {
+                            setAction(R.string.undo) {
+                                model.moveBaseNotes(longArrayOf(id), folderFrom)
+                            }
+                        }
+                        .show()
                 }
             }
         }
@@ -148,10 +182,14 @@ abstract class NotallyFragment : Fragment(), ItemListener {
     private fun goToActivity(activity: Class<*>, baseNote: BaseNote) {
         val intent = Intent(requireContext(), activity)
         intent.putExtra(Constants.SelectedBaseNote, baseNote.id)
-        startActivity(intent)
+        startActivityForResult(intent, REQUEST_NOTE_EDIT)
     }
 
     abstract fun getBackground(): Int
 
     abstract fun getObservable(): LiveData<List<Item>>
+
+    companion object {
+        private const val REQUEST_NOTE_EDIT = 11
+    }
 }
