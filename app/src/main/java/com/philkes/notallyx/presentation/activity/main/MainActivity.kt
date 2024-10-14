@@ -27,6 +27,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.platform.MaterialFade
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.BaseNote
@@ -44,6 +45,7 @@ import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.applySpans
+import com.philkes.notallyx.utils.movedToResId
 import java.io.File
 import kotlinx.coroutines.launch
 
@@ -144,14 +146,11 @@ class MainActivity : AppCompatActivity() {
         val export = createExportMenu(menu)
 
         val changeColor = menu.add(R.string.change_color, R.drawable.change_color) { changeColor() }
-        val delete =
-            menu.add(R.string.delete, R.drawable.delete) { model.moveBaseNotes(Folder.DELETED) }
-        val archive =
-            menu.add(R.string.archive, R.drawable.archive) { model.moveBaseNotes(Folder.ARCHIVED) }
-        val restore =
-            menu.add(R.string.restore, R.drawable.restore) { model.moveBaseNotes(Folder.NOTES) }
+        val delete = menu.add(R.string.delete, R.drawable.delete) { moveNotes(Folder.DELETED) }
+        val archive = menu.add(R.string.archive, R.drawable.archive) { moveNotes(Folder.ARCHIVED) }
+        val restore = menu.add(R.string.restore, R.drawable.restore) { moveNotes(Folder.NOTES) }
         val unarchive =
-            menu.add(R.string.unarchive, R.drawable.unarchive) { model.moveBaseNotes(Folder.NOTES) }
+            menu.add(R.string.unarchive, R.drawable.unarchive) { moveNotes(Folder.NOTES) }
         val deleteForever = menu.add(R.string.delete_forever, R.drawable.delete) { deleteForever() }
 
         model.actionMode.count.observe(this) { count ->
@@ -207,6 +206,18 @@ class MainActivity : AppCompatActivity() {
             function()
             return@setOnMenuItemClickListener false
         }
+    }
+
+    private fun moveNotes(folderTo: Folder) {
+        val folderFrom = model.actionMode.getFirstNote().folder
+        val ids = model.moveBaseNotes(folderTo)
+        Snackbar.make(
+                findViewById(R.id.DrawerLayout),
+                resources.getQuantityString(folderTo.movedToResId(), ids.size, ids.size),
+                Snackbar.LENGTH_SHORT,
+            )
+            .apply { setAction(R.string.undo) { model.moveBaseNotes(ids, folderFrom) } }
+            .show()
     }
 
     private fun share() {

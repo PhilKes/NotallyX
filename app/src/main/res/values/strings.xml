@@ -58,6 +58,25 @@
     <string name="delete_note_forever">Delete note forever?</string>
     <string name="your_notes_associated">Your notes attached to this label will not be deleted</string>
 
+    <!-- Snackbars -->
+    <plurals name="deleted_selected_notes">
+        <item quantity="one">Deleted %d note</item>
+        <item quantity="other">Deleted %d notes</item>
+    </plurals>
+    <plurals name="archived_selected_notes">
+        <item quantity="one">Archived %d note</item>
+        <item quantity="other">Archived %d notes</item>
+    </plurals>
+    <plurals name="unarchived_selected_notes">
+        <item quantity="one">Unarchived %d note</item>
+        <item quantity="other">Unarchived %d notes</item>
+    </plurals>
+    <plurals name="restored_selected_notes">
+        <item quantity="one">Restored %d note</item>
+        <item quantity="other">Restored %d notes</item>
+    </plurals>
+
+
     <!-- Lists and Notes -->
     <string name="note">Note</string>
     <string name="item">Item</string>

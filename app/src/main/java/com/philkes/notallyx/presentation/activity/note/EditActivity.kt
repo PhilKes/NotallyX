@@ -368,17 +368,26 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
     }
 
     private fun delete() {
-        model.folder = Folder.DELETED
-        finish()
+        moveNote(Folder.DELETED)
     }
 
     private fun restore() {
-        model.folder = Folder.NOTES
-        finish()
+        moveNote(Folder.NOTES)
     }
 
     private fun archive() {
-        model.folder = Folder.ARCHIVED
+        moveNote(Folder.ARCHIVED)
+    }
+
+    private fun moveNote(toFolder: Folder) {
+        val resultIntent =
+            Intent().apply {
+                putExtra(NOTE_ID, model.id)
+                putExtra(FOLDER_FROM, model.folder.name)
+                putExtra(FOLDER_TO, toFolder.name)
+            }
+        model.folder = toFolder
+        setResult(RESULT_OK, resultIntent)
         finish()
     }
 
@@ -644,5 +653,9 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
         private const val REQUEST_PLAY_AUDIO = 35
         private const val REQUEST_AUDIO_PERMISSION = 36
         private const val REQUEST_ATTACH_FILES = 37
+
+        const val NOTE_ID = "note_id"
+        const val FOLDER_FROM = "folder_from"
+        const val FOLDER_TO = "folder_to"
     }
 }
