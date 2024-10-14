@@ -26,7 +26,6 @@ import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.ListInfo
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.misc.MaxItems
 import com.philkes.notallyx.presentation.view.misc.MaxLines
 import com.philkes.notallyx.presentation.view.misc.MaxTitle
@@ -59,9 +58,10 @@ class SettingsFragment : Fragment() {
                 binding.TextSize.setup(TextSize, value)
             }
 
-            listItemSorting.observe(viewLifecycleOwner) { value ->
-                binding.CheckedListItemSorting.setup(ListItemSorting, value)
-            }
+            // TODO: Hide for now until checked auto-sort is working reliably
+            //            listItemSorting.observe(viewLifecycleOwner) { value ->
+            //                binding.CheckedListItemSorting.setup(ListItemSorting, value)
+            //            }
 
             binding.MaxItems.setup(MaxItems, maxItems)
 
