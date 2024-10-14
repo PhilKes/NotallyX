@@ -9,19 +9,27 @@ import android.hardware.biometrics.BiometricPrompt
 import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
 import android.os.CancellationSignal
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.philkes.notallyx.R
+import javax.crypto.Cipher
 
 fun Activity.showBiometricOrPinPrompt(
+    isForDecrypt: Boolean,
+    cipherIv: ByteArray? = null,
     requestCode: Int,
-    title: Int,
-    onSuccess: () -> Unit,
+    titleResId: Int,
+    descriptionResId: Int? = null,
+    onSuccess: (cipher: Cipher) -> Unit,
     onFailure: () -> Unit,
 ) {
     showBiometricOrPinPrompt(
+        isForDecrypt,
         this,
         requestCode,
-        title,
+        titleResId,
+        descriptionResId,
+        cipherIv,
         onSuccess,
         ::startActivityForResult,
         onFailure,
@@ -29,15 +37,21 @@ fun Activity.showBiometricOrPinPrompt(
 }
 
 fun Fragment.showBiometricOrPinPrompt(
+    isForDecrypt: Boolean,
     requestCode: Int,
-    title: Int,
-    onSuccess: () -> Unit,
+    titleResId: Int,
+    descriptionResId: Int,
+    cipherIv: ByteArray? = null,
+    onSuccess: (cipher: Cipher) -> Unit,
     onFailure: () -> Unit,
 ) {
     showBiometricOrPinPrompt(
+        isForDecrypt,
         requireContext(),
         requestCode,
-        title,
+        titleResId,
+        descriptionResId,
+        cipherIv,
         onSuccess,
         ::startActivityForResult,
         onFailure,
@@ -45,57 +59,41 @@ fun Fragment.showBiometricOrPinPrompt(
 }
 
 private fun showBiometricOrPinPrompt(
+    isForDecrypt: Boolean,
     context: Context,
     requestCode: Int,
-    title: Int,
-    onSuccess: () -> Unit,
+    titleResId: Int,
+    descriptionResId: Int? = null,
+    cipherIv: ByteArray? = null,
+    onSuccess: (cipher: Cipher) -> Unit,
     startActivityForResult: (intent: Intent, requestCode: Int) -> Unit,
     onFailure: () -> Unit,
 ) {
     when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-            // API 30 and above: Use BiometricPrompt with setAllowedAuthenticators
-            val prompt =
-                BiometricPrompt.Builder(context)
-                    .setTitle(context.getString(title))
-                    .setAllowedAuthenticators(
-                        BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                            BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                    )
-                    .build()
-            prompt.authenticate(
-                getCancellationSignal(context),
-                context.mainExecutor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult?
-                    ) {
-                        super.onAuthenticationSucceeded(result)
-                        onSuccess.invoke()
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        onFailure.invoke()
-                    }
-                },
-            )
-        }
-
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
-            // API 28-29: Use BiometricPrompt without setAllowedAuthenticators
             val prompt =
                 BiometricPrompt.Builder(context)
-                    .setTitle(context.getString(title))
-                    .setNegativeButton(context.getString(R.string.cancel), context.mainExecutor) {
-                        _,
-                        _ ->
-                        //                        Toast.makeText(context, "Authentication
-                        // cancelled", Toast.LENGTH_SHORT)
-                        //                            .show()
+                    .apply {
+                        setTitle(context.getString(titleResId))
+                        descriptionResId?.let {
+                            setDescription(context.getString(descriptionResId))
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            setAllowedAuthenticators(
+                                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                            )
+                        }
                     }
                     .build()
+            val cipher =
+                if (isForDecrypt) {
+                    getInitializedCipherForDecryption(iv = cipherIv!!)
+                } else {
+                    getInitializedCipherForEncryption()
+                }
             prompt.authenticate(
+                BiometricPrompt.CryptoObject(cipher),
                 getCancellationSignal(context),
                 context.mainExecutor,
                 object : BiometricPrompt.AuthenticationCallback() {
@@ -103,7 +101,7 @@ private fun showBiometricOrPinPrompt(
                         result: BiometricPrompt.AuthenticationResult?
                     ) {
                         super.onAuthenticationSucceeded(result)
-                        onSuccess.invoke()
+                        onSuccess.invoke(result!!.cryptoObject!!.cipher)
                     }
 
                     override fun onAuthenticationFailed() {
@@ -113,19 +111,21 @@ private fun showBiometricOrPinPrompt(
                 },
             )
         }
-
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-            // API 23-27: Use FingerprintManager
             val fingerprintManager =
                 context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
             if (
                 fingerprintManager.isHardwareDetected &&
                     fingerprintManager.hasEnrolledFingerprints()
             ) {
-                val cryptoObject: FingerprintManager.CryptoObject? =
-                    null // Setup CryptoObject if needed
+                val cipher =
+                    if (isForDecrypt) {
+                        getInitializedCipherForDecryption(iv = cipherIv!!)
+                    } else {
+                        getInitializedCipherForEncryption()
+                    }
                 fingerprintManager.authenticate(
-                    cryptoObject,
+                    FingerprintManager.CryptoObject(cipher),
                     getCancellationSignal(context),
                     0,
                     object : FingerprintManager.AuthenticationCallback() {
@@ -133,7 +133,7 @@ private fun showBiometricOrPinPrompt(
                             result: FingerprintManager.AuthenticationResult?
                         ) {
                             super.onAuthenticationSucceeded(result)
-                            onSuccess.invoke()
+                            onSuccess.invoke(result!!.cryptoObject!!.cipher)
                         }
 
                         override fun onAuthenticationFailed() {
@@ -144,11 +144,10 @@ private fun showBiometricOrPinPrompt(
                     null,
                 )
             } else {
-                // No fingerprint available, fallback to PIN
                 promptPinAuthentication(
                     context,
                     requestCode,
-                    title,
+                    titleResId,
                     startActivityForResult,
                     onFailure,
                 )
@@ -157,26 +156,29 @@ private fun showBiometricOrPinPrompt(
 
         else -> {
             // API 21-22: No biometric support, fallback to PIN/Password
-            promptPinAuthentication(context, requestCode, title, startActivityForResult, onFailure)
+            promptPinAuthentication(
+                context,
+                requestCode,
+                titleResId,
+                startActivityForResult,
+                onFailure,
+            )
         }
     }
 }
 
-// Function to handle the cancellation signal
 private fun getCancellationSignal(context: Context): CancellationSignal {
     return CancellationSignal().apply {
         setOnCancelListener {
-            //            Toast.makeText(context, "Authentication cancelled",
-            // Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.biometrics_failure, Toast.LENGTH_SHORT).show()
         }
     }
 }
 
-// Function to prompt PIN/Password/Pattern fallback using KeyguardManager
 private fun promptPinAuthentication(
     context: Context,
     requestCode: Int,
-    title: Int,
+    titleResId: Int,
     startActivityForResult: (intent: Intent, requestCode: Int) -> Unit,
     onFailure: () -> Unit,
 ) {
@@ -185,7 +187,10 @@ private fun promptPinAuthentication(
         // For API 23 and above, use isDeviceSecure
         if (keyguardManager.isDeviceSecure) {
             val intent =
-                keyguardManager.createConfirmDeviceCredentialIntent(context.getString(title), null)
+                keyguardManager.createConfirmDeviceCredentialIntent(
+                    context.getString(titleResId),
+                    null,
+                )
             if (intent != null) {
                 startActivityForResult(intent, requestCode)
             } else {
@@ -199,8 +204,8 @@ private fun promptPinAuthentication(
         if (keyguardManager.isKeyguardSecure) {
             val intent =
                 keyguardManager.createConfirmDeviceCredentialIntent(
-                    "Unlock with PIN",
-                    "Please unlock to proceed",
+                    context.getString(titleResId),
+                    null,
                 )
             if (intent != null) {
                 startActivityForResult(intent, requestCode)

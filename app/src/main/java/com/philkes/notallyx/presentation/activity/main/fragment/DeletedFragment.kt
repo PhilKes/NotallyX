@@ -22,5 +22,5 @@ class DeletedFragment : NotallyFragment() {
 
     override fun getBackground() = R.drawable.delete
 
-    override fun getObservable() = model.deletedNotes
+    override fun getObservable() = model.deletedNotes!!
 }

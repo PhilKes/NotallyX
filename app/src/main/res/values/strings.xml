@@ -58,6 +58,8 @@
     <string name="delete_note_forever">Delete note forever?</string>
     <string name="your_notes_associated">Your notes attached to this label will not be deleted</string>
     <string name="biometrics_setup_success">Biometric/PIN lock has been enabled</string>
+    <string name="biometrics_disable_success">Biometric/PIN lock has been disabled</string>
+    <string name="biometrics_failure">Failed to authenticate vai Biometric/PIN</string>
 
     <!-- Snackbars -->
     <plurals name="deleted_selected_notes">
@@ -244,6 +246,9 @@
 
     <!-- Lock -->
     <string name="enable_lock_title">Enable lock via Biometric/PIN</string>
+    <string name="enable_lock_description">This will also encrypt the database</string>
+    <string name="disable_lock_title">Disable lock via Biometric/PIN</string>
+    <string name="disable_lock_description">This will also decrypt the database</string>
     <string name="unlock">Unlock via Biometric/PIN</string>
     <string name="biometrics_no_support">No biometric features available on this device</string>
     <string name="biometrics_not_setup">Biometrics/PIN are not setup for your device yet</string>

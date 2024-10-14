@@ -30,6 +30,8 @@ import android.widget.RadioGroup
 import android.widget.RemoteViews
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
@@ -302,6 +304,27 @@ fun Context.canAuthenticateWithBiometrics(): Int {
         }
     }
     return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+}
+
+val String.toPreservedByteArray: ByteArray
+    get() {
+        return this.toByteArray(Charsets.ISO_8859_1)
+    }
+
+val ByteArray.toPreservedString: String
+    get() {
+        return String(this, Charsets.ISO_8859_1)
+    }
+
+fun <T> LiveData<T>.observeForeverSkipFirst(observer: Observer<T>) {
+    var isFirstEvent = true
+    this.observeForever { value ->
+        if (isFirstEvent) {
+            isFirstEvent = false
+        } else {
+            observer.onChanged(value)
+        }
+    }
 }
 
 private fun formatTimestamp(timestamp: Long, dateFormat: String): String {

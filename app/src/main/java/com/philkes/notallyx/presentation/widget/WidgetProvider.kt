@@ -50,7 +50,7 @@ class WidgetProvider : AppWidgetProvider() {
         val noteId = intent.getLongExtra(Constants.SelectedBaseNote, 0)
         val position = intent.getIntExtra(EXTRA_POSITION, 0)
         val checked = intent.getBooleanExtra(RemoteViews.EXTRA_CHECKED, false)
-        val database = NotallyDatabase.getDatabase(context.applicationContext as Application)
+        val database = NotallyDatabase.getDatabase(context.applicationContext as Application).value
         val pendingResult = goAsync()
         GlobalScope.launch {
             withContext(Dispatchers.IO) {

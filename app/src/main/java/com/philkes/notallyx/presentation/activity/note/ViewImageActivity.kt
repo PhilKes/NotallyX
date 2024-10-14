@@ -60,19 +60,21 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         val initial = intent.getIntExtra(POSITION, 0)
         binding.RecyclerView.scrollToPosition(initial)
 
-        lifecycleScope.launch {
-            val database = NotallyDatabase.getDatabase(application)
-            val id = intent.getLongExtra(Constants.SelectedBaseNote, 0)
+        val database = NotallyDatabase.getDatabase(application)
+        val id = intent.getLongExtra(Constants.SelectedBaseNote, 0)
 
-            val json = withContext(Dispatchers.IO) { database.getBaseNoteDao().getImages(id) }
-            val original = Converters.jsonToFiles(json)
-            val images = ArrayList<FileAttachment>(original.size)
-            original.filterNotTo(images) { image -> deletedImages.contains(image) }
+        database.observe(this@ViewImageActivity) {
+            lifecycleScope.launch {
+                val json = withContext(Dispatchers.IO) { it.getBaseNoteDao().getImages(id) }
+                val original = Converters.jsonToFiles(json)
+                val images = ArrayList<FileAttachment>(original.size)
+                original.filterNotTo(images) { image -> deletedImages.contains(image) }
 
-            val mediaRoot = IO.getExternalImagesDirectory(application)
-            val adapter = ImageAdapter(mediaRoot, images)
-            binding.RecyclerView.adapter = adapter
-            setupToolbar(binding, adapter)
+                val mediaRoot = IO.getExternalImagesDirectory(application)
+                val adapter = ImageAdapter(mediaRoot, images)
+                binding.RecyclerView.adapter = adapter
+                setupToolbar(binding, adapter)
+            }
         }
     }
 

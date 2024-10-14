@@ -13,6 +13,7 @@ import androidx.core.text.toHtml
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.philkes.notallyx.Preferences
@@ -75,16 +76,17 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     var currentFile: File? = null
 
     lateinit var labels: LiveData<List<String>>
-    private lateinit var allNotes: LiveData<List<BaseNote>>
-    lateinit var baseNotes: Content
-    lateinit var deletedNotes: Content
-    lateinit var archivedNotes: Content
+    var allNotes: LiveData<List<BaseNote>>? = null
+    var allNotesObserver: Observer<List<BaseNote>>? = null
+    var baseNotes: Content? = null
+    var deletedNotes: Content? = null
+    var archivedNotes: Content? = null
 
     var folder = Folder.NOTES
         set(value) {
             if (field != value) {
                 field = value
-                searchResults.fetch(keyword, folder)
+                searchResults!!.fetch(keyword, folder)
             }
         }
 
@@ -92,11 +94,11 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         set(value) {
             if (field != value) {
                 field = value
-                searchResults.fetch(keyword, folder)
+                searchResults!!.fetch(keyword, folder)
             }
         }
 
-    lateinit var searchResults: SearchResult
+    var searchResults: SearchResult? = null
 
     private val pinned = Header(app.getString(R.string.pinned))
     private val others = Header(app.getString(R.string.others))
@@ -113,24 +115,46 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val actionMode = ActionMode()
 
     init {
-        init()
+        NotallyDatabase.getDatabase(app).observeForever(::init)
     }
 
-    fun init() {
-        database = NotallyDatabase.getDatabase(app)
+    private fun init(database: NotallyDatabase) {
+        this.database = database
         baseNoteDao = database.getBaseNoteDao()
         labelDao = database.getLabelDao()
         commonDao = database.getCommonDao()
 
         labels = labelDao.getAll()
+
+        allNotes?.removeObserver(allNotesObserver!!)
+        allNotesObserver = Observer { list -> Cache.list = list }
         allNotes = baseNoteDao.getAll()
+        allNotes!!.observeForever(allNotesObserver!!)
 
-        baseNotes = Content(baseNoteDao.getFrom(Folder.NOTES), ::transform)
-        deletedNotes = Content(baseNoteDao.getFrom(Folder.DELETED), ::transform)
-        archivedNotes = Content(baseNoteDao.getFrom(Folder.ARCHIVED), ::transform)
+        if (baseNotes == null) {
+            baseNotes = Content(baseNoteDao.getFrom(Folder.NOTES), ::transform)
+        } else {
+            baseNotes!!.setObserver(baseNoteDao.getFrom(Folder.NOTES))
+        }
 
-        allNotes.observeForever { list -> Cache.list = list }
-        searchResults = SearchResult(viewModelScope, baseNoteDao, ::transform)
+        if (deletedNotes == null) {
+            deletedNotes = Content(baseNoteDao.getFrom(Folder.DELETED), ::transform)
+        } else {
+            deletedNotes!!.setObserver(baseNoteDao.getFrom(Folder.DELETED))
+        }
+
+        if (archivedNotes == null) {
+            archivedNotes = Content(baseNoteDao.getFrom(Folder.ARCHIVED), ::transform)
+        } else {
+            archivedNotes!!.setObserver(baseNoteDao.getFrom(Folder.ARCHIVED))
+        }
+
+        if (searchResults == null) {
+            searchResults = SearchResult(viewModelScope, baseNoteDao, ::transform)
+        } else {
+            searchResults!!.baseNoteDao = baseNoteDao
+        }
+
         viewModelScope.launch {
             val previousNotes = Migrations.getPreviousNotes(app)
             val previousLabels = Migrations.getPreviousLabels(app)
@@ -581,6 +605,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun updateLabel(oldValue: String, newValue: String, onComplete: (success: Boolean) -> Unit) =
         executeAsyncWithCallback({ commonDao.updateLabel(oldValue, newValue) }, onComplete)
+
+    fun closeDatabase() {
+        database.close()
+    }
 
     private fun getEmptyFolder(name: String): File {
         val folder = File(app.cacheDir, name)

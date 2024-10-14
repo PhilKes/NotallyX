@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
@@ -31,6 +32,7 @@ import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
 import com.philkes.notallyx.presentation.view.misc.BiometricLock
+import com.philkes.notallyx.presentation.view.misc.BiometricLock.disabled
 import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.ListInfo
@@ -49,6 +51,8 @@ import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 import com.philkes.notallyx.utils.checkedTag
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
+import com.philkes.notallyx.utils.security.decryptDatabase
+import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 
 class SettingsFragment : Fragment() {
@@ -142,7 +146,8 @@ class SettingsFragment : Fragment() {
             }
         }
         when (requestCode) {
-            REQUEST_SETUP_BIOMETRICS -> showEnableBiometricLock()
+            REQUEST_SETUP_LOCK -> showEnableBiometricLock()
+            REQUEST_DISABLE_LOCK -> showDisableBiometricLock()
         }
     }
 
@@ -373,7 +378,17 @@ class SettingsFragment : Fragment() {
                                 showBiometricsNotSetupDialog()
                         }
                     } else {
-                        model.savePreference(info, newValue)
+                        when (requireContext().canAuthenticateWithBiometrics()) {
+                            BiometricManager.BIOMETRIC_SUCCESS -> showDisableBiometricLock()
+                            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                                showNoBiometricsSupportToast()
+                                model.preferences.biometricLock.value = disabled
+                            }
+                            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                                showBiometricsNotSetupDialog()
+                                model.preferences.biometricLock.value = disabled
+                            }
+                        }
                     }
                 }
                 .setNegativeButton(R.string.cancel, null)
@@ -383,15 +398,43 @@ class SettingsFragment : Fragment() {
 
     private fun showEnableBiometricLock() {
         showBiometricOrPinPrompt(
-            REQUEST_SETUP_BIOMETRICS,
+            false,
+            REQUEST_SETUP_LOCK,
             R.string.enable_lock_title,
-            {
-                model.savePreference(BiometricLock, enabled)
+            R.string.enable_lock_description,
+            onSuccess = { cipher ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    model.preferences.iv = cipher.iv
+                    val passphrase = model.preferences.generatePassphrase(cipher)
+                    encryptDatabase(requireContext(), passphrase)
+                    model.savePreference(BiometricLock, enabled)
+                }
+                (activity?.application as NotallyXApplication).isLocked = false
                 showBiometricsEnabledToast()
             },
         ) {
             showBiometricsNotSetupDialog()
         }
+    }
+
+    private fun showDisableBiometricLock() {
+        showBiometricOrPinPrompt(
+            true,
+            REQUEST_DISABLE_LOCK,
+            R.string.disable_lock_title,
+            R.string.disable_lock_description,
+            model.preferences.iv!!,
+            onSuccess = { cipher ->
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    val encryptedPassphrase = model.preferences.getDatabasePassphrase()
+                    val passphrase = cipher.doFinal(encryptedPassphrase)
+                    model.closeDatabase()
+                    decryptDatabase(requireContext(), passphrase)
+                    model.savePreference(BiometricLock, disabled)
+                }
+                showBiometricsDisabledToast()
+            },
+        ) {}
     }
 
     private fun showNoBiometricsSupportToast() {
@@ -404,6 +447,13 @@ class SettingsFragment : Fragment() {
     private fun showBiometricsEnabledToast() {
         ContextCompat.getMainExecutor(requireContext()).execute {
             Toast.makeText(requireContext(), R.string.biometrics_setup_success, Toast.LENGTH_LONG)
+                .show()
+        }
+    }
+
+    private fun showBiometricsDisabledToast() {
+        ContextCompat.getMainExecutor(requireContext()).execute {
+            Toast.makeText(requireContext(), R.string.biometrics_disable_success, Toast.LENGTH_LONG)
                 .show()
         }
     }
@@ -421,7 +471,7 @@ class SettingsFragment : Fragment() {
                     } else {
                         Intent(Settings.ACTION_SECURITY_SETTINGS)
                     }
-                startActivityForResult(intent, REQUEST_SETUP_BIOMETRICS)
+                startActivityForResult(intent, REQUEST_SETUP_LOCK)
             }
             .show()
     }
@@ -474,6 +524,7 @@ class SettingsFragment : Fragment() {
         private const val REQUEST_IMPORT_BACKUP = 20
         private const val REQUEST_EXPORT_BACKUP = 21
         private const val REQUEST_CHOOSE_FOLDER = 22
-        private const val REQUEST_SETUP_BIOMETRICS = 23
+        private const val REQUEST_SETUP_LOCK = 23
+        private const val REQUEST_DISABLE_LOCK = 24
     }
 }

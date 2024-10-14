@@ -46,7 +46,6 @@ import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.applySpans
 import com.philkes.notallyx.utils.movedToResId
-import com.philkes.notallyx.utils.checkForBiometrics
 import java.io.File
 import kotlinx.coroutines.launch
 

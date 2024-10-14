@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 
 class SearchResult(
     private val scope: CoroutineScope,
-    private val baseNoteDao: BaseNoteDao,
+    var baseNoteDao: BaseNoteDao,
     transform: (List<BaseNote>) -> List<Item>,
 ) : LiveData<List<Item>>() {
 

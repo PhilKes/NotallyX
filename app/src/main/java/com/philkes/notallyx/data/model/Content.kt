@@ -1,6 +1,7 @@
 package com.philkes.notallyx.data.model
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 
 /**
  * The instance of LiveData returned by Room only listens for changes while the fragment observing
@@ -17,10 +18,20 @@ import androidx.lifecycle.LiveData
  * To stop this, this class acts as a wrapper over the LiveData returned by Room and continuously
  * observes it.
  */
-class Content(liveData: LiveData<List<BaseNote>>, transform: (List<BaseNote>) -> List<Item>) :
-    LiveData<List<Item>>() {
+class Content(
+    private var liveData: LiveData<List<BaseNote>>,
+    private val transform: (List<BaseNote>) -> List<Item>,
+) : LiveData<List<Item>>() {
+    private var observer: Observer<List<BaseNote>>? = null
 
     init {
-        liveData.observeForever { list -> value = transform(list) }
+        setObserver(liveData)
+    }
+
+    fun setObserver(liveData: LiveData<List<BaseNote>>) {
+        observer?.let { this.liveData.removeObserver(it) }
+        this.liveData = liveData
+        observer = Observer { list -> value = transform(list) }
+        this.liveData.observeForever(observer!!)
     }
 }
