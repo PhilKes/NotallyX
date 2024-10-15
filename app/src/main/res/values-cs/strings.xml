@@ -89,7 +89,7 @@
     <string name="light">Světlé</string>
     <string name="follow_system">Podle systému</string>
 
-    <string name="date_format">Formát data</string>
+    <string name="creation_date_format">Formát data</string>
     <string name="none">Žádné</string>
 
     <string name="text_size">Velikost písma</string>

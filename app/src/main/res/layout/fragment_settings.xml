@@ -30,6 +30,11 @@
             android:id="@+id/TextSize"
             layout="@layout/preference" />
 
+
+        <include
+            android:id="@+id/NotesSortOrder"
+            layout="@layout/preference" />
+
 <!--        <include-->
 <!--            android:id="@+id/CheckedListItemSorting"-->
 <!--            layout="@layout/preference" />-->

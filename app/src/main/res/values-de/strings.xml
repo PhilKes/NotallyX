@@ -91,7 +91,7 @@
     <string name="light">Hell</string>
     <string name="follow_system">Systemeinstellung folgen</string>
 
-    <string name="date_format">Datumsformat</string>
+    <string name="creation_date_format">Datumsformat</string>
     <string name="none">Keines</string>
 
     <string name="text_size">Textgröße</string>

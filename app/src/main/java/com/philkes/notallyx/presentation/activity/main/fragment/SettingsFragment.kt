@@ -17,8 +17,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
+import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
+import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
@@ -30,13 +32,16 @@ import com.philkes.notallyx.presentation.view.misc.MaxItems
 import com.philkes.notallyx.presentation.view.misc.MaxLines
 import com.philkes.notallyx.presentation.view.misc.MaxTitle
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
+import com.philkes.notallyx.presentation.view.misc.NotesSorting
 import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
+import com.philkes.notallyx.presentation.view.misc.SortDirection
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
+import com.philkes.notallyx.utils.checkedTag
 
 class SettingsFragment : Fragment() {
 
@@ -56,6 +61,10 @@ class SettingsFragment : Fragment() {
 
             textSize.observe(viewLifecycleOwner) { value ->
                 binding.TextSize.setup(TextSize, value)
+            }
+
+            notesSorting.observe(viewLifecycleOwner) { (sortBy, sortDirection) ->
+                binding.NotesSortOrder.setup(NotesSorting, sortBy, sortDirection)
             }
 
             // TODO: Hide for now until checked auto-sort is working reliably
@@ -253,6 +262,69 @@ class SettingsFragment : Fragment() {
                     dialog.cancel()
                     val newValue = entryValues[which]
                     model.savePreference(info, newValue)
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun PreferenceBinding.setup(
+        info: NotesSorting,
+        sortBy: String,
+        sortDirection: SortDirection,
+    ) {
+        Title.setText(info.title)
+
+        val entries = info.getEntries(requireContext())
+        val entryValues = info.getEntryValues()
+
+        val checked = entryValues.indexOf(sortBy)
+        val displayValue = entries[checked]
+
+        Value.text = "$displayValue (${requireContext().getString(sortDirection.textResId)})"
+
+        root.setOnClickListener {
+            val layout = NotesSortDialogBinding.inflate(layoutInflater, null, false)
+            entries.zip(entryValues).forEachIndexed { idx, (choiceText, sortByValue) ->
+                ChoiceItemBinding.inflate(layoutInflater).root.apply {
+                    id = idx
+                    text = choiceText
+                    tag = sortByValue
+                    layout.NotesSortByRadioGroup.addView(this)
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        NotesSorting.getSortIconResId(sortByValue),
+                        0,
+                        0,
+                        0,
+                    )
+                    if (sortByValue == sortBy) {
+                        layout.NotesSortByRadioGroup.check(this.id)
+                    }
+                }
+            }
+
+            SortDirection.entries.forEachIndexed { idx, sortDir ->
+                ChoiceItemBinding.inflate(layoutInflater).root.apply {
+                    id = idx
+                    text = requireContext().getString(sortDir.textResId)
+                    tag = sortDir
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(sortDir.iconResId, 0, 0, 0)
+                    layout.NotesSortDirectionRadioGroup.addView(this)
+                    if (sortDir == sortDirection) {
+                        layout.NotesSortDirectionRadioGroup.check(this.id)
+                    }
+                }
+            }
+
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(info.title)
+                .setView(layout.root)
+                .setPositiveButton(R.string.save) { dialog, _ ->
+                    dialog.cancel()
+                    val newSortBy = layout.NotesSortByRadioGroup.checkedTag() as String
+                    val newSortDirection =
+                        layout.NotesSortDirectionRadioGroup.checkedTag() as SortDirection
+                    model.preferences.savePreference(info, newSortBy, newSortDirection)
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()

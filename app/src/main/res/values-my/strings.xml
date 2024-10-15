@@ -89,7 +89,7 @@
     <string name="light">အလင်း</string>
     <string name="follow_system">ဖုန်းအတိုင်း</string>
 
-    <string name="date_format">နေ့ရက်ပုံစံ</string>
+    <string name="creation_date_format">နေ့ရက်ပုံစံ</string>
     <string name="none">ဘာမှမရှိ</string>
 
     <string name="text_size">စာလလုံးအရွယ်အစား</string>

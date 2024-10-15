@@ -80,7 +80,7 @@
     <string name="light">ライト</string>
     <string name="follow_system">システムのテーマを使用</string>
 
-    <string name="date_format">日付の表示</string>
+    <string name="creation_date_format">日付の表示</string>
     <string name="none">表示しない</string>
 
     <string name="content_density">プレビュー</string>

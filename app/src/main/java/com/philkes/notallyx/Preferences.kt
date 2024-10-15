@@ -12,7 +12,9 @@ import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.misc.MaxItems
 import com.philkes.notallyx.presentation.view.misc.MaxLines
 import com.philkes.notallyx.presentation.view.misc.MaxTitle
+import com.philkes.notallyx.presentation.view.misc.NotesSorting
 import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
+import com.philkes.notallyx.presentation.view.misc.SortDirection
 import com.philkes.notallyx.presentation.view.misc.TextInfo
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.Theme
@@ -33,6 +35,8 @@ class Preferences private constructor(app: Application) {
     val theme = BetterLiveData(getListPref(Theme))
     val dateFormat = BetterLiveData(getListPref(DateFormat))
 
+    val notesSorting = BetterLiveData(getNotesSorting(NotesSorting))
+
     val textSize = BetterLiveData(getListPref(TextSize))
     val listItemSorting = BetterLiveData(getListPref(ListItemSorting))
     var maxItems = getSeekbarPref(MaxItems)
@@ -45,6 +49,13 @@ class Preferences private constructor(app: Application) {
 
     private fun getListPref(info: ListInfo) =
         requireNotNull(preferences.getString(info.key, info.defaultValue))
+
+    private fun getNotesSorting(info: NotesSorting): Pair<String, SortDirection> {
+        val sortBy = requireNotNull(preferences.getString(info.key, info.defaultValue))
+        val sortDirection =
+            requireNotNull(preferences.getString(info.directionKey, info.defaultValueDirection))
+        return Pair(sortBy, SortDirection.valueOf(sortDirection))
+    }
 
     private fun getTextPref(info: TextInfo) =
         requireNotNull(preferences.getString(info.key, info.defaultValue))
@@ -98,6 +109,13 @@ class Preferences private constructor(app: Application) {
         }
     }
 
+    fun savePreference(info: NotesSorting, sortBy: String, sortDirection: SortDirection) {
+        editor.putString(info.key, sortBy)
+        editor.putString(info.directionKey, sortDirection.name)
+        editor.commit()
+        notesSorting.postValue(getNotesSorting(info))
+    }
+
     fun savePreference(info: ListInfo, value: String) {
         editor.putString(info.key, value)
         editor.commit()
@@ -107,6 +125,7 @@ class Preferences private constructor(app: Application) {
             DateFormat -> dateFormat.postValue(getListPref(info))
             TextSize -> textSize.postValue(getListPref(info))
             ListItemSorting -> listItemSorting.postValue(getListPref(info))
+            else -> return
         }
     }
 

@@ -63,7 +63,7 @@ object DateFormat : ListInfo {
     const val relative = "relative"
     const val absolute = "absolute"
 
-    override val title = R.string.date_format
+    override val title = R.string.creation_date_format
     override val key = "dateFormat"
     override val defaultValue = relative
 
@@ -145,4 +145,37 @@ object ListItemSorting : ListInfo {
         val ids = arrayOf(R.string.no_auto_sort, R.string.auto_sort_by_checked)
         return convertToValues(ids, context)
     }
+}
+
+object NotesSorting : ListInfo {
+    const val autoSortByCreationDate = "autoSortByCreationDate"
+    const val autoSortByModifiedDate = "autoSortByModifiedDate"
+    const val autoSortByTitle = "autoSortByTitle"
+
+    override val title = R.string.notes_sorted_by
+    override val key = "notesSorting"
+    const val directionKey = "notesSortingDirection"
+    override val defaultValue = autoSortByCreationDate
+    val defaultValueDirection = SortDirection.DESC.name
+
+    override fun getEntryValues() =
+        arrayOf(autoSortByCreationDate, autoSortByModifiedDate, autoSortByTitle)
+
+    override fun getEntries(context: Context): Array<String> {
+        val ids = arrayOf(R.string.creation_date, R.string.modified_date, R.string.title)
+        return convertToValues(ids, context)
+    }
+
+    fun getSortIconResId(sortBy: String): Int {
+        return when (sortBy) {
+            autoSortByModifiedDate -> R.drawable.edit_calendar
+            autoSortByTitle -> R.drawable.sort_by_alpha
+            else -> R.drawable.calendar_add_on
+        }
+    }
+}
+
+enum class SortDirection(val textResId: Int, val iconResId: Int) {
+    ASC(R.string.ascending, R.drawable.arrow_upward),
+    DESC(R.string.descending, R.drawable.arrow_downward),
 }

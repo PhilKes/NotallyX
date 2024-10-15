@@ -90,7 +90,7 @@
     <string name="light">Luminos</string>
     <string name="follow_system">Urmează sistemul</string>
 
-    <string name="date_format">Formatul datei</string>
+    <string name="creation_date_format">Formatul datei</string>
     <string name="none">Nici unul</string>
 
     <string name="text_size">Mărimea textului</string>

@@ -83,7 +83,7 @@
     <string name="light">Chiaro</string>
     <string name="follow_system">Tema di Sistema</string>
 
-    <string name="date_format">Formato data</string>
+    <string name="creation_date_format">Formato data</string>
     <string name="none">Nessuno</string>
 
     <string name="content_density">Densità del contenuto</string>
