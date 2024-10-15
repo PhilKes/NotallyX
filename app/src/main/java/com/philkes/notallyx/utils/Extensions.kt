@@ -17,6 +17,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.EditText
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.RemoteViews
 import android.widget.TextView
 import com.philkes.notallyx.R
@@ -219,6 +221,10 @@ fun Folder.movedToResId(): Int {
         Folder.ARCHIVED -> R.plurals.archived_selected_notes
         Folder.NOTES -> R.plurals.restored_selected_notes
     }
+}
+
+fun RadioGroup.checkedTag(): Any {
+    return this.findViewById<RadioButton?>(this.checkedRadioButtonId).tag
 }
 
 private fun formatTimestamp(timestamp: Long, dateFormat: String): String {

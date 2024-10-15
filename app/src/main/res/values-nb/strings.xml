@@ -88,7 +88,7 @@
     <string name="light">Lyst</string>
     <string name="follow_system">Følg systemet</string>
 
-    <string name="date_format">Datoformat</string>
+    <string name="creation_date_format">Datoformat</string>
     <string name="none">Ikke vis</string>
 
     <string name="text_size">Skriftstørrelse</string>

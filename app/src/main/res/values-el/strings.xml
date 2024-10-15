@@ -79,7 +79,7 @@
     <string name="light">Φωτεινό</string>
     <string name="follow_system">Ακολούθηση συστήματος</string>
 
-    <string name="date_format">Μορφή ημερομηνίας</string>
+    <string name="creation_date_format">Μορφή ημερομηνίας</string>
     <string name="none">Καμία</string>
 
     <string name="content_density">Πυκνότητα περιεχομένου</string>

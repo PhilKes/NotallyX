@@ -8,6 +8,7 @@ import android.net.Uri
 import android.print.PostPDFGenerator
 import android.text.Html
 import android.widget.Toast
+import androidx.core.database.getLongOrNull
 import androidx.core.text.toHtml
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -314,6 +315,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val title = cursor.getString(cursor.getColumnIndexOrThrow("title"))
         val pinnedTmp = cursor.getInt(cursor.getColumnIndexOrThrow("pinned"))
         val timestamp = cursor.getLong(cursor.getColumnIndexOrThrow("timestamp"))
+        val modifiedTimestampIndex = cursor.getColumnIndex("modifiedTimestamp")
+        val modifiedTimestamp =
+            if (modifiedTimestampIndex == -1) {
+                timestamp
+            } else {
+                cursor.getLongOrNull(modifiedTimestampIndex) ?: timestamp
+            }
         val labelsTmp = cursor.getString(cursor.getColumnIndexOrThrow("labels"))
         val body = cursor.getString(cursor.getColumnIndexOrThrow("body"))
         val spansTmp = cursor.getString(cursor.getColumnIndexOrThrow("spans"))
@@ -360,6 +368,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             title,
             pinned,
             timestamp,
+            modifiedTimestamp,
             labels,
             body,
             spans,

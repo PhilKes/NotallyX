@@ -87,7 +87,7 @@ class ConfigureWidgetActivity : AppCompatActivity(), ItemListener {
     override fun onClick(position: Int) {
         if (position != -1) {
             val preferences = Preferences.getInstance(application)
-            val noteId = (adapter.currentList[position] as BaseNote).id
+            val noteId = (adapter.getItem(position) as BaseNote).id
             preferences.updateWidget(id, noteId)
 
             val manager = AppWidgetManager.getInstance(this)

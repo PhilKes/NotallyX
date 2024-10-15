@@ -89,7 +89,7 @@
     <string name="light">Sáng</string>
     <string name="follow_system">Mặc định hệ thống</string>
 
-    <string name="date_format">Định dạng ngày tháng</string>
+    <string name="creation_date_format">Định dạng ngày tháng</string>
     <string name="none">Không</string>
 
     <string name="text_size">Cỡ chữ</string>

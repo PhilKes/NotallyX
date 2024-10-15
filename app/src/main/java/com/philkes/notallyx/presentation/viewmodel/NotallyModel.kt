@@ -69,6 +69,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     var title = String()
     var pinned = false
     var timestamp = System.currentTimeMillis()
+    var modifiedTimestamp = System.currentTimeMillis()
 
     val labels = ArrayList<String>()
 
@@ -343,6 +344,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 title = baseNote.title
                 pinned = baseNote.pinned
                 timestamp = baseNote.timestamp
+                modifiedTimestamp = baseNote.modifiedTimestamp
 
                 setLabels(baseNote.labels)
 
@@ -402,6 +404,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             title,
             pinned,
             timestamp,
+            modifiedTimestamp,
             labels,
             body,
             spans,

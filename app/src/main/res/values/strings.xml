@@ -118,7 +118,7 @@
     <string name="light">Light</string>
     <string name="follow_system">Follow system</string>
 
-    <string name="date_format">Date format</string>
+    <string name="creation_date_format">Creation Date format</string>
     <string name="none">None</string>
 
     <string name="text_size">Text size</string>
@@ -129,6 +129,14 @@
     <string name="checked_list_item_sorting">List auto sort</string>
     <string name="no_auto_sort">Dont autosort</string>
     <string name="auto_sort_by_checked">Autosort by checked items</string>
+
+    <string name="notes_sorted_by">Notes sorted by</string>
+    <string name="creation_date">Created At</string>
+    <string name="modified_date">Last Modified At</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="sort_direction">Sort Direction</string>
+
 
     <string name="content_density">Content density</string>
     <string name="max_items_to_display">Max items to display in list</string>

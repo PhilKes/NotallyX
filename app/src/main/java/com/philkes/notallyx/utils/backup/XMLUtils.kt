@@ -106,6 +106,7 @@ object XMLUtils {
             title,
             pinned,
             timestamp,
+            timestamp,
             labels,
             body,
             spans,

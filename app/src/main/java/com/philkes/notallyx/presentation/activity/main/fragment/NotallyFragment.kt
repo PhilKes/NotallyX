@@ -66,7 +66,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
     // See [RecyclerView.ViewHolder.getAdapterPosition]
     override fun onClick(position: Int) {
         if (position != -1) {
-            notesAdapter?.currentList?.get(position)?.let { item ->
+            notesAdapter?.getItem(position)?.let { item ->
                 if (item is BaseNote) {
                     if (model.actionMode.isEnabled()) {
                         handleNoteSelection(item.id, position, item)
@@ -83,7 +83,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
 
     override fun onLongClick(position: Int) {
         if (position != -1) {
-            notesAdapter?.currentList?.get(position)?.let { item ->
+            notesAdapter?.getItem(position)?.let { item ->
                 if (item is BaseNote) {
                     handleNoteSelection(item.id, position, item)
                 }
@@ -159,6 +159,10 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         getObservable().observe(viewLifecycleOwner) { list ->
             notesAdapter?.submitList(list)
             binding?.ImageView?.isVisible = list.isEmpty()
+        }
+
+        model.preferences.notesSorting.observe(viewLifecycleOwner) { (sortBy, sortDirection) ->
+            notesAdapter?.setSorting(sortBy, sortDirection)
         }
 
         model.actionMode.closeListener.observe(viewLifecycleOwner) { event ->

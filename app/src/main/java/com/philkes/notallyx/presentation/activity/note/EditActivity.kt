@@ -74,6 +74,9 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
     }
 
     open suspend fun saveNote() {
+        if (changeHistory.canUndo()) {
+            model.modifiedTimestamp = System.currentTimeMillis()
+        }
         model.saveNote()
         WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
     }
