@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,6 +16,7 @@ import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.databinding.ActivityViewImageBinding
+import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
 import com.philkes.notallyx.utils.IO
@@ -28,14 +28,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ViewImageActivity : AppCompatActivity() {
+class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
 
     private var currentImage: FileAttachment? = null
     private lateinit var deletedImages: ArrayList<FileAttachment>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityViewImageBinding.inflate(layoutInflater)
+        binding = ActivityViewImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         val savedList = savedInstanceState?.getParcelableArrayList<FileAttachment>(DELETED_IMAGES)
@@ -60,19 +60,21 @@ class ViewImageActivity : AppCompatActivity() {
         val initial = intent.getIntExtra(POSITION, 0)
         binding.RecyclerView.scrollToPosition(initial)
 
-        lifecycleScope.launch {
-            val database = NotallyDatabase.getDatabase(application)
-            val id = intent.getLongExtra(Constants.SelectedBaseNote, 0)
+        val database = NotallyDatabase.getDatabase(application)
+        val id = intent.getLongExtra(Constants.SelectedBaseNote, 0)
 
-            val json = withContext(Dispatchers.IO) { database.getBaseNoteDao().getImages(id) }
-            val original = Converters.jsonToFiles(json)
-            val images = ArrayList<FileAttachment>(original.size)
-            original.filterNotTo(images) { image -> deletedImages.contains(image) }
+        database.observe(this@ViewImageActivity) {
+            lifecycleScope.launch {
+                val json = withContext(Dispatchers.IO) { it.getBaseNoteDao().getImages(id) }
+                val original = Converters.jsonToFiles(json)
+                val images = ArrayList<FileAttachment>(original.size)
+                original.filterNotTo(images) { image -> deletedImages.contains(image) }
 
-            val mediaRoot = IO.getExternalImagesDirectory(application)
-            val adapter = ImageAdapter(mediaRoot, images)
-            binding.RecyclerView.adapter = adapter
-            setupToolbar(binding, adapter)
+                val mediaRoot = IO.getExternalImagesDirectory(application)
+                val adapter = ImageAdapter(mediaRoot, images)
+                binding.RecyclerView.adapter = adapter
+                setupToolbar(binding, adapter)
+            }
         }
     }
 

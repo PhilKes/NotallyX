@@ -1,7 +1,14 @@
 package com.philkes.notallyx.utils
 
+import android.app.KeyguardManager
+import android.content.Context
+import android.content.pm.PackageManager
 import android.content.res.Resources
 import android.graphics.Typeface
+import android.hardware.biometrics.BiometricManager
+import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
+import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import android.os.Build
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
@@ -19,6 +26,9 @@ import android.view.inputmethod.EditorInfo
 import android.widget.EditText
 import android.widget.RemoteViews
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
@@ -218,6 +228,52 @@ fun Folder.movedToResId(): Int {
         Folder.DELETED -> R.plurals.deleted_selected_notes
         Folder.ARCHIVED -> R.plurals.archived_selected_notes
         Folder.NOTES -> R.plurals.restored_selected_notes
+    }
+}
+
+fun Context.canAuthenticateWithBiometrics(): Int {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            val keyguardManager: KeyguardManager =
+                this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+            val packageManager: PackageManager = this.packageManager
+            if (!packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
+                return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+            }
+            if (!keyguardManager.isKeyguardSecure) {
+                return BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
+            }
+        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
+            val biometricManager: BiometricManager =
+                this.getSystemService(BiometricManager::class.java)
+            return biometricManager.canAuthenticate()
+        } else {
+            val biometricManager: BiometricManager =
+                this.getSystemService(BiometricManager::class.java)
+            return biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
+        }
+    }
+    return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+}
+
+val String.toPreservedByteArray: ByteArray
+    get() {
+        return this.toByteArray(Charsets.ISO_8859_1)
+    }
+
+val ByteArray.toPreservedString: String
+    get() {
+        return String(this, Charsets.ISO_8859_1)
+    }
+
+fun <T> LiveData<T>.observeForeverSkipFirst(observer: Observer<T>) {
+    var isFirstEvent = true
+    this.observeForever { value ->
+        if (isFirstEvent) {
+            isFirstEvent = false
+        } else {
+            observer.onChanged(value)
+        }
     }
 }
 

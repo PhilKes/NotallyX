@@ -2,14 +2,20 @@ package com.philkes.notallyx.utils.backup
 
 import android.app.Application
 import android.content.Context
+import android.os.Build
 import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.Converters
+import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.utils.IO
 import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.security.decryptDatabase
+import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
+import java.io.File
 import java.io.OutputStream
 import java.util.concurrent.TimeUnit
 import java.util.zip.ZipOutputStream
@@ -21,10 +27,24 @@ fun doBackup(
 ) {
     val zipStream = ZipOutputStream(outputStream)
 
-    val database = NotallyDatabase.getDatabase(app)
+    val database = NotallyDatabase.getDatabase(app).value
+
+    val preferences = Preferences.getInstance(app)
 
     database.checkpoint()
-    Export.backupDatabase(app, zipStream)
+
+    if (
+        preferences.biometricLock.value == enabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    ) {
+        val cipher = getInitializedCipherForDecryption(iv = preferences.iv!!)
+        val passphrase = cipher.doFinal(preferences.getDatabasePassphrase())
+        val decryptedFile = File.createTempFile("decrypted", "tmp", app.cacheDir)
+        decryptDatabase(app, passphrase, decryptedFile)
+        Export.backupDatabase(app, zipStream, decryptedFile)
+        decryptedFile.delete()
+    } else {
+        Export.backupDatabase(app, zipStream)
+    }
 
     val imageRoot = IO.getExternalImagesDirectory(app)
     val fileRoot = IO.getExternalFilesDirectory(app)

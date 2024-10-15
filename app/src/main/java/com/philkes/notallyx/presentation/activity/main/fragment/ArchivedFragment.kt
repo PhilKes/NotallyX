@@ -6,5 +6,5 @@ class ArchivedFragment : NotallyFragment() {
 
     override fun getBackground() = R.drawable.archive
 
-    override fun getObservable() = model.archivedNotes
+    override fun getObservable() = model.archivedNotes!!
 }
