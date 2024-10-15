@@ -29,7 +29,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.FileAttachment
+import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.misc.DateFormat
@@ -220,6 +222,14 @@ val FileAttachment.isImage: Boolean
     get() {
         return mimeType.startsWith("image/")
     }
+
+fun Folder.movedToResId(): Int {
+    return when (this) {
+        Folder.DELETED -> R.plurals.deleted_selected_notes
+        Folder.ARCHIVED -> R.plurals.archived_selected_notes
+        Folder.NOTES -> R.plurals.restored_selected_notes
+    }
+}
 
 fun Context.canAuthenticateWithBiometrics(): Int {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
