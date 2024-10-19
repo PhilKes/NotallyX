@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="Blue50">#E3F2FD</color>
     <color name="Indigo100">#C5CAE9</color>
 
-    <color name="LightBlue500">#03A9F4</color>
-    <color name="LightBlue100">#B3E5fC</color>
+    <color name="Blue500">#7285D0</color>
+    <color name="Blue100">#C5CAE9</color>
+    <color name="Blue50">#E8EAF6</color>
 
     <color name="Black">#000000</color>
     <color name="Transparent">#00000000</color>

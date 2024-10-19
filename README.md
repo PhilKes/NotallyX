@@ -1,13 +1,18 @@
-## NotallyX
+<h1 align="center">
+    <img src="fastlane/metadata/android/en-US/images/icon.png" alt="icon" />
+    <br />
+    <b>NotallyX | Minimalistic note taking app</b>
+</h1>
 
-[Notally](https://github.com/OmGodse/Notally), but eXtended.
+[Notally](https://github.com/OmGodse/Notally), but eXtended
 
 <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="250"/>
 
 ### Additional Features
 * Order Tasks with Subtasks
 * Attach any file to a note (also included in backups)
-* Many minor improvements such as removing all checked tasks from the context menu, smoother navigation
+* Sort notes by title, last modified date, creation date
+* Many minor improvements such as option to removing all checked tasks, smoother navigation,...
 
 ### Included Features from the original Notally App
 * Widgets

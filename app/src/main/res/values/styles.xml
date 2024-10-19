@@ -27,8 +27,8 @@
 
     <style name="AppTheme" parent="Base.AppTheme">
         <item name="colorPrimaryDark">@color/Black</item>
-        <item name="colorPrimary">@color/LightBlue500</item>
-        <item name="alternateFabTint">@color/LightBlue500</item>
+        <item name="colorPrimary">@color/Blue500</item>
+        <item name="alternateFabTint">@color/Blue500</item>
         <item name="alternateFabBackground">@color/Blue50</item>
     </style>
 
