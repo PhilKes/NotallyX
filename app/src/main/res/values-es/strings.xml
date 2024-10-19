@@ -79,7 +79,7 @@
     <string name="list">Lista</string>
     <string name="grid">Cuadrícula</string>
 
-    <string name="date_format">Formato de fecha</string>
+    <string name="creation_date_format">Formato de fecha</string>
     <string name="none">Ninguno</string>
 
     <string name="text_size">Tamaño de texto</string>

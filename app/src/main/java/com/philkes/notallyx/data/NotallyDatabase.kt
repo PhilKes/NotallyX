@@ -16,7 +16,7 @@ import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.Label
 
 @TypeConverters(Converters::class)
-@Database(entities = [BaseNote::class, Label::class], version = 5)
+@Database(entities = [BaseNote::class, Label::class], version = 6)
 abstract class NotallyDatabase : RoomDatabase() {
 
     abstract fun getLabelDao(): LabelDao
@@ -40,7 +40,13 @@ abstract class NotallyDatabase : RoomDatabase() {
                 ?: synchronized(this) {
                     val instance =
                         Room.databaseBuilder(app, NotallyDatabase::class.java, DatabaseName)
-                            .addMigrations(Migration2, Migration3, Migration4, Migration5)
+                            .addMigrations(
+                                Migration2,
+                                Migration3,
+                                Migration4,
+                                Migration5,
+                                Migration6,
+                            )
                             .build()
                     this.instance = instance
                     return instance
@@ -74,6 +80,15 @@ abstract class NotallyDatabase : RoomDatabase() {
 
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL("ALTER TABLE `BaseNote` ADD COLUMN `files` TEXT NOT NULL DEFAULT `[]`")
+            }
+        }
+
+        object Migration6 : Migration(5, 6) {
+
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE `BaseNote` ADD COLUMN `modifiedTimestamp` INTEGER NOT NULL DEFAULT 'timestamp'"
+                )
             }
         }
     }

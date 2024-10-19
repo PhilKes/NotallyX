@@ -83,7 +83,7 @@
     <string name="light">Terang</string>
     <string name="follow_system">Ikuti sistem</string>
 
-    <string name="date_format">Format tanggal</string>
+    <string name="creation_date_format">Format tanggal</string>
     <string name="none">Tidak ada</string>
 
     <string name="content_density">Kerapatan konten</string>

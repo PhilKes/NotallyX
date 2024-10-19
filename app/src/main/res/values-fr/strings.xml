@@ -89,7 +89,7 @@
     <string name="light">Lumineux</string>
     <string name="follow_system">En fonction du système</string>
 
-    <string name="date_format">Format de la date</string>
+    <string name="creation_date_format">Format de la date</string>
     <string name="none">Aucun</string>
 
     <string name="text_size">Taille du texte</string>
