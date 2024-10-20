@@ -1,5 +1,6 @@
 package com.philkes.notallyx.utils
 
+import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.pm.PackageManager
@@ -24,11 +25,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.RemoteViews
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
@@ -52,7 +55,8 @@ import org.ocpsoft.prettytime.PrettyTime
  */
 fun String.applySpans(representations: List<SpanRepresentation>): Editable {
     val editable = Editable.Factory.getInstance().newEditable(this)
-    representations.forEach { (bold, link, italic, monospace, strikethrough, start, end) ->
+    representations.forEach { (bold, link, linkData, italic, monospace, strikethrough, start, end)
+        ->
         try {
             if (bold) {
                 editable.setSpan(StyleSpan(Typeface.BOLD), start, end)
@@ -61,7 +65,7 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
                 editable.setSpan(StyleSpan(Typeface.ITALIC), start, end)
             }
             if (link) {
-                val url = getURL(start, end)
+                val url = linkData ?: getURL(start, end)
                 editable.setSpan(URLSpan(url), start, end)
             }
             if (monospace) {
@@ -227,6 +231,7 @@ fun EditText.createListTextWatcherWithHistory(listManager: ListManager, position
 
 fun EditText.createTextWatcherWithHistory(
     changeHistory: ChangeHistory,
+    onTextChanged: ((text: CharSequence, start: Int, count: Int) -> Unit)? = null,
     updateModel: (text: Editable) -> Unit,
 ) =
     object : TextWatcher {
@@ -236,7 +241,9 @@ fun EditText.createTextWatcherWithHistory(
             currentTextBefore = this@createTextWatcherWithHistory.text.clone()
         }
 
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            onTextChanged?.invoke(s!!, start, count)
+        }
 
         override fun afterTextChanged(s: Editable?) {
             val textBefore = currentTextBefore
@@ -327,6 +334,11 @@ fun <T> LiveData<T>.observeForeverSkipFirst(observer: Observer<T>) {
             observer.onChanged(value)
         }
     }
+}
+
+fun Activity.showKeyboard(view: View) {
+    val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+    inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
 }
 
 private fun formatTimestamp(timestamp: Long, dateFormat: String): String {

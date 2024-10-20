@@ -63,12 +63,13 @@ object Converters {
         return iterable.map { jsonObject ->
             val bold = jsonObject.getSafeBoolean("bold")
             val link = jsonObject.getSafeBoolean("link")
+            val linkData = jsonObject.getSafeString("linkData")
             val italic = jsonObject.getSafeBoolean("italic")
             val monospace = jsonObject.getSafeBoolean("monospace")
             val strikethrough = jsonObject.getSafeBoolean("strikethrough")
             val start = jsonObject.getInt("start")
             val end = jsonObject.getInt("end")
-            SpanRepresentation(bold, link, italic, monospace, strikethrough, start, end)
+            SpanRepresentation(bold, link, linkData, italic, monospace, strikethrough, start, end)
         }
     }
 
@@ -107,6 +108,7 @@ object Converters {
                 val jsonObject = JSONObject()
                 jsonObject.put("bold", representation.bold)
                 jsonObject.put("link", representation.link)
+                jsonObject.put("linkData", representation.linkData)
                 jsonObject.put("italic", representation.italic)
                 jsonObject.put("monospace", representation.monospace)
                 jsonObject.put("strikethrough", representation.strikethrough)
@@ -137,6 +139,14 @@ object Converters {
             getBoolean(name)
         } catch (exception: JSONException) {
             false
+        }
+    }
+
+    private fun JSONObject.getSafeString(name: String): String? {
+        return try {
+            getString(name)
+        } catch (exception: JSONException) {
+            null
         }
     }
 

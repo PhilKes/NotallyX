@@ -40,6 +40,7 @@
     <!-- Dialogs -->
     <string name="save">Save</string>
     <string name="edit">Edit</string>
+    <string name="copy">Copy</string>
     <string name="cancel">Cancel</string>
     <string name="continue_">Continue</string>
     <string name="open_link">Open link</string>
@@ -104,6 +105,10 @@
 
     <!-- Messages -->
     <string name="cant_open_link">Can’t open link</string>
+    <string name="invalid_link">Copy a valid link into your clipboard</string>
+    <string name="updated_link">Updated Link</string>
+    <string name="copied_link">Copied Link to Clipboard</string>
+    <string name="edit_link">Edit Link</string>
     <string name="something_went_wrong">Something went wrong. Please try again.</string>
     <string name="install_an_email">Install an email app to send feedback</string>
     <string name="install_a_browser">Install a browser to open this link</string>
