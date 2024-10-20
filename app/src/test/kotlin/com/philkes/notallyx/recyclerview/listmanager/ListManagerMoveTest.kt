@@ -257,7 +257,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     @Test
     fun `endDrag parent without children`() {
         setSorting(ListItemSorting.noAutoSort)
-        dragCallback.simulateDrag(3, 1, "D".itemCount)
+        listItemDragCallback.simulateDrag(3, 1, "D".itemCount)
 
         items.assertOrder("A", "D", "B")
         (changeHistory.lookUp() as ListMoveChange).assert(3, 1, 1, " D")
@@ -271,7 +271,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         listManager.changeIsChild(5, true, false)
         items.printList("Before")
 
-        dragCallback.simulateDrag(4, 2, "E".itemCount)
+        listItemDragCallback.simulateDrag(4, 2, "E".itemCount)
         items.printList("After move 3 to 2")
 
         items.assertOrder("A", "B", "E", "F", "C", "D")
@@ -289,7 +289,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("Before")
 
         // TODO: parents cant be moved into other parents' children yet
-        dragCallback.simulateDrag(4, 2, "E".itemCount)
+        listItemDragCallback.simulateDrag(4, 2, "E".itemCount)
         items.printList("After move 3 to 2")
 
         items.assertOrder("A", "B", "E", "F", "C", "D")
@@ -305,7 +305,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         listManager.changeIsChild(2, true, false)
         items.printList("Before")
 
-        dragCallback.simulateDrag(0, items.lastIndex, "A".itemCount)
+        listItemDragCallback.simulateDrag(0, items.lastIndex, "A".itemCount)
         items.printList("After move 0 to ${items.lastIndex}")
         // TODO: test is faulty?
         items.assertOrder("D", "E", "F", "A", "B", "C")
@@ -321,7 +321,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         listManager.changeIsChild(4, true, false)
         items.printList("Before")
 
-        dragCallback.simulateDrag(3, 0, "D".itemCount)
+        listItemDragCallback.simulateDrag(3, 0, "D".itemCount)
         items.printList("After move 3 to 0")
 
         items.assertOrder("D", "E", "A", "B", "C", "F")
@@ -335,7 +335,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(3, true, false)
 
-        dragCallback.simulateDrag(3, 1, "D".itemCount)
+        listItemDragCallback.simulateDrag(3, 1, "D".itemCount)
 
         items.assertOrder("A", "D", "B", "C", "E", "F")
         "A".assertChildren("D")
@@ -349,7 +349,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         listManager.changeIsChild(4, true, false)
         listManager.changeIsChild(5, true, false)
 
-        dragCallback.simulateDrag(5, 3, "F".itemCount)
+        listItemDragCallback.simulateDrag(5, 3, "F".itemCount)
 
         items.assertOrder("A", "B", "C", "F", "D", "E")
         "C".assertChildren("F", "D", "E")
@@ -361,7 +361,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         setSorting(ListItemSorting.noAutoSort)
         listManager.changeIsChild(3, true, false)
 
-        dragCallback.simulateDrag(3, 0, "D".itemCount)
+        listItemDragCallback.simulateDrag(3, 0, "D".itemCount)
 
         items.assertOrder("D", "A", "B", "C", "E", "F")
         "D".assertIsParent()

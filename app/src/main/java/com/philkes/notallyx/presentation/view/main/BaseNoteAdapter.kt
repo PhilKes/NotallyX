@@ -16,7 +16,7 @@ import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteTitleSort
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByTitle
 import com.philkes.notallyx.presentation.view.misc.SortDirection
-import com.philkes.notallyx.presentation.view.note.listitem.ItemListener
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import java.io.File
 
 class BaseNoteAdapter(
@@ -27,7 +27,7 @@ class BaseNoteAdapter(
     private val maxLines: Int,
     private val maxTitle: Int,
     private val imageRoot: File?,
-    private val listener: ItemListener,
+    private val listener: ListItemListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var list =

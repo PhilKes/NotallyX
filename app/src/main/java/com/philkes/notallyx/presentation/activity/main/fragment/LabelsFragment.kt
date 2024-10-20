@@ -22,11 +22,11 @@ import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.LabelAdapter
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
-import com.philkes.notallyx.presentation.view.note.listitem.ItemListener
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.add
 
-class LabelsFragment : Fragment(), ItemListener {
+class LabelsFragment : Fragment(), ListItemListener {
 
     private var labelAdapter: LabelAdapter? = null
     private var binding: FragmentNotesBinding? = null
