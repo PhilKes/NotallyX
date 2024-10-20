@@ -269,6 +269,7 @@ val FileAttachment.isImage: Boolean
     get() {
         return mimeType.startsWith("image/")
     }
+
 fun Folder.movedToResId(): Int {
     return when (this) {
         Folder.DELETED -> R.plurals.deleted_selected_notes
@@ -280,6 +281,7 @@ fun Folder.movedToResId(): Int {
 fun RadioGroup.checkedTag(): Any {
     return this.findViewById<RadioButton?>(this.checkedRadioButtonId).tag
 }
+
 fun Context.canAuthenticateWithBiometrics(): Int {
     var canAuthenticate = true
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
