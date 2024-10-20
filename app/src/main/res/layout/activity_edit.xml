@@ -21,9 +21,11 @@
         android:visibility="gone">
 
         <LinearLayout
+            android:id="@+id/ContentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:focusableInTouchMode="true"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
             android:orientation="vertical"
             android:paddingBottom="16dp">
 

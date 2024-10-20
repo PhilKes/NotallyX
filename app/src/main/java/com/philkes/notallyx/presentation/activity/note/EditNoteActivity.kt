@@ -14,6 +14,7 @@ import android.util.Patterns
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -117,6 +118,15 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     model.body = binding.EnterBody.text!!.clone()
                 }
             }
+
+        binding.ContentLayout.setOnClickListener {
+            binding.EnterBody.apply {
+                requestFocus()
+                setSelection(text!!.length)
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
     }
 
     private fun setupMovementMethod() {
