@@ -4,27 +4,42 @@
     <b>NotallyX | Minimalistic note taking app</b>
 </h1>
 
+<div align="center" style="display: flex; justify-content: space-between; width: 100%;">
+    <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1_preview.png" alt="Image 1" style="width: 40%;">
+</div>
+
+
+### Features
 [Notally](https://github.com/OmGodse/Notally), but eXtended
 
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="250"/>
-
-### Additional Features
-* Order Tasks with Subtasks
-* Attach any file to a note (also included in backups)
-* Sort notes by title, last modified date, creation date
-* Many minor improvements such as option to removing all checked tasks, smoother navigation,...
-
-### Included Features from the original Notally App
-* Widgets
-* Auto backup
-* Adjustable text size
-* Support for Lollipop devices and up
-* APK size of 1.4 MB (1.8 MB uncompressed)
-* Color, pin and label your notes for quick organisation
-* Complement your notes with pictures (JPG, PNG, WEBP)
-* Export notes as TXT, JSON, HTML or PDF files with formatting
 * Create rich text notes with support for bold, italics, mono space and strike-through
+* Create task lists and order them with subtasks
+* Complement your notes with any type of file such as pictures, PDFs, etc.
+* Sort notes by title, last modified date, creation date
+* Display the notes either in a List or Grid
+* Color, pin and label your notes for quick organisation
 * Add clickable links to notes with support for phone numbers, email addresses and web urls
+* Actions to quickly remove checked tasks
+* Undo/Redo actions
+* Extensive preferences to adjust views to your liking
+* Use Home Screen to access important notes fast
+* Quickly share notes by text
+* Lock your notes via Biometric/PIN
+* Configurable auto-backups
+* Adaptive android app icon
+* Support for Lollipop devices and up
+
+<div style="display: flex; justify-content: space-between; width: 100%;">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Image 6" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Image 2" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Image 3" style="width: 32%;"/>
+</div>
+
+<div style="display: flex; justify-content: space-between; width: 100%;">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Image 4" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Image 5" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" alt="Image 7" style="width: 32%;"/>
+</div>
 
 ### Releases
 Currently the App is only released on Github, see [NotallyX/Releases](https://github.com/PhilKes/NotallyX/releases)
