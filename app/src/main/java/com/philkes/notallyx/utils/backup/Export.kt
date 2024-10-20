@@ -9,12 +9,15 @@ import java.util.zip.ZipOutputStream
 
 object Export {
 
-    fun backupDatabase(app: Application, zipStream: ZipOutputStream) {
+    fun backupDatabase(
+        app: Application,
+        zipStream: ZipOutputStream,
+        databaseFile: File = app.getDatabasePath(NotallyDatabase.DatabaseName),
+    ) {
         val entry = ZipEntry(NotallyDatabase.DatabaseName)
         zipStream.putNextEntry(entry)
 
-        val file = app.getDatabasePath(NotallyDatabase.DatabaseName)
-        val inputStream = FileInputStream(file)
+        val inputStream = FileInputStream(databaseFile)
         inputStream.copyTo(zipStream)
         inputStream.close()
 

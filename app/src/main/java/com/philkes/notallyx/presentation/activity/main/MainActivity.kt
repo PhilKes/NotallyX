@@ -12,7 +12,6 @@ import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.core.view.forEach
@@ -36,6 +35,7 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityMainBinding
 import com.philkes.notallyx.databinding.DialogColorBinding
+import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
@@ -49,9 +49,8 @@ import com.philkes.notallyx.utils.movedToResId
 import java.io.File
 import kotlinx.coroutines.launch
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : LockedActivity<ActivityMainBinding>() {
 
-    private lateinit var binding: ActivityMainBinding
     private lateinit var navController: NavController
     private lateinit var configuration: AppBarConfiguration
 
@@ -71,7 +70,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setSupportActionBar(binding.Toolbar)
         setupFAB()
         setupMenu()

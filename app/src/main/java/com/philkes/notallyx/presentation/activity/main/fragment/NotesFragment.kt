@@ -14,7 +14,7 @@ class NotesFragment : NotallyFragment() {
         }
     }
 
-    override fun getObservable() = model.baseNotes
+    override fun getObservable() = model.baseNotes!!
 
     override fun getBackground() = R.drawable.notebook
 }

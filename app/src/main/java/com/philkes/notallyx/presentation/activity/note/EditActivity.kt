@@ -18,7 +18,6 @@ import android.view.ViewGroup.LayoutParams
 import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -27,7 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
@@ -35,6 +33,7 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
+import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
@@ -52,12 +51,8 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-abstract class EditActivity(private val type: Type) : AppCompatActivity() {
-
-    internal lateinit var binding: ActivityEditBinding
-
+abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEditBinding>() {
     internal val model: NotallyModel by viewModels()
-    internal lateinit var preferences: Preferences
     internal lateinit var changeHistory: ChangeHistory
 
     override fun finish() {
@@ -83,7 +78,6 @@ abstract class EditActivity(private val type: Type) : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        preferences = Preferences.getInstance(application)
         model.type = type
         initialiseBinding()
         setContentView(binding.root)

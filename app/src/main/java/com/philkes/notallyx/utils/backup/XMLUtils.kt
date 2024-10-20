@@ -123,7 +123,6 @@ object XMLUtils {
         var isChild = false
         var order: Int? = null
 
-        // TODO: migration required?
         while (parser.next() != XmlPullParser.END_DOCUMENT) {
             if (parser.eventType == XmlPullParser.START_TAG) {
                 when (parser.name) {

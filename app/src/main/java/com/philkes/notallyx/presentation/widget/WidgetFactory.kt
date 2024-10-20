@@ -21,8 +21,12 @@ class WidgetFactory(private val app: Application, private val id: Long, private 
     RemoteViewsService.RemoteViewsFactory {
 
     private var baseNote: BaseNote? = null
-    private val database = NotallyDatabase.getDatabase(app)
+    private lateinit var database: NotallyDatabase
     private val preferences = Preferences.getInstance(app)
+
+    init {
+        NotallyDatabase.getDatabase(app).observeForever { database = it }
+    }
 
     override fun onCreate() {}
 

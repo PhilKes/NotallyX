@@ -1,11 +1,13 @@
 package com.philkes.notallyx
 
 import android.app.Application
+import android.os.Build
 import android.preference.PreferenceManager
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
+import com.philkes.notallyx.presentation.view.misc.BiometricLock
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.ListInfo
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
@@ -19,6 +21,14 @@ import com.philkes.notallyx.presentation.view.misc.TextInfo
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.view.misc.View
+import com.philkes.notallyx.utils.toPreservedByteArray
+import com.philkes.notallyx.utils.toPreservedString
+import java.security.SecureRandom
+import javax.crypto.Cipher
+
+private const val DATABASE_ENCRYPTION_KEY = "database_encryption_key"
+
+private const val ENCRYPTION_IV = "encryption_iv"
 
 /**
  * Custom implementation of androidx.preference library Way faster, simpler and smaller, logic of
@@ -46,6 +56,41 @@ class Preferences private constructor(app: Application) {
     val autoBackupPath = BetterLiveData(getTextPref(AutoBackup))
     var autoBackupPeriodDays = BetterLiveData(getSeekbarPref(AutoBackupPeriodDays))
     var autoBackupMax = getSeekbarPref(AutoBackupMax)
+
+    val biometricLock = BetterLiveData(getListPref(BiometricLock))
+    var iv: ByteArray?
+        get() = preferences.getString(ENCRYPTION_IV, null)?.toPreservedByteArray
+        set(value) {
+            editor.putString(ENCRYPTION_IV, value?.toPreservedString)
+            editor.commit()
+        }
+
+    fun getDatabasePassphrase(): ByteArray {
+        val string = preferences.getString(DATABASE_ENCRYPTION_KEY, "")!!
+        return string.toPreservedByteArray
+    }
+
+    fun generatePassphrase(cipher: Cipher): ByteArray {
+        val random =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                SecureRandom.getInstanceStrong()
+            } else {
+                SecureRandom()
+            }
+        val result = ByteArray(64)
+
+        random.nextBytes(result)
+
+        // filter out zero byte values, as SQLCipher does not like them
+        while (result.contains(0)) {
+            random.nextBytes(result)
+        }
+
+        val encryptedPassphrase = cipher.doFinal(result)
+        editor.putString(DATABASE_ENCRYPTION_KEY, encryptedPassphrase.toPreservedString)
+        editor.commit()
+        return result
+    }
 
     private fun getListPref(info: ListInfo) =
         requireNotNull(preferences.getString(info.key, info.defaultValue))
@@ -125,6 +170,7 @@ class Preferences private constructor(app: Application) {
             DateFormat -> dateFormat.postValue(getListPref(info))
             TextSize -> textSize.postValue(getListPref(info))
             ListItemSorting -> listItemSorting.postValue(getListPref(info))
+            BiometricLock -> biometricLock.postValue(getListPref(info))
             else -> return
         }
     }

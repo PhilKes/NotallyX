@@ -27,6 +27,7 @@ import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.AttachmentDeleteService
 import com.philkes.notallyx.data.NotallyDatabase
+import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
@@ -54,7 +55,7 @@ import kotlinx.coroutines.withContext
 class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     private val database = NotallyDatabase.getDatabase(app)
-    private val baseNoteDao = database.getBaseNoteDao()
+    private lateinit var baseNoteDao: BaseNoteDao
 
     val textSize = Preferences.getInstance(app).textSize.value
 
@@ -86,6 +87,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     var imageRoot = IO.getExternalImagesDirectory(app)
     var audioRoot = IO.getExternalAudioDirectory(app)
     var filesRoot = IO.getExternalFilesDirectory(app)
+
+    init {
+        database.observeForever { baseNoteDao = it.getBaseNoteDao() }
+    }
 
     fun addAudio() {
         viewModelScope.launch {
