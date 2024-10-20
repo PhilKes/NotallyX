@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.activity.main
 
 import android.app.Activity
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.print.PostPDFGenerator
@@ -108,6 +109,11 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 .setCheckable(true)
                 .setIcon(R.drawable.settings)
         }
+        try {
+            val pInfo = packageManager.getPackageInfo(packageName, 0)
+            val version = pInfo.versionName
+            binding.Version.text = "v$version"
+        } catch (_: PackageManager.NameNotFoundException) {}
     }
 
     private fun setupActionMode() {
