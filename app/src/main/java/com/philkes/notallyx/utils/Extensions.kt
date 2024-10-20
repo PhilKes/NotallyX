@@ -7,6 +7,7 @@ import android.text.InputType
 import android.text.Spannable
 import android.text.Spanned
 import android.text.TextWatcher
+import android.text.style.CharacterStyle
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
@@ -64,6 +65,48 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
         }
     }
     return editable
+}
+
+/**
+ * Extension function for Editable to modify or remove spans based on the selection range.
+ *
+ * @param selectionStart the start index of the selection
+ * @param selectionEnd the end index of the selection
+ */
+fun Editable.removeSelectionFromSpan(selectionStart: Int, selectionEnd: Int) {
+    // Get all spans of type CharacterStyle (can be extended to other types)
+    val spans = getSpans(selectionStart, selectionEnd, CharacterStyle::class.java)
+
+    for (span in spans) {
+        val spanStart = getSpanStart(span)
+        val spanEnd = getSpanEnd(span)
+
+        when {
+            // Case 1: Selection is exactly the span's range (remove entire span)
+            selectionStart <= spanStart && selectionEnd >= spanEnd -> {
+                removeSpan(span)
+            }
+            // Case 2: Selection is part of the span (split the span)
+            selectionStart > spanStart && selectionEnd < spanEnd -> {
+                // Remove the original span
+                removeSpan(span)
+                // Reapply two new spans: one for the part before the selection, and one for the
+                // part after
+                setSpan(span, spanStart, selectionStart, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+                setSpan(span, selectionEnd, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            // Case 3: Selection overlaps the start of the span (trim the span)
+            selectionStart <= spanStart && selectionEnd < spanEnd -> {
+                removeSpan(span)
+                setSpan(span, selectionEnd, spanEnd, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+            // Case 4: Selection overlaps the end of the span (trim the span)
+            else -> {
+                removeSpan(span)
+                setSpan(span, spanStart, selectionStart, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        }
+    }
 }
 
 private fun String.getURL(start: Int, end: Int): String {
@@ -174,33 +217,35 @@ fun EditText.createListTextWatcherWithHistory(listManager: ListManager, position
 
 fun EditText.createTextWatcherWithHistory(
     changeHistory: ChangeHistory,
-    updateModel: (text: String) -> Unit,
+    updateModel: (text: Editable) -> Unit,
 ) =
     object : TextWatcher {
-        private lateinit var currentTextBefore: String
+        private lateinit var currentTextBefore: Editable
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            currentTextBefore = s.toString()
+            currentTextBefore = this@createTextWatcherWithHistory.text.clone()
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
         override fun afterTextChanged(s: Editable?) {
             val textBefore = currentTextBefore
-            val textAfter = requireNotNull(s).toString()
+            val textAfter = requireNotNull(s)
             updateModel.invoke(textAfter)
 
             changeHistory.push(
                 EditTextChange(
                     this@createTextWatcherWithHistory,
-                    textAfter,
                     textBefore,
+                    textAfter,
                     this,
                     updateModel,
                 )
             )
         }
     }
+
+fun Editable.clone(): Editable = Editable.Factory.getInstance().newEditable(this)
 
 fun View.getQuantityString(id: Int, quantity: Int): String {
     return context.resources.getQuantityString(id, quantity, quantity)

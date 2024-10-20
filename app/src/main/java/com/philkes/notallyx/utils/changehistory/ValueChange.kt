@@ -7,7 +7,7 @@ abstract class ValueChange<T>(protected val newValue: T, protected val oldValue:
     }
 
     override fun undo() {
-        update(newValue, true)
+        update(oldValue, true)
     }
 
     abstract fun update(value: T, isUndo: Boolean)

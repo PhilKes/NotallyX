@@ -6,7 +6,6 @@ import android.net.Uri
 import android.text.Editable
 import android.text.Spanned
 import android.text.TextWatcher
-import android.text.style.CharacterStyle
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
@@ -15,14 +14,18 @@ import android.util.Patterns
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import android.view.inputmethod.InputMethodManager
+import android.widget.EditText
 import android.widget.Toast
-import androidx.core.text.getSpans
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.add
+import com.philkes.notallyx.utils.changehistory.EditTextChange
+import com.philkes.notallyx.utils.clone
 import com.philkes.notallyx.utils.createTextWatcherWithHistory
+import com.philkes.notallyx.utils.removeSelectionFromSpan
 import com.philkes.notallyx.utils.setOnNextAction
 
 class EditNoteActivity : EditActivity(Type.NOTE) {
@@ -42,8 +45,8 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
     override fun setupListeners() {
         super.setupListeners()
         enterBodyTextWatcher = run {
-            binding.EnterBody.createTextWatcherWithHistory(changeHistory) { text: String ->
-                model.body = Editable.Factory.getInstance().newEditable(text)
+            binding.EnterBody.createTextWatcherWithHistory(changeHistory) { text: Editable ->
+                model.body = text.clone()
             }
         }
         binding.EnterBody.addTextChangedListener(enterBodyTextWatcher)
@@ -99,7 +102,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                                     mode?.finish()
                                 }
                                 add(R.string.clear_formatting, 0) {
-                                    removeSpans()
+                                    clearFormatting()
                                     mode?.finish()
                                 }
                             }
@@ -112,8 +115,18 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
 
                 override fun onDestroyActionMode(mode: ActionMode?) {
                     binding.EnterBody.isActionModeOn = false
+                    model.body = binding.EnterBody.text!!.clone()
                 }
             }
+
+        binding.ContentLayout.setOnClickListener {
+            binding.EnterBody.apply {
+                requestFocus()
+                setSelection(text!!.length)
+                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+            }
+        }
     }
 
     private fun setupMovementMethod() {
@@ -147,23 +160,28 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
         binding.EnterBody.movementMethod = movementMethod
     }
 
-    private fun removeSpans() {
-        val selectionEnd = binding.EnterBody.selectionEnd
-        val selectionStart = binding.EnterBody.selectionStart
-
-        ifBothNotNullAndInvalid(selectionStart, selectionEnd) { start, end ->
-            binding.EnterBody.text?.getSpans<CharacterStyle>(start, end)?.forEach { span ->
-                binding.EnterBody.text?.removeSpan(span)
-            }
+    private fun clearFormatting() {
+        binding.EnterBody.changeFormatting { start, end, text ->
+            text.removeSelectionFromSpan(start, end)
         }
     }
 
     private fun applySpan(span: Any) {
-        val selectionEnd = binding.EnterBody.selectionEnd
-        val selectionStart = binding.EnterBody.selectionStart
+        binding.EnterBody.changeFormatting { start, end, text ->
+            text.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
 
+    private fun EditText.changeFormatting(change: (start: Int, end: Int, text: Editable) -> Unit) {
         ifBothNotNullAndInvalid(selectionStart, selectionEnd) { start, end ->
-            binding.EnterBody.text?.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            val textBefore = text!!.clone()
+            change(start, end, text)
+            val textAfter = text!!.clone()
+            changeHistory.push(
+                EditTextChange(this, textBefore, textAfter, enterBodyTextWatcher) { text ->
+                    model.body = text.clone()
+                }
+            )
         }
     }
 
