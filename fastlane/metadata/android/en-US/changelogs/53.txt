@@ -1,3 +1,0 @@
-Updated German, Polish, Czech, Vietnamese, Slovenian, Norwegian and French translations
-
-You can now create new labels on the spot when editing a note

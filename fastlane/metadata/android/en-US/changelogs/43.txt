@@ -1,3 +1,0 @@
-Updated Dutch, French, Portugese, Czech, Polish and Japanese translations
-Added Greek translation
-Updated the search option to include deleted and archived notes

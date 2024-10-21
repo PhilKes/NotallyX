@@ -1,3 +1,0 @@
-You can now add lists as widgets. Android 12 users and above can check off list items from the widget itself.
-
-Added dark mode to widgets
