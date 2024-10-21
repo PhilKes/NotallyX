@@ -15,6 +15,7 @@
     <string name="archive">Archiveren</string>
     <string name="unarchive">De-archiveren</string>
     <string name="add_images">Afbeeldingen toevoegen</string>
+    <string name="attach_file">Bestand bijvoegen</string>
     <string name="delete_all">Alles verwijderen</string>
     <string name="record_audio">Audio opnemen</string>
     <string name="change_color">Kleur wijzigen</string>
@@ -22,12 +23,14 @@
     <string name="delete_checked_items">Geselecteerde items verwijderen</string>
     <string name="check_all_items">Alle items selecteren</string>
     <string name="uncheck_all_items">Selectie opheffen van alle items</string>
+    <string name="redo">Opnieuw doen</string>
+    <string name="undo">Ongedaan maken</string>
 
     <!-- Pinning -->
     <string name="pin">Vastmaken</string>
     <string name="unpin">Losmaken</string>
     <string name="pinned">Vastgemaakt</string>
-    <string name="others">Anders</string>
+    <string name="others">Anderen</string>
 
     <!-- Chooser dialog hints -->
     <string name="view_note">Notitie bekijken</string>
@@ -35,6 +38,7 @@
     <!-- Dialogs -->
     <string name="save">Opslaan</string>
     <string name="edit">Bewerken</string>
+    <string name="copy">Kopiëren</string>
     <string name="cancel">Annuleren</string>
     <string name="continue_">Doorgaan</string>
     <string name="open_link">Link openen</string>
@@ -47,11 +51,32 @@
     <string name="edit_label">Label bewerken</string>
     <string name="label_exists">Label bestaat al</string>
     <string name="delete_label">Label verwijderen?</string>
-    <string name="create_new">Nog geen labels. Nieuw label aanmaken?</string>
+    <string name="create_new">Nog geen labels. Een aanmaken?</string>
     <string name="delete_all_notes">Alle notities verwijderen?</string>
     <string name="delete_selected_notes">Geselecteerde notities verwijderen?</string>
     <string name="delete_note_forever">Notitie definitief verwijderen?</string>
     <string name="your_notes_associated">Je notities die aan dit label zijn gekoppeld, worden niet verwijderd</string>
+    <string name="biometrics_setup_success">Biometrische/PIN-vergrendeling is ingeschakeld</string>
+    <string name="biometrics_disable_success">Biometrische/PIN-vergrendeling is uitgeschakeld</string>
+    <string name="biometrics_failure">Authenticatie via Biometrisch/PIN is mislukt</string>
+
+    <!-- Snackbars -->
+    <plurals name="deleted_selected_notes">
+        <item quantity="one">Verwijderde %d notitie</item>
+        <item quantity="other">Verwijderde %d notities</item>
+    </plurals>
+    <plurals name="archived_selected_notes">
+        <item quantity="one">Gearchiveerde %d notitie</item>
+        <item quantity="other">Gearchiveerde %d notities</item>
+    </plurals>
+    <plurals name="unarchived_selected_notes">
+        <item quantity="one">De-gearchiveerde %d notitie</item>
+        <item quantity="other">De-gearchiveerde %d notities</item>
+    </plurals>
+    <plurals name="restored_selected_notes">
+        <item quantity="one">Herstelde %d notitie</item>
+        <item quantity="other">Herstelde %d notities</item>
+    </plurals>
 
     <!-- Lists and Notes -->
     <string name="note">Notitie</string>
@@ -64,7 +89,7 @@
     <string name="bold">Vetgedrukt</string>
     <string name="link">Link</string>
     <string name="italic">Cursief</string>
-    <string name="strikethrough">Doorgestreept</string>
+    <string name="strikethrough">Doorhalen</string>
     <string name="clear_formatting">Opmaak wissen</string>
     <string name="monospace">Monospace</string>
 
@@ -77,8 +102,12 @@
 
     <!-- Messages -->
     <string name="cant_open_link">Kan link niet openen</string>
+    <string name="invalid_link">Kopieer een geldige link naar je klembord</string>
+    <string name="updated_link">Bijgewerkte link</string>
+    <string name="copied_link">Link naar klembord gekopieerd</string>
+    <string name="edit_link">Link bewerken</string>
     <string name="something_went_wrong">Er is iets fout gegaan. Probeer het opnieuw.</string>
-    <string name="install_an_email">Installeer een e-mail app om feedback te versturen</string>
+    <string name="install_an_email">Installeer een e-mailapp om feedback te sturen</string>
     <string name="install_a_browser">Installeer een browser om deze link te openen</string>
     <string name="cant_find_note">Kan notitie niet vinden. Misschien is deze verwijderd</string>
 
@@ -92,7 +121,7 @@
     <string name="theme">Thema</string>
     <string name="dark">Donker</string>
     <string name="light">Licht</string>
-    <string name="follow_system">Volg systeeminstellingen</string>
+    <string name="follow_system">Volg systeem</string>
 
     <string name="creation_date_format">Datumformaat</string>
     <string name="none">Geen</string>
@@ -106,22 +135,37 @@
     <string name="no_auto_sort">Niet automatisch sorteren</string>
     <string name="auto_sort_by_checked">Automatisch sorteren op geselecteerde items</string>
 
+    <string name="notes_sorted_by">Notities gesorteerd op</string>
+    <string name="creation_date">Gemaakt op</string>
+    <string name="modified_date">Laatst gewijzigd op</string>
+    <string name="ascending">Oplopend</string>
+    <string name="descending">Aflopend</string>
+    <string name="sort_direction">Sorteer volgorde</string>
+
     <string name="content_density">Inhoudsdichtheid</string>
-    <string name="max_items_to_display">Maximaal aantal items dat in de lijst kan worden weergegeven</string>
-    <string name="max_lines_to_display">Maximaal aantal regels in de notitie weergeven</string>
-    <string name="max_lines_to_display_title">Maximaal aantal regels in de titel weergeven</string>
+    <string name="max_items_to_display">Maximaal aantal items in lijst</string>
+    <string name="max_lines_to_display">Maximaal aantal regels in notitie</string>
+    <string name="max_lines_to_display_title">Maximaal aantal regels in titel</string>
+
+    <string name="security">Beveiliging</string>
+
+    <string name="biometric_lock">Vergrendel app met biometrische gegevens of PIN</string>
+    <string name="enabled">Ingeschakeld</string>
+    <string name="disabled">Uitgeschakeld</string>
 
     <!-- Backup -->
     <string name="backup">Back-up</string>
     <string name="auto_backup">Automatische back-up</string>
+    <string name="max_backups">Aantal back-ups dat moet worden bewaard</string>
+    <string name="backup_period_days">Periode van automatische back-up in dagen</string>
     <string name="tap_to_set_up">Tik om in te stellen</string>
-    <string name="notes_will_be">Notities worden elke dag geback-upt op de interne opslag van je apparaat.\n\nDit werkt mogelijk niet als energiebesparingsmodus is ingeschakeld</string>
+    <string name="notes_will_be">Notities worden dagelijks geback-upt naar de interne opslag van je telefoon.\n\nDit werkt mogelijk niet als je de energiebesparende modus hebt ingeschakeld</string>
     <string name="choose_folder">Kies een map</string>
     <string name="disable_auto_backup">Automatische back-up uitschakelen</string>
     <string name="choose_another_folder">Kies een andere map</string>
-    <string name="cant_find_folder">Kan de map niet vinden. Deze is misschien verplaatst of verwijderd</string>
+    <string name="cant_find_folder">Kan map niet vinden. Deze is mogelijk verplaatst of verwijderd</string>
     <string name="invalid_backup">Ongeldige back-up</string>
-    <string name="imported_backup">Back-up geïmporteerd</string>
+    <string name="imported_backup">Geïmporteerde back-up</string>
     <string name="exporting_backup">Back-up exporteren</string>
     <string name="importing_backup">Back-up importeren</string>
     <string name="calculating">Berekenen…</string>
@@ -129,10 +173,15 @@
     <string name="export_backup">Back-up exporteren</string>
     <string name="import_backup">Back-up importeren</string>
 
+    <string name="auto_backup_period">Periode van automatische back-up</string>
+    <string name="daily">Dagelijks</string>
+    <string name="weekly">Wekelijks</string>
+    <string name="monthly">Maandelijks</string>
+
     <string name="about">Over</string>
     <string name="libraries">Bibliotheken</string>
     <string name="rate">Beoordeel deze app</string>
-    <string name="send_feedback">Stuur feedback</string>
+    <string name="send_feedback">Rapporteer een probleem of doe een functieverzoek</string>
 
     <string name="github" translatable="false">GitHub</string>
 
@@ -145,18 +194,36 @@
     <string name="adding_images">Afbeeldingen toevoegen</string>
     <string name="deleting_images">Afbeeldingen verwijderen</string>
     <string name="invalid_image">Ongeldige afbeelding</string>
-    <string name="error_while_renaming_image">Fout tijdens het hernoemen van afbeelding</string>
-    <string name="image_format_not_supported">Afbeeldingsformaat wordt niet ondersteund</string>
+    <string name="error_while_renaming_image">Fout bij het hernoemen van afbeelding</string>
+    <string name="image_format_not_supported">Afbeeldingsformaat niet ondersteund</string>
     <string name="delete_image_forever">Afbeelding definitief verwijderen?</string>
-    <string name="cant_load_image">Afbeelding kan niet worden geladen. Deze is misschien verplaatst of verwijderd</string>
+    <string name="cant_load_image">Kan afbeelding niet laden. Deze is mogelijk verplaatst of verwijderd</string>
     <string name="unknown_name">Onbekende naam</string>
     <string name="unknown_error">Onbekende fout</string>
     <string name="insert_an_sd_card_images">Plaats een SD-kaart om afbeeldingen toe te voegen</string>
-    <string name="please_grant_notally_notification">Geef NotallyX toestemming om meldingen te versturen. Dit wordt gebruikt om de voortgang weer te geven als operaties zoals het verwijderen van afbeeldingen of het importeren van back-ups langer duren</string>
+    <string name="insert_an_sd_card_files">Plaats een SD-kaart om bestanden toe te voegen</string>
+    <string name="please_grant_notally_notification">Geef NotallyX toestemming om meldingen te verzenden. Dit wordt gebruikt om de voortgang weer te geven als operaties zoals het verwijderen van afbeeldingen of het importeren van back-ups langer duren</string>
 
     <plurals name="cant_add_images">
         <item quantity="one">Kan %d afbeelding niet toevoegen</item>
         <item quantity="other">Kan %d afbeeldingen niet toevoegen</item>
+    </plurals>
+
+    <!-- Files -->
+    <string name="adding_files">Bestanden toevoegen</string>
+    <string name="deleting_files">Bestanden verwijderen</string>
+    <string name="delete_file">Bestand \'%s\' verwijderen?</string>
+    <string name="error_while_renaming_file">Fout bij het hernoemen van bestand</string>
+    <string name="cant_load_file">Kan bestand niet laden. Dit kan verplaatst of verwijderd zijn</string>
+
+    <plurals name="cant_add_files">
+        <item quantity="one">Kan %d bestand niet toevoegen</item>
+        <item quantity="other">Kan %d bestanden niet toevoegen</item>
+    </plurals>
+
+    <plurals name="more_files">
+        <item quantity="one">…%d ander bestand</item>
+        <item quantity="other">…%d andere bestanden</item>
     </plurals>
 
     <!-- Audio -->
@@ -176,4 +243,14 @@
     <string name="please_grant_notally_audio">Geef NotallyX toestemming om audio op te nemen. Opnames verlaten nooit je apparaat</string>
     <string name="insert_an_sd_card_audio">Plaats een SD-kaart om audio op te nemen</string>
     <string name="something_went_wrong_audio">Er is iets fout gegaan. De audio-opname kan zijn verplaatst of verwijderd.\n\nFout: (%1$d, %2$d)</string>
+
+    <!-- Lock -->
+    <string name="enable_lock_title">Vergrendeling inschakelen via Biometrisch/PIN</string>
+    <string name="enable_lock_description">Dit versleutelt ook de database</string>
+    <string name="disable_lock_title">Vergrendeling uitschakelen via Biometrisch/PIN</string>
+    <string name="disable_lock_description">Dit ontsleutelt ook de database</string>
+    <string name="unlock">Ontgrendel via Biometrisch/PIN</string>
+    <string name="biometrics_no_support">Geen biometrische functies beschikbaar op dit apparaat</string>
+    <string name="biometrics_not_setup">Biometrische/PIN-instellingen zijn nog niet ingesteld voor je apparaat</string>
+
 </resources>
