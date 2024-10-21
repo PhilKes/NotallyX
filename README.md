@@ -1,35 +1,45 @@
-<h1 align="center">
-    <img src="fastlane/metadata/android/en-US/images/icon.png" alt="icon" />
+<h2 align="center">
+    <img src="fastlane/metadata/android/en-US/images/icon.png" alt="icon" width="90"/>
     <br />
     <b>NotallyX | Minimalistic note taking app</b>
-</h1>
 
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="70"/>](https://f-droid.org/packages/com.philkes.notallyx/)
+</h2>
+
+<div style="display: flex; justify-content: space-between; width: 100%;">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Image 6" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Image 2" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Image 3" style="width: 32%;"/>
+</div>
+
+<div style="display: flex; justify-content: space-between; width: 100%;">
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Image 4" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Image 5" style="width: 32%;"/>
+  <img src="fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" alt="Image 7" style="width: 32%;"/>
+</div>
+
+### Features
 [Notally](https://github.com/OmGodse/Notally), but eXtended
 
-<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" width="250"/><img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" width="250"/>
-
-### Additional Features
-* Order Tasks with Subtasks
-* Attach any file to a note (also included in backups)
-* Sort notes by title, last modified date, creation date
-* Many minor improvements such as option to removing all checked tasks, smoother navigation,...
-
-### Included Features from the original Notally App
-* Widgets
-* Auto backup
-* Adjustable text size
+* Create **rich text** notes with support for bold, italics, mono space and strike-through
+* Create **task lists** and order them with subtasks
+* Complement your notes with any type of file such as **pictures**, PDFs, etc.
+* **Sort notes** by title, last modified date, creation date
+* **Color, pin and label** your notes for quick organisation
+* Add **clickable links** to notes with support for phone numbers, email addresses and web urls
+* **Undo/Redo actions**
+* Use **Home Screen Widget** to access important notes fast
+* **Lock your notes via Biometric/PIN**
+* Configurable **auto-backups**
+* Display the notes either in a **List or Grid**
+* Quickly share notes by text
+* Extensive preferences to adjust views to your liking
+* Actions to quickly remove checked tasks
+* Adaptive android app icon
 * Support for Lollipop devices and up
-* APK size of 1.4 MB (1.8 MB uncompressed)
-* Color, pin and label your notes for quick organisation
-* Complement your notes with pictures (JPG, PNG, WEBP)
-* Export notes as TXT, JSON, HTML or PDF files with formatting
-* Create rich text notes with support for bold, italics, mono space and strike-through
-* Add clickable links to notes with support for phone numbers, email addresses and web urls
 
-### Releases
-Currently the App is only released on Github, see [NotallyX/Releases](https://github.com/PhilKes/NotallyX/releases)
 
-In the future I might also publish new versions on the Google Play Store under the NotallyX name.
+---
 
 ### Translations
 All translations are crowd sourced. To contribute, follow these [guidelines](https://m2.material.io/design/communication/writing.html) and open a pull request.
@@ -43,5 +53,6 @@ The project is a default Android project written in Kotlin.
 Before submitting your proposed changes as a Pull-Request, make sure all tests are still working, and run `./gradlew ktfmtFormat` for common formatting.
 
 ### Attribution
-The original Notally project was developed by [OmGodse](https://github.com/OmGodse) under the [GPL 3.0 License](https://github.com/OmGodse/Notally/blob/master/LICENSE.md)
-In accordance to GPL 3.0, this project is licensed under the same [GPL 3.0 License](https://github.com/PhilKes/NotallyX/blob/master/LICENSE.md)
+The original Notally project was developed by [OmGodse](https://github.com/OmGodse) under the [GPL 3.0 License](https://github.com/OmGodse/Notally/blob/master/LICENSE.md).
+
+In accordance to GPL 3.0, this project is licensed under the same [GPL 3.0 License](https://github.com/PhilKes/NotallyX/blob/master/LICENSE.md).

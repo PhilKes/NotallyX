@@ -1,0 +1,10 @@
+Toolbar action for Undo/Redo any change
+Visible Delete button for list items instead of having to swipe right
+Order your lists in subtasks by swiping them to the right
+You can now attach any file to a note, not just pictures
+Customize the sort order of your notes by last modified, title,...
+Secure your notes via Biometric/PIN lock
+Auto-backups are now much more configurable
+Added monochrome app icon for custom theming
+Quickly change notes displayed in Widget instead of having to remove/re-add them
+Quickly check/delete tasks

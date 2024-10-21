@@ -246,8 +246,8 @@ fun EditText.createTextWatcherWithHistory(
         }
 
         override fun afterTextChanged(s: Editable?) {
-            val textBefore = currentTextBefore
-            val textAfter = requireNotNull(s)
+            val textBefore = currentTextBefore.clone()
+            val textAfter = requireNotNull(s).clone()
             updateModel.invoke(textAfter)
 
             changeHistory.push(

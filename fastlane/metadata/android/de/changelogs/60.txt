@@ -1,0 +1,11 @@
+Toolbar Buttons um Änderungen zurückzunehmen/wiederholen
+Bei Listen Löschen-Button direkt anzeigen anstatt swipen zu müssen
+Sortiere deine Listen in Unteraufgaben indem du sie nach rechts swipest
+Hänge beliebige Dateien an deine Notizen an, nicht nur Bilder.
+Customize the sort order of your notes by last modified, title,...
+Sortiere deine Notizen nach Datum der letzten Änderung, Titel,...
+Sichere deine Notizen per Biometric/PIN Lock
+Automatische Backups können nun deutlich stärker konfiguriert werden
+Adaptives Android App Icon nun verfügbar
+Tausche schnell in Home-Screen Widget angezeigte Notizen aus, anstatt sie neu hinzufügen zu müssen
+Markiere/Lösche schnell und einfach erledigte Aufgaben über die Toolbar

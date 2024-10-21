@@ -98,9 +98,10 @@ class ListItemVH(
                     // TODO: when there are multiple checked items above it does not jump to the
                     // last
                     // unchecked item but always re-adds a new item
-                    listManager.delete(adapterPosition, false)
+                    listManager.delete(adapterPosition, false) != null
+                } else {
+                    false
                 }
-                true
             }
         }
     }

@@ -1,7 +1,6 @@
 package com.philkes.notallyx.presentation.activity.main.fragment
 
 import android.app.Activity
-import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.hardware.biometrics.BiometricManager
@@ -14,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -46,7 +44,6 @@ import com.philkes.notallyx.presentation.view.misc.SortDirection
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
-import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
@@ -121,7 +118,7 @@ class SettingsFragment : Fragment() {
             openLink("https://play.google.com/store/apps/details?id=com.philkes.notallyx")
         }
 
-        binding.SendFeedback.setOnClickListener { sendEmailWithLog() }
+        binding.SendFeedback.setOnClickListener { sendFeedback() }
     }
 
     override fun onCreateView(
@@ -199,27 +196,16 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun sendEmailWithLog() {
+    private fun sendFeedback() {
         val intent =
-            Intent(Intent.ACTION_SEND).apply {
-                selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
-
-                // TODO: replace with github issue create link?
-                putExtra(Intent.EXTRA_EMAIL, arrayOf("omgodseapps@gmail.com"))
-                putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
-            }
-
-        val app = requireContext().applicationContext as Application
-        val log = Operations.getLog(app)
-        if (log.exists()) {
-            val uri = FileProvider.getUriForFile(app, "${app.packageName}.provider", log)
-            intent.putExtra(Intent.EXTRA_STREAM, uri)
-        }
-
+            Intent(
+                Intent.ACTION_VIEW,
+                Uri.parse("https://github.com/PhilKes/NotallyX/issues/new/choose"),
+            )
         try {
             startActivity(intent)
         } catch (exception: ActivityNotFoundException) {
-            Toast.makeText(requireContext(), R.string.install_an_email, Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), R.string.install_a_browser, Toast.LENGTH_LONG).show()
         }
     }
 
@@ -232,6 +218,7 @@ class SettingsFragment : Fragment() {
                 "Work Manager",
                 "Subsampling Scale ImageView",
                 "Material Components for Android",
+                "SQLCipher",
             )
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.libraries)
@@ -239,16 +226,14 @@ class SettingsFragment : Fragment() {
                 when (which) {
                     0 -> openLink("https://github.com/bumptech/glide")
                     1 -> openLink("https://github.com/ocpsoft/prettytime")
-                    2 ->
-                        openLink(
-                            "https://github.com/rambler-digital-solutions/swipe-layout-android"
-                        )
+                    2 -> openLink("https://github.com/zerobranch/SwipeLayout")
                     3 -> openLink("https://developer.android.com/jetpack/androidx/releases/work")
                     4 -> openLink("https://github.com/davemorrissey/subsampling-scale-image-view")
                     5 ->
                         openLink(
                             "https://github.com/material-components/material-components-android"
                         )
+                    6 -> openLink("https://github.com/sqlcipher/sqlcipher")
                 }
             }
             .setNegativeButton(R.string.cancel, null)
