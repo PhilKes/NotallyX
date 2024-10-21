@@ -425,7 +425,8 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         spanned.getSpans<CharacterStyle>().forEach { span ->
             val end = spanned.getSpanEnd(span)
             val start = spanned.getSpanStart(span)
-            val representation = SpanRepresentation(false, false, false, false, false, start, end)
+            val representation =
+                SpanRepresentation(false, false, null, false, false, false, start, end)
 
             when (span) {
                 is StyleSpan -> {
@@ -433,7 +434,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                     representation.italic = span.style == Typeface.ITALIC
                 }
 
-                is URLSpan -> representation.link = true
+                is URLSpan -> {
+                    representation.link = true
+                    representation.linkData = span.url
+                }
                 is TypefaceSpan -> representation.monospace = span.family == "monospace"
                 is StrikethroughSpan -> representation.strikethrough = true
             }
@@ -459,6 +463,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 }
                 if (match.link) {
                     representation.link = true
+                    representation.linkData = match.linkData
                 }
                 if (match.italic) {
                     representation.italic = true

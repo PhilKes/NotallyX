@@ -1,5 +1,8 @@
 package com.philkes.notallyx.presentation.activity.note
 
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
@@ -14,12 +17,12 @@ import android.util.Patterns
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
-import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.databinding.UpdateLinkDialogBinding
 import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.changehistory.EditTextChange
@@ -27,6 +30,7 @@ import com.philkes.notallyx.utils.clone
 import com.philkes.notallyx.utils.createTextWatcherWithHistory
 import com.philkes.notallyx.utils.removeSelectionFromSpan
 import com.philkes.notallyx.utils.setOnNextAction
+import com.philkes.notallyx.utils.showKeyboard
 
 class EditNoteActivity : EditActivity(Type.NOTE) {
 
@@ -45,7 +49,22 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
     override fun setupListeners() {
         super.setupListeners()
         enterBodyTextWatcher = run {
-            binding.EnterBody.createTextWatcherWithHistory(changeHistory) { text: Editable ->
+            binding.EnterBody.createTextWatcherWithHistory(
+                changeHistory,
+                { text, start, count ->
+                    if (count > 1) {
+                        val changedText = text.substring(start, start + count)
+                        if (Patterns.WEB_URL.matcher(changedText).matches()) {
+                            binding.EnterBody.text?.setSpan(
+                                URLSpan(changedText),
+                                start,
+                                start + count,
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                            )
+                        }
+                    }
+                },
+            ) { text: Editable ->
                 model.body = text.clone()
             }
         }
@@ -86,7 +105,20 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                                     mode?.finish()
                                 }
                                 add(R.string.link, 0) {
-                                    applySpan(URLSpan(null))
+                                    val clipBoardText = getClipboardText()
+                                    if (
+                                        clipBoardText != null &&
+                                            Patterns.WEB_URL.matcher(clipBoardText).matches()
+                                    ) {
+                                        applySpan(URLSpan(clipBoardText.toString()))
+                                    } else {
+                                        Toast.makeText(
+                                                this@EditNoteActivity,
+                                                R.string.invalid_link,
+                                                Toast.LENGTH_LONG,
+                                            )
+                                            .show()
+                                    }
                                     mode?.finish()
                                 }
                                 add(R.string.italic, 0) {
@@ -113,6 +145,12 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     return true
                 }
 
+                fun getClipboardText(): CharSequence? {
+                    val clipboard = baseContext.getSystemService(ClipboardManager::class.java)!!
+                    val clipData = clipboard.primaryClip!!
+                    return if (clipData.itemCount > 0) clipData.getItemAt(0)!!.text else null
+                }
+
                 override fun onDestroyActionMode(mode: ActionMode?) {
                     binding.EnterBody.isActionModeOn = false
                     model.body = binding.EnterBody.text!!.clone()
@@ -123,26 +161,43 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
             binding.EnterBody.apply {
                 requestFocus()
                 setSelection(text!!.length)
-                val imm = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-                imm.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+                showKeyboard(this)
             }
         }
     }
 
     private fun setupMovementMethod() {
-        val items = arrayOf(getString(R.string.edit), getString(R.string.open_link))
+        val items =
+            arrayOf(
+                getString(R.string.copy),
+                getString(R.string.edit),
+                getString(R.string.open_link),
+            )
         val movementMethod = LinkMovementMethod { span ->
             MaterialAlertDialogBuilder(this)
-                .setItems(items) { dialog, which ->
-                    if (which == 1) {
-                        val spanStart = binding.EnterBody.text?.getSpanStart(span)
-                        val spanEnd = binding.EnterBody.text?.getSpanEnd(span)
+                .setTitle(span.url)
+                .setItems(items) { _, which ->
+                    when (which) {
+                        0 -> {
+                            val clipboard: ClipboardManager =
+                                getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                            val clip = ClipData.newPlainText("label", span.url)
+                            clipboard.setPrimaryClip(clip)
+                            Toast.makeText(this, R.string.copied_link, Toast.LENGTH_LONG).show()
+                        }
+                        1 ->
+                            showUrlInputDialog(span.url) { newUrl ->
+                                binding.EnterBody.changeFormatting { _, _, text ->
+                                    text.replaceUrlSpan(span, newUrl)
+                                    model.body = text.clone()
+                                    Toast.makeText(this, R.string.updated_link, Toast.LENGTH_LONG)
+                                        .show()
+                                }
+                            }
 
-                        ifBothNotNullAndInvalid(spanStart, spanEnd) { start, end ->
-                            val text = binding.EnterBody.text?.substring(start, end)
-                            if (text != null) {
-                                val link = getURLFrom(text)
-                                val uri = Uri.parse(link)
+                        2 -> {
+                            if (span.url != null) {
+                                val uri = Uri.parse(span.url)
 
                                 val intent = Intent(Intent.ACTION_VIEW, uri)
                                 try {
@@ -160,22 +215,56 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
         binding.EnterBody.movementMethod = movementMethod
     }
 
+    private fun Editable.replaceUrlSpan(existingSpan: URLSpan, newUrl: String) {
+        val start = this.getSpanStart(existingSpan)
+        val end = this.getSpanEnd(existingSpan)
+        if (start >= 0 && end >= 0) {
+            this.removeSpan(existingSpan)
+            val newSpan = URLSpan(newUrl)
+            this.setSpan(newSpan, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    private fun showUrlInputDialog(urlBefore: String, onSuccess: (newUrl: String) -> Unit) {
+        val layout = UpdateLinkDialogBinding.inflate(layoutInflater)
+        layout.InputText.setText(urlBefore)
+        MaterialAlertDialogBuilder(this)
+            .setView(layout.root)
+            .setTitle(R.string.edit_link)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val userInput = layout.InputText.text.toString()
+                onSuccess.invoke(userInput)
+            }
+            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+            .show()
+        layout.InputText.requestFocus()
+        showKeyboard(layout.InputText)
+    }
+
     private fun clearFormatting() {
         binding.EnterBody.changeFormatting { start, end, text ->
             text.removeSelectionFromSpan(start, end)
         }
     }
 
-    private fun applySpan(span: Any) {
-        binding.EnterBody.changeFormatting { start, end, text ->
-            text.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    private fun applySpan(
+        span: Any,
+        start: Int = binding.EnterBody.selectionStart,
+        end: Int = binding.EnterBody.selectionEnd,
+    ) {
+        binding.EnterBody.changeFormatting(start, end) { textStart, textEnd, text ->
+            text.setSpan(span, textStart, textEnd, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
         }
     }
 
-    private fun EditText.changeFormatting(change: (start: Int, end: Int, text: Editable) -> Unit) {
-        ifBothNotNullAndInvalid(selectionStart, selectionEnd) { start, end ->
+    private fun EditText.changeFormatting(
+        start: Int = selectionStart,
+        end: Int = selectionEnd,
+        change: (start: Int, end: Int, text: Editable) -> Unit,
+    ) {
+        ifBothNotNullAndInvalid(start, end) { textStart, textEnd ->
             val textBefore = text!!.clone()
-            change(start, end, text)
+            change(textStart, textEnd, text)
             val textAfter = text!!.clone()
             changeHistory.push(
                 EditTextChange(this, textBefore, textAfter, enterBodyTextWatcher) { text ->

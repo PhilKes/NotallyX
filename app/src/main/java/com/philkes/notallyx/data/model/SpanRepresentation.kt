@@ -3,6 +3,7 @@ package com.philkes.notallyx.data.model
 data class SpanRepresentation(
     var bold: Boolean,
     var link: Boolean,
+    var linkData: String?,
     var italic: Boolean,
     var monospace: Boolean,
     var strikethrough: Boolean,

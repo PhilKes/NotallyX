@@ -146,9 +146,19 @@ object XMLUtils {
         val end = parser.getAttributeValue(null, "end").toInt()
         val bold = parser.getAttributeValue(null, "bold")?.toBoolean() ?: false
         val link = parser.getAttributeValue(null, "link")?.toBoolean() ?: false
+        val linkData = parser.getAttributeValue(null, "linkData")?.toString()
         val italic = parser.getAttributeValue(null, "italic")?.toBoolean() ?: false
         val monospace = parser.getAttributeValue(null, "monospace")?.toBoolean() ?: false
         val strikethrough = parser.getAttributeValue(null, "strike")?.toBoolean() ?: false
-        return SpanRepresentation(bold, link, italic, monospace, strikethrough, start, end)
+        return SpanRepresentation(
+            bold,
+            link,
+            linkData,
+            italic,
+            monospace,
+            strikethrough,
+            start,
+            end,
+        )
     }
 }
