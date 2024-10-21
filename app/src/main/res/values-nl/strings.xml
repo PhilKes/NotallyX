@@ -51,7 +51,7 @@
     <string name="edit_label">Label bewerken</string>
     <string name="label_exists">Label bestaat al</string>
     <string name="delete_label">Label verwijderen?</string>
-    <string name="create_new">Nog geen labels. Een aanmaken?</string>
+    <string name="create_new">Nog geen labels. Nieuw label aanmaken?</string>
     <string name="delete_all_notes">Alle notities verwijderen?</string>
     <string name="delete_selected_notes">Geselecteerde notities verwijderen?</string>
     <string name="delete_note_forever">Notitie definitief verwijderen?</string>
@@ -89,7 +89,7 @@
     <string name="bold">Vetgedrukt</string>
     <string name="link">Link</string>
     <string name="italic">Cursief</string>
-    <string name="strikethrough">Doorhalen</string>
+    <string name="strikethrough">Doorgestreept</string>
     <string name="clear_formatting">Opmaak wissen</string>
     <string name="monospace">Monospace</string>
 
@@ -107,7 +107,7 @@
     <string name="copied_link">Link naar klembord gekopieerd</string>
     <string name="edit_link">Link bewerken</string>
     <string name="something_went_wrong">Er is iets fout gegaan. Probeer het opnieuw.</string>
-    <string name="install_an_email">Installeer een e-mailapp om feedback te sturen</string>
+    <string name="install_an_email">Installeer een e-mail app om feedback te sturen</string>
     <string name="install_a_browser">Installeer een browser om deze link te openen</string>
     <string name="cant_find_note">Kan notitie niet vinden. Misschien is deze verwijderd</string>
 
@@ -121,7 +121,7 @@
     <string name="theme">Thema</string>
     <string name="dark">Donker</string>
     <string name="light">Licht</string>
-    <string name="follow_system">Volg systeem</string>
+    <string name="follow_system">Volg systeeminstellingen</string>
 
     <string name="creation_date_format">Datumformaat</string>
     <string name="none">Geen</string>
@@ -181,7 +181,7 @@
     <string name="about">Over</string>
     <string name="libraries">Bibliotheken</string>
     <string name="rate">Beoordeel deze app</string>
-    <string name="send_feedback">Rapporteer een probleem of doe een functieverzoek</string>
+    <string name="send_feedback">Stuur feedback</string>
 
     <string name="github" translatable="false">GitHub</string>
 
