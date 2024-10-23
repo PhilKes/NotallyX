@@ -547,23 +547,33 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         executeAsync { baseNoteDao.updateLabels(id, labels) }
     }
 
-    fun deleteBaseNotes() {
-        val ids = LongArray(actionMode.selectedNotes.size)
-        val attachments = ArrayList<Attachment>()
-        actionMode.selectedNotes.onEachIndexed { index, entry ->
-            ids[index] = entry.key
-            attachments.addAll(entry.value.images)
-            attachments.addAll(entry.value.files)
-            attachments.addAll(entry.value.audios)
-        }
-        actionMode.close(false)
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) { baseNoteDao.delete(ids) }
-            informOtherComponents(attachments, ids)
-        }
+    fun deleteSelectedBaseNotes() {
+        deleteBaseNotes(LongArray(actionMode.selectedNotes.size))
     }
 
     fun deleteAllBaseNotes() {
+        viewModelScope.launch {
+            deleteBaseNotes(withContext(Dispatchers.IO) { baseNoteDao.getAllIds().toLongArray() })
+            Toast.makeText(app, R.string.cleared_data, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun deleteBaseNotes(ids: LongArray) {
+        val attachments = ArrayList<Attachment>()
+        viewModelScope.launch {
+            val notes = withContext(Dispatchers.IO) { baseNoteDao.getByIds(ids) }
+            notes.forEach { note ->
+                attachments.addAll(note.images)
+                attachments.addAll(note.files)
+                attachments.addAll(note.audios)
+            }
+            actionMode.close(false)
+            withContext(Dispatchers.IO) { baseNoteDao.delete(ids) }
+            app.deleteAttachments(attachments, ids)
+        }
+    }
+
+    fun deleteAllTrashedBaseNotes() {
         viewModelScope.launch {
             val ids: LongArray
             val images = ArrayList<FileAttachment>()

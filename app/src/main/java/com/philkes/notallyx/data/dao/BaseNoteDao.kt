@@ -42,6 +42,10 @@ interface BaseNoteDao {
 
     @Query("SELECT * FROM BaseNote") fun getAll(): LiveData<List<BaseNote>>
 
+    @Query("SELECT * FROM BaseNote WHERE id IN (:ids)") fun getByIds(ids: LongArray): List<BaseNote>
+
+    @Query("SELECT B.id FROM BaseNote B") fun getAllIds(): List<Long>
+
     @Query("SELECT * FROM BaseNote WHERE id = :id") fun get(id: Long): BaseNote?
 
     @Query("SELECT images FROM BaseNote WHERE id = :id") fun getImages(id: Long): String

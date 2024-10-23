@@ -108,6 +108,8 @@ class SettingsFragment : Fragment() {
 
         binding.ExportBackup.setOnClickListener { exportBackup() }
 
+        binding.ClearData.setOnClickListener { clearData() }
+
         setupProgressDialog(R.string.exporting_backup, model.exportingBackup)
         setupProgressDialog(R.string.importing_backup, model.importingBackup)
 
@@ -167,6 +169,14 @@ class SettingsFragment : Fragment() {
                 addCategory(Intent.CATEGORY_OPENABLE)
             }
         startActivityForResult(intent, REQUEST_IMPORT_BACKUP)
+    }
+
+    private fun clearData() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setMessage(R.string.clear_data_message)
+            .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAllBaseNotes() }
+            .setNegativeButton(R.string.cancel) { _, _ -> }
+            .show()
     }
 
     private fun setupProgressDialog(titleId: Int, liveData: MutableLiveData<BackupProgress>) {

@@ -42,6 +42,7 @@
     <string name="edit">Edit</string>
     <string name="copy">Copy</string>
     <string name="cancel">Cancel</string>
+    <string name="clear">Clear</string>
     <string name="continue_">Continue</string>
     <string name="open_link">Open link</string>
     <string name="make_list">Make list</string>
@@ -174,9 +175,12 @@
     <string name="exporting_backup">Exporting backup</string>
     <string name="importing_backup">Importing backup</string>
     <string name="calculating">Calculating…</string>
+    <string name="clear_data_message">All Notes, Images, Files, Audios will be permanently deleted</string>
 
     <string name="export_backup">Export backup</string>
     <string name="import_backup">Import backup</string>
+    <string name="clear_data">Clear Data</string>
+    <string name="cleared_data">All Data has been cleared</string>
 
     <string name="auto_backup_period">Auto backup period</string>
     <string name="daily">Daily</string>
