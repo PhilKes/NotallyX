@@ -43,6 +43,12 @@ import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.FileProgress
 import com.philkes.notallyx.utils.IO
+import com.philkes.notallyx.utils.IO.copyToFile
+import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
+import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
+import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
+import com.philkes.notallyx.utils.IO.getTempAudioFile
+import com.philkes.notallyx.utils.IO.rename
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.applySpans
 import java.io.File
@@ -84,9 +90,9 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     val addingFiles = MutableLiveData<FileProgress>()
     val eventBus = MutableLiveData<Event<List<FileError>>>()
 
-    var imageRoot = IO.getExternalImagesDirectory(app)
-    var audioRoot = IO.getExternalAudioDirectory(app)
-    var filesRoot = IO.getExternalFilesDirectory(app)
+    var imageRoot = app.getExternalImagesDirectory()
+    var audioRoot = app.getExternalAudioDirectory()
+    var filesRoot = app.getExternalFilesDirectory()
 
     init {
         database.observeForever { baseNoteDao = it.getBaseNoteDao() }
@@ -100,7 +106,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                     Regenerate because the directory may have been deleted between the time of activity creation
                     and audio recording
                     */
-                    audioRoot = IO.getExternalAudioDirectory(app)
+                    audioRoot = app.getExternalAudioDirectory()
                     requireNotNull(audioRoot) { "audioRoot is null" }
 
                     /*
@@ -108,11 +114,11 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                     is not null. audioRoot.exists() can be false if the folder `Audio` has been deleted after
                     the previous line, but audioRoot itself can't be null
                     */
-                    val original = IO.getTempAudioFile(app)
+                    val original = app.getTempAudioFile()
                     val name = "${UUID.randomUUID()}.m4a"
                     val final = File(audioRoot, name)
                     val input = FileInputStream(original)
-                    IO.copyStreamToFile(input, final)
+                    input.copyToFile(final)
 
                     original.delete()
 
@@ -146,7 +152,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         Regenerate because the directory may have been deleted between the time of activity creation
         and image addition
          */
-        imageRoot = IO.getExternalImagesDirectory(app)
+        imageRoot = app.getExternalImagesDirectory()
         requireNotNull(imageRoot) { "imageRoot is null" }
         addFiles(uris, imageRoot!!, FileType.IMAGE)
     }
@@ -156,7 +162,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         Regenerate because the directory may have been deleted between the time of activity creation
         and image addition
          */
-        filesRoot = IO.getExternalFilesDirectory(app)
+        filesRoot = app.getExternalFilesDirectory()
         requireNotNull(filesRoot) { "filesRoot is null" }
         addFiles(uris, filesRoot!!, FileType.ANY)
     }
@@ -195,7 +201,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                         val temp = File(directory, "Temp")
 
                         val inputStream = requireNotNull(app.contentResolver.openInputStream(uri))
-                        IO.copyStreamToFile(inputStream, temp)
+                        inputStream.copyToFile(temp)
 
                         val originalName = app.getFileName(uri)
                         when (fileType) {
@@ -209,7 +215,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                                     val extension = getExtensionForMimeType(mimeType)
                                     if (extension != null) {
                                         val name = "${UUID.randomUUID()}.$extension"
-                                        if (IO.renameFile(temp, name)) {
+                                        if (temp.rename(name)) {
                                             successes.add(
                                                 FileAttachment(name, originalName ?: name, mimeType)
                                             )
@@ -236,7 +242,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                                 val extension =
                                     if (fileExtension.isNotEmpty()) ".${fileExtension}" else ""
                                 val name = "${UUID.randomUUID()}${extension}"
-                                if (IO.renameFile(temp, name)) {
+                                if (temp.rename(name)) {
                                     successes.add(
                                         FileAttachment(name, originalName ?: name, mimeType)
                                     )

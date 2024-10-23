@@ -14,7 +14,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.ActivityPlayAudioBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
-import com.philkes.notallyx.utils.IO
+import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.audio.AudioPlayService
 import com.philkes.notallyx.utils.audio.LocalBinder
@@ -98,7 +98,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
     }
 
     private fun share() {
-        val audioRoot = IO.getExternalAudioDirectory(application)
+        val audioRoot = application.getExternalAudioDirectory()
         val file = if (audioRoot != null) File(audioRoot, audio.name) else null
         if (file != null && file.exists()) {
             val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
@@ -128,7 +128,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
     }
 
     private fun saveToDevice() {
-        val audioRoot = IO.getExternalAudioDirectory(application)
+        val audioRoot = application.getExternalAudioDirectory()
         val file = if (audioRoot != null) File(audioRoot, audio.name) else null
         if (file != null && file.exists()) {
             val intent =
@@ -148,7 +148,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
     private fun writeAudioToUri(uri: Uri) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val audioRoot = IO.getExternalAudioDirectory(application)
+                val audioRoot = application.getExternalAudioDirectory()
                 val file = if (audioRoot != null) File(audioRoot, audio.name) else null
                 if (file != null && file.exists()) {
                     val output = contentResolver.openOutputStream(uri) as FileOutputStream

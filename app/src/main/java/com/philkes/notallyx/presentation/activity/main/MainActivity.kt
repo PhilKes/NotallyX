@@ -260,7 +260,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private fun deleteForever() {
         MaterialAlertDialogBuilder(this)
             .setMessage(R.string.delete_selected_notes)
-            .setPositiveButton(R.string.delete) { _, _ -> model.deleteBaseNotes() }
+            .setPositiveButton(R.string.delete) { _, _ -> model.deleteSelectedBaseNotes() }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }

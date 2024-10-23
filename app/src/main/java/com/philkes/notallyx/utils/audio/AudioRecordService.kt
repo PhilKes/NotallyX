@@ -13,7 +13,7 @@ import android.os.SystemClock
 import androidx.annotation.RequiresApi
 import com.philkes.notallyx.R
 import com.philkes.notallyx.presentation.activity.note.RecordAudioActivity
-import com.philkes.notallyx.utils.IO
+import com.philkes.notallyx.utils.IO.getTempAudioFile
 import com.philkes.notallyx.utils.audio.Status.PAUSED
 import com.philkes.notallyx.utils.audio.Status.READY
 import com.philkes.notallyx.utils.audio.Status.RECORDING
@@ -85,7 +85,7 @@ class AudioRecordService : Service() {
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
 
-            val output = IO.getTempAudioFile(this@AudioRecordService)
+            val output = this@AudioRecordService.getTempAudioFile()
             setOutputFile(output.path)
             prepare()
         }

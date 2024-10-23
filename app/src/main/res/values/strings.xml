@@ -62,6 +62,8 @@
     <string name="biometrics_setup_success">Biometric/PIN lock has been enabled</string>
     <string name="biometrics_disable_success">Biometric/PIN lock has been disabled</string>
     <string name="biometrics_failure">Failed to authenticate vai Biometric/PIN</string>
+    <string name="backup_password_hint">By setting this, all future backup ZIPs will be encrypted and password-protected</string>
+    <string name="import_backup_password_hint">If your backup is not password-protected simply press Import, otherwise enter the correct password.</string>
 
     <!-- Snackbars -->
     <plurals name="deleted_selected_notes">
@@ -162,6 +164,8 @@
     <!-- Backup -->
     <string name="backup">Backup</string>
     <string name="auto_backup">Auto backup</string>
+    <string name="backup_password">Backup Password</string>
+    <string name="wrong_password">Wrong password provided</string>
     <string name="max_backups">Amount of backups to keep</string>
     <string name="backup_period_days">Auto backup period in days</string>
     <string name="tap_to_set_up">Tap to set up</string>
