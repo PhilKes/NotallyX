@@ -24,16 +24,17 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 import java.text.DateFormat
 
 object Operations {
 
     const val extraCharSequence = "com.philkes.notallyx.extra.charSequence"
 
-    fun getLog(app: Application): File {
-        val folder = File(app.filesDir, "logs")
-        folder.mkdir()
-        return File(folder, "Log.v1.txt")
+    fun getLastExceptionLog(app: Application): String {
+        val logContents = getLog(app).readText().substringAfterLast("[Start]")
+        return URLEncoder.encode(logContents, StandardCharsets.UTF_8.toString())
     }
 
     fun log(app: Application, throwable: Throwable) {
@@ -115,6 +116,12 @@ object Operations {
                 view.text = label
             }
         }
+    }
+
+    private fun getLog(app: Application): File {
+        val folder = File(app.filesDir, "logs")
+        folder.mkdir()
+        return File(folder, "Log.v1.txt")
     }
 
     private fun getOutlinedDrawable(context: Context): MaterialShapeDrawable {

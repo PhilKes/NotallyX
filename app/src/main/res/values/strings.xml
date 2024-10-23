@@ -186,7 +186,9 @@
     <string name="about">About</string>
     <string name="libraries">Libraries</string>
     <string name="rate">Rate this app</string>
-    <string name="send_feedback">Report an issue or make a feature request</string>
+    <string name="send_feedback">Send Feedback</string>
+    <string name="report_bug">Report an issue/bug</string>
+    <string name="make_feature_request">Make a feature request</string>
 
     <string name="github" translatable="false">GitHub</string>
 
