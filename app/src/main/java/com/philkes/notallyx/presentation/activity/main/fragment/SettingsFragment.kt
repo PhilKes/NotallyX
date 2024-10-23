@@ -44,6 +44,7 @@ import com.philkes.notallyx.presentation.view.misc.SortDirection
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
@@ -197,16 +198,42 @@ class SettingsFragment : Fragment() {
     }
 
     private fun sendFeedback() {
-        val intent =
-            Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse("https://github.com/PhilKes/NotallyX/issues/new/choose"),
-            )
-        try {
-            startActivity(intent)
-        } catch (exception: ActivityNotFoundException) {
-            Toast.makeText(requireContext(), R.string.install_a_browser, Toast.LENGTH_LONG).show()
-        }
+        MaterialAlertDialogBuilder(requireContext())
+        val options =
+            arrayOf(getString(R.string.report_bug), getString(R.string.make_feature_request))
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.send_feedback)
+            .setItems(options) { _, which ->
+                val intent =
+                    when (which) {
+                        0 -> {
+                            val app = requireContext().applicationContext as Application
+                            val logs = Operations.getLastExceptionLog(app)
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(
+                                    "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml&logs=$logs"
+                                        .take(2000)
+                                ),
+                            )
+                        }
+                        else ->
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(
+                                    "https://github.com/PhilKes/NotallyX/issues/new?labels=enhancement&template=feature_request.md"
+                                ),
+                            )
+                    }
+                try {
+                    startActivity(intent)
+                } catch (exception: ActivityNotFoundException) {
+                    Toast.makeText(requireContext(), R.string.install_a_browser, Toast.LENGTH_LONG)
+                        .show()
+                }
+            }
+            .setNegativeButton(R.string.cancel, null)
+            .show()
     }
 
     private fun displayLibraries() {
