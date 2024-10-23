@@ -300,6 +300,7 @@ class SettingsFragment : Fragment() {
                 "Subsampling Scale ImageView",
                 "Material Components for Android",
                 "SQLCipher",
+                "Zip4J",
             )
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.libraries)
@@ -315,6 +316,7 @@ class SettingsFragment : Fragment() {
                             "https://github.com/material-components/material-components-android"
                         )
                     6 -> openLink("https://github.com/sqlcipher/sqlcipher")
+                    7 -> openLink("https://github.com/srikanth-lingala/zip4j")
                 }
             }
             .setNegativeButton(R.string.cancel, null)
