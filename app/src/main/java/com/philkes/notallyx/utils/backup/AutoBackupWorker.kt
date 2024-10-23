@@ -8,6 +8,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
+import com.philkes.notallyx.utils.backup.Export.exportAsZip
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -28,9 +29,7 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
                 val formatter = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ENGLISH)
                 val backupFilePrefix = "NotallyX_Backup_"
                 val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
-                val zipFile = requireNotNull(folder.createFile("application/zip", name))
-                val outputStream = requireNotNull(app.contentResolver.openOutputStream(zipFile.uri))
-                doBackup(outputStream, app)
+                exportAsZip(requireNotNull(folder.createFile("application/zip", name)).uri, app)
                 val backupFiles = folder.listZipFiles(backupFilePrefix)
                 backupFiles.drop(maxBackups).forEach {
                     if (it.exists()) {

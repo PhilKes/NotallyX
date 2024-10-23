@@ -18,7 +18,7 @@ import com.philkes.notallyx.presentation.view.misc.View
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.widget.WidgetProvider
-import com.philkes.notallyx.utils.IO
+import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import java.util.Collections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,7 +54,7 @@ class ConfigureWidgetActivity : LockedActivity<ActivityConfigureWidgetBinding>()
                     maxItems,
                     maxLines,
                     maxTitle,
-                    IO.getExternalImagesDirectory(application),
+                    application.getExternalImagesDirectory(),
                     this@ConfigureWidgetActivity,
                 )
             }

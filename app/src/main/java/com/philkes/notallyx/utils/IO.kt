@@ -3,6 +3,10 @@ package com.philkes.notallyx.utils
 import android.app.Application
 import android.content.Context
 import android.os.Build
+import com.philkes.notallyx.data.AttachmentDeleteService
+import com.philkes.notallyx.data.model.Attachment
+import com.philkes.notallyx.presentation.widget.WidgetProvider
+import com.philkes.notallyx.utils.IO.clearDirectory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -10,23 +14,66 @@ import java.nio.file.Files
 
 object IO {
 
-    private fun createDirectory(file: File) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Files.createDirectory(file.toPath())
-        } else file.mkdir()
+    const val SUBFOLDER_IMAGES = "Images"
+    const val SUBFOLDER_FILES = "Files"
+    const val SUBFOLDER_AUDIOS = "Audios"
+
+    fun Application.getExternalImagesDirectory() = getExternalDirectory(SUBFOLDER_IMAGES)
+
+    fun Application.getExternalAudioDirectory() = getExternalDirectory(SUBFOLDER_AUDIOS)
+
+    fun Application.getExternalFilesDirectory() = getExternalDirectory(SUBFOLDER_FILES)
+
+    fun Context.getTempAudioFile(): File {
+        return File(externalCacheDir, "Temp.m4a")
     }
 
-    fun getExternalImagesDirectory(app: Application) = getExternalDirectory(app, "Images")
+    fun InputStream.copyToFile(destination: File) {
+        val output = FileOutputStream(destination)
+        copyTo(output)
+        close()
+        output.close()
+    }
 
-    fun getExternalAudioDirectory(app: Application) = getExternalDirectory(app, "Audios")
+    fun File.rename(newName: String): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val source = toPath()
+            val destination = source.resolveSibling(newName)
+            Files.move(source, destination)
+            true // If move failed, an exception would have been thrown
+        } else {
+            val destination = resolveSibling(newName)
+            renameTo(destination)
+        }
+    }
 
-    fun getExternalFilesDirectory(app: Application) = getExternalDirectory(app, "Files")
+    fun File.clearDirectory() {
+        val files = listFiles()
+        if (files != null) {
+            for (file in files) {
+                file.delete()
+            }
+        }
+    }
 
-    private fun getExternalDirectory(app: Application, name: String): File? {
+    fun Application.deleteAttachments(attachments: ArrayList<Attachment>, ids: LongArray) {
+        if (attachments.isNotEmpty()) {
+            AttachmentDeleteService.start(this, attachments)
+        }
+        if (ids.isNotEmpty()) {
+            WidgetProvider.sendBroadcast(this, ids)
+        }
+    }
+
+    fun Application.getBackupDir() = getEmptyFolder("backup")
+
+    fun Application.getExportedPath() = getEmptyFolder("exported")
+
+    private fun Application.getExternalDirectory(name: String): File? {
         var file: File? = null
 
         try {
-            val mediaDir = app.externalMediaDirs.firstOrNull()
+            val mediaDir = externalMediaDirs.firstOrNull()
             if (mediaDir != null) {
                 file = File(mediaDir, name)
                 if (file.exists()) {
@@ -43,26 +90,17 @@ object IO {
         return file
     }
 
-    fun getTempAudioFile(context: Context): File {
-        return File(context.externalCacheDir, "Temp.m4a")
+    private fun createDirectory(file: File) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Files.createDirectory(file.toPath())
+        } else file.mkdir()
     }
 
-    fun copyStreamToFile(input: InputStream, destination: File) {
-        val output = FileOutputStream(destination)
-        input.copyTo(output)
-        input.close()
-        output.close()
-    }
-
-    fun renameFile(file: File, name: String): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val source = file.toPath()
-            val destination = source.resolveSibling(name)
-            Files.move(source, destination)
-            true // If move failed, an exception would have been thrown
-        } else {
-            val destination = file.resolveSibling(name)
-            file.renameTo(destination)
-        }
+    private fun Application.getEmptyFolder(name: String): File {
+        val folder = File(cacheDir, name)
+        if (folder.exists()) {
+            folder.clearDirectory()
+        } else folder.mkdir()
+        return folder
     }
 }

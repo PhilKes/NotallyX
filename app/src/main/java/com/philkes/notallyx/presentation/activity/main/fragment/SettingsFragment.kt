@@ -1,6 +1,7 @@
 package com.philkes.notallyx.presentation.activity.main.fragment
 
 import android.app.Activity
+import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.hardware.biometrics.BiometricManager
@@ -8,6 +9,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
+import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.ChoiceItemBinding
@@ -26,9 +29,12 @@ import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
+import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
+import com.philkes.notallyx.presentation.view.misc.BackupPassword
+import com.philkes.notallyx.presentation.view.misc.BackupPassword.emptyPassword
 import com.philkes.notallyx.presentation.view.misc.BiometricLock
 import com.philkes.notallyx.presentation.view.misc.BiometricLock.disabled
 import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
@@ -46,7 +52,7 @@ import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
-import com.philkes.notallyx.utils.backup.scheduleAutoBackup
+import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
 import com.philkes.notallyx.utils.checkedTag
 import com.philkes.notallyx.utils.security.decryptDatabase
@@ -99,6 +105,10 @@ class SettingsFragment : Fragment() {
                 scheduleAutoBackup(value.toLong(), requireContext())
             }
 
+            backupPassword.observe(viewLifecycleOwner) { value ->
+                binding.BackupPassword.setup(BackupPassword, value)
+            }
+
             biometricLock.observe(viewLifecycleOwner) { value ->
                 binding.BiometricLock.setup(BiometricLock, value)
             }
@@ -138,7 +148,7 @@ class SettingsFragment : Fragment() {
         if (resultCode == Activity.RESULT_OK) {
             intent?.data?.let { uri ->
                 when (requestCode) {
-                    REQUEST_IMPORT_BACKUP -> model.importBackup(uri)
+                    REQUEST_IMPORT_BACKUP -> importBackup(uri)
                     REQUEST_EXPORT_BACKUP -> model.exportBackup(uri)
                     REQUEST_CHOOSE_FOLDER -> model.setAutoBackupPath(uri)
                 }
@@ -148,6 +158,40 @@ class SettingsFragment : Fragment() {
         when (requestCode) {
             REQUEST_SETUP_LOCK -> showEnableBiometricLock()
             REQUEST_DISABLE_LOCK -> showDisableBiometricLock()
+        }
+    }
+
+    private fun importBackup(uri: Uri) {
+        when (requireContext().contentResolver.getType(uri)) {
+            "text/xml" -> {
+                model.importXmlBackup(uri)
+            }
+
+            "application/zip" -> {
+                val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
+                val password = model.preferences.backupPassword.value
+                layout.InputText.apply {
+                    if (password != emptyPassword) {
+                        setText(password)
+                    }
+                    transformationMethod = PasswordTransformationMethod.getInstance()
+                }
+                layout.InputTextLayout.endIconMode = END_ICON_PASSWORD_TOGGLE
+                layout.Message.apply {
+                    setText(R.string.import_backup_password_hint)
+                    visibility = View.VISIBLE
+                }
+                MaterialAlertDialogBuilder(requireContext())
+                    .setTitle(R.string.backup_password)
+                    .setView(layout.root)
+                    .setPositiveButton(R.string.import_backup) { dialog, _ ->
+                        dialog.cancel()
+                        val usedPassword = layout.InputText.text.toString()
+                        model.importZipBackup(uri, usedPassword)
+                    }
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            }
         }
     }
 
@@ -370,6 +414,42 @@ class SettingsFragment : Fragment() {
                     model.preferences.savePreference(info, newSortBy, newSortDirection)
                 }
                 .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun PreferenceBinding.setup(info: BackupPassword, password: String) {
+        Title.setText(info.title)
+
+        Value.transformationMethod =
+            if (password != emptyPassword) PasswordTransformationMethod.getInstance() else null
+        Value.text = password
+        root.setOnClickListener {
+            val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
+            layout.InputText.apply {
+                if (password != emptyPassword) {
+                    setText(password)
+                }
+                transformationMethod = PasswordTransformationMethod.getInstance()
+            }
+            layout.InputTextLayout.endIconMode = END_ICON_PASSWORD_TOGGLE
+            layout.Message.apply {
+                setText(R.string.backup_password_hint)
+                visibility = View.VISIBLE
+            }
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(info.title)
+                .setView(layout.root)
+                .setPositiveButton(R.string.save) { dialog, _ ->
+                    dialog.cancel()
+                    val updatedPassword = layout.InputText.text.toString()
+                    model.preferences.savePreference(info, updatedPassword)
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .setNeutralButton(R.string.clear) { dialog, _ ->
+                    dialog.cancel()
+                    model.preferences.savePreference(info, emptyPassword)
+                }
                 .show()
         }
     }
