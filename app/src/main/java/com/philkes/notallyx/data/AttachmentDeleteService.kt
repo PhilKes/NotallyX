@@ -14,7 +14,9 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
-import com.philkes.notallyx.utils.IO
+import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
+import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
+import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.isImage
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -65,9 +67,9 @@ class AttachmentDeleteService : Service() {
 
         scope.launch {
             withContext(Dispatchers.IO) {
-                val imageRoot = IO.getExternalImagesDirectory(application)
-                val audioRoot = IO.getExternalAudioDirectory(application)
-                val fileRoot = IO.getExternalFilesDirectory(application)
+                val imageRoot = application.getExternalImagesDirectory()
+                val audioRoot = application.getExternalAudioDirectory()
+                val fileRoot = application.getExternalFilesDirectory()
                 do {
                     val attachments = channel.receive()
                     attachments.forEachIndexed { index, attachment ->

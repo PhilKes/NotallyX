@@ -99,6 +99,13 @@
             android:layout_height="wrap_content"
             android:text="@string/export_backup" />
 
+        <TextView
+          android:id="@+id/ClearData"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/clear_data" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -114,6 +121,10 @@
             android:id="@+id/BiometricLock"
             layout="@layout/preference" />
 
+        <include
+          android:id="@+id/BackupPassword"
+          layout="@layout/preference" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -124,6 +135,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/about" />
+
+        <TextView
+          android:id="@+id/SendFeedback"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/send_feedback" />
 
         <TextView
             android:id="@+id/GitHub"
@@ -146,13 +164,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/rate" />
-
-        <TextView
-            android:id="@+id/SendFeedback"
-            style="@style/Preference"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/send_feedback" />
 
     </LinearLayout>
 

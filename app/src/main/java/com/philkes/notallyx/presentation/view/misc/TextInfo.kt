@@ -18,3 +18,12 @@ object AutoBackup : TextInfo {
     override val key = "autoBackup"
     override val defaultValue = emptyPath
 }
+
+object BackupPassword : TextInfo {
+    const val emptyPassword = "None"
+
+    override val title = R.string.backup_password
+
+    override val key = "backupPassword"
+    override val defaultValue = emptyPassword
+}

@@ -3,9 +3,12 @@ package com.philkes.notallyx
 import android.app.Application
 import android.os.Build
 import android.preference.PreferenceManager
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
+import com.philkes.notallyx.presentation.view.misc.BackupPassword
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.presentation.view.misc.BiometricLock
 import com.philkes.notallyx.presentation.view.misc.DateFormat
@@ -40,6 +43,15 @@ class Preferences private constructor(app: Application) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(app)
     private val editor = preferences.edit()
 
+    private val encryptedPreferences =
+        EncryptedSharedPreferences.create(
+            app,
+            "secret_shared_prefs",
+            MasterKey.Builder(app).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+        )
+
     // Main thread (unfortunately)
     val view = BetterLiveData(getListPref(View))
     val theme = BetterLiveData(getListPref(Theme))
@@ -56,6 +68,7 @@ class Preferences private constructor(app: Application) {
     val autoBackupPath = BetterLiveData(getTextPref(AutoBackup))
     var autoBackupPeriodDays = BetterLiveData(getSeekbarPref(AutoBackupPeriodDays))
     var autoBackupMax = getSeekbarPref(AutoBackupMax)
+    var backupPassword = BetterLiveData(getEncryptedTextPref(BackupPassword))
 
     val biometricLock = BetterLiveData(getListPref(BiometricLock))
     var iv: ByteArray?
@@ -104,6 +117,9 @@ class Preferences private constructor(app: Application) {
 
     private fun getTextPref(info: TextInfo) =
         requireNotNull(preferences.getString(info.key, info.defaultValue))
+
+    private fun getEncryptedTextPref(info: TextInfo) =
+        requireNotNull(encryptedPreferences.getString(info.key, info.defaultValue))
 
     private fun getSeekbarPref(info: SeekbarInfo) =
         requireNotNull(preferences.getInt(info.key, info.defaultValue))
@@ -176,10 +192,12 @@ class Preferences private constructor(app: Application) {
     }
 
     fun savePreference(info: TextInfo, value: String) {
+        val editor = if (info is BackupPassword) encryptedPreferences.edit() else this.editor
         editor.putString(info.key, value)
         editor.commit()
         when (info) {
             AutoBackup -> autoBackupPath.postValue(getTextPref(info))
+            BackupPassword -> backupPassword.postValue(getEncryptedTextPref(info))
         }
     }
 

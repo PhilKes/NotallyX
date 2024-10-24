@@ -87,6 +87,7 @@ dependencies {
     implementation "net.zetetic:android-database-sqlcipher:4.5.3"
     implementation "androidx.sqlite:sqlite-ktx:2.4.0"
     implementation "androidx.security:security-crypto:1.1.0-alpha06"
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
 
     implementation "androidx.work:work-runtime:2.9.1"
 
