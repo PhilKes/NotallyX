@@ -6,5 +6,5 @@ Customize the sort order of your notes by last modified, title,...
 Secure your notes via Biometric/PIN lock
 Auto-backups are now much more configurable
 Added monochrome app icon for custom theming
-Quickly change notes displayed in Widget instead of having to remove/re-add them
+Quickly change notes displayed in Widget
 Quickly check/delete tasks
