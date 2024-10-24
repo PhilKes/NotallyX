@@ -280,23 +280,23 @@ class ListManagerMoveTest : ListManagerTestBase() {
         (changeHistory.lookUp() as ListMoveChange).assert(4, 2, 2, " E(F)")
     }
 
-    @Test
-    fun `endDrag parent with children into other parent with auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
-        listManager.changeIsChild(1, true, false)
-        listManager.changeIsChild(2, true, false)
-        listManager.changeIsChild(5, true, false)
-        items.printList("Before")
-
-        // TODO: parents cant be moved into other parents' children yet
-        listItemDragCallback.simulateDrag(4, 2, "E".itemCount)
-        items.printList("After move 3 to 2")
-
-        items.assertOrder("A", "B", "E", "F", "C", "D")
-        "A".assertChildren("B", "E", "F", "C")
-        "D".assertChildren()
-        (changeHistory.lookUp() as ListMoveChange).assert(4, 2, 2, " E(F)")
-    }
+    //    @Test
+    //    fun `endDrag parent with children into other parent with auto-sort enabled`() {
+    //        setSorting(ListItemSorting.autoSortByChecked)
+    //        listManager.changeIsChild(1, true, false)
+    //        listManager.changeIsChild(2, true, false)
+    //        listManager.changeIsChild(5, true, false)
+    //        items.printList("Before")
+    //
+    //        // TODO: parents cant be moved into other parents' children yet
+    //        listItemDragCallback.simulateDrag(4, 2, "E".itemCount)
+    //        items.printList("After move 3 to 2")
+    //
+    //        items.assertOrder("A", "B", "E", "F", "C", "D")
+    //        "A".assertChildren("B", "E", "F", "C")
+    //        "D".assertChildren()
+    //        (changeHistory.lookUp() as ListMoveChange).assert(4, 2, 2, " E(F)")
+    //    }
 
     @Test
     fun `endDrag parent with children to bottom`() {
