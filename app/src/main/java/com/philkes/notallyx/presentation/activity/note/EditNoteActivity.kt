@@ -9,6 +9,7 @@ import android.net.Uri
 import android.text.Editable
 import android.text.Spanned
 import android.text.TextWatcher
+import android.text.style.CharacterStyle
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
@@ -22,7 +23,7 @@ import android.widget.Toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.databinding.UpdateLinkDialogBinding
+import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.changehistory.EditTextChange
@@ -188,7 +189,8 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         1 ->
                             showUrlInputDialog(span.url) { newUrl ->
                                 binding.EnterBody.changeFormatting { _, _, text ->
-                                    text.replaceUrlSpan(span, newUrl)
+                                    newUrl?.let { text.replaceUrlSpan(span, it) }
+                                        ?: clearFormatting(span)
                                     model.body = text.clone()
                                     Toast.makeText(this, R.string.updated_link, Toast.LENGTH_LONG)
                                         .show()
@@ -225,8 +227,8 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
         }
     }
 
-    private fun showUrlInputDialog(urlBefore: String, onSuccess: (newUrl: String) -> Unit) {
-        val layout = UpdateLinkDialogBinding.inflate(layoutInflater)
+    private fun showUrlInputDialog(urlBefore: String, onSuccess: (newUrl: String?) -> Unit) {
+        val layout = TextInputDialogBinding.inflate(layoutInflater)
         layout.InputText.setText(urlBefore)
         MaterialAlertDialogBuilder(this)
             .setView(layout.root)
@@ -236,14 +238,31 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                 onSuccess.invoke(userInput)
             }
             .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+            .setNeutralButton(R.string.clear) { dialog, _ ->
+                dialog.cancel()
+                onSuccess.invoke(null)
+            }
             .show()
         layout.InputText.requestFocus()
         showKeyboard(layout.InputText)
     }
 
-    private fun clearFormatting() {
-        binding.EnterBody.changeFormatting { start, end, text ->
-            text.removeSelectionFromSpan(start, end)
+    private fun clearFormatting(
+        start: Int = binding.EnterBody.selectionStart,
+        end: Int = binding.EnterBody.selectionEnd,
+    ) {
+        binding.EnterBody.changeFormatting(start, end) { textStart, textEnd, text ->
+            text.removeSelectionFromSpan(textStart, textEnd)
+        }
+    }
+
+    private fun clearFormatting(span: CharacterStyle) {
+        binding.EnterBody.apply {
+            val start = text!!.getSpanStart(span)
+            val end = text!!.getSpanEnd(span)
+            changeFormatting(start, end) { textStart, textEnd, text ->
+                text.removeSelectionFromSpan(textStart, textEnd)
+            }
         }
     }
 

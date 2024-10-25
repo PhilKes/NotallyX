@@ -19,7 +19,7 @@ import com.philkes.notallyx.databinding.ActivityViewImageBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
-import com.philkes.notallyx.utils.IO
+import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.add
 import java.io.File
 import java.io.FileInputStream
@@ -70,7 +70,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
                 val images = ArrayList<FileAttachment>(original.size)
                 original.filterNotTo(images) { image -> deletedImages.contains(image) }
 
-                val mediaRoot = IO.getExternalImagesDirectory(application)
+                val mediaRoot = application.getExternalImagesDirectory()
                 val adapter = ImageAdapter(mediaRoot, images)
                 binding.RecyclerView.adapter = adapter
                 setupToolbar(binding, adapter)
@@ -141,7 +141,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
     }
 
     private fun share(image: FileAttachment) {
-        val mediaRoot = IO.getExternalImagesDirectory(application)
+        val mediaRoot = application.getExternalImagesDirectory()
         val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
         if (file != null && file.exists()) {
             val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
@@ -163,7 +163,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
     }
 
     private fun saveToDevice(image: FileAttachment) {
-        val mediaRoot = IO.getExternalImagesDirectory(application)
+        val mediaRoot = application.getExternalImagesDirectory()
         val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
         if (file != null && file.exists()) {
             val intent =
@@ -180,7 +180,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
     private fun writeImageToUri(uri: Uri) {
         lifecycleScope.launch {
             withContext(Dispatchers.IO) {
-                val mediaRoot = IO.getExternalImagesDirectory(application)
+                val mediaRoot = application.getExternalImagesDirectory()
                 val file =
                     if (mediaRoot != null) File(mediaRoot, requireNotNull(currentImage).localName)
                     else null
