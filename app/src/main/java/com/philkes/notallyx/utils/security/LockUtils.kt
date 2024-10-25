@@ -108,6 +108,11 @@ private fun showBiometricOrPinPrompt(
                         super.onAuthenticationFailed()
                         onFailure.invoke()
                     }
+
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
+                        super.onAuthenticationError(errorCode, errString)
+                        onFailure.invoke()
+                    }
                 },
             )
         }
@@ -138,6 +143,14 @@ private fun showBiometricOrPinPrompt(
 
                         override fun onAuthenticationFailed() {
                             super.onAuthenticationFailed()
+                            onFailure.invoke()
+                        }
+
+                        override fun onAuthenticationError(
+                            errorCode: Int,
+                            errString: CharSequence?,
+                        ) {
+                            super.onAuthenticationError(errorCode, errString)
                             onFailure.invoke()
                         }
                     },

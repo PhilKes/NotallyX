@@ -49,9 +49,13 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_BIOMETRIC_AUTHENTICATION && resultCode == Activity.RESULT_OK) {
-            notallyXApplication.isLocked = false
-            show()
+        if (requestCode == REQUEST_BIOMETRIC_AUTHENTICATION) {
+            if (resultCode == Activity.RESULT_OK) {
+                notallyXApplication.isLocked = false
+                show()
+            } else {
+                finish()
+            }
         }
     }
 
