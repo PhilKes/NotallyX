@@ -24,6 +24,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.TextInputDialogBinding
+import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.changehistory.EditTextChange
@@ -36,6 +37,12 @@ import com.philkes.notallyx.utils.showKeyboard
 class EditNoteActivity : EditActivity(Type.NOTE) {
 
     private lateinit var enterBodyTextWatcher: TextWatcher
+
+    override suspend fun saveNote() {
+        super.saveNote()
+        model.saveNote()
+        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
+    }
 
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { binding.EnterBody.requestFocus() }
