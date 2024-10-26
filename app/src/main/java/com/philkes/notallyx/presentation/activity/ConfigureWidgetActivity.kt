@@ -84,6 +84,10 @@ class ConfigureWidgetActivity : LockedActivity<ActivityConfigureWidgetBinding>()
                 adapter.submitList(notes)
             }
         }
+
+        preferences.notesSorting.observe(this) { (sortBy, sortDirection) ->
+            adapter.setSorting(sortBy, sortDirection)
+        }
     }
 
     override fun onClick(position: Int) {
