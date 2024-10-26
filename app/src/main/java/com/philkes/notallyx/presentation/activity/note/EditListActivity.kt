@@ -26,6 +26,7 @@ class EditListActivity : EditActivity(Type.LIST) {
     private lateinit var listManager: ListManager
 
     override suspend fun saveNote() {
+        super.saveNote()
         model.saveNote(items.toMutableList())
         WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
     }

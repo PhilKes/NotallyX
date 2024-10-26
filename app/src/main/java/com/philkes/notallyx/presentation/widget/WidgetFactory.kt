@@ -67,10 +67,7 @@ class WidgetFactory(private val app: Application, private val id: Long, private 
                 TypedValue.COMPLEX_UNIT_SP,
                 TextSize.getDisplayTitleSize(preferences.textSize.value),
             )
-            if (note.title.isNotEmpty()) {
-                setTextViewText(R.id.Title, note.title)
-                setViewVisibility(R.id.Title, View.VISIBLE)
-            } else setViewVisibility(R.id.Title, View.GONE)
+            setTextViewText(R.id.Title, note.title)
 
             val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
 
@@ -97,10 +94,7 @@ class WidgetFactory(private val app: Application, private val id: Long, private 
                 TypedValue.COMPLEX_UNIT_SP,
                 TextSize.getDisplayTitleSize(preferences.textSize.value),
             )
-            if (list.title.isNotEmpty()) {
-                setTextViewText(R.id.Title, list.title)
-                setViewVisibility(R.id.Title, View.VISIBLE)
-            } else setViewVisibility(R.id.Title, View.GONE)
+            setTextViewText(R.id.Title, list.title)
 
             val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
 

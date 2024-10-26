@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
+import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
@@ -20,7 +21,6 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
 import androidx.core.view.isVisible
-import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -41,11 +41,11 @@ import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
-import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.createTextWatcherWithHistory
 import com.philkes.notallyx.utils.displayFormattedTimestamp
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +54,7 @@ import kotlinx.coroutines.launch
 abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEditBinding>() {
     internal val model: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
+    internal lateinit var enterTitleTextWatcher: TextWatcher
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -72,8 +73,6 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         if (changeHistory.canUndo()) {
             model.modifiedTimestamp = System.currentTimeMillis()
         }
-        model.saveNote()
-        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -241,18 +240,28 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     abstract fun configureUI()
 
     open fun setupListeners() {
-        binding.EnterTitle.doAfterTextChanged { text ->
-            model.title = requireNotNull(text).trim().toString()
+        enterTitleTextWatcher = run {
+            binding.EnterTitle.createTextWatcherWithHistory(changeHistory) { text: Editable ->
+                model.title = text.trim().toString()
+            }
         }
+        binding.EnterTitle.addTextChangedListener(enterTitleTextWatcher)
     }
 
     open fun setStateFromModel() {
         binding.DateCreated.displayFormattedTimestamp(model.timestamp, preferences.dateFormat.value)
-
-        binding.EnterTitle.setText(model.title)
+        updateEnterTitle()
         Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
 
         setColor()
+    }
+
+    private fun updateEnterTitle() {
+        binding.EnterTitle.apply {
+            removeTextChangedListener(enterTitleTextWatcher)
+            setText(model.title)
+            addTextChangedListener(enterTitleTextWatcher)
+        }
     }
 
     private fun handleSharedNote() {
