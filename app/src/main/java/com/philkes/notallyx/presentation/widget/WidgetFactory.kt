@@ -15,7 +15,6 @@ import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getSelectNoteIntent
-import com.philkes.notallyx.utils.displayFormattedTimestamp
 
 class WidgetFactory(private val app: Application, private val id: Long, private val widgetId: Int) :
     RemoteViewsService.RemoteViewsFactory {
@@ -71,9 +70,6 @@ class WidgetFactory(private val app: Application, private val id: Long, private 
 
             val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
 
-            setTextViewTextSize(R.id.Date, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
-            displayFormattedTimestamp(R.id.Date, note.timestamp, preferences.dateFormat.value)
-
             setTextViewTextSize(R.id.Note, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
             if (note.body.isNotEmpty()) {
                 setTextViewText(R.id.Note, note.body)
@@ -95,11 +91,6 @@ class WidgetFactory(private val app: Application, private val id: Long, private 
                 TextSize.getDisplayTitleSize(preferences.textSize.value),
             )
             setTextViewText(R.id.Title, list.title)
-
-            val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
-
-            setTextViewTextSize(R.id.Date, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
-            displayFormattedTimestamp(R.id.Date, list.timestamp, preferences.dateFormat.value)
 
             val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
             setOnClickFillInIntent(R.id.LinearLayout, intent)

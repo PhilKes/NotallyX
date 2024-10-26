@@ -35,14 +35,4 @@
 
     </LinearLayout>
 
-
-
-    <TextView
-        android:id="@+id/Date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="16dp"
-        android:textAppearance="?attr/textAppearanceBody2"
-        android:textColor="?android:textColorSecondary" />
-
 </LinearLayout>
