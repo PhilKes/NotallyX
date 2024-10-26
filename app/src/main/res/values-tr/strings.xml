@@ -80,7 +80,7 @@
     <string name="light">Açık</string>
     <string name="follow_system">Sistem varsayılanı</string>
 
-    <string name="creation_date_format">Zaman biçimi</string>
+    <string name="date_format">Zaman biçimi</string>
     <string name="none">Hiçbiri</string>
 
     <string name="content_density">İçerik yoğunluğu</string>

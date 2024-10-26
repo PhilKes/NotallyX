@@ -129,7 +129,7 @@
     <string name="light">Light</string>
     <string name="follow_system">Follow system</string>
 
-    <string name="creation_date_format">Creation Date format</string>
+    <string name="date_format">Date format</string>
     <string name="none">None</string>
 
     <string name="text_size">Text size</string>
@@ -142,8 +142,8 @@
     <string name="auto_sort_by_checked">Autosort by checked items</string>
 
     <string name="notes_sorted_by">Notes sorted by</string>
-    <string name="creation_date">Created At</string>
-    <string name="modified_date">Last Modified At</string>
+    <string name="creation_date">Created</string>
+    <string name="modified_date">Modified</string>
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
     <string name="sort_direction">Sort Direction</string>

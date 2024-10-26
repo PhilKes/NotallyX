@@ -63,7 +63,7 @@ object DateFormat : ListInfo {
     const val relative = "relative"
     const val absolute = "absolute"
 
-    override val title = R.string.creation_date_format
+    override val title = R.string.date_format
     override val key = "dateFormat"
     override val defaultValue = relative
 

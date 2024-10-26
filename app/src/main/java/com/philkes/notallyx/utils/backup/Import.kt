@@ -37,8 +37,8 @@ import net.lingala.zip4j.exception.ZipException
 object Import {
 
     /**
-     * We only import the images/files referenced in notes. e.g If someone has added garbage to the ZIP
-     * file, like a 100 MB image, ignore it.
+     * We only import the images/files referenced in notes. e.g If someone has added garbage to the
+     * ZIP file, like a 100 MB image, ignore it.
      */
     suspend fun importZip(
         app: Application,

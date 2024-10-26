@@ -29,7 +29,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
-import android.widget.RemoteViews
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
@@ -183,18 +182,16 @@ fun Menu.add(
     return menuItem
 }
 
-fun TextView.displayFormattedTimestamp(timestamp: Long, dateFormat: String) {
+fun TextView.displayFormattedTimestamp(
+    timestamp: Long,
+    dateFormat: String,
+    prefixResId: Int? = null,
+) {
     if (dateFormat != DateFormat.none) {
         visibility = View.VISIBLE
-        text = formatTimestamp(timestamp, dateFormat)
+        text =
+            "${prefixResId?.let { getString(it) } ?: ""} ${formatTimestamp(timestamp, dateFormat)}"
     } else visibility = View.GONE
-}
-
-fun RemoteViews.displayFormattedTimestamp(id: Int, timestamp: Long, dateFormat: String) {
-    if (dateFormat != DateFormat.none) {
-        setViewVisibility(id, View.VISIBLE)
-        setTextViewText(id, formatTimestamp(timestamp, dateFormat))
-    } else setViewVisibility(id, View.GONE)
 }
 
 val Int.dp: Int
@@ -264,8 +261,8 @@ fun EditText.createTextWatcherWithHistory(
 
 fun Editable.clone(): Editable = Editable.Factory.getInstance().newEditable(this)
 
-fun View.getQuantityString(id: Int, quantity: Int): String {
-    return context.resources.getQuantityString(id, quantity, quantity)
+fun View.getString(id: Int, vararg formatArgs: String): String {
+    return context.resources.getString(id, *formatArgs)
 }
 
 fun View.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {

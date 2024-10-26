@@ -22,6 +22,7 @@ import java.io.File
 class BaseNoteAdapter(
     private val selectedIds: Set<Long>,
     private val dateFormat: String,
+    private val sortedBy: String,
     private val textSize: String,
     private val maxItems: Int,
     private val maxLines: Int,
@@ -48,7 +49,12 @@ class BaseNoteAdapter(
         when (val item = list[position]) {
             is Header -> (holder as HeaderVH).bind(item)
             is BaseNote ->
-                (holder as BaseNoteVH).bind(item, imageRoot, selectedIds.contains(item.id))
+                (holder as BaseNoteVH).bind(
+                    item,
+                    imageRoot,
+                    selectedIds.contains(item.id),
+                    sortedBy,
+                )
         }
     }
 

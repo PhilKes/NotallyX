@@ -81,7 +81,7 @@
     <string name="light">Светлая</string>
     <string name="follow_system">Как в системе</string>
 
-    <string name="creation_date_format">Формат даты</string>
+    <string name="date_format">Формат даты</string>
     <string name="none">Отсутствует</string>
 
     <string name="content_density">Плотность контента</string>

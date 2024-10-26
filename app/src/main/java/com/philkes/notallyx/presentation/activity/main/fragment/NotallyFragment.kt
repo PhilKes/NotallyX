@@ -131,6 +131,7 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
                 BaseNoteAdapter(
                     model.actionMode.selectedIds,
                     dateFormat.value,
+                    notesSorting.value.first,
                     textSize.value,
                     maxItems,
                     maxLines,

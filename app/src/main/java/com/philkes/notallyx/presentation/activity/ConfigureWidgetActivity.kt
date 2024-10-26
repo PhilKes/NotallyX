@@ -50,6 +50,7 @@ class ConfigureWidgetActivity : LockedActivity<ActivityConfigureWidgetBinding>()
                 BaseNoteAdapter(
                     Collections.emptySet(),
                     dateFormat.value,
+                    notesSorting.value.first,
                     textSize.value,
                     maxItems,
                     maxLines,
