@@ -99,7 +99,9 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
     internal fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
         Log.d(TAG, "onDragStart")
         reset()
-
+        if (viewHolder.adapterPosition == -1) {
+            return
+        }
         val item = listManager.getItem(viewHolder.adapterPosition)
         if (!item.isChild) {
             childViewHolders =
