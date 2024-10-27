@@ -2,8 +2,6 @@
     <img src="fastlane/metadata/android/en-US/images/icon.png" alt="icon" width="90"/>
     <br />
     <b>NotallyX | Minimalistic note taking app</b>
-
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="70"/>](https://f-droid.org/packages/com.philkes.notallyx/)
 </h2>
 
 <div style="display: flex; justify-content: space-between; width: 100%;">
