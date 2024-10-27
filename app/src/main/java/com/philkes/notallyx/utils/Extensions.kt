@@ -183,11 +183,11 @@ fun Menu.add(
 }
 
 fun TextView.displayFormattedTimestamp(
-    timestamp: Long,
+    timestamp: Long?,
     dateFormat: String,
     prefixResId: Int? = null,
 ) {
-    if (dateFormat != DateFormat.none) {
+    if (dateFormat != DateFormat.none && timestamp != null) {
         visibility = View.VISIBLE
         text =
             "${prefixResId?.let { getString(it) } ?: ""} ${formatTimestamp(timestamp, dateFormat)}"

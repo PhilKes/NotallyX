@@ -24,6 +24,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
+import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
@@ -74,7 +75,7 @@ class BaseNoteVH(
         binding.root.isChecked = checked
     }
 
-    fun bind(baseNote: BaseNote, imageRoot: File?, checked: Boolean, sortingKey: String) {
+    fun bind(baseNote: BaseNote, imageRoot: File?, checked: Boolean, sortBy: String) {
         updateCheck(checked)
 
         when (baseNote.type) {
@@ -82,11 +83,13 @@ class BaseNoteVH(
             Type.LIST -> bindList(baseNote.items)
         }
         val (date, datePrefixResId) =
-            when (sortingKey) {
+            when (sortBy) {
+                autoSortByCreationDate -> Pair(baseNote.timestamp, R.string.creation_date)
                 autoSortByModifiedDate -> Pair(baseNote.modifiedTimestamp, R.string.modified_date)
-                else -> Pair(baseNote.timestamp, R.string.creation_date)
+                else -> Pair(null, null)
             }
-        binding.Date.displayFormattedTimestamp(date, dateFormat, prefixResId = datePrefixResId)
+        binding.Date.displayFormattedTimestamp(date, dateFormat, datePrefixResId)
+
         setColor(baseNote.color)
         setImages(baseNote.images, imageRoot)
         setFiles(baseNote.files)
@@ -225,7 +228,7 @@ class BaseNoteVH(
     private fun setFiles(files: List<FileAttachment>) {
         binding.apply {
             if (files.isNotEmpty()) {
-                FileView.visibility = View.VISIBLE
+                FileViewLayout.visibility = View.VISIBLE
                 FileView.text = files[0].originalName
                 if (files.size > 1) {
                     FileViewMore.apply {
@@ -236,8 +239,7 @@ class BaseNoteVH(
                     FileViewMore.visibility = View.GONE
                 }
             } else {
-                FileView.visibility = View.GONE
-                FileViewMore.visibility = View.GONE
+                FileViewLayout.visibility = View.GONE
             }
         }
     }
