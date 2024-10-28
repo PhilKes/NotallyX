@@ -9,7 +9,7 @@ import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 
 class ColorAdapter(private val listener: ListItemListener) : RecyclerView.Adapter<ColorVH>() {
 
-    private val colors = Color.values()
+    private val colors = Color.entries.toTypedArray()
 
     override fun getItemCount() = colors.size
 

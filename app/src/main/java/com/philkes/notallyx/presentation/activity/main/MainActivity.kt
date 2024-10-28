@@ -1,6 +1,5 @@
 package com.philkes.notallyx.presentation.activity.main
 
-import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -12,6 +11,9 @@ import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
@@ -55,14 +57,15 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     private lateinit var navController: NavController
     private lateinit var configuration: AppBarConfiguration
+    private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private val model: BaseNoteModel by viewModels()
-
-    override fun onBackPressed() {
-        if (model.actionMode.enabled.value) {
-            model.actionMode.close(true)
-        } else super.onBackPressed()
-    }
+    private val actionModeCancelCallback =
+        object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                model.actionMode.close(true)
+            }
+        }
 
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(configuration)
@@ -78,13 +81,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         setupActionMode()
         setupNavigation()
         setupSearch()
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_EXPORT_FILE && resultCode == Activity.RESULT_OK) {
-            data?.data?.let { uri -> model.writeCurrentFileToUri(uri) }
-        }
+        setupActivityResultLaunchers()
+        onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
     }
 
     private fun setupFAB() {
@@ -141,6 +140,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 binding.ActionMode.visibility = View.GONE
                 binding.DrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNDEFINED)
             }
+            actionModeCancelCallback.isEnabled = enabled
         }
 
         val menu = binding.ActionMode.menu
@@ -387,9 +387,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension)
             }
-
         model.currentFile = file
-        startActivityForResult(intent, REQUEST_EXPORT_FILE)
+        exportFileActivityResultLauncher.launch(intent)
     }
 
     private fun setupNavigation() {
@@ -472,7 +471,12 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
     }
 
-    companion object {
-        private const val REQUEST_EXPORT_FILE = 10
+    private fun setupActivityResultLaunchers() {
+        exportFileActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> model.writeCurrentFileToUri(uri) }
+                }
+            }
     }
 }

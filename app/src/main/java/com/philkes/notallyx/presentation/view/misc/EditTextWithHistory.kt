@@ -43,12 +43,13 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
                 { text, start, count ->
                     val changedText = text.substring(start, start + count)
                     if (changedText.isWebUrl() || changedText.isNoteUrl()) {
-                        this.text?.setSpan(
-                            URLSpan(changedText),
-                            start,
-                            start + count,
-                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                        )
+                        super.getText()
+                            ?.setSpan(
+                                URLSpan(changedText),
+                                start,
+                                start + count,
+                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                            )
                     }
                 },
             ) { text: Editable ->

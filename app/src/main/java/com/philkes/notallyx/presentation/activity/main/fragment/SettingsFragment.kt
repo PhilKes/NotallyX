@@ -1,6 +1,5 @@
 package com.philkes.notallyx.presentation.activity.main.fragment
 
-import android.app.Activity
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -14,6 +13,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
@@ -63,6 +65,12 @@ import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 class SettingsFragment : Fragment() {
 
     private val model: BaseNoteModel by activityViewModels()
+    private lateinit var importBackupActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var importOtherActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var exportBackupActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var chooseFolderActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var setupLockActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var disableLockActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var selectedImportSource: ImportSource
 
@@ -149,22 +157,46 @@ class SettingsFragment : Fragment() {
         return binding.root
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
-        if (resultCode == Activity.RESULT_OK) {
-            intent?.data?.let { uri ->
-                when (requestCode) {
-                    REQUEST_IMPORT_BACKUP -> importBackup(uri)
-                    REQUEST_EXPORT_BACKUP -> model.exportBackup(uri)
-                    REQUEST_CHOOSE_FOLDER -> model.setAutoBackupPath(uri)
-                    REQUEST_IMPORT_OTHER -> model.importFromOtherApp(uri, selectedImportSource)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setupActivityResultLaunchers()
+    }
+
+    private fun setupActivityResultLaunchers() {
+        importBackupActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> importBackup(uri) }
                 }
-                return
             }
-        }
-        when (requestCode) {
-            REQUEST_SETUP_LOCK -> showEnableBiometricLock()
-            REQUEST_DISABLE_LOCK -> showDisableBiometricLock()
-        }
+        importOtherActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        model.importFromOtherApp(uri, selectedImportSource)
+                    }
+                }
+            }
+        exportBackupActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> model.exportBackup(uri) }
+                }
+            }
+        chooseFolderActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> model.setAutoBackupPath(uri) }
+                }
+            }
+        setupLockActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                showEnableBiometricLock()
+            }
+        disableLockActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                showDisableBiometricLock()
+            }
     }
 
     private fun importBackup(uri: Uri) {
@@ -208,7 +240,7 @@ class SettingsFragment : Fragment() {
                 addCategory(Intent.CATEGORY_OPENABLE)
                 putExtra(Intent.EXTRA_TITLE, "NotallyX Backup")
             }
-        startActivityForResult(intent, REQUEST_EXPORT_BACKUP)
+        exportBackupActivityResultLauncher.launch(intent)
     }
 
     private fun importBackup() {
@@ -218,7 +250,7 @@ class SettingsFragment : Fragment() {
                 putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/zip", "text/xml"))
                 addCategory(Intent.CATEGORY_OPENABLE)
             }
-        startActivityForResult(intent, REQUEST_IMPORT_BACKUP)
+        importBackupActivityResultLauncher.launch(intent)
     }
 
     private fun clearData() {
@@ -254,7 +286,7 @@ class SettingsFragment : Fragment() {
                                 )
                                 addCategory(Intent.CATEGORY_OPENABLE)
                             }
-                        startActivityForResult(intent, REQUEST_IMPORT_OTHER)
+                        importOtherActivityResultLauncher.launch(intent)
                     }
                     .setNegativeButton(R.string.help) { _, _ ->
                         val intent =
@@ -347,7 +379,7 @@ class SettingsFragment : Fragment() {
             .setMessage(R.string.notes_will_be)
             .setPositiveButton(R.string.choose_folder) { _, _ ->
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                startActivityForResult(intent, REQUEST_CHOOSE_FOLDER)
+                chooseFolderActivityResultLauncher.launch(intent)
             }
             .show()
     }
@@ -522,7 +554,7 @@ class SettingsFragment : Fragment() {
     private fun showEnableBiometricLock() {
         showBiometricOrPinPrompt(
             false,
-            REQUEST_SETUP_LOCK,
+            setupLockActivityResultLauncher,
             R.string.enable_lock_title,
             R.string.enable_lock_description,
             onSuccess = { cipher ->
@@ -543,7 +575,7 @@ class SettingsFragment : Fragment() {
     private fun showDisableBiometricLock() {
         showBiometricOrPinPrompt(
             true,
-            REQUEST_DISABLE_LOCK,
+            disableLockActivityResultLauncher,
             R.string.disable_lock_title,
             R.string.disable_lock_description,
             model.preferences.iv!!,
@@ -594,7 +626,7 @@ class SettingsFragment : Fragment() {
                     } else {
                         Intent(Settings.ACTION_SECURITY_SETTINGS)
                     }
-                startActivityForResult(intent, REQUEST_SETUP_LOCK)
+                setupLockActivityResultLauncher.launch(intent)
             }
             .show()
     }
@@ -641,14 +673,5 @@ class SettingsFragment : Fragment() {
         } catch (exception: ActivityNotFoundException) {
             Toast.makeText(requireContext(), R.string.install_a_browser, Toast.LENGTH_LONG).show()
         }
-    }
-
-    companion object {
-        private const val REQUEST_IMPORT_BACKUP = 20
-        private const val REQUEST_EXPORT_BACKUP = 21
-        private const val REQUEST_CHOOSE_FOLDER = 22
-        private const val REQUEST_SETUP_LOCK = 23
-        private const val REQUEST_DISABLE_LOCK = 24
-        private const val REQUEST_IMPORT_OTHER = 25
     }
 }

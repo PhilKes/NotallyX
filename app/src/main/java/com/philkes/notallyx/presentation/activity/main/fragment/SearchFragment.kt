@@ -23,8 +23,8 @@ class SearchFragment : NotallyFragment() {
             }
 
         binding?.ChipGroup?.apply {
-            setOnCheckedChangeListener { _, checkedId ->
-                when (checkedId) {
+            setOnCheckedStateChangeListener { _, checkedId ->
+                when (checkedId.first()) {
                     R.id.Notes -> model.folder = Folder.NOTES
                     R.id.Deleted -> model.folder = Folder.DELETED
                     R.id.Archived -> model.folder = Folder.ARCHIVED

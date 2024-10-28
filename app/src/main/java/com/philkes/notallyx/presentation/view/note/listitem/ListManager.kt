@@ -185,7 +185,7 @@ class ListManager(
     ) {
         if (updateIsChild) {
             if (newPosition.isBeforeChildItemOfOtherParent) {
-                items.setIsChild(newPosition, true, true)
+                items.setIsChild(newPosition, isChild = true, forceOnChildren = true)
             } else if (newPosition == 0) {
                 items.setIsChild(newPosition, false)
             }

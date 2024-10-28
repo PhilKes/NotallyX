@@ -217,7 +217,7 @@ private fun ListItemSortedList.updatePositions(
             idsOfChildren.addAll(
                 updatedItem.children
                     .reversed() // start recalculations from the lowest child upwards
-                    .map { it.id }
+                    .map { item -> item.id }
             )
         }
         this.updateItemAt(newPosition, updatedItem)

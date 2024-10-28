@@ -7,6 +7,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -15,6 +17,7 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.ActivityPlayAudioBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.getParcelableExtraCompat
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.audio.AudioPlayService
 import com.philkes.notallyx.utils.audio.LocalBinder
@@ -30,6 +33,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
 
     private var service: AudioPlayService? = null
     private lateinit var connection: ServiceConnection
+    private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var audio: Audio
 
@@ -38,7 +42,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         binding = ActivityPlayAudioBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        audio = requireNotNull(intent.getParcelableExtra(AUDIO))
+        audio = requireNotNull(intent.getParcelableExtraCompat(AUDIO, Audio::class.java))
         binding.AudioControlView.setDuration(audio.duration)
 
         val intent = Intent(this, AudioPlayService::class.java)
@@ -69,6 +73,13 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         }
 
         setupToolbar(binding)
+
+        exportFileActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> writeAudioToUri(uri) }
+                }
+            }
     }
 
     override fun onDestroy() {
@@ -81,13 +92,6 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         if (isFinishing) {
             val intent = Intent(this, AudioPlayService::class.java)
             stopService(intent)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_EXPORT_FILE && resultCode == RESULT_OK) {
-            data?.data?.let { uri -> writeAudioToUri(uri) }
         }
     }
 
@@ -145,7 +149,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
             val title = formatter.format(audio.timestamp)
 
             intent.putExtra(Intent.EXTRA_TITLE, title)
-            startActivityForResult(intent, REQUEST_EXPORT_FILE)
+            exportFileActivityResultLauncher.launch(intent)
         }
     }
 
@@ -194,6 +198,5 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
 
     companion object {
         const val AUDIO = "AUDIO"
-        private const val REQUEST_EXPORT_FILE = 50
     }
 }

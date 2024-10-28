@@ -1,7 +1,6 @@
 package com.philkes.notallyx.presentation.activity.note
 
 import android.Manifest
-import android.app.Activity
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,6 +15,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup.LayoutParams
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
@@ -34,6 +35,8 @@ import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
+import com.philkes.notallyx.presentation.getParcelableArrayListExtraCompat
+import com.philkes.notallyx.presentation.getParcelableExtraCompat
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.Constants
@@ -53,6 +56,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEditBinding>() {
+    private lateinit var recordAudioActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var addImagesActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var viewImagesActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var selectLabelsActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var playAudioActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var attachFilesActivityResultLauncher: ActivityResultLauncher<Intent>
+
     internal val model: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
 
@@ -98,15 +108,22 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             configureUI()
             binding.ScrollView.visibility = View.VISIBLE
         }
+
+        setupActivityResultLaunchers()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == Activity.RESULT_OK) {
-            when (requestCode) {
-                REQUEST_ADD_IMAGES -> {
-                    val uri = data?.data
-                    val clipData = data?.clipData
+    private fun setupActivityResultLaunchers() {
+        recordAudioActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    model.addAudio()
+                }
+            }
+        addImagesActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val uri = result.data?.data
+                    val clipData = result.data?.clipData
                     if (uri != null) {
                         val uris = arrayOf(uri)
                         model.addImages(uris)
@@ -116,36 +133,49 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                         model.addImages(uris)
                     }
                 }
-
-                REQUEST_VIEW_IMAGES -> {
+            }
+        viewImagesActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
                     val list =
-                        data?.getParcelableArrayListExtra<FileAttachment>(
-                            ViewImageActivity.DELETED_IMAGES
+                        result.data?.getParcelableArrayListExtraCompat(
+                            ViewImageActivity.DELETED_IMAGES,
+                            FileAttachment::class.java,
                         )
                     if (!list.isNullOrEmpty()) {
                         model.deleteImages(list)
                     }
                 }
-
-                REQUEST_SELECT_LABELS -> {
-                    val list = data?.getStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS)
+            }
+        selectLabelsActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val list =
+                        result.data?.getStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS)
                     if (list != null && list != model.labels) {
                         model.setLabels(list)
                         Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
                     }
                 }
-
-                REQUEST_RECORD_AUDIO -> model.addAudio()
-                REQUEST_PLAY_AUDIO -> {
-                    val audio = data?.getParcelableExtra<Audio>(PlayAudioActivity.AUDIO)
+            }
+        playAudioActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val audio =
+                        result.data?.getParcelableExtraCompat(
+                            PlayAudioActivity.AUDIO,
+                            Audio::class.java,
+                        )
                     if (audio != null) {
                         model.deleteAudio(audio)
                     }
                 }
-
-                REQUEST_ATTACH_FILES -> {
-                    val uri = data?.data
-                    val clipData = data?.clipData
+            }
+        attachFilesActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val uri = result.data?.data
+                    val clipData = result.data?.clipData
                     if (uri != null) {
                         val uris = arrayOf(uri)
                         model.addFiles(uris)
@@ -156,7 +186,6 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     }
                 }
             }
-        }
     }
 
     override fun onRequestPermissionsResult(
@@ -166,8 +195,6 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            REQUEST_NOTIFICATION_PERMISSION_IMAGES -> selectImages()
-            REQUEST_NOTIFICATION_PERMISSION_FILES -> selectFiles()
             REQUEST_AUDIO_PERMISSION -> {
                 if (
                     grantResults.isNotEmpty() &&
@@ -295,7 +322,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     private fun recordAudio() {
         if (model.audioRoot != null) {
             val intent = Intent(this, RecordAudioActivity::class.java)
-            startActivityForResult(intent, REQUEST_RECORD_AUDIO)
+            recordAudioActivityResultLauncher.launch(intent)
         } else Toast.makeText(this, R.string.insert_an_sd_card_audio, Toast.LENGTH_LONG).show()
     }
 
@@ -320,7 +347,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                     addCategory(Intent.CATEGORY_OPENABLE)
                 }
-            startActivityForResult(intent, REQUEST_ADD_IMAGES)
+            addImagesActivityResultLauncher.launch(intent)
         } else Toast.makeText(this, R.string.insert_an_sd_card_images, Toast.LENGTH_LONG).show()
     }
 
@@ -333,7 +360,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
                     addCategory(Intent.CATEGORY_OPENABLE)
                 }
-            startActivityForResult(intent, REQUEST_ATTACH_FILES)
+            attachFilesActivityResultLauncher.launch(intent)
         } else Toast.makeText(this, R.string.insert_an_sd_card_files, Toast.LENGTH_LONG).show()
     }
 
@@ -349,7 +376,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     private fun label() {
         val intent = Intent(this, SelectLabelsActivity::class.java)
         intent.putStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS, model.labels)
-        startActivityForResult(intent, REQUEST_SELECT_LABELS)
+        selectLabelsActivityResultLauncher.launch(intent)
     }
 
     private fun delete() {
@@ -402,7 +429,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                         putExtra(ViewImageActivity.POSITION, position)
                         putExtra(Constants.SelectedBaseNote, model.id)
                     }
-                startActivityForResult(intent, REQUEST_VIEW_IMAGES)
+                viewImagesActivityResultLauncher.launch(intent)
             }
 
         imageAdapter.registerAdapterDataObserver(
@@ -534,7 +561,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 val audio = model.audios.value[position]
                 val intent = Intent(this, PlayAudioActivity::class.java)
                 intent.putExtra(PlayAudioActivity.AUDIO, audio)
-                startActivityForResult(intent, REQUEST_PLAY_AUDIO)
+                playAudioActivityResultLauncher.launch(intent)
             }
         }
         binding.AudioRecyclerView.adapter = adapter
@@ -602,15 +629,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     }
 
     companion object {
-        private const val REQUEST_ADD_IMAGES = 30
-        private const val REQUEST_VIEW_IMAGES = 31
-        private const val REQUEST_NOTIFICATION_PERMISSION_IMAGES = 32
-        private const val REQUEST_SELECT_LABELS = 33
-        private const val REQUEST_RECORD_AUDIO = 34
-        private const val REQUEST_PLAY_AUDIO = 35
         private const val REQUEST_AUDIO_PERMISSION = 36
-        private const val REQUEST_ATTACH_FILES = 37
-        private const val REQUEST_NOTIFICATION_PERMISSION_FILES = 38
 
         const val NOTE_ID = "note_id"
         const val FOLDER_FROM = "folder_from"

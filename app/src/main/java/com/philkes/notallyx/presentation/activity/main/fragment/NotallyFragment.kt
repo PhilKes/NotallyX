@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -36,6 +38,8 @@ import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 abstract class NotallyFragment : Fragment(), ListItemListener {
 
     private var notesAdapter: BaseNoteAdapter? = null
+    private lateinit var openNoteActivityResultLauncher: ActivityResultLauncher<Intent>
+
     internal var binding: FragmentNotesBinding? = null
 
     internal val model: BaseNoteModel by activityViewModels()
@@ -52,6 +56,35 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
         setupAdapter()
         setupRecyclerView()
         setupObserver()
+
+        setupActivityResultLaunchers()
+    }
+
+    private fun setupActivityResultLaunchers() {
+        openNoteActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    // If a note has been moved inside of EditActivity
+                    // present snackbar to undo it
+                    val data = result.data
+                    val id = data?.getLongExtra(NOTE_ID, -1)
+                    if (id != null) {
+                        val folderFrom = Folder.valueOf(data.getStringExtra(FOLDER_FROM)!!)
+                        val folderTo = Folder.valueOf(data.getStringExtra(FOLDER_TO)!!)
+                        Snackbar.make(
+                                binding!!.root,
+                                requireContext().getQuantityString(folderTo.movedToResId(), 1),
+                                Snackbar.LENGTH_SHORT,
+                            )
+                            .apply {
+                                setAction(R.string.undo) {
+                                    model.moveBaseNotes(longArrayOf(id), folderFrom)
+                                }
+                            }
+                            .show()
+                    }
+                }
+            }
     }
 
     override fun onCreateView(
@@ -87,32 +120,6 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
             notesAdapter?.getItem(position)?.let { item ->
                 if (item is BaseNote) {
                     handleNoteSelection(item.id, position, item)
-                }
-            }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_NOTE_EDIT) {
-                // If a note has been moved inside of EditActivity
-                // present snackbar to undo it
-                val id = data?.getLongExtra(NOTE_ID, -1)
-                if (id != null) {
-                    val folderFrom = Folder.valueOf(data.getStringExtra(FOLDER_FROM)!!)
-                    val folderTo = Folder.valueOf(data.getStringExtra(FOLDER_TO)!!)
-                    Snackbar.make(
-                            binding!!.root,
-                            requireContext().getQuantityString(folderTo.movedToResId(), 1),
-                            Snackbar.LENGTH_SHORT,
-                        )
-                        .apply {
-                            setAction(R.string.undo) {
-                                model.moveBaseNotes(longArrayOf(id), folderFrom)
-                            }
-                        }
-                        .show()
                 }
             }
         }
@@ -188,14 +195,10 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
     private fun goToActivity(activity: Class<*>, baseNote: BaseNote) {
         val intent = Intent(requireContext(), activity)
         intent.putExtra(Constants.SelectedBaseNote, baseNote.id)
-        startActivityForResult(intent, REQUEST_NOTE_EDIT)
+        openNoteActivityResultLauncher.launch(intent)
     }
 
     abstract fun getBackground(): Int
 
     abstract fun getObservable(): LiveData<List<Item>>
-
-    companion object {
-        private const val REQUEST_NOTE_EDIT = 11
-    }
 }
