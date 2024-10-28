@@ -90,7 +90,7 @@
     <string name="light">Svetlo</string>
     <string name="follow_system">Privzeto v sistemu</string>
 
-    <string name="creation_date_format">Zapis datuma</string>
+    <string name="date_format">Zapis datuma</string>
     <string name="none">Brez</string>
 
     <string name="text_size">Velikost pisave</string>

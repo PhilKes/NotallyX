@@ -50,6 +50,7 @@ class ConfigureWidgetActivity : LockedActivity<ActivityConfigureWidgetBinding>()
                 BaseNoteAdapter(
                     Collections.emptySet(),
                     dateFormat.value,
+                    notesSorting.value.first,
                     textSize.value,
                     maxItems,
                     maxLines,
@@ -82,6 +83,10 @@ class ConfigureWidgetActivity : LockedActivity<ActivityConfigureWidgetBinding>()
                     }
                 adapter.submitList(notes)
             }
+        }
+
+        preferences.notesSorting.observe(this) { (sortBy, sortDirection) ->
+            adapter.setSorting(sortBy, sortDirection)
         }
     }
 

@@ -123,7 +123,7 @@
     <string name="light">Licht</string>
     <string name="follow_system">Volg systeeminstellingen</string>
 
-    <string name="creation_date_format">Datumformaat</string>
+    <string name="date_format">Datumformaat</string>
     <string name="none">Geen</string>
 
     <string name="text_size">Tekstgrootte</string>
@@ -136,8 +136,8 @@
     <string name="auto_sort_by_checked">Automatisch sorteren op geselecteerde items</string>
 
     <string name="notes_sorted_by">Notities gesorteerd op</string>
-    <string name="creation_date">Gemaakt op</string>
-    <string name="modified_date">Laatst gewijzigd op</string>
+    <string name="creation_date">Gemaakt</string>
+    <string name="modified_date">Gewijzigd</string>
     <string name="ascending">Oplopend</string>
     <string name="descending">Aflopend</string>
     <string name="sort_direction">Sorteer volgorde</string>

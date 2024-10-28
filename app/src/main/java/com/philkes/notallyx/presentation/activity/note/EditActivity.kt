@@ -35,6 +35,8 @@ import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.view.Constants
+import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
+import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
 import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
@@ -249,7 +251,14 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     }
 
     open fun setStateFromModel() {
-        binding.DateCreated.displayFormattedTimestamp(model.timestamp, preferences.dateFormat.value)
+        val (date, datePrefixResId) =
+            when (preferences.notesSorting.value.first) {
+                autoSortByCreationDate -> Pair(model.timestamp, R.string.creation_date)
+                autoSortByModifiedDate -> Pair(model.modifiedTimestamp, R.string.modified_date)
+                else -> Pair(null, null)
+            }
+        binding.Date.displayFormattedTimestamp(date, preferences.dateFormat.value, datePrefixResId)
+
         updateEnterTitle()
         Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
 
@@ -594,7 +603,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         val body = TextSize.getEditBodySize(model.textSize)
 
         binding.EnterTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, title)
-        binding.DateCreated.setTextSize(TypedValue.COMPLEX_UNIT_SP, date)
+        binding.Date.setTextSize(TypedValue.COMPLEX_UNIT_SP, date)
         binding.EnterBody.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
         setupImages()

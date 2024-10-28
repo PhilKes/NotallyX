@@ -89,7 +89,7 @@
     <string name="light">Jasny</string>
     <string name="follow_system">Systemowy</string>
 
-    <string name="creation_date_format">Format daty</string>
+    <string name="date_format">Format daty</string>
     <string name="none">Brak</string>
 
     <string name="text_size">Rozmiar tekstu</string>

@@ -86,7 +86,7 @@
     <string name="light">浅</string>
     <string name="follow_system">系统主题</string>
 
-    <string name="creation_date_format">日期格式</string>
+    <string name="date_format">日期格式</string>
     <string name="none">无</string>
 
     <string name="text_size">文本大小</string>
