@@ -5,6 +5,8 @@ import android.os.Build
 import android.preference.PreferenceManager
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.philkes.notallyx.data.model.toPreservedByteArray
+import com.philkes.notallyx.data.model.toPreservedString
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
@@ -24,8 +26,6 @@ import com.philkes.notallyx.presentation.view.misc.TextInfo
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.view.misc.View
-import com.philkes.notallyx.utils.toPreservedByteArray
-import com.philkes.notallyx.utils.toPreservedString
 import java.security.SecureRandom
 import javax.crypto.Cipher
 

@@ -92,6 +92,11 @@
 
         </activity>
 
+        <activity
+            android:name=".presentation.activity.note.PickNoteActivity"
+            android:exported="false">
+        </activity>
+
         <receiver
             android:name=".presentation.widget.WidgetProvider"
             android:exported="false"

@@ -6,6 +6,8 @@ import android.view.inputmethod.InputMethodManager
 import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
@@ -14,9 +16,7 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSort
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.widget.WidgetProvider
-import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
-import com.philkes.notallyx.utils.setOnNextAction
 
 class EditListActivity : EditActivity(Type.LIST) {
 

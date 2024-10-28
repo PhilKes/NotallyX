@@ -39,14 +39,14 @@ import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
+import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.applySpans
+import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.add
-import com.philkes.notallyx.utils.applySpans
-import com.philkes.notallyx.utils.movedToResId
 import java.io.File
 import kotlinx.coroutines.launch
 

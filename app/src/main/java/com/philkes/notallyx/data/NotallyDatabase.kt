@@ -17,9 +17,9 @@ import com.philkes.notallyx.data.dao.LabelDao
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.Label
+import com.philkes.notallyx.presentation.observeForeverSkipFirst
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
-import com.philkes.notallyx.utils.observeForeverSkipFirst
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import net.sqlcipher.database.SupportFactory
 

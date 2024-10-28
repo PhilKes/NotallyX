@@ -19,12 +19,13 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.FragmentNotesBinding
+import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.LabelAdapter
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
-import com.philkes.notallyx.utils.add
 
 class LabelsFragment : Fragment(), ListItemListener {
 
@@ -113,9 +114,7 @@ class LabelsFragment : Fragment(), ListItemListener {
                     }
                 }
             }
-            .show()
-
-        dialogBinding.EditText.requestFocus()
+            .showAndFocus(dialogBinding.EditText)
     }
 
     private fun confirmDeletion(value: String) {
@@ -152,8 +151,6 @@ class LabelsFragment : Fragment(), ListItemListener {
                     }
                 }
             }
-            .show()
-
-        dialogBinding.EditText.requestFocus()
+            .showAndFocus(dialogBinding.EditText)
     }
 }

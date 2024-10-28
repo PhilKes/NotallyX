@@ -4,7 +4,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import androidx.navigation.fragment.findNavController
 import com.philkes.notallyx.R
-import com.philkes.notallyx.utils.add
+import com.philkes.notallyx.presentation.add
 
 class NotesFragment : NotallyFragment() {
 

@@ -13,9 +13,10 @@ import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.databinding.ActivityLabelBinding
 import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.view.main.SelectableLabelAdapter
 import com.philkes.notallyx.presentation.viewmodel.LabelModel
-import com.philkes.notallyx.utils.add
 
 class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
 
@@ -70,9 +71,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
                     }
                 }
             }
-            .show()
-
-        binding.EditText.requestFocus()
+            .showAndFocus(binding.EditText)
     }
 
     private fun setupRecyclerView() {

@@ -10,6 +10,14 @@
         android:layout_height="wrap_content"
         app:title="@string/select_note" />
 
+    <TextView
+      android:id="@+id/EmptyView"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:text="@string/empty_list"
+      android:gravity="center"
+      android:visibility="gone"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RecyclerView"
         android:layout_width="match_parent"

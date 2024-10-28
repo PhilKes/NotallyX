@@ -25,12 +25,12 @@ import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FO
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
+import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
 import com.philkes.notallyx.presentation.view.misc.View as ViewPref
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
-import com.philkes.notallyx.utils.movedToResId
 
 abstract class NotallyFragment : Fragment(), ListItemListener {
 
