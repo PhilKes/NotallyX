@@ -14,10 +14,10 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
+import com.philkes.notallyx.data.model.isImage
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
-import com.philkes.notallyx.utils.isImage
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope

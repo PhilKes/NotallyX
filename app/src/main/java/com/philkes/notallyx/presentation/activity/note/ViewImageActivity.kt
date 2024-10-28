@@ -17,10 +17,10 @@ import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.databinding.ActivityViewImageBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
-import com.philkes.notallyx.utils.add
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

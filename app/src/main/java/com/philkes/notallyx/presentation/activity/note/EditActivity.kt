@@ -11,7 +11,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
-import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
@@ -34,6 +33,8 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
@@ -45,10 +46,7 @@ import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.add
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
-import com.philkes.notallyx.utils.createTextWatcherWithHistory
-import com.philkes.notallyx.utils.displayFormattedTimestamp
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -56,7 +54,6 @@ import kotlinx.coroutines.launch
 abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEditBinding>() {
     internal val model: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
-    internal lateinit var enterTitleTextWatcher: TextWatcher
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -118,6 +115,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                         model.addImages(uris)
                     }
                 }
+
                 REQUEST_VIEW_IMAGES -> {
                     val list =
                         data?.getParcelableArrayListExtra<FileAttachment>(
@@ -127,6 +125,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                         model.deleteImages(list)
                     }
                 }
+
                 REQUEST_SELECT_LABELS -> {
                     val list = data?.getStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS)
                     if (list != null && list != model.labels) {
@@ -134,6 +133,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                         Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
                     }
                 }
+
                 REQUEST_RECORD_AUDIO -> model.addAudio()
                 REQUEST_PLAY_AUDIO -> {
                     val audio = data?.getParcelableExtra<Audio>(PlayAudioActivity.AUDIO)
@@ -141,6 +141,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                         model.deleteAudio(audio)
                     }
                 }
+
                 REQUEST_ATTACH_FILES -> {
                     val uri = data?.data
                     val clipData = data?.clipData
@@ -242,12 +243,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     abstract fun configureUI()
 
     open fun setupListeners() {
-        enterTitleTextWatcher = run {
-            binding.EnterTitle.createTextWatcherWithHistory(changeHistory) { text: Editable ->
-                model.title = text.trim().toString()
-            }
+        binding.EnterTitle.initHistory(changeHistory) { text ->
+            model.title = text.trim().toString()
         }
-        binding.EnterTitle.addTextChangedListener(enterTitleTextWatcher)
     }
 
     open fun setStateFromModel() {
@@ -259,18 +257,10 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             }
         binding.Date.displayFormattedTimestamp(date, preferences.dateFormat.value, datePrefixResId)
 
-        updateEnterTitle()
+        binding.EnterTitle.setText(model.title)
         Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
 
         setColor()
-    }
-
-    private fun updateEnterTitle() {
-        binding.EnterTitle.apply {
-            removeTextChangedListener(enterTitleTextWatcher)
-            setText(model.title)
-            addTextChangedListener(enterTitleTextWatcher)
-        }
     }
 
     private fun handleSharedNote() {

@@ -32,6 +32,7 @@ import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.SearchResult
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.ListInfo
 import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
@@ -44,7 +45,6 @@ import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.applySpans
 import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.Export.exportAsZip
 import com.philkes.notallyx.utils.backup.Import.importZip

@@ -45,6 +45,8 @@
     <string name="clear">Clear</string>
     <string name="continue_">Continue</string>
     <string name="open_link">Open link</string>
+    <string name="open_note">Open Note</string>
+    <string name="display_text">Text to display</string>
     <string name="make_list">Make list</string>
     <string name="take_note">Take note</string>
     <string name="add_label">Add label</string>
@@ -94,6 +96,9 @@
     <string name="drag_handle">Drag Handle</string>
     <string name="bold">Bold</string>
     <string name="link">Link</string>
+    <string name="link_note">Link Note</string>
+    <string name="change_note">Change Note</string>
+    <string name="remove_link">Remove Link</string>
     <string name="italic">Italic</string>
     <string name="strikethrough">Strikethrough</string>
     <string name="clear_formatting">Clear formatting</string>

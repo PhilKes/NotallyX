@@ -13,6 +13,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getSelectNoteIntent
 

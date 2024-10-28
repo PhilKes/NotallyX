@@ -24,15 +24,15 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
+import com.philkes.notallyx.presentation.applySpans
+import com.philkes.notallyx.presentation.displayFormattedTimestamp
+import com.philkes.notallyx.presentation.dp
+import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.applySpans
-import com.philkes.notallyx.utils.displayFormattedTimestamp
-import com.philkes.notallyx.utils.dp
-import com.philkes.notallyx.utils.getQuantityString
 import java.io.File
 
 class BaseNoteVH(

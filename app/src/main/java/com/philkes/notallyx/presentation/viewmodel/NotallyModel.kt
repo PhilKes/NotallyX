@@ -36,13 +36,13 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.FileProgress
-import com.philkes.notallyx.utils.IO
 import com.philkes.notallyx.utils.IO.copyToFile
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
@@ -50,7 +50,6 @@ import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.IO.getTempAudioFile
 import com.philkes.notallyx.utils.IO.rename
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.applySpans
 import java.io.File
 import java.io.FileInputStream
 import java.util.UUID

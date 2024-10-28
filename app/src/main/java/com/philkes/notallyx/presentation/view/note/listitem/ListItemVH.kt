@@ -12,11 +12,11 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
+import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
+import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.misc.SwipeLayout.SwipeActionsListener
 import com.philkes.notallyx.presentation.view.misc.TextSize
-import com.philkes.notallyx.utils.createListTextWatcherWithHistory
-import com.philkes.notallyx.utils.setOnNextAction
 
 class ListItemVH(
     val binding: RecyclerListItemBinding,

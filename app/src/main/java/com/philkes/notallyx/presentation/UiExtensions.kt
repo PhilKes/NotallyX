@@ -1,7 +1,9 @@
-package com.philkes.notallyx.utils
+package com.philkes.notallyx.presentation
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -24,25 +26,28 @@ import android.view.KeyEvent
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
-import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
+import com.philkes.notallyx.data.model.getUrl
 import com.philkes.notallyx.presentation.view.misc.DateFormat
+import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
-import com.philkes.notallyx.utils.changehistory.EditTextChange
+import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
 import java.util.Date
 import kotlin.math.roundToInt
 import org.ocpsoft.prettytime.PrettyTime
@@ -64,7 +69,7 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
                 editable.setSpan(StyleSpan(Typeface.ITALIC), start, end)
             }
             if (link) {
-                val url = linkData ?: getURL(start, end)
+                val url = linkData ?: getUrl(start, end)
                 editable.setSpan(URLSpan(url), start, end)
             }
             if (monospace) {
@@ -81,7 +86,7 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
 }
 
 /**
- * Extension function for Editable to modify or remove spans based on the selection range.
+ * Adjusts or removes spans based on the selection range.
  *
  * @param selectionStart the start index of the selection
  * @param selectionEnd the end index of the selection
@@ -120,12 +125,6 @@ fun Editable.removeSelectionFromSpan(selectionStart: Int, selectionEnd: Int) {
             }
         }
     }
-}
-
-private fun String.getURL(start: Int, end: Int): String {
-    return if (end <= length) {
-        EditNoteActivity.getURLFrom(substring(start, end))
-    } else EditNoteActivity.getURLFrom(substring(start, length))
 }
 
 private fun Spannable.setSpan(span: Any, start: Int, end: Int) {
@@ -226,7 +225,7 @@ fun EditText.createListTextWatcherWithHistory(listManager: ListManager, position
         }
     }
 
-fun EditText.createTextWatcherWithHistory(
+fun EditTextWithHistory.createTextWatcherWithHistory(
     changeHistory: ChangeHistory,
     onTextChanged: ((text: CharSequence, start: Int, count: Int) -> Unit)? = null,
     updateModel: (text: Editable) -> Unit,
@@ -235,7 +234,7 @@ fun EditText.createTextWatcherWithHistory(
         private lateinit var currentTextBefore: Editable
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            currentTextBefore = this@createTextWatcherWithHistory.text.clone()
+            currentTextBefore = this@createTextWatcherWithHistory.getTextClone()
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -248,11 +247,10 @@ fun EditText.createTextWatcherWithHistory(
             updateModel.invoke(textAfter)
 
             changeHistory.push(
-                EditTextChange(
+                EditTextWithHistoryChange(
                     this@createTextWatcherWithHistory,
                     textBefore,
                     textAfter,
-                    this,
                     updateModel,
                 )
             )
@@ -269,11 +267,6 @@ fun View.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): Stri
     return context.resources.getQuantityString(id, quantity, *formatArgs)
 }
 
-val FileAttachment.isImage: Boolean
-    get() {
-        return mimeType.startsWith("image/")
-    }
-
 fun Folder.movedToResId(): Int {
     return when (this) {
         Folder.DELETED -> R.plurals.deleted_selected_notes
@@ -287,7 +280,6 @@ fun RadioGroup.checkedTag(): Any {
 }
 
 fun Context.canAuthenticateWithBiometrics(): Int {
-    var canAuthenticate = true
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
             val keyguardManager: KeyguardManager =
@@ -312,16 +304,6 @@ fun Context.canAuthenticateWithBiometrics(): Int {
     return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
 }
 
-val String.toPreservedByteArray: ByteArray
-    get() {
-        return this.toByteArray(Charsets.ISO_8859_1)
-    }
-
-val ByteArray.toPreservedString: String
-    get() {
-        return String(this, Charsets.ISO_8859_1)
-    }
-
 fun <T> LiveData<T>.observeForeverSkipFirst(observer: Observer<T>) {
     var isFirstEvent = true
     this.observeForever { value ->
@@ -344,4 +326,24 @@ private fun formatTimestamp(timestamp: Long, dateFormat: String): String {
         DateFormat.relative -> PrettyTime().format(date)
         else -> java.text.DateFormat.getDateInstance(java.text.DateFormat.FULL).format(date)
     }
+}
+
+fun Activity.copyToClipBoard(text: CharSequence) {
+    val clipboard: ClipboardManager =
+        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+    val clip = ClipData.newPlainText("label", text)
+    clipboard.setPrimaryClip(clip)
+}
+
+fun ClipboardManager.getLatestText(): CharSequence? {
+    return if (primaryClip!!.itemCount > 0) primaryClip!!.getItemAt(0)!!.text else null
+}
+
+fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
+    val dialog = show()
+    view.requestFocus()
+    if (view is EditText) {
+        dialog.window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE)
+    }
+    return dialog
 }

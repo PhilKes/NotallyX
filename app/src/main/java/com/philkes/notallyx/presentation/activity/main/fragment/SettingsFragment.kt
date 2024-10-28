@@ -30,6 +30,8 @@ import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
+import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
+import com.philkes.notallyx.presentation.checkedTag
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
@@ -53,8 +55,6 @@ import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
-import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
-import com.philkes.notallyx.utils.checkedTag
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt

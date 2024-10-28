@@ -4,7 +4,7 @@ import android.view.Menu
 import android.view.MenuInflater
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
-import com.philkes.notallyx.utils.add
+import com.philkes.notallyx.presentation.add
 
 class DeletedFragment : NotallyFragment() {
 
