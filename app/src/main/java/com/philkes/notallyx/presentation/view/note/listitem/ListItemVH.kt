@@ -26,6 +26,7 @@ class ListItemVH(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var editTextWatcher: TextWatcher
+    private var dragHandleInitialY: Float = 0f
 
     init {
         val body = TextSize.getEditBodySize(textSize)
@@ -47,8 +48,15 @@ class ListItemVH(
         }
 
         binding.DragHandle.setOnTouchListener { _, event ->
-            if (event.actionMasked == MotionEvent.ACTION_DOWN) {
-                touchHelper.startDrag(this)
+            when (event.actionMasked) {
+                MotionEvent.ACTION_DOWN -> dragHandleInitialY = event.y
+                MotionEvent.ACTION_MOVE,
+                MotionEvent.ACTION_CANCEL -> {
+                    val dY = Math.abs(dragHandleInitialY!! - event.y)
+                    if (dY > binding.DragHandle.measuredHeight * 0.15f) {
+                        touchHelper.startDrag(this)
+                    }
+                }
             }
             false
         }

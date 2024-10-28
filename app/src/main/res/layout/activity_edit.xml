@@ -121,6 +121,8 @@
                 android:clipToPadding="false"
                 android:overScrollMode="never"
                 android:paddingTop="4dp"
+                android:paddingStart="14dp"
+                android:paddingEnd="14dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             <TextView
