@@ -136,7 +136,7 @@ class BaseNoteVH(
                                 visibility = View.VISIBLE
                                 if (item.isChild) {
                                     val layoutParams = layoutParams as LinearLayout.LayoutParams
-                                    layoutParams.marginStart = 150.dp
+                                    layoutParams.marginStart = 20.dp(context)
                                     setLayoutParams(layoutParams)
                                 }
                             }

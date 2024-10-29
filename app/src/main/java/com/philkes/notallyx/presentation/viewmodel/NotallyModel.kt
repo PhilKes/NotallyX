@@ -36,15 +36,11 @@ import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.IO.copyToFile
 import com.philkes.notallyx.utils.IO.deleteAttachments
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.IO.getTempAudioFile
-import com.philkes.notallyx.utils.IO.rename
-import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.applySpans
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -296,7 +292,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             val end = spanned.getSpanEnd(span)
             val start = spanned.getSpanStart(span)
             val representation =
-                SpanRepresentation(false, false, null, false, false, false, start, end)
+                SpanRepresentation(start, end, false, false, null, false, false, false)
 
             when (span) {
                 is StyleSpan -> {

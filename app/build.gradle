@@ -1,4 +1,5 @@
 import com.ncorti.ktfmt.gradle.tasks.KtfmtFormatTask
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -57,8 +58,8 @@ android {
         excludes += ["DebugProbesKt.bin", "META-INF/**.version", "kotlin/**.kotlin_builtins", "kotlin-tooling-metadata.json"]
     }
 
-    testOptions{
-        unitTests{
+    testOptions {
+        unitTests {
             includeAndroidResources true
         }
     }
@@ -120,6 +121,8 @@ dependencies {
     implementation "com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0"
 
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
+    implementation "org.simpleframework:simple-xml:2.7.1"
+    implementation 'org.jsoup:jsoup:1.18.1'
 
     testImplementation "junit:junit:4.13.2"
     testImplementation "androidx.test:core:1.6.1"

@@ -1,14 +1,14 @@
 package com.philkes.notallyx.data.model
 
 data class SpanRepresentation(
-    var bold: Boolean,
-    var link: Boolean,
-    var linkData: String?,
-    var italic: Boolean,
-    var monospace: Boolean,
-    var strikethrough: Boolean,
     var start: Int,
     var end: Int,
+    var bold: Boolean = false,
+    var link: Boolean = false,
+    var linkData: String? = null,
+    var italic: Boolean = false,
+    var monospace: Boolean = false,
+    var strikethrough: Boolean = false,
 ) {
 
     fun isNotUseless(): Boolean {

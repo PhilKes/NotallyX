@@ -246,7 +246,7 @@ class SettingsFragment : Fragment() {
                         dialog.cancel()
                         val intent =
                             Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                                type = "*/*"
+                                type = "ap/*"
                                 putExtra(
                                     Intent.EXTRA_MIME_TYPES,
                                     arrayOf(selectedImportSource.mimeType),

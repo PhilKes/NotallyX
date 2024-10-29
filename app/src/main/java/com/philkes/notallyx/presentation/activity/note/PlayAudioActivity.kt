@@ -62,7 +62,11 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
 
         binding.Play.setOnClickListener { service?.play() }
 
-        binding.AudioControlView.onSeekComplete = { milliseconds -> service?.seek(milliseconds) }
+        audio.duration?.let {
+            binding.AudioControlView.onSeekComplete = { milliseconds ->
+                service?.seek(milliseconds)
+            }
+        }
 
         setupToolbar(binding)
     }

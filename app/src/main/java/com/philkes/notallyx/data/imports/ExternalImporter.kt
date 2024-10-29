@@ -1,10 +1,11 @@
 package com.philkes.notallyx.data.imports
 
 import android.app.Application
+import android.net.Uri
+import com.philkes.notallyx.data.model.BaseNote
 import java.io.File
-import java.io.InputStream
 
 interface ExternalImporter {
 
-    fun importFrom(inputStream: InputStream, app: Application): Pair<NotesImport, File>
+    fun importFrom(uri: Uri, app: Application): Pair<List<BaseNote>, File>
 }

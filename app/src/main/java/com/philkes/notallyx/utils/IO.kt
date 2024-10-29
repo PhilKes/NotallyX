@@ -2,8 +2,13 @@ package com.philkes.notallyx.utils
 
 import android.app.Application
 import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.media.MediaMetadataRetriever
 import android.os.Build
 import androidx.lifecycle.MutableLiveData
+import android.util.Log
+import androidx.core.net.toUri
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
@@ -16,6 +21,8 @@ import java.io.InputStream
 import java.nio.file.Files
 
 object IO {
+
+    private const val TAG = "IO"
 
     const val SUBFOLDER_IMAGES = "Images"
     const val SUBFOLDER_FILES = "Files"
@@ -36,6 +43,12 @@ object IO {
         copyTo(output)
         close()
         output.close()
+        Log.d(TAG, "Copied InputStream to '${destination.absolutePath}'")
+    }
+
+    fun File.write(bytes: ByteArray) {
+        outputStream().use { outputStream -> outputStream.write(bytes) }
+        Log.d(TAG, "Wrote ${bytes.size} bytes to '${this.absolutePath}'")
     }
 
     fun File.rename(newName: String): Boolean {
@@ -56,6 +69,27 @@ object IO {
             for (file in files) {
                 file.delete()
             }
+        }
+    }
+
+    fun File.decodeToBitmap(): Bitmap? {
+        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
+        return BitmapFactory.decodeFile(absolutePath, options)
+    }
+
+    fun File.isAudioFile(context: Context): Boolean {
+        val retriever = MediaMetadataRetriever()
+        return try {
+            retriever.setDataSource(context, toUri()) // Try to set the file path
+            val hasAudio = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO)
+            val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+            val mimeType = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
+            mimeType != null && hasAudio != null ||
+                    duration != null // If it has audio metadata, it's a valid audio file
+        } catch (e: Exception) {
+            false // An exception means it’s not a valid audio file
+        } finally {
+            retriever.release() // Always release retriever to free resources
         }
     }
 

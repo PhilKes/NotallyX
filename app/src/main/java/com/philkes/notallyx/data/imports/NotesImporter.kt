@@ -1,11 +1,13 @@
 package com.philkes.notallyx.data.imports
 
 import android.app.Application
+import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.DataUtil
 import com.philkes.notallyx.data.NotallyDatabase
+import com.philkes.notallyx.data.imports.evernote.EvernoteImporter
 import com.philkes.notallyx.data.imports.google.GoogleKeepImporter
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
@@ -13,20 +15,28 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import java.io.File
-import java.io.InputStream
 
 class NotesImporter(private val app: Application, private val database: NotallyDatabase) {
 
-    suspend fun import(inputStream: InputStream, importSource: ImportSource) {
-        val (import, importDataFolder) =
+    suspend fun import(uri: Uri, importSource: ImportSource) {
+        val (notes, importDataFolder) =
             when (importSource) {
-                ImportSource.GOOGLE_KEEP -> GoogleKeepImporter().importFrom(inputStream, app)
+                ImportSource.GOOGLE_KEEP -> GoogleKeepImporter().importFrom(uri, app)
+                ImportSource.EVERNOTE -> EvernoteImporter().importFrom(uri, app)
             }
-        database.getLabelDao().insert(import.labels)
-        importFiles(import.files, importDataFolder, NotallyModel.FileType.ANY)
-        importFiles(import.images, importDataFolder, NotallyModel.FileType.IMAGE)
-        importAudios(import.audios, importDataFolder)
-        database.getBaseNoteDao().insert(import.baseNotes)
+        database.getLabelDao().insert(notes.flatMap { it.labels }.distinct().map { Label(it) })
+        importFiles(
+            notes.flatMap { it.files }.distinct(),
+            importDataFolder,
+            NotallyModel.FileType.ANY,
+        )
+        importFiles(
+            notes.flatMap { it.images }.distinct(),
+            importDataFolder,
+            NotallyModel.FileType.IMAGE,
+        )
+        importAudios(notes.flatMap { it.audios }.distinct(), importDataFolder)
+        database.getBaseNoteDao().insert(notes)
     }
 
     private suspend fun importFiles(
@@ -54,7 +64,7 @@ class NotesImporter(private val app: Application, private val database: NotallyD
             val file = File(sourceFolder, originalAudio.name)
             val audio = DataUtil.addAudio(app, file, false)
             originalAudio.name = audio.name
-            originalAudio.duration = audio.duration
+            originalAudio.duration = if (audio.duration == 0L) null else audio.duration
             originalAudio.timestamp = audio.timestamp
         }
     }
@@ -79,7 +89,15 @@ enum class ImportSource(
         R.string.google_keep_help,
         "https://support.google.com/keep/answer/10017039",
         R.drawable.icon_google_keep,
-    )
+    ),
+    EVERNOTE(
+        "evernote",
+        R.string.evernote,
+        "*/*", // 'application/enex+xml' is not recognized
+        R.string.evernote_help,
+        "https://help.evernote.com/hc/en-us/articles/209005557-Export-notes-and-notebooks-as-ENEX-or-HTML",
+        R.drawable.icon_evernote,
+    ),
 }
 
 data class NotesImport(

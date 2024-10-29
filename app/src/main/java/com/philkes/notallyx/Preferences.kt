@@ -43,7 +43,7 @@ class Preferences private constructor(app: Application) {
     private val preferences = PreferenceManager.getDefaultSharedPreferences(app)
     private val editor = preferences.edit()
 
-    private val encryptedPreferences =
+    private val encryptedPreferences by lazy {
         EncryptedSharedPreferences.create(
             app,
             "secret_shared_prefs",
@@ -51,6 +51,7 @@ class Preferences private constructor(app: Application) {
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
         )
+    }
 
     // Main thread (unfortunately)
     val view = BetterLiveData(getListPref(View))
@@ -68,7 +69,7 @@ class Preferences private constructor(app: Application) {
     val autoBackupPath = BetterLiveData(getTextPref(AutoBackup))
     var autoBackupPeriodDays = BetterLiveData(getSeekbarPref(AutoBackupPeriodDays))
     var autoBackupMax = getSeekbarPref(AutoBackupMax)
-    var backupPassword = BetterLiveData(getEncryptedTextPref(BackupPassword))
+    val backupPassword by lazy { BetterLiveData(getEncryptedTextPref(BackupPassword)) }
 
     val biometricLock = BetterLiveData(getListPref(BiometricLock))
     var iv: ByteArray?
@@ -119,7 +120,7 @@ class Preferences private constructor(app: Application) {
         requireNotNull(preferences.getString(info.key, info.defaultValue))
 
     private fun getEncryptedTextPref(info: TextInfo) =
-        requireNotNull(encryptedPreferences.getString(info.key, info.defaultValue))
+        requireNotNull(encryptedPreferences!!.getString(info.key, info.defaultValue))
 
     private fun getSeekbarPref(info: SeekbarInfo) =
         requireNotNull(preferences.getInt(info.key, info.defaultValue))
@@ -192,7 +193,7 @@ class Preferences private constructor(app: Application) {
     }
 
     fun savePreference(info: TextInfo, value: String) {
-        val editor = if (info is BackupPassword) encryptedPreferences.edit() else this.editor
+        val editor = if (info is BackupPassword) encryptedPreferences!!.edit() else this.editor
         editor.putString(info.key, value)
         editor.commit()
         when (info) {

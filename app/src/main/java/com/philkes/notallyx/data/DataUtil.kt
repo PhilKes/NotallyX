@@ -10,6 +10,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
+import com.philkes.notallyx.presentation.getFileName
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel.FileType
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.IO.copyToFile
@@ -18,7 +19,6 @@ import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.IO.rename
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.getFileName
 import java.io.File
 import java.io.FileInputStream
 import java.util.UUID
@@ -205,8 +205,8 @@ class DataUtil {
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(final.path)
                 val duration =
-                    retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION) ?: "-1"
-                Audio(name, duration.toLong(), System.currentTimeMillis())
+                    retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
+                Audio(name, duration?.toLong(), System.currentTimeMillis())
             }
         }
 

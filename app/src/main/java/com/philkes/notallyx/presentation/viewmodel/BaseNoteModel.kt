@@ -6,7 +6,6 @@ import android.net.Uri
 import android.print.PostPDFGenerator
 import android.text.Html
 import android.widget.Toast
-import androidx.core.database.getLongOrNull
 import androidx.core.text.toHtml
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -255,10 +254,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             Operations.log(app, throwable)
         }
         viewModelScope.launch(exceptionHandler) {
-            withContext(Dispatchers.IO) {
-                NotesImporter(app, database)
-                    .import(app.contentResolver.openInputStream(uri)!!, importSource)
-            }
+            withContext(Dispatchers.IO) { NotesImporter(app, database).import(uri, importSource) }
             Toast.makeText(app, R.string.imported_backup, Toast.LENGTH_LONG).show()
         }
     }

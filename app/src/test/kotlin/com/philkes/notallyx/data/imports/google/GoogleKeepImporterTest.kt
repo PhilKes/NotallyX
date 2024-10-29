@@ -26,6 +26,7 @@ class GoogleKeepImporterTest {
               "isPinned": false,
               "isArchived": false,
               "textContent": "This is some note, nothing special",
+              "textContentHtml": "<p dir=\"ltr\" style=\"line-height:1.38;margin-top:0.0pt;margin-bottom:0.0pt;\"><span style=\"font-size:16.0pt;font-family:'Google Sans';color:#000000;background-color:transparent;font-weight:400;font-style:normal;font-variant:normal;text-decoration:none;vertical-align:baseline;white-space:pre;white-space:pre-wrap;\">This is some note, nothing special<\/span><\/p>",
               "title": "Normal Note",
               "userEditedTimestampUsec": 1729518341059120,
               "createdTimestampUsec": 1729518341059000,
@@ -43,8 +44,8 @@ class GoogleKeepImporterTest {
         val expected =
             createBaseNote(
                 title = "Normal Note",
-                timestamp = 1729518341059000,
-                modifiedTimestamp = 1729518341059120,
+                timestamp = 1729518341059,
+                modifiedTimestamp = 1729518341059,
                 labels = listOf("Label1", "Label2"),
                 body = "This is some note, nothing special",
             )

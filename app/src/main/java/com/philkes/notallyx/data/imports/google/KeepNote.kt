@@ -5,17 +5,18 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class KeepNote(
-    val attachments: List<KeepAttachment>? = listOf(),
-    val color: String? = Color.DEFAULT.name,
-    val isTrashed: Boolean? = false,
-    val isArchived: Boolean? = false,
-    val isPinned: Boolean? = false,
-    val textContent: String? = "",
-    val title: String? = "",
-    val labels: List<KeepLabel>? = listOf(),
-    val userEditedTimestampUsec: Long? = System.currentTimeMillis(),
-    val createdTimestampUsec: Long? = System.currentTimeMillis(),
-    val listContent: List<KeepListItem>? = listOf(),
+    val attachments: List<KeepAttachment> = listOf(),
+    val color: String = Color.DEFAULT.name,
+    val isTrashed: Boolean = false,
+    val isArchived: Boolean = false,
+    val isPinned: Boolean = false,
+    val textContent: String = "",
+    val textContentHtml: String = "",
+    val title: String = "",
+    val labels: List<KeepLabel> = listOf(),
+    val userEditedTimestampUsec: Long = System.currentTimeMillis(),
+    val createdTimestampUsec: Long = System.currentTimeMillis(),
+    val listContent: List<KeepListItem> = listOf(),
 )
 
 @Serializable data class KeepLabel(val name: String)

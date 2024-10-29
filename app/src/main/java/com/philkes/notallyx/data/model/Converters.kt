@@ -51,7 +51,7 @@ object Converters {
         val iterable = JSONArray(json).iterable<JSONObject>()
         return iterable.map { jsonObject ->
             val name = jsonObject.getString("name")
-            val duration = jsonObject.getLong("duration")
+            val duration = jsonObject.getSafeLong("duration")
             val timestamp = jsonObject.getLong("timestamp")
             Audio(name, duration, timestamp)
         }
@@ -69,7 +69,7 @@ object Converters {
             val strikethrough = jsonObject.getSafeBoolean("strikethrough")
             val start = jsonObject.getInt("start")
             val end = jsonObject.getInt("end")
-            SpanRepresentation(bold, link, linkData, italic, monospace, strikethrough, start, end)
+            SpanRepresentation(start, end, bold, link, linkData, italic, monospace, strikethrough)
         }
     }
 
@@ -153,6 +153,14 @@ object Converters {
     private fun JSONObject.getSafeInt(name: String): Int? {
         return try {
             getInt(name)
+        } catch (exception: JSONException) {
+            null
+        }
+    }
+
+    private fun JSONObject.getSafeLong(name: String): Long? {
+        return try {
+            getLong(name)
         } catch (exception: JSONException) {
             null
         }

@@ -8,7 +8,6 @@ import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
-import android.content.res.Resources
 import android.graphics.Typeface
 import android.hardware.biometrics.BiometricManager
 import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
@@ -26,6 +25,7 @@ import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
+import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
@@ -52,7 +52,6 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.getUrl
 import com.philkes.notallyx.databinding.DialogProgressBinding
-import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
 import com.philkes.notallyx.presentation.view.misc.Progress
@@ -61,7 +60,6 @@ import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
 import java.io.File
 import java.util.Date
-import kotlin.math.roundToInt
 import org.ocpsoft.prettytime.PrettyTime
 
 /**
@@ -71,7 +69,7 @@ import org.ocpsoft.prettytime.PrettyTime
  */
 fun String.applySpans(representations: List<SpanRepresentation>): Editable {
     val editable = Editable.Factory.getInstance().newEditable(this)
-    representations.forEach { (bold, link, linkData, italic, monospace, strikethrough, start, end)
+    representations.forEach { (start, end, bold, link, linkData, italic, monospace, strikethrough)
         ->
         try {
             if (bold) {
@@ -205,8 +203,13 @@ fun TextView.displayFormattedTimestamp(
     } else visibility = View.GONE
 }
 
-val Int.dp: Int
-    get() = (this / Resources.getSystem().displayMetrics.density).roundToInt()
+fun Int.dp(context: Context): Int =
+    TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            this.toFloat(),
+            context.resources.displayMetrics,
+        )
+        .toInt()
 
 /**
  * Creates a TextWatcher for an EditText that is part of a list. Everytime the text is changed, a
