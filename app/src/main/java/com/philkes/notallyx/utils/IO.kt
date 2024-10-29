@@ -3,10 +3,13 @@ package com.philkes.notallyx.utils
 import android.app.Application
 import android.content.Context
 import android.os.Build
-import com.philkes.notallyx.data.AttachmentDeleteService
+import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.data.model.Attachment
+import com.philkes.notallyx.data.model.Audio
+import com.philkes.notallyx.data.model.FileAttachment
+import com.philkes.notallyx.data.model.isImage
+import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.widget.WidgetProvider
-import com.philkes.notallyx.utils.IO.clearDirectory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -56,13 +59,37 @@ object IO {
         }
     }
 
-    fun Application.deleteAttachments(attachments: ArrayList<Attachment>, ids: LongArray) {
+    fun Application.deleteAttachments(
+        attachments: Collection<Attachment>,
+        ids: LongArray? = null,
+        progress: MutableLiveData<Progress>? = null,
+    ) {
         if (attachments.isNotEmpty()) {
-            AttachmentDeleteService.start(this, attachments)
+            progress?.postValue(Progress(0, attachments.size))
+            val imageRoot = getExternalImagesDirectory()
+            val audioRoot = getExternalAudioDirectory()
+            val fileRoot = getExternalFilesDirectory()
+            attachments.forEachIndexed { index, attachment ->
+                val file =
+                    when (attachment) {
+                        is Audio ->
+                            if (audioRoot != null) File(audioRoot, attachment.name) else null
+
+                        is FileAttachment -> {
+                            val root = if (attachment.isImage) imageRoot else fileRoot
+                            if (root != null) File(root, attachment.localName) else null
+                        }
+                    }
+                if (file != null && file.exists()) {
+                    file.delete()
+                }
+                progress?.postValue(Progress(index + 1, attachments.size))
+            }
         }
-        if (ids.isNotEmpty()) {
+        if (ids?.isNotEmpty() == true) {
             WidgetProvider.sendBroadcast(this, ids)
         }
+        progress?.postValue(Progress(inProgress = false))
     }
 
     fun Application.getBackupDir() = getEmptyFolder("backup")
@@ -79,9 +106,9 @@ object IO {
                 if (file.exists()) {
                     if (!file.isDirectory) {
                         file.delete()
-                        createDirectory(file)
+                        file.createDirectory()
                     }
-                } else createDirectory(file)
+                } else file.createDirectory()
             }
         } catch (exception: Exception) {
             exception.printStackTrace()
@@ -90,10 +117,10 @@ object IO {
         return file
     }
 
-    private fun createDirectory(file: File) {
+    private fun File.createDirectory() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            Files.createDirectory(file.toPath())
-        } else file.mkdir()
+            Files.createDirectory(toPath())
+        } else mkdir()
     }
 
     private fun Application.getEmptyFolder(name: String): File {

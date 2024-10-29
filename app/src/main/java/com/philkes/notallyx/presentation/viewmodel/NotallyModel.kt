@@ -25,7 +25,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.AttachmentDeleteService
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.Audio
@@ -38,12 +37,13 @@ import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.view.misc.BetterLiveData
+import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.FileProgress
 import com.philkes.notallyx.utils.IO.copyToFile
+import com.philkes.notallyx.utils.IO.deleteAttachments
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
@@ -86,7 +86,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     val files = BetterLiveData<List<FileAttachment>>(emptyList())
     val audios = BetterLiveData<List<Audio>>(emptyList())
 
-    val addingFiles = MutableLiveData<FileProgress>()
+    val addingFiles = MutableLiveData<Progress>()
     val eventBus = MutableLiveData<Event<List<FileError>>>()
 
     var imageRoot = app.getExternalImagesDirectory()
@@ -142,7 +142,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             copy.remove(audio)
             audios.value = copy
             updateAudios()
-            AttachmentDeleteService.start(app, arrayListOf(audio))
+            withContext(Dispatchers.IO) { app.deleteAttachments(arrayListOf(audio)) }
         }
     }
 
@@ -181,7 +181,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             )
 
         viewModelScope.launch {
-            addingFiles.value = FileProgress(true, 0, uris.size, fileType)
+            addingFiles.postValue(Progress(0, uris.size))
 
             val successes = ArrayList<FileAttachment>()
             val errors = ArrayList<FileError>()
@@ -257,10 +257,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                     }
                 }
 
-                addingFiles.value = FileProgress(true, index + 1, uris.size, fileType)
+                addingFiles.postValue(Progress(index + 1, uris.size))
             }
 
-            addingFiles.value = FileProgress(false, 0, 0, fileType)
+            addingFiles.postValue(Progress(inProgress = false))
 
             if (successes.isNotEmpty()) {
                 val copy =
@@ -311,7 +311,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             copy.removeAll(list)
             images.value = copy
             updateImages()
-            AttachmentDeleteService.start(app, list)
+            withContext(Dispatchers.IO) { app.deleteAttachments(list) }
         }
     }
 
@@ -321,7 +321,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             copy.removeAll(list)
             files.value = copy
             updateFiles()
-            AttachmentDeleteService.start(app, list)
+            withContext(Dispatchers.IO) { app.deleteAttachments(list) }
         }
     }
 
@@ -382,7 +382,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         WidgetProvider.sendBroadcast(app, longArrayOf(id))
         val attachments = ArrayList(images.value + files.value + audios.value)
         if (attachments.isNotEmpty()) {
-            AttachmentDeleteService.start(app, attachments)
+            withContext(Dispatchers.IO) { app.deleteAttachments(attachments) }
         }
     }
 

@@ -35,6 +35,7 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.ListInfo
+import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
@@ -45,7 +46,6 @@ import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.Export.exportAsZip
 import com.philkes.notallyx.utils.backup.Import.importZip
 import com.philkes.notallyx.utils.backup.Migrations
@@ -106,8 +106,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val fileRoot = app.getExternalFilesDirectory()
     private val audioRoot = app.getExternalAudioDirectory()
 
-    val importingBackup = MutableLiveData<BackupProgress>()
-    val exportingBackup = MutableLiveData<BackupProgress>()
+    val importProgress = MutableLiveData<Progress>()
+    val exportProgress = MutableLiveData<Progress>()
+    val deletionProgress = MutableLiveData<Progress>()
 
     val actionMode = ActionMode()
 
@@ -209,16 +210,14 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun exportBackup(uri: Uri) {
         viewModelScope.launch {
-            exportingBackup.value = BackupProgress(true, 0, 0, true)
-            withContext(Dispatchers.IO) { exportAsZip(uri, app, exportingBackup) }
-            exportingBackup.value = BackupProgress(false, 0, 0, false)
+            withContext(Dispatchers.IO) { exportAsZip(uri, app, exportProgress) }
             Toast.makeText(app, R.string.saved_to_device, Toast.LENGTH_LONG).show()
         }
     }
 
     fun importZipBackup(uri: Uri, password: String) {
         val backupDir = app.getBackupDir()
-        viewModelScope.launch { importZip(app, uri, backupDir, password, importingBackup) }
+        viewModelScope.launch { importZip(app, uri, backupDir, password, importProgress) }
     }
 
     fun importXmlBackup(uri: Uri) {
@@ -340,6 +339,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     private fun deleteBaseNotes(ids: LongArray) {
         val attachments = ArrayList<Attachment>()
         viewModelScope.launch {
+            deletionProgress.value = Progress(indeterminate = true)
             val notes = withContext(Dispatchers.IO) { baseNoteDao.getByIds(ids) }
             notes.forEach { note ->
                 attachments.addAll(note.images)
@@ -347,8 +347,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 attachments.addAll(note.audios)
             }
             actionMode.close(false)
-            withContext(Dispatchers.IO) { baseNoteDao.delete(ids) }
-            app.deleteAttachments(attachments, ids)
+            withContext(Dispatchers.IO) {
+                baseNoteDao.delete(ids)
+                app.deleteAttachments(attachments, ids, deletionProgress)
+            }
         }
     }
 
@@ -372,7 +374,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             attachments.addAll(images)
             attachments.addAll(files)
             attachments.addAll(audios)
-            app.deleteAttachments(attachments, ids)
+            withContext(Dispatchers.IO) { app.deleteAttachments(attachments, ids) }
         }
     }
 

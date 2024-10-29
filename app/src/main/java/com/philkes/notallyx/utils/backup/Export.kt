@@ -11,8 +11,10 @@ import androidx.work.WorkManager
 import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.Converters
+import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.presentation.view.misc.BackupPassword.emptyPassword
 import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
+import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.utils.IO.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.IO.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.IO.SUBFOLDER_IMAGES
@@ -36,8 +38,9 @@ object Export {
     fun exportAsZip(
         fileUri: Uri,
         app: Application,
-        backupProgress: MutableLiveData<BackupProgress>? = null,
+        backupProgress: MutableLiveData<Progress>? = null,
     ) {
+        backupProgress?.postValue(Progress(indeterminate = true))
         val database = NotallyDatabase.getDatabase(app).value
         database.checkpoint()
         val preferences = Preferences.getInstance(app)
@@ -77,14 +80,14 @@ object Export {
         val fileRoot = app.getExternalFilesDirectory()
         val audioRoot = app.getExternalAudioDirectory()
 
-        val images = database.getBaseNoteDao().getAllImages()
-        val files = database.getBaseNoteDao().getAllFiles()
+        val images = database.getBaseNoteDao().getAllImages().toFileAttachments()
+        val files = database.getBaseNoteDao().getAllFiles().toFileAttachments()
         val audios = database.getBaseNoteDao().getAllAudios()
-        val total = images.size + files.size + audios.size
+        val total = images.count() + files.count() + audios.size
+        backupProgress?.postValue(Progress(0, total))
 
         val counter = AtomicInteger(0)
-        exportFileAttachments(
-            images,
+        images.export(
             zipFile,
             zipParameters,
             imageRoot,
@@ -94,8 +97,7 @@ object Export {
             total,
             counter,
         )
-        exportFileAttachments(
-            files,
+        files.export(
             zipFile,
             zipParameters,
             fileRoot,
@@ -114,9 +116,7 @@ object Export {
                 } catch (exception: Exception) {
                     Operations.log(app, exception)
                 } finally {
-                    backupProgress?.postValue(
-                        BackupProgress(true, counter.incrementAndGet(), total, false)
-                    )
+                    backupProgress?.postValue(Progress(counter.incrementAndGet(), total))
                 }
             }
 
@@ -128,33 +128,32 @@ object Export {
             }
             zipFile.file.delete()
         }
+        backupProgress?.postValue(Progress(inProgress = false))
     }
 
-    private fun exportFileAttachments(
-        files: List<String>,
+    private fun List<String>.toFileAttachments(): Sequence<FileAttachment> {
+        return asSequence().flatMap { string -> Converters.jsonToFiles(string) }
+    }
+
+    private fun Sequence<FileAttachment>.export(
         zipFile: ZipFile,
         zipParameters: ZipParameters,
         fileRoot: File?,
         subfolder: String,
         app: Application,
-        backupProgress: MutableLiveData<BackupProgress>?,
+        backupProgress: MutableLiveData<Progress>?,
         total: Int,
         counter: AtomicInteger,
     ) {
-        files
-            .asSequence()
-            .flatMap { string -> Converters.jsonToFiles(string) }
-            .forEach { file ->
-                try {
-                    backupFile(zipFile, zipParameters, fileRoot, subfolder, file.localName)
-                } catch (exception: Exception) {
-                    Operations.log(app, exception)
-                } finally {
-                    backupProgress?.postValue(
-                        BackupProgress(true, counter.incrementAndGet(), total, false)
-                    )
-                }
+        forEach { file ->
+            try {
+                backupFile(zipFile, zipParameters, fileRoot, subfolder, file.localName)
+            } catch (exception: Exception) {
+                Operations.log(app, exception)
+            } finally {
+                backupProgress?.postValue(Progress(counter.incrementAndGet(), total))
             }
+        }
     }
 
     fun scheduleAutoBackup(periodInDays: Long, context: Context) {
