@@ -190,11 +190,13 @@
     <string name="calculating">Calculating…</string>
     <string name="clear_data_message">All Notes, Images, Files, Audios will be permanently deleted</string>
 
+    <string name="google_keep">Google Keep</string>
+
     <string name="export_backup">Export backup</string>
     <string name="import_backup">Import backup</string>
     <string name="clear_data">Clear Data</string>
     <string name="cleared_data">All Data has been cleared</string>
-    <string name="import_other">Import from other App</string>
+    <string name="import_other">Import Notes from other App</string>
 
     <string name="auto_backup_period">Auto backup period</string>
     <string name="daily">Daily</string>

@@ -66,17 +66,19 @@ class NotesImporter(private val app: Application, private val database: NotallyD
 
 enum class ImportSource(
     val folderName: String,
-    val displayName: String,
+    val displayNameResId: Int,
     val mimeType: String,
     val helpTextResId: Int,
     val documentationUrl: String,
+    val iconResId: Int,
 ) {
     GOOGLE_KEEP(
         "googlekeep",
-        "Google Keep",
+        R.string.google_keep,
         "application/zip",
         R.string.google_keep_help,
         "https://support.google.com/keep/answer/10017039",
+        R.drawable.icon_google_keep,
     )
 }
 

@@ -15,7 +15,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -51,6 +50,7 @@ import com.philkes.notallyx.presentation.view.misc.NotesSorting
 import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
 import com.philkes.notallyx.presentation.view.misc.SortDirection
 import com.philkes.notallyx.presentation.view.misc.TextSize
+import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
@@ -231,7 +231,14 @@ class SettingsFragment : Fragment() {
     private fun importOther() {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_other_app)
-            .setItems(ImportSource.entries.map { it.displayName }.toTypedArray()) { _, which ->
+            .setAdapter(
+                TextWithIconAdapter(
+                    requireContext(),
+                    ImportSource.entries.toMutableList(),
+                    { item -> getString(item.displayNameResId) },
+                    ImportSource::iconResId,
+                )
+            ) { _, which ->
                 selectedImportSource = ImportSource.entries[which]
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(selectedImportSource.helpTextResId)
@@ -436,7 +443,7 @@ class SettingsFragment : Fragment() {
 
         Value.transformationMethod =
             if (password != emptyPassword) PasswordTransformationMethod.getInstance() else null
-        Value.text = password
+        Value.text = if (password != emptyPassword) password else getText(R.string.tap_to_set_up)
         root.setOnClickListener {
             val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
             layout.InputText.apply {
