@@ -139,7 +139,6 @@
     <string name="cant_find_folder">Kann den Ordner nicht finden. Er kann verschoben oder gelöscht worden sein</string>
     <string name="invalid_backup">Ungültige Backup</string>
     <string name="google_keep_help">Um deine Notizen aus Google Notizen zu importieren musst du deine Google Takeout ZIP Datei herunterladen\n\nFalls du das Takeout ZIP schon hast, klicke auf Import und wähle es aus.</string>
-    <string name="imported_backup">Backup importiert</string>
     <string name="exporting_backup">Backup Exportieren</string>
     <string name="importing_backup">Backup Importieren</string>
     <string name="calculating">Berechne…</string>

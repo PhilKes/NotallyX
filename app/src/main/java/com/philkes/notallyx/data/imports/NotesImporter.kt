@@ -4,45 +4,83 @@ import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.DataUtil
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.imports.evernote.EvernoteImporter
 import com.philkes.notallyx.data.imports.google.GoogleKeepImporter
 import com.philkes.notallyx.data.model.Audio
-import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import java.io.File
+import java.util.concurrent.atomic.AtomicInteger
 
 class NotesImporter(private val app: Application, private val database: NotallyDatabase) {
 
-    suspend fun import(uri: Uri, importSource: ImportSource) {
-        val (notes, importDataFolder) =
-            when (importSource) {
-                ImportSource.GOOGLE_KEEP -> GoogleKeepImporter().importFrom(uri, app)
-                ImportSource.EVERNOTE -> EvernoteImporter().importFrom(uri, app)
-            }
-        database.getLabelDao().insert(notes.flatMap { it.labels }.distinct().map { Label(it) })
-        importFiles(
-            notes.flatMap { it.files }.distinct(),
-            importDataFolder,
-            NotallyModel.FileType.ANY,
-        )
-        importFiles(
-            notes.flatMap { it.images }.distinct(),
-            importDataFolder,
-            NotallyModel.FileType.IMAGE,
-        )
-        importAudios(notes.flatMap { it.audios }.distinct(), importDataFolder)
-        database.getBaseNoteDao().insert(notes)
+    suspend fun import(
+        uri: Uri,
+        importSource: ImportSource,
+        progress: MutableLiveData<ImportProgress>? = null,
+    ): Int {
+        val tempDir = File(app.cacheDir, IMPORT_CACHE_FOLDER)
+        if (!tempDir.exists()) {
+            tempDir.mkdirs()
+        }
+        try {
+            val (notes, importDataFolder) =
+                try {
+                    when (importSource) {
+                        ImportSource.GOOGLE_KEEP -> GoogleKeepImporter()
+                        ImportSource.EVERNOTE -> EvernoteImporter()
+                    }.import(app, uri, tempDir, progress)
+                } catch (e: Exception) {
+                    Log.e(TAG, "import: failed", e)
+                    progress?.postValue(ImportProgress(inProgress = false))
+                    throw e
+                }
+            database.getLabelDao().insert(notes.flatMap { it.labels }.distinct().map { Label(it) })
+            val files = notes.flatMap { it.files }.distinct()
+            val images = notes.flatMap { it.images }.distinct()
+            val audios = notes.flatMap { it.audios }.distinct()
+            val totalFiles = files.size + images.size + audios.size
+            val counter = AtomicInteger(1)
+            progress?.postValue(
+                ImportProgress(total = totalFiles, stage = ImportStage.IMPORT_FILES)
+            )
+            importFiles(
+                files,
+                importDataFolder,
+                NotallyModel.FileType.ANY,
+                progress,
+                totalFiles,
+                counter,
+            )
+            importFiles(
+                images,
+                importDataFolder,
+                NotallyModel.FileType.IMAGE,
+                progress,
+                totalFiles,
+                counter,
+            )
+            importAudios(audios, importDataFolder, progress, totalFiles, counter)
+            database.getBaseNoteDao().insert(notes)
+            progress?.postValue(ImportProgress(inProgress = false))
+            return notes.size
+        } finally {
+            tempDir.deleteRecursively()
+        }
     }
 
     private suspend fun importFiles(
         files: List<FileAttachment>,
         sourceFolder: File,
         fileType: NotallyModel.FileType,
+        progress: MutableLiveData<ImportProgress>?,
+        total: Int?,
+        counter: AtomicInteger?,
     ) {
         files.forEach { file ->
             val uri = File(sourceFolder, file.localName).toUri()
@@ -55,27 +93,47 @@ class NotesImporter(private val app: Application, private val database: NotallyD
                 file.originalName = fileAttachment.originalName
                 file.mimeType = fileAttachment.mimeType
             }
-            error?.let { Log.d(TAG, "Failed to import: $error") }
+            error?.let { Log.e(TAG, "Failed to import: $error") }
+            progress?.postValue(
+                ImportProgress(
+                    current = counter!!.getAndIncrement(),
+                    total = total!!,
+                    stage = ImportStage.IMPORT_FILES,
+                )
+            )
         }
     }
 
-    private suspend fun importAudios(audios: List<Audio>, sourceFolder: File) {
+    private suspend fun importAudios(
+        audios: List<Audio>,
+        sourceFolder: File,
+        progress: MutableLiveData<ImportProgress>?,
+        totalFiles: Int,
+        counter: AtomicInteger,
+    ) {
         audios.forEach { originalAudio ->
             val file = File(sourceFolder, originalAudio.name)
             val audio = DataUtil.addAudio(app, file, false)
             originalAudio.name = audio.name
             originalAudio.duration = if (audio.duration == 0L) null else audio.duration
             originalAudio.timestamp = audio.timestamp
+            progress?.postValue(
+                ImportProgress(
+                    current = counter.getAndIncrement(),
+                    total = totalFiles,
+                    stage = ImportStage.IMPORT_FILES,
+                )
+            )
         }
     }
 
     companion object {
         private const val TAG = "NotesImporter"
+        const val IMPORT_CACHE_FOLDER = "imports"
     }
 }
 
 enum class ImportSource(
-    val folderName: String,
     val displayNameResId: Int,
     val mimeType: String,
     val helpTextResId: Int,
@@ -83,7 +141,6 @@ enum class ImportSource(
     val iconResId: Int,
 ) {
     GOOGLE_KEEP(
-        "googlekeep",
         R.string.google_keep,
         "application/zip",
         R.string.google_keep_help,
@@ -91,7 +148,6 @@ enum class ImportSource(
         R.drawable.icon_google_keep,
     ),
     EVERNOTE(
-        "evernote",
         R.string.evernote,
         "*/*", // 'application/enex+xml' is not recognized
         R.string.evernote_help,
@@ -99,11 +155,3 @@ enum class ImportSource(
         R.drawable.icon_evernote,
     ),
 }
-
-data class NotesImport(
-    val baseNotes: List<BaseNote>,
-    val labels: List<Label>,
-    val files: List<FileAttachment>,
-    val images: List<FileAttachment>,
-    val audios: List<Audio>,
-)

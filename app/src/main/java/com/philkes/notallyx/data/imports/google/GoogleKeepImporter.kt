@@ -2,10 +2,12 @@ package com.philkes.notallyx.data.imports.google
 
 import android.app.Application
 import android.net.Uri
+import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ExternalImporter
 import com.philkes.notallyx.data.imports.ImportException
-import com.philkes.notallyx.data.imports.ImportSource
+import com.philkes.notallyx.data.imports.ImportProgress
+import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.imports.parseBodyAndSpansFromHtml
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
@@ -32,58 +34,72 @@ class GoogleKeepImporter : ExternalImporter {
         allowTrailingComma = true
     }
 
-    override fun importFrom(uri: Uri, app: Application): Pair<List<BaseNote>, File> {
-        val tempDir = File(app.cacheDir, ImportSource.GOOGLE_KEEP.folderName)
-        if (!tempDir.exists()) {
-            tempDir.mkdirs()
-        }
+    override fun import(
+        app: Application,
+        source: Uri,
+        destination: File,
+        progress: MutableLiveData<ImportProgress>?,
+    ): Pair<List<BaseNote>, File> {
+        progress?.postValue(ImportProgress(indeterminate = true, stage = ImportStage.EXTRACT_FILES))
         val dataFolder =
             try {
-                unzip(tempDir, app.contentResolver.openInputStream(uri)!!)
+                unzip(destination, app.contentResolver.openInputStream(source)!!)
             } catch (e: Exception) {
                 throw ImportException(R.string.invalid_google_keep, e)
             }
 
         if (!dataFolder.exists()) {
-            throw ImportException(R.string.invalid_google_keep)
+            throw ImportException(
+                R.string.invalid_google_keep,
+                RuntimeException("Extracting Takeout.zip failed"),
+            )
         }
 
-        val baseNotes =
+        val noteFiles =
             dataFolder
-                .walk()
-                .mapNotNull { importFile ->
-                    if (importFile.extension == "json") {
-                        parseToBaseNote(importFile.readText())
-                    } else null
+                .listFiles { file ->
+                    file.isFile && file.extension.equals("json", ignoreCase = true)
+                }
+                ?.toList() ?: emptyList()
+        val total = noteFiles.size
+        progress?.postValue(ImportProgress(0, total, stage = ImportStage.IMPORT_NOTES))
+        var counter = 1
+        val baseNotes =
+            noteFiles
+                .mapNotNull { file ->
+                    val baseNote = file.readText().parseToBaseNote()
+                    progress?.postValue(
+                        ImportProgress(counter++, total, stage = ImportStage.IMPORT_NOTES)
+                    )
+                    baseNote
                 }
                 .toList()
         return Pair(baseNotes, dataFolder)
     }
 
-    fun parseToBaseNote(jsonString: String): BaseNote {
-        val keepNote = json.decodeFromString<KeepNote>(jsonString)
-
+    fun String.parseToBaseNote(): BaseNote {
+        val googleKeepNote = json.decodeFromString<GoogleKeepNote>(this)
         val (body, spans) =
             parseBodyAndSpansFromHtml(
-                keepNote.textContentHtml,
+                googleKeepNote.textContentHtml,
                 paragraphsAsNewLine = true,
                 brTagsAsNewLine = true,
             )
 
         val images =
-            keepNote.attachments
+            googleKeepNote.attachments
                 .filter { it.mimetype.startsWith("image") }
                 .map { FileAttachment(it.filePath, it.filePath, it.mimetype) }
         val files =
-            keepNote.attachments
+            googleKeepNote.attachments
                 .filter { !it.mimetype.startsWith("audio") && !it.mimetype.startsWith("image") }
                 .map { FileAttachment(it.filePath, it.filePath, it.mimetype) }
         val audios =
-            keepNote.attachments
+            googleKeepNote.attachments
                 .filter { it.mimetype.startsWith("audio") }
                 .map { Audio(it.filePath, 0L, System.currentTimeMillis()) }
         val items =
-            keepNote.listContent.mapIndexed { index, item ->
+            googleKeepNote.listContent.mapIndexed { index, item ->
                 ListItem(
                     body = item.text,
                     checked = item.isChecked,
@@ -95,19 +111,19 @@ class GoogleKeepImporter : ExternalImporter {
 
         return BaseNote(
             id = 0L, // Auto-generated
-            type = if (keepNote.listContent.isNotEmpty()) Type.LIST else Type.NOTE,
+            type = if (googleKeepNote.listContent.isNotEmpty()) Type.LIST else Type.NOTE,
             folder =
                 when {
-                    keepNote.isTrashed -> Folder.DELETED
-                    keepNote.isArchived -> Folder.ARCHIVED
+                    googleKeepNote.isTrashed -> Folder.DELETED
+                    googleKeepNote.isArchived -> Folder.ARCHIVED
                     else -> Folder.NOTES
                 },
             color = Color.DEFAULT, // Ignoring color mapping
-            title = keepNote.title,
-            pinned = keepNote.isPinned,
-            timestamp = keepNote.createdTimestampUsec / 1000,
-            modifiedTimestamp = keepNote.userEditedTimestampUsec / 1000,
-            labels = keepNote.labels.map { it.name },
+            title = googleKeepNote.title,
+            pinned = googleKeepNote.isPinned,
+            timestamp = googleKeepNote.createdTimestampUsec / 1000,
+            modifiedTimestamp = googleKeepNote.userEditedTimestampUsec / 1000,
+            labels = googleKeepNote.labels.map { it.name },
             body = body,
             spans = spans,
             items = items,

@@ -46,7 +46,7 @@ class NotesImporterTest {
 
     private fun testImport(importSource: ImportSource, expectedAmountNotes: Int) {
         val importSourceFile = prepareImportSources(importSource)
-        val importOutputFolder = prepareMediaFolder(importSource)
+        val importOutputFolder = prepareMediaFolder()
         runBlocking {
             NotesImporter(application, database).import(importSourceFile.toUri(), importSource)
 
@@ -108,12 +108,13 @@ class NotesImporterTest {
         }
     }
 
-    private fun prepareMediaFolder(importSource: ImportSource): String {
+    private fun prepareMediaFolder(): String {
         val dir =
-            File.createTempFile("notallyxNotesImporterTest", importSource.folderName).apply {
-                delete()
-                mkdirs()
-            }
+            File.createTempFile("notallyxNotesImporterTest", NotesImporter.IMPORT_CACHE_FOLDER)
+                .apply {
+                    delete()
+                    mkdirs()
+                }
         val path = dir.toPath().toString()
         ShadowEnvironment.addExternalDir(path)
         println("Output folder: $path")
@@ -121,8 +122,8 @@ class NotesImporterTest {
     }
 
     private fun prepareImportSources(importSource: ImportSource): File {
-        val tempDir = Files.createTempDirectory("imports-${importSource.folderName}").toFile()
-        copyTestFilesToTempDir("imports/${importSource.folderName}", tempDir)
+        val tempDir = Files.createTempDirectory("imports-${importSource.name.lowercase()}").toFile()
+        copyTestFilesToTempDir("imports/${importSource.name.lowercase()}", tempDir)
         println("Input folder: ${tempDir.absolutePath}")
         return when (importSource) {
             ImportSource.GOOGLE_KEEP -> File(tempDir, "Takeout.zip")

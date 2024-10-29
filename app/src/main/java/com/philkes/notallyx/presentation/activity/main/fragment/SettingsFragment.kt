@@ -31,6 +31,7 @@ import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
 import com.philkes.notallyx.presentation.checkedTag
+import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
@@ -124,7 +125,7 @@ class SettingsFragment : Fragment() {
         binding.ClearData.setOnClickListener { clearData() }
 
         model.exportProgress.setupProgressDialog(this, R.string.exporting_backup)
-        model.importProgress.setupProgressDialog(this, R.string.importing_backup)
+        model.importProgress.setupImportProgressDialog(this, R.string.importing_backup)
         model.deletionProgress.setupProgressDialog(this, R.string.deleting_files)
 
         binding.GitHub.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }

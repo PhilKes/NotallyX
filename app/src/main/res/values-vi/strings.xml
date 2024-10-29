@@ -111,7 +111,6 @@
     <string name="choose_another_folder">Chọn thư mục khác</string>
     <string name="cant_find_folder">Không tìm thấy thư mục. Có lẽ nó đã bị đổi tên hoặc xóa</string>
     <string name="invalid_backup">Bản sao lưu không hợp lệ</string>
-    <string name="imported_backup">Đã nhập bản sao lưu</string>
     <string name="exporting_backup">Đã xuất bản sao lưu</string>
     <string name="calculating">Đang xử lý…</string>
 

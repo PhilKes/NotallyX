@@ -4,10 +4,12 @@ import android.app.Application
 import android.net.Uri
 import android.util.Base64
 import android.webkit.MimeTypeMap
+import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ExternalImporter
 import com.philkes.notallyx.data.imports.ImportException
-import com.philkes.notallyx.data.imports.ImportSource
+import com.philkes.notallyx.data.imports.ImportProgress
+import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.imports.evernote.EvernoteImporter.Companion.parseTimestamp
 import com.philkes.notallyx.data.imports.parseBodyAndSpansFromHtml
 import com.philkes.notallyx.data.model.Audio
@@ -18,6 +20,7 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.utils.IO.write
+import com.philkes.notallyx.utils.Operations
 import java.io.File
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -31,25 +34,38 @@ import org.simpleframework.xml.core.Persister
 class EvernoteImporter : ExternalImporter {
     private val serializer: Serializer = Persister(AnnotationStrategy())
 
-    override fun importFrom(uri: Uri, app: Application): Pair<List<BaseNote>, File> {
-        if (MimeTypeMap.getFileExtensionFromUrl(uri.toString()) != "enex") {
-            throw ImportException(R.string.invalid_evernote)
-        }
-        val tempDir = File(app.cacheDir, ImportSource.EVERNOTE.folderName)
-        if (!tempDir.exists()) {
-            tempDir.mkdirs()
+    override fun import(
+        app: Application,
+        source: Uri,
+        destination: File,
+        progress: MutableLiveData<ImportProgress>?,
+    ): Pair<List<BaseNote>, File> {
+        progress?.postValue(ImportProgress(indeterminate = true))
+        if (MimeTypeMap.getFileExtensionFromUrl(source.toString()) != "enex") {
+            throw ImportException(
+                R.string.invalid_evernote,
+                IllegalArgumentException("Provided file is not in ENEX format"),
+            )
         }
         val evernoteExport: EvernoteExport =
-            parseExport(app.contentResolver.openInputStream(uri)!!)!!
-        saveResourcesToFiles(
-            evernoteExport.notes.flatMap { it.resources }.distinctBy { it.attributes?.fileName },
-            tempDir,
-        )
+            parseExport(app.contentResolver.openInputStream(source)!!)!!
+
+        val total = evernoteExport.notes.size
+        progress?.postValue(ImportProgress(total = total))
+        var counter = 1
         try {
-            val notes = evernoteExport.notes.map { it.mapToBaseNote() }
-            return Pair(notes, tempDir)
+            val notes =
+                evernoteExport.notes.map {
+                    val note = it.mapToBaseNote()
+                    progress?.postValue(ImportProgress(current = counter++, total = total))
+                    note
+                }
+            val resources =
+                evernoteExport.notes.flatMap { it.resources }.distinctBy { it.attributes?.fileName }
+            saveResourcesToFiles(app, resources, destination, progress)
+            return Pair(notes, destination)
         } catch (e: Exception) {
-            throw ImportException(R.string.invalid_evernote)
+            throw ImportException(R.string.invalid_evernote, e)
         }
     }
 
@@ -60,11 +76,30 @@ class EvernoteImporter : ExternalImporter {
             throw ImportException(R.string.invalid_evernote, e)
         }
 
-    private fun saveResourcesToFiles(resources: Collection<EvernoteResource>, dir: File) {
-        resources.forEach {
+    private fun saveResourcesToFiles(
+        app: Application,
+        resources: Collection<EvernoteResource>,
+        dir: File,
+        progress: MutableLiveData<ImportProgress>? = null,
+    ) {
+        progress?.postValue(
+            ImportProgress(total = resources.size, stage = ImportStage.EXTRACT_FILES)
+        )
+        resources.forEachIndexed { idx, it ->
             val file = File(dir, it.attributes!!.fileName)
-            val data = Base64.decode(it.data!!.content.trimStart(), Base64.DEFAULT)
-            file.write(data)
+            try {
+                val data = Base64.decode(it.data!!.content.trimStart(), Base64.DEFAULT)
+                file.write(data)
+            } catch (e: Exception) {
+                Operations.log(app, e)
+            }
+            progress?.postValue(
+                ImportProgress(
+                    current = idx + 1,
+                    total = resources.size,
+                    stage = ImportStage.EXTRACT_FILES,
+                )
+            )
         }
     }
 

@@ -48,6 +48,8 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.imports.ImportProgress
+import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.getUrl
@@ -279,7 +281,7 @@ fun View.getString(id: Int, vararg formatArgs: String): String {
 }
 
 fun View.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {
-    return context.resources.getQuantityString(id, quantity, *formatArgs)
+    return context.getQuantityString(id, quantity, *formatArgs)
 }
 
 fun Folder.movedToResId(): Int {
@@ -370,11 +372,33 @@ fun MutableLiveData<out Progress>.setupProgressDialog(fragment: Fragment, titleI
     )
 }
 
-private fun MutableLiveData<out Progress>.setupProgressDialog(
+fun MutableLiveData<ImportProgress>.setupImportProgressDialog(fragment: Fragment, titleId: Int) {
+    setupProgressDialog(
+        fragment.requireContext(),
+        fragment.layoutInflater,
+        fragment.viewLifecycleOwner,
+        titleId,
+    ) { context, binding, progress ->
+        val stageStr =
+            context.getString(
+                when (progress.stage) {
+                    ImportStage.IMPORT_NOTES -> R.string.imported_notes
+                    ImportStage.EXTRACT_FILES -> R.string.extracted_files
+                    ImportStage.IMPORT_FILES -> R.string.imported_files
+                }
+            )
+        binding.Count.text =
+            "${context.getString(R.string.count, progress.current, progress.total)} $stageStr"
+    }
+}
+
+private fun <T : Progress> MutableLiveData<T>.setupProgressDialog(
     context: Context,
     layoutInflater: LayoutInflater,
     viewLifecycleOwner: LifecycleOwner,
     titleId: Int,
+    renderProgress: ((context: Context, binding: DialogProgressBinding, progress: T) -> Unit)? =
+        null,
 ) {
     val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
     val dialog =
@@ -398,7 +422,10 @@ private fun MutableLiveData<out Progress>.setupProgressDialog(
                         max = progress.total
                         setProgressCompat(progress.current, true)
                     }
-                    Count.text = context.getString(R.string.count, progress.current, progress.total)
+                    if (renderProgress == null) {
+                        Count.text =
+                            context.getString(R.string.count, progress.current, progress.total)
+                    } else renderProgress.invoke(context, this, progress)
                 }
             }
             dialog.show()
@@ -454,4 +481,8 @@ fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
         dialog.window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE)
     }
     return dialog
+}
+
+fun Context.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {
+    return resources.getQuantityString(id, quantity, quantity, *formatArgs)
 }

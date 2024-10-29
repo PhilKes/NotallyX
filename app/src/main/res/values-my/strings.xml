@@ -71,7 +71,6 @@
     <string name="cant_open_link">လင့်ကိုမဖွင့်နိုင်ပါ။</string>
     <string name="invalid_image">ရုပ်ပုံမှား​နေသည်။</string>
     <string name="invalid_backup">အရန်သိမ်းဖိုင်မှားနေသည်။</string>
-    <string name="imported_backup">အရန်သိမ်းထားသည်များ သွင်းမည်။</string>
     <string name="something_went_wrong">တစ်စုံတစ်ခုမှားယွင်း​နေသည်။ထပ်မံကြိုးစားပါ။</string>
     <string name="image_format_not_supported">ဤရုပ်ပုံဖိုင်အမျိုးအစားအား လက်မခံပါ။</string>
     <string name="install_an_email">တုံ့ပြန်ချက်​ပေးပို့ရန် အီး​မေးလ်အက်ပ် တစ်ခုအရင်သွင်းပါ</string>

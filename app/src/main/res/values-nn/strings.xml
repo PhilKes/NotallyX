@@ -110,7 +110,6 @@
     <string name="choose_another_folder">Vel ei anna mappe</string>
     <string name="cant_find_folder">Finn ikkje mappa. Den kan ha blitt flytta eller sletta</string>
     <string name="invalid_backup">Ugyldeg sikkerheitskopi</string>
-    <string name="imported_backup">Importert sikkerheitskopi</string>
     <string name="exporting_backup">Eksporterer sikkerheitskopi</string>
     <string name="importing_backup">Importerer sikkerheitskopi</string>
     <string name="calculating">Bereknar…</string>

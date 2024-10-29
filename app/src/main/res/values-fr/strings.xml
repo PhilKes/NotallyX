@@ -112,7 +112,6 @@
     <string name="choose_another_folder">Choisir un autre dossier</string>
     <string name="cant_find_folder">Impossible de trouver le dossier. Il a peut-être été déplacé ou supprimé.</string>
     <string name="invalid_backup">Sauvegarde invalide</string>
-    <string name="imported_backup">Sauvegarde importée</string>
     <string name="exporting_backup">Exportation de la sauvegarde</string>
     <string name="importing_backup">Importation de la sauvegarde</string>
     <string name="calculating">Calcul…</string>

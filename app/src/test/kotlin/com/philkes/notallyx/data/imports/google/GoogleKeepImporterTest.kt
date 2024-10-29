@@ -49,7 +49,7 @@ class GoogleKeepImporterTest {
                 labels = listOf("Label1", "Label2"),
                 body = "This is some note, nothing special",
             )
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertEquals(expected, actual)
     }
@@ -66,7 +66,7 @@ class GoogleKeepImporterTest {
         """
                 .trimIndent()
 
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertThat(actual)
             .extracting("title", "folder")
@@ -85,7 +85,7 @@ class GoogleKeepImporterTest {
         """
                 .trimIndent()
 
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertThat(actual)
             .extracting("title", "folder")
@@ -103,7 +103,7 @@ class GoogleKeepImporterTest {
         """
                 .trimIndent()
 
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertThat(actual).extracting("title", "pinned").containsExactly("Pinned Note", true)
     }
@@ -128,7 +128,7 @@ class GoogleKeepImporterTest {
         """
                 .trimIndent()
 
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertThat(actual)
             .extracting("type", "title", "items")
@@ -158,7 +158,7 @@ class GoogleKeepImporterTest {
         """
                 .trimIndent()
 
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertThat(actual)
             .extracting("title", "images")
@@ -184,7 +184,7 @@ class GoogleKeepImporterTest {
         """
                 .trimIndent()
 
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertThat(actual)
             .extracting("title", "files")
@@ -210,7 +210,7 @@ class GoogleKeepImporterTest {
         """
                 .trimIndent()
 
-        val actual = importer.parseToBaseNote(json)
+        val actual = with(importer) { json.parseToBaseNote() }
 
         assertThat(actual.title).isEqualTo("Audio Note")
         assertThat(actual.audios[0].name).isEqualTo("audio.3gp")

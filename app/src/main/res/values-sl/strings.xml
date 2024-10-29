@@ -113,7 +113,6 @@
     <string name="choose_another_folder">Izberite drugo mapo</string>
     <string name="cant_find_folder">Mapa ne obstaja. Morda je bila premaknjena ali izbrisana.</string>
     <string name="invalid_backup">Neveljavna varnostna kopija</string>
-    <string name="imported_backup">Varnostna kopija je bila uvožena</string>
     <string name="exporting_backup">Izvažanje varnostne kopije</string>
     <string name="importing_backup">Uvažanje varnostne kopije</string>
     <string name="calculating">Izračun…</string>

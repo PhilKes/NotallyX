@@ -112,7 +112,6 @@
     <string name="choose_another_folder">Vybrat jinou složku</string>
     <string name="cant_find_folder">Složka nebyla nalezena. Možná byla přesunuta nebo smazána.</string>
     <string name="invalid_backup">Neplatný soubor zálohy</string>
-    <string name="imported_backup">Záloha importována</string>
     <string name="exporting_backup">Vytváří se záloha</string>
     <string name="importing_backup">Importuje se záloha</string>
     <string name="calculating">Probíhá výpočet…</string>

@@ -6,9 +6,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.os.Build
-import androidx.lifecycle.MutableLiveData
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
@@ -85,7 +85,7 @@ object IO {
             val duration = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
             val mimeType = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE)
             mimeType != null && hasAudio != null ||
-                    duration != null // If it has audio metadata, it's a valid audio file
+                duration != null // If it has audio metadata, it's a valid audio file
         } catch (e: Exception) {
             false // An exception means it’s not a valid audio file
         } finally {
