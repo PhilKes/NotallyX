@@ -38,7 +38,6 @@ import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.view.Constants
-import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.LinkMovementMethod
 
 private const val UNNAMED_NOTE_PLACEHOLDER = "Unnamed Note"
@@ -48,12 +47,6 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
     private lateinit var selectedSpan: URLSpan
     private lateinit var pickNoteNewActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var pickNoteUpdateActivityResultLauncher: ActivityResultLauncher<Intent>
-
-    override suspend fun saveNote() {
-        super.saveNote()
-        model.saveNote()
-        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
-    }
 
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { binding.EnterBody.requestFocus() }

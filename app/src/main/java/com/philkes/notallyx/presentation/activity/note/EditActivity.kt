@@ -48,6 +48,7 @@ import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
+import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
@@ -68,7 +69,11 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
-            saveNote()
+            if (model.isEmpty()) {
+                model.deleteBaseNote()
+            } else if (changeHistory.canUndo()) {
+                saveNote()
+            }
             super.finish()
         }
     }
@@ -76,13 +81,15 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong("id", model.id)
-        lifecycleScope.launch { saveNote() }
+        if (changeHistory.canUndo()) {
+            lifecycleScope.launch { saveNote() }
+        }
     }
 
     open suspend fun saveNote() {
-        if (changeHistory.canUndo()) {
-            model.modifiedTimestamp = System.currentTimeMillis()
-        }
+        model.modifiedTimestamp = System.currentTimeMillis()
+        model.saveNote()
+        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
