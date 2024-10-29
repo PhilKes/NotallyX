@@ -5,6 +5,7 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.content.res.Resources
@@ -12,7 +13,9 @@ import android.graphics.Typeface
 import android.hardware.biometrics.BiometricManager
 import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
 import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
+import android.net.Uri
 import android.os.Build
+import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
@@ -56,6 +59,7 @@ import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
+import java.io.File
 import java.util.Date
 import kotlin.math.roundToInt
 import org.ocpsoft.prettytime.PrettyTime
@@ -322,6 +326,28 @@ fun <T> LiveData<T>.observeForeverSkipFirst(observer: Observer<T>) {
         }
     }
 }
+
+fun String.fileNameWithoutExtension(): String {
+    return this.substringAfterLast("/") // Remove the path
+        .substringBeforeLast(".") // Remove the extension
+}
+
+fun Context.getFileName(uri: Uri): String? =
+    when (uri.scheme) {
+        ContentResolver.SCHEME_CONTENT -> getContentFileName(uri)
+        else -> uri.path?.let(::File)?.name
+    }
+
+fun Context.getContentFileName(uri: Uri): String? =
+    runCatching {
+            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                cursor.moveToFirst()
+                return@use cursor
+                    .getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
+                    .let(cursor::getString)
+            }
+        }
+        .getOrNull()
 
 fun Activity.showKeyboard(view: View) {
     val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager

@@ -15,6 +15,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -22,6 +23,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.imports.ImportSource
 import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.NotesSortDialogBinding
@@ -60,6 +62,8 @@ import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 class SettingsFragment : Fragment() {
 
     private val model: BaseNoteModel by activityViewModels()
+
+    private lateinit var selectedImportSource: ImportSource
 
     private fun setupBinding(binding: FragmentSettingsBinding) {
         model.preferences.apply {
@@ -113,6 +117,7 @@ class SettingsFragment : Fragment() {
         }
 
         binding.ImportBackup.setOnClickListener { importBackup() }
+        binding.ImportOther.setOnClickListener { importOther() }
 
         binding.ExportBackup.setOnClickListener { exportBackup() }
 
@@ -150,6 +155,7 @@ class SettingsFragment : Fragment() {
                     REQUEST_IMPORT_BACKUP -> importBackup(uri)
                     REQUEST_EXPORT_BACKUP -> model.exportBackup(uri)
                     REQUEST_CHOOSE_FOLDER -> model.setAutoBackupPath(uri)
+                    REQUEST_IMPORT_OTHER -> model.importFromOtherApp(uri, selectedImportSource)
                 }
                 return
             }
@@ -219,6 +225,40 @@ class SettingsFragment : Fragment() {
             .setMessage(R.string.clear_data_message)
             .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAllBaseNotes() }
             .setNegativeButton(R.string.cancel) { _, _ -> }
+            .show()
+    }
+
+    private fun importOther() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.choose_other_app)
+            .setItems(ImportSource.entries.map { it.displayName }.toTypedArray()) { _, which ->
+                selectedImportSource = ImportSource.entries[which]
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(selectedImportSource.helpTextResId)
+                    .setPositiveButton(R.string.import_action) { dialog, _ ->
+                        dialog.cancel()
+                        val intent =
+                            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                type = "*/*"
+                                putExtra(
+                                    Intent.EXTRA_MIME_TYPES,
+                                    arrayOf(selectedImportSource.mimeType),
+                                )
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                            }
+                        startActivityForResult(intent, REQUEST_IMPORT_OTHER)
+                    }
+                    .setNegativeButton(R.string.help) { _, _ ->
+                        val intent =
+                            Intent(Intent.ACTION_VIEW).apply {
+                                data = Uri.parse(selectedImportSource.documentationUrl)
+                            }
+                        startActivity(intent)
+                    }
+                    .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+                    .show()
+            }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -601,5 +641,6 @@ class SettingsFragment : Fragment() {
         private const val REQUEST_CHOOSE_FOLDER = 22
         private const val REQUEST_SETUP_LOCK = 23
         private const val REQUEST_DISABLE_LOCK = 24
+        private const val REQUEST_IMPORT_OTHER = 25
     }
 }

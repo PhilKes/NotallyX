@@ -1,13 +1,8 @@
 package com.philkes.notallyx.presentation.viewmodel
 
 import android.app.Application
-import android.content.ContentResolver
-import android.content.Context
-import android.graphics.BitmapFactory
 import android.graphics.Typeface
-import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.SpannableStringBuilder
 import android.text.Spanned
@@ -16,15 +11,14 @@ import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
-import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.text.getSpans
-import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.DataUtil
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.Audio
@@ -50,9 +44,8 @@ import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.IO.getTempAudioFile
 import com.philkes.notallyx.utils.IO.rename
 import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.applySpans
 import java.io.File
-import java.io.FileInputStream
-import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -99,36 +92,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     fun addAudio() {
         viewModelScope.launch {
-            val audio =
-                withContext(Dispatchers.IO) {
-                    /*
-                    Regenerate because the directory may have been deleted between the time of activity creation
-                    and audio recording
-                    */
-                    audioRoot = app.getExternalAudioDirectory()
-                    requireNotNull(audioRoot) { "audioRoot is null" }
-
-                    /*
-                    If we have reached this point, an SD card (emulated or real) exists and audioRoot
-                    is not null. audioRoot.exists() can be false if the folder `Audio` has been deleted after
-                    the previous line, but audioRoot itself can't be null
-                    */
-                    val original = app.getTempAudioFile()
-                    val name = "${UUID.randomUUID()}.m4a"
-                    val final = File(audioRoot, name)
-                    val input = FileInputStream(original)
-                    input.copyToFile(final)
-
-                    original.delete()
-
-                    val retriever = MediaMetadataRetriever()
-                    retriever.setDataSource(final.path)
-                    val duration =
-                        requireNotNull(
-                            retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION)
-                        )
-                    Audio(name, duration.toLong(), System.currentTimeMillis())
-                }
+            val audio = DataUtil.addAudio(app, app.getTempAudioFile(), true)
             val copy = ArrayList(audios.value)
             copy.add(audio)
             audios.value = copy
@@ -167,19 +131,12 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     private fun addFiles(uris: Array<Uri>, directory: File, fileType: FileType) {
-        val unknownName = app.getString(R.string.unknown_name)
-        val unknownError = app.getString(R.string.unknown_error)
-        val invalidImage = app.getString(R.string.invalid_image)
-        val formatNotSupported = app.getString(R.string.image_format_not_supported)
         val errorWhileRenaming =
-            app.getString(
-                if (fileType == FileType.IMAGE) {
-                    R.string.error_while_renaming_image
-                } else {
-                    R.string.error_while_renaming_file
-                }
-            )
-
+            if (fileType == FileType.IMAGE) {
+                R.string.error_while_renaming_image
+            } else {
+                R.string.error_while_renaming_file
+            }
         viewModelScope.launch {
             addingFiles.postValue(Progress(0, uris.size))
 
@@ -187,76 +144,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             val errors = ArrayList<FileError>()
 
             uris.forEachIndexed { index, uri ->
-                withContext(Dispatchers.IO) {
-                    val document = requireNotNull(DocumentFile.fromSingleUri(app, uri))
-                    val displayName = document.name ?: unknownName
-                    try {
-
-                        /*
-                        If we have reached this point, an SD card (emulated or real) exists and externalRoot
-                        is not null. externalRoot.exists() can be false if the folder `Images` has been deleted after
-                        the previous line, but externalRoot itself can't be null
-                        */
-                        val temp = File(directory, "Temp")
-
-                        val inputStream = requireNotNull(app.contentResolver.openInputStream(uri))
-                        inputStream.copyToFile(temp)
-
-                        val originalName = app.getFileName(uri)
-                        when (fileType) {
-                            FileType.IMAGE -> {
-                                val options = BitmapFactory.Options()
-                                options.inJustDecodeBounds = true
-                                BitmapFactory.decodeFile(temp.path, options)
-                                val mimeType = options.outMimeType
-
-                                if (mimeType != null) {
-                                    val extension = getExtensionForMimeType(mimeType)
-                                    if (extension != null) {
-                                        val name = "${UUID.randomUUID()}.$extension"
-                                        if (temp.rename(name)) {
-                                            successes.add(
-                                                FileAttachment(name, originalName ?: name, mimeType)
-                                            )
-                                        } else {
-                                            // I don't expect this error to ever happen but just in
-                                            // case
-                                            errors.add(
-                                                FileError(displayName, errorWhileRenaming, fileType)
-                                            )
-                                        }
-                                    } else
-                                        errors.add(
-                                            FileError(displayName, formatNotSupported, fileType)
-                                        )
-                                } else errors.add(FileError(displayName, invalidImage, fileType))
-                            }
-
-                            FileType.ANY -> {
-                                val mimeType =
-                                    app.contentResolver.getType(uri) ?: "application/octet-stream"
-                                val fileExtension =
-                                    MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType)
-                                        ?: ""
-                                val extension =
-                                    if (fileExtension.isNotEmpty()) ".${fileExtension}" else ""
-                                val name = "${UUID.randomUUID()}${extension}"
-                                if (temp.rename(name)) {
-                                    successes.add(
-                                        FileAttachment(name, originalName ?: name, mimeType)
-                                    )
-                                } else {
-                                    // I don't expect this error to ever happen but just in case
-                                    errors.add(FileError(displayName, errorWhileRenaming, fileType))
-                                }
-                            }
-                        }
-                    } catch (exception: Exception) {
-                        errors.add(FileError(displayName, unknownError, fileType))
-                        Operations.log(app, exception)
-                    }
-                }
-
+                val (fileAttachment, error) =
+                    DataUtil.addFile(app, uri, directory, fileType, errorWhileRenaming)
+                fileAttachment?.let { successes.add(it) }
+                error?.let { errors.add(it) }
                 addingFiles.postValue(Progress(index + 1, uris.size))
             }
 
@@ -288,23 +179,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun Context.getFileName(uri: Uri): String? =
-        when (uri.scheme) {
-            ContentResolver.SCHEME_CONTENT -> getContentFileName(uri)
-            else -> uri.path?.let(::File)?.name
-        }
-
-    private fun Context.getContentFileName(uri: Uri): String? =
-        runCatching {
-                contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                    cursor.moveToFirst()
-                    return@use cursor
-                        .getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
-                        .let(cursor::getString)
-                }
-            }
-            .getOrNull()
-
     fun deleteImages(list: ArrayList<FileAttachment>) {
         viewModelScope.launch {
             val copy = ArrayList(images.value)
@@ -322,15 +196,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             files.value = copy
             updateFiles()
             withContext(Dispatchers.IO) { app.deleteAttachments(list) }
-        }
-    }
-
-    private fun getExtensionForMimeType(type: String): String? {
-        return when (type) {
-            "image/png" -> "png"
-            "image/jpeg" -> "jpg"
-            "image/webp" -> "webp"
-            else -> null
         }
     }
 

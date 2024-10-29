@@ -176,10 +176,14 @@
     <string name="tap_to_set_up">Tap to set up</string>
     <string name="notes_will_be">Notes will be backed up to your phone’s internal storage everyday.\n\nThis may not work if you have power saving mode enabled</string>
     <string name="choose_folder">Choose folder</string>
+    <string name="import_action">Import</string>
     <string name="disable_auto_backup">Disable auto backup</string>
     <string name="choose_another_folder">Choose another folder</string>
     <string name="cant_find_folder">Can’t find folder. It may have been moved or deleted</string>
     <string name="invalid_backup">Invalid backup</string>
+    <string name="invalid_google_keep">Invalid Google Takeout ZIP File provided</string>
+    <string name="help">Help</string>
+    <string name="google_keep_help">In order to import your Notes from Google Keep you must download your Google Takeout ZIP file.\n\nIf you already have a Takeout ZIP file, click Import and choose the ZIP file.</string>
     <string name="imported_backup">Imported backup</string>
     <string name="exporting_backup">Exporting backup</string>
     <string name="importing_backup">Importing backup</string>
@@ -190,6 +194,7 @@
     <string name="import_backup">Import backup</string>
     <string name="clear_data">Clear Data</string>
     <string name="cleared_data">All Data has been cleared</string>
+    <string name="import_other">Import from other App</string>
 
     <string name="auto_backup_period">Auto backup period</string>
     <string name="daily">Daily</string>
@@ -198,6 +203,7 @@
 
     <string name="about">About</string>
     <string name="libraries">Libraries</string>
+    <string name="choose_other_app">Choose which app to import from</string>
     <string name="rate">Rate this app</string>
     <string name="send_feedback">Send Feedback</string>
     <string name="report_bug">Report an issue/bug</string>

@@ -19,7 +19,11 @@ abstract class BaseNoteSort(
             item1 == null && item2 == null -> 0
             item1 == null && item2 != null -> -1
             item1 != null && item2 == null -> 1
-            item1 is BaseNote && item2 is BaseNote -> compare(item1, item2, sortDirection)
+            item1 is BaseNote && item2 is BaseNote -> {
+                val pinnedCompare = item1.pinned.compareTo(item2.pinned) * -1
+                return if (pinnedCompare != 0) pinnedCompare
+                else compare(item1, item2, sortDirection)
+            }
             item1 is Header && item2 is Header -> 0
             else -> 0
         }

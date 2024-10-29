@@ -7,6 +7,8 @@ plugins {
     id 'kotlin-parcelize'
     id 'com.google.devtools.ksp'
     id 'com.ncorti.ktfmt.gradle' version '0.20.1'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.9.0'
+
 }
 
 android {
@@ -53,6 +55,12 @@ android {
 
     packagingOptions.resources {
         excludes += ["DebugProbesKt.bin", "META-INF/**.version", "kotlin/**.kotlin_builtins", "kotlin-tooling-metadata.json"]
+    }
+
+    testOptions{
+        unitTests{
+            includeAndroidResources true
+        }
     }
 }
 
@@ -111,10 +119,19 @@ dependencies {
     implementation "com.github.bumptech.glide:glide:4.15.1"
     implementation "com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0"
 
+    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"
+
     testImplementation "junit:junit:4.13.2"
     testImplementation "androidx.test:core:1.6.1"
+    testImplementation "androidx.test:core-ktx:1.6.1"
     testImplementation "org.mockito:mockito-core:5.13.0"
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.4.0"
     testImplementation "io.mockk:mockk:1.13.12"
     testImplementation "org.json:json:20180813"
+    testImplementation "org.assertj:assertj-core:3.24.2"
+    testImplementation "org.robolectric:robolectric:4.13"
+
+    androidTestImplementation "androidx.room:room-testing:$roomVersion"
+    androidTestImplementation "androidx.work:work-testing:2.9.1"
+
 }

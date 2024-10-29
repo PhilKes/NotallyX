@@ -6,6 +6,7 @@ import android.net.Uri
 import android.print.PostPDFGenerator
 import android.text.Html
 import android.widget.Toast
+import androidx.core.database.getLongOrNull
 import androidx.core.text.toHtml
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -19,6 +20,9 @@ import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.dao.CommonDao
 import com.philkes.notallyx.data.dao.LabelDao
+import com.philkes.notallyx.data.imports.ImportException
+import com.philkes.notallyx.data.imports.ImportSource
+import com.philkes.notallyx.data.imports.NotesImporter
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
@@ -126,7 +130,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
         allNotes?.removeObserver(allNotesObserver!!)
         allNotesObserver = Observer { list -> Cache.list = list }
-        allNotes = baseNoteDao.getAll()
+        allNotes = baseNoteDao.getAllAsync()
         allNotes!!.observeForever(allNotesObserver!!)
 
         if (baseNotes == null) {
@@ -231,6 +235,29 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 val stream = requireNotNull(app.contentResolver.openInputStream(uri))
                 val backup = XMLUtils.readBackupFromStream(stream)
                 commonDao.importBackup(backup.first, backup.second)
+            }
+            Toast.makeText(app, R.string.imported_backup, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun importFromOtherApp(uri: Uri, importSource: ImportSource) {
+        val database = NotallyDatabase.getDatabase(app).value
+
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            Toast.makeText(
+                    app,
+                    if (throwable is ImportException) {
+                        throwable.textResId
+                    } else R.string.invalid_backup,
+                    Toast.LENGTH_LONG,
+                )
+                .show()
+            Operations.log(app, throwable)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            withContext(Dispatchers.IO) {
+                NotesImporter(app, database)
+                    .import(app.contentResolver.openInputStream(uri)!!, importSource)
             }
             Toast.makeText(app, R.string.imported_backup, Toast.LENGTH_LONG).show()
         }

@@ -160,8 +160,16 @@ object Export {
         val request =
             PeriodicWorkRequest.Builder(AutoBackupWorker::class.java, periodInDays, TimeUnit.DAYS)
                 .build()
-        WorkManager.getInstance(context)
-            .enqueueUniquePeriodicWork("Auto Backup", ExistingPeriodicWorkPolicy.UPDATE, request)
+        try {
+            WorkManager.getInstance(context)
+                .enqueueUniquePeriodicWork(
+                    "Auto Backup",
+                    ExistingPeriodicWorkPolicy.UPDATE,
+                    request,
+                )
+        } catch (e: IllegalStateException) {
+            // only happens in Unit-Tests
+        }
     }
 
     private fun backupFile(

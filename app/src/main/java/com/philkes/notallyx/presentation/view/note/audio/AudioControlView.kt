@@ -60,6 +60,10 @@ class AudioControlView(context: Context, attrs: AttributeSet) : RelativeLayout(c
 
     fun setDuration(milliseconds: Long) {
         duration = milliseconds
+        if (milliseconds == -1L) {
+            // TODO: ?
+            return
+        }
         progress.valueTo = milliseconds.toFloat()
         length.text = DateUtils.formatElapsedTime(recycle, milliseconds / 1000)
     }
@@ -78,7 +82,7 @@ class AudioControlView(context: Context, attrs: AttributeSet) : RelativeLayout(c
     @Synchronized
     private fun updateComponents(now: Long) {
         var milliseconds = now - base
-        if (milliseconds > duration) {
+        if (duration > -1L && milliseconds > duration) {
             milliseconds = duration
         }
         chronometer.text = DateUtils.formatElapsedTime(recycle, milliseconds / 1000)
