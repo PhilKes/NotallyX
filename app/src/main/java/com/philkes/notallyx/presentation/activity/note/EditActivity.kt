@@ -31,10 +31,10 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityEditBinding
-import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
+import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
@@ -165,7 +165,8 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
-            REQUEST_NOTIFICATION_PERMISSION -> selectImages()
+            REQUEST_NOTIFICATION_PERMISSION_IMAGES -> selectImages()
+            REQUEST_NOTIFICATION_PERMISSION_FILES -> selectFiles()
             REQUEST_AUDIO_PERMISSION -> {
                 if (
                     grantResults.isNotEmpty() &&
@@ -210,12 +211,8 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
             add(R.string.share, R.drawable.share) { share() }
             add(R.string.labels, R.drawable.label) { label() }
-            add(R.string.add_images, R.drawable.add_images) {
-                checkNotificationPermission { selectImages() }
-            }
-            add(R.string.attach_file, R.drawable.text_file) {
-                checkNotificationPermission { selectFiles() }
-            }
+            add(R.string.add_images, R.drawable.add_images) { selectImages() }
+            add(R.string.attach_file, R.drawable.text_file) { selectFiles() }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 add(R.string.record_audio, R.drawable.record_audio) { checkAudioPermission() }
@@ -292,24 +289,6 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     .show()
             } else requestPermissions(arrayOf(permission), REQUEST_AUDIO_PERMISSION)
         } else recordAudio()
-    }
-
-    private fun checkNotificationPermission(onSuccess: () -> Unit) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val permission = Manifest.permission.POST_NOTIFICATIONS
-            if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
-                if (shouldShowRequestPermissionRationale(permission)) {
-                    MaterialAlertDialogBuilder(this)
-                        .setMessage(R.string.please_grant_notally_notification)
-                        .setNegativeButton(R.string.cancel) { _, _ -> onSuccess() }
-                        .setPositiveButton(R.string.continue_) { _, _ ->
-                            requestPermissions(arrayOf(permission), REQUEST_NOTIFICATION_PERMISSION)
-                        }
-                        .setOnDismissListener { onSuccess() }
-                        .show()
-                } else requestPermissions(arrayOf(permission), REQUEST_NOTIFICATION_PERMISSION)
-            } else onSuccess()
-        } else onSuccess()
     }
 
     private fun recordAudio() {
@@ -599,40 +578,12 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         setupImages()
         setupFiles()
         setupAudios()
-        setupProgressDialog()
-
-        binding.root.isSaveFromParentEnabled = false
-    }
-
-    private fun setupProgressDialog() {
-        val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
-        val dialog =
-            MaterialAlertDialogBuilder(this)
-                .setView(dialogBinding.root)
-                .setCancelable(false)
-                .create()
-
-        model.addingFiles.observe(this) { progress ->
-            if (progress.inProgress) {
-                dialog.setTitle(
-                    if (progress.fileType == NotallyModel.FileType.IMAGE) {
-                        R.string.adding_images
-                    } else {
-                        R.string.adding_files
-                    }
-                )
-                dialog.show()
-                dialogBinding.apply {
-                    ProgressBar.max = progress.total
-                    ProgressBar.setProgressCompat(progress.current, true)
-                    Count.text = getString(R.string.count, progress.current, progress.total)
-                }
-            } else dialog.dismiss()
-        }
-
+        model.addingFiles.setupProgressDialog(this, R.string.adding_files)
         model.eventBus.observe(this) { event ->
             event.handle { errors -> displayFileErrors(errors) }
         }
+
+        binding.root.isSaveFromParentEnabled = false
     }
 
     private fun bindPinned(item: MenuItem) {
@@ -652,12 +603,13 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     companion object {
         private const val REQUEST_ADD_IMAGES = 30
         private const val REQUEST_VIEW_IMAGES = 31
-        private const val REQUEST_NOTIFICATION_PERMISSION = 32
+        private const val REQUEST_NOTIFICATION_PERMISSION_IMAGES = 32
         private const val REQUEST_SELECT_LABELS = 33
         private const val REQUEST_RECORD_AUDIO = 34
         private const val REQUEST_PLAY_AUDIO = 35
         private const val REQUEST_AUDIO_PERMISSION = 36
         private const val REQUEST_ATTACH_FILES = 37
+        private const val REQUEST_NOTIFICATION_PERMISSION_FILES = 38
 
         const val NOTE_ID = "note_id"
         const val FOLDER_FROM = "folder_from"

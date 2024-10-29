@@ -16,6 +16,7 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.utils.IO.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.IO.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.IO.SUBFOLDER_IMAGES
@@ -45,9 +46,9 @@ object Import {
         zipFileUri: Uri,
         databaseFolder: File,
         zipPassword: String,
-        importingBackup: MutableLiveData<BackupProgress>? = null,
+        importingBackup: MutableLiveData<Progress>? = null,
     ) {
-        importingBackup?.value = BackupProgress(true, 0, 0, true)
+        importingBackup?.postValue(Progress(indeterminate = true))
         try {
             withContext(Dispatchers.IO) {
                 val stream = requireNotNull(app.contentResolver.openInputStream(zipFileUri))
@@ -82,6 +83,8 @@ object Import {
                     baseNotes.fold(0) { acc, baseNote ->
                         acc + baseNote.images.size + baseNote.files.size + baseNote.audios.size
                     }
+                importingBackup?.postValue(Progress(0, total))
+
                 val current = AtomicInteger(1)
                 val imageRoot = app.getExternalImagesDirectory()
                 val fileRoot = app.getExternalFilesDirectory()
@@ -117,9 +120,7 @@ object Import {
                         } catch (exception: Exception) {
                             Operations.log(app, exception)
                         } finally {
-                            importingBackup?.postValue(
-                                BackupProgress(true, current.get(), total, false)
-                            )
+                            importingBackup?.postValue(Progress(current.get(), total))
                             current.getAndIncrement()
                         }
                     }
@@ -130,7 +131,6 @@ object Import {
                     .getCommonDao()
                     .importBackup(baseNotes, labels)
             }
-            importingBackup?.value = BackupProgress(false, 0, 0, false)
             databaseFolder.clearDirectory()
             Toast.makeText(app, R.string.imported_backup, Toast.LENGTH_LONG).show()
         } catch (e: ZipException) {
@@ -144,7 +144,7 @@ object Import {
             Toast.makeText(app, R.string.invalid_backup, Toast.LENGTH_LONG).show()
             Operations.log(app, e)
         } finally {
-            importingBackup?.value = BackupProgress(false, 0, 0, false)
+            importingBackup?.value = Progress(inProgress = false)
         }
     }
 
@@ -156,7 +156,7 @@ object Import {
         zipFile: ZipFile,
         current: AtomicInteger,
         total: Int,
-        importingBackup: MutableLiveData<BackupProgress>? = null,
+        importingBackup: MutableLiveData<Progress>? = null,
     ) {
         files.forEach { file ->
             try {
@@ -170,7 +170,7 @@ object Import {
             } catch (exception: Exception) {
                 Operations.log(app, exception)
             } finally {
-                importingBackup?.postValue(BackupProgress(true, current.get(), total, false))
+                importingBackup?.postValue(Progress(current.get(), total))
                 current.getAndIncrement()
             }
         }

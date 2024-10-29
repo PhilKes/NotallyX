@@ -18,13 +18,11 @@ import androidx.core.content.ContextCompat
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.MutableLiveData
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.ChoiceItemBinding
-import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
@@ -32,6 +30,7 @@ import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
 import com.philkes.notallyx.presentation.checkedTag
+import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
 import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
@@ -53,7 +52,6 @@ import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.backup.BackupProgress
 import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
@@ -120,8 +118,9 @@ class SettingsFragment : Fragment() {
 
         binding.ClearData.setOnClickListener { clearData() }
 
-        setupProgressDialog(R.string.exporting_backup, model.exportingBackup)
-        setupProgressDialog(R.string.importing_backup, model.importingBackup)
+        model.exportProgress.setupProgressDialog(this, R.string.exporting_backup)
+        model.importProgress.setupProgressDialog(this, R.string.importing_backup)
+        model.deletionProgress.setupProgressDialog(this, R.string.deleting_files)
 
         binding.GitHub.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
 
@@ -221,34 +220,6 @@ class SettingsFragment : Fragment() {
             .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAllBaseNotes() }
             .setNegativeButton(R.string.cancel) { _, _ -> }
             .show()
-    }
-
-    private fun setupProgressDialog(titleId: Int, liveData: MutableLiveData<BackupProgress>) {
-        val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
-        val dialog =
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(titleId)
-                .setView(dialogBinding.root)
-                .setCancelable(false)
-                .create()
-
-        liveData.observe(viewLifecycleOwner) { progress ->
-            if (progress.inProgress) {
-                if (progress.indeterminate) {
-                    dialogBinding.apply {
-                        ProgressBar.isIndeterminate = true
-                        Count.setText(R.string.calculating)
-                    }
-                } else {
-                    dialogBinding.apply {
-                        ProgressBar.max = progress.total
-                        ProgressBar.setProgressCompat(progress.current, true)
-                        Count.text = getString(R.string.count, progress.current, progress.total)
-                    }
-                }
-                dialog.show()
-            } else dialog.dismiss()
-        }
     }
 
     private fun sendFeedback() {

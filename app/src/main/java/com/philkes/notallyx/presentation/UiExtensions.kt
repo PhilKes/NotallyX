@@ -1,5 +1,6 @@
 package com.philkes.notallyx.presentation
 
+import android.Manifest
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.ClipData
@@ -23,6 +24,7 @@ import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
 import android.view.KeyEvent
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -36,15 +38,21 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.getUrl
+import com.philkes.notallyx.databinding.DialogProgressBinding
+import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
+import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
@@ -318,6 +326,77 @@ fun <T> LiveData<T>.observeForeverSkipFirst(observer: Observer<T>) {
 fun Activity.showKeyboard(view: View) {
     val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
     inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+}
+
+fun MutableLiveData<out Progress>.setupProgressDialog(activity: Activity, titleId: Int) {
+    setupProgressDialog(activity, activity.layoutInflater, activity as LifecycleOwner, titleId)
+}
+
+fun MutableLiveData<out Progress>.setupProgressDialog(fragment: Fragment, titleId: Int) {
+    setupProgressDialog(
+        fragment.requireContext(),
+        fragment.layoutInflater,
+        fragment.viewLifecycleOwner,
+        titleId,
+    )
+}
+
+private fun MutableLiveData<out Progress>.setupProgressDialog(
+    context: Context,
+    layoutInflater: LayoutInflater,
+    viewLifecycleOwner: LifecycleOwner,
+    titleId: Int,
+) {
+    val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
+    val dialog =
+        MaterialAlertDialogBuilder(context)
+            .setTitle(titleId)
+            .setView(dialogBinding.root)
+            .setCancelable(false)
+            .create()
+
+    observe(viewLifecycleOwner) { progress ->
+        if (progress.inProgress) {
+            if (progress.indeterminate) {
+                dialogBinding.apply {
+                    ProgressBar.isIndeterminate = true
+                    Count.setText(R.string.calculating)
+                }
+            } else {
+                dialogBinding.apply {
+                    ProgressBar.apply {
+                        isIndeterminate = false
+                        max = progress.total
+                        setProgressCompat(progress.current, true)
+                    }
+                    Count.text = context.getString(R.string.count, progress.current, progress.total)
+                }
+            }
+            dialog.show()
+        } else dialog.dismiss()
+    }
+}
+
+fun Activity.checkNotificationPermission(
+    requestCode: Int,
+    messageResId: Int,
+    onSuccess: () -> Unit,
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        val permission = Manifest.permission.POST_NOTIFICATIONS
+        if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
+            if (shouldShowRequestPermissionRationale(permission)) {
+                MaterialAlertDialogBuilder(this)
+                    .setMessage(messageResId)
+                    .setNegativeButton(R.string.cancel) { _, _ -> onSuccess() }
+                    .setPositiveButton(R.string.continue_) { _, _ ->
+                        requestPermissions(arrayOf(permission), requestCode)
+                    }
+                    .setOnDismissListener { onSuccess() }
+                    .show()
+            } else requestPermissions(arrayOf(permission), requestCode)
+        } else onSuccess()
+    } else onSuccess()
 }
 
 private fun formatTimestamp(timestamp: Long, dateFormat: String): String {
