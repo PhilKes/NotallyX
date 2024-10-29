@@ -17,11 +17,14 @@
     <string name="archive">Archivieren</string>
     <string name="unarchive">Archivierung aufheben</string>
     <string name="add_images">Bilder hinzufügen</string>
+    <string name="attach_file">Datei hinzufügen</string>
     <string name="delete_all">Alles löschen</string>
+    <string name="record_audio">Sprachnotiz aufnehmen</string>
     <string name="change_color">Farbe ändern</string>
     <string name="delete_forever">Endgültig löschen</string>
 
     <!-- Pinning -->
+    <string name="undo">Wiederholen</string>
     <string name="pin">Anpinnen</string>
     <string name="unpin">Loslösen</string>
     <string name="pinned">Angepinnt</string>
@@ -33,7 +36,9 @@
     <!-- Dialogs -->
     <string name="save">Speichern</string>
     <string name="edit">Bearbeiten</string>
+    <string name="copy">Kopieren</string>
     <string name="cancel">Abbrechen</string>
+    <string name="clear">Löschen</string>
      <string name="continue_">Weiter</string>
     <string name="open_link">Link öffnen</string>
     <string name="make_list">Liste erstellen</string>
@@ -50,6 +55,12 @@
     <string name="delete_selected_notes">Ausgewählte Notizen löschen?</string>
     <string name="delete_note_forever">Notiz endgültig löschen?</string>
     <string name="your_notes_associated">Notizen, welche dieses Label verwenden, werden nicht gelöscht.</string>
+    <string name="biometrics_setup_success">Biometrische/PIN Sperre aktiviert</string>
+    <string name="biometrics_disable_success">Biometrische/PIN Sperre deaktiviert</string>
+    <string name="biometrics_failure">Fehler bei Authentifizierung per Biometrie/PIN</string>
+    <string name="backup_password_hint">Durch diese Einstellung werden alle zukünftigen ZIP Backups verschlüsselt und passwortgeschützt</string>
+    <string name="import_backup_password_hint">Falls das Backup nicht passwortgeschützt ist, drücken Sie einfach auf Importieren, andernfalls geben Sie das richtige Passwort ein.</string>
+
 
     <!-- Lists and Notes -->
     <string name="note">Notiz</string>
@@ -57,6 +68,7 @@
     <string name="date">Datum</string>
     <string name="title">Titel</string>
     <string name="add_item">Eintrag hinzufügen</string>
+    <string name="audio_recordings">Sprachnotizen</string>
     <string name="drag_handle">Ziehgriff</string>
     <string name="bold">Fett</string>
     <string name="link">Link erstellen</string>
@@ -74,6 +86,7 @@
     
     <!-- Messages -->
     <string name="cant_open_link">Link konnte nicht geöffnet werden</string>
+    <string name="edit_link">Link ändern</string>
     <string name="something_went_wrong">Etwas ist schief gelaufen. Bitte erneut versuchen.</string>
     <string name="install_an_email">Installiere eine E-Mail-App zum Senden von Feedback</string>
     <string name="install_a_browser">Installiere einen Browser, um diesen Link zu öffnen</string>
@@ -99,35 +112,54 @@
     <string name="medium">Mittel</string>
     <string name="large">Groß</string>
 
+    <string name="sort_direction">Reihenfolge</string>
     <string name="content_density">Notizvorschau</string>
     <string name="max_items_to_display">Maximal angezeigte Listeneinträge</string>
     <string name="max_lines_to_display">Maximal angezeigte Zeilen</string>
      <string name="max_lines_to_display_title">Maximal angezeigte Zeilen im Titel</string>
-    
+
+    <string name="security">Sicherheit</string>
+
+    <string name="biometric_lock">App per Biometrie/PIN sperren</string>
+    <string name="enabled">Aktiviert</string>
+    <string name="disabled">Deaktiviert</string>
+
     <!-- Backup -->
-    <string name="backup">Sicherung</string>
-    <string name="auto_backup">Automatische Sicherung</string>
+    <string name="backup">Backup</string>
+    <string name="auto_backup">Automatisches Backup</string>
+    <string name="backup_password">Backup Passwort</string>
+    <string name="wrong_password">Falsches Passwort eingegeben</string>
+    <string name="max_backups">Anzahl zu behaltende Backups</string>
+    <string name="backup_period_days">Auto. Backup Intervall in Tagen</string>
     <string name="tap_to_set_up">Zum Einrichten antippen</string>
     <string name="notes_will_be">Notizen werden täglich auf dem internen Speicher deines Telefons gesichert.\n\nDies funktioniert möglicherweise nicht, wenn du den Energiesparmodus aktiviert hast.</string>
     <string name="choose_folder">Ordner wählen</string>
-    <string name="disable_auto_backup">Automatische Sicherung deaktivieren</string>
+    <string name="disable_auto_backup">Automatisches Backup deaktivieren</string>
     <string name="choose_another_folder">Anderen Ordner wählen</string>
     <string name="cant_find_folder">Kann den Ordner nicht finden. Er kann verschoben oder gelöscht worden sein</string>
-    <string name="invalid_backup">Ungültige Sicherung</string>
-    <string name="imported_backup">Importierte Sicherung</string>
-    <string name="exporting_backup">Exportieren der Sicherung</string>
-    <string name="importing_backup">Importieren der Sicherung</string>
+    <string name="invalid_backup">Ungültige Backup</string>
+    <string name="google_keep_help">Um deine Notizen aus Google Notizen zu importieren musst du deine Google Takeout ZIP Datei herunterladen\n\nFalls du das Takeout ZIP schon hast, klicke auf Import und wähle es aus.</string>
+    <string name="exporting_backup">Backup Exportieren</string>
+    <string name="importing_backup">Backup Importieren</string>
     <string name="calculating">Berechne…</string>
-    
-    <string name="export_backup">Notizen sichern</string>
-    <string name="import_backup">Notizen wiederherstellen</string>
+    <string name="clear_data_message">Alle Notizen, Bilder, Dateien und Sprachnotizen werden permanent gelöscht</string>
 
+    <string name="google_keep">Google Notizen</string>
+
+    <string name="export_backup">Backup erstellen</string>
+    <string name="import_backup">Backup importieren</string>
+    <string name="clear_data">Alle Daten löschen</string>
+    <string name="cleared_data">Alle Daten erfolgreich geläscht</string>
+    <string name="import_other">Notizen von anderer App importieren</string>
+
+    <string name="monthly">Monatlich</string>
     <string name="about">Über</string>
     <string name="libraries">Bibliotheken</string>
+    <string name="choose_other_app">Wähle von welcher App importiert werden soll</string>
     <string name="rate">App bewerten</string>
     <string name="send_feedback">Feedback senden</string>
-
-    
+    <string name="report_bug">Fehler/Bug melden</string>
+    <string name="make_feature_request">Feature/Verbesserung vorschlagen</string>
 
     <!-- Widget -->
     <string name="single_note_or_list">Einzelne Notiz oder Liste</string>
@@ -139,13 +171,15 @@
     <string name="deleting_images">Bilder löschen</string>
     <string name="invalid_image">Ungültiges Bild</string>
     <string name="error_while_renaming_image">Fehler beim Umbenennen des Bildes</string>
+    <string name="cant_load_file">Datei kann nicht geladen werden. Eventuell wurde sie verschoben oder gelöscht</string>
     <string name="image_format_not_supported">Bildformat nicht unterstützt</string>
     <string name="delete_image_forever">Bild endgültig löschen?</string>
     <string name="cant_load_image">Bild kann nicht geladen werden. Es kann verschoben oder gelöscht worden sein</string>
     <string name="unknown_name">Unbekannter Name</string>
     <string name="unknown_error">Unbekannter Fehler</string>
     <string name="insert_an_sd_card_images">SD-Karte einlegen, um Bilder hinzuzufügen</string>
-    <string name="please_grant_notally_notification">Bitte erteile NotallyX die Berechtigung, Benachrichtigungen zu senden. Dies wird verwendet, um den Fortschritt anzuzeigen, wenn Vorgänge wie das Löschen von Bildern oder das Importieren von Sicherungen Zeit in Anspruch nehmen</string>
+    <string name="insert_an_sd_card_files">SD-Karte einlegen, um Dateien hinzuzufügen</string>
+    <string name="please_grant_notally_notification">Bitte erteile NotallyX die Berechtigung, Benachrichtigungen zu senden. Dies wird verwendet, um den Fortschritt anzuzeigen, wenn Vorgänge wie das Löschen von Bildern oder das Importieren von Backupen Zeit in Anspruch nehmen</string>
 
     <plurals name="cant_add_images">
         <item quantity="one">Kann %d Bild nicht hinzufügen</item>
@@ -157,5 +191,48 @@
         <item quantity="one">…%d weitere Datei</item>
         <item quantity="other">…%d weitere Dateien</item>
     </plurals>
-    
+    <string name="delete_checked_items">Abgehakte Elemente löschen</string>
+    <string name="check_all_items">Alle Elemente abhaken</string>
+    <string name="uncheck_all_items">Alle Elemente abwählen</string>
+    <string name="redo">Rückgängig</string>
+    <string name="invalid_link">Kopiere einen validen Link</string>
+    <string name="updated_link">Link aktualisiert</string>
+    <string name="copied_link">Link kopiert</string>
+    <string name="checked_list_item_sorting">Liste automatisch sortieren</string>
+    <string name="no_auto_sort">Nicht automatisch sortieren</string>
+    <string name="auto_sort_by_checked">Nach abgehakten Elementen sortieren</string>
+    <string name="notes_sorted_by">Notizen sortieren nach</string>
+    <string name="creation_date">Erstellt am</string>
+    <string name="modified_date">Zuletzt geändert am</string>
+    <string name="ascending">Aufsteigend</string>
+    <string name="descending">Absteigend</string>
+    <string name="auto_backup_period">Intervall für autom. Backups</string>
+    <string name="daily">Täglich</string>
+    <string name="weekly">Wöchentlich</string>
+    <string name="adding_files">Dateien hinzufügen</string>
+    <string name="deleting_files">Dateien löschen</string>
+    <string name="delete_file">Datei \'%s\' löschen?</string>
+    <string name="error_while_renaming_file">Datei umbennen fehlgeschlagen</string>
+    <string name="resume">Fortfahren</string>
+    <string name="paused">Pausiert</string>
+    <string name="recording">Nimmt auf...</string>
+    <string name="ready_to_record">Bereit zum Aufnehmen</string>
+    <string name="discard">Verwerfen</string>
+    <string name="save_recording">Aufnahme speichern?</string>
+    <string name="delete_audio_recording_forever">Aufnahme für immer löschen?</string>
+    <string name="tap_for_more_options">Klick für mehr Optionen</string>
+    <string name="to_record_audio">Um Sprachnotizen zu erstellen, braucht NotallyX Zugriff auf dein Mikrofon. Klicke Einstellunge > Berechtigungen und aktiviere Mikrofon</string>
+    <string name="please_grant_notally_audio">Bitte gib NotallyX die Berechtigung Sprachnotizen zu erstellen. Die Aufnahmen verlassen niemals dein Gerät.</string>
+    <string name="insert_an_sd_card_audio">Lege eine SD-Karte ein um Sprachnotizen aufzunehmen</string>
+    <string name="something_went_wrong_audio">Etwas lief schief. Die Sprachnotiz wurde eventuell verschoben oder gelöscht.\n\nFehler : (%1$d, %2$d)</string>
+    <string name="enable_lock_title">Aktiviere Biometrie/PIN Sperre</string>
+    <string name="enable_lock_description">Dies verschlüsselt außerdem die Datenbank</string>
+    <string name="disable_lock_title">Deaktivierte Biometrie/PIN Sperre</string>
+    <string name="disable_lock_description">Dies entschlüsselt außerdem die Datenbank</string>
+    <string name="unlock">Entsperre mittels Biometrie/PIN</string>
+    <string name="biometrics_no_support">Dein Geräte verfügt über keine biometrischen Features</string>
+    <string name="biometrics_not_setup">Biometrie/PIN wurde für dein Gerät noch nicht eingerichtet</string>
+    <string name="invalid_google_keep">"Invalide Google Takeout ZIP Datei bereitgestellt "</string>
+    <string name="help">Hilfe</string>
+
 </resources>

@@ -68,7 +68,6 @@
     <string name="empty_list">Lista vuota</string>
     <string name="cant_open_link">Impossibile aprire il link</string>
     <string name="invalid_backup">Backup invalido</string>
-    <string name="imported_backup">Backup importato</string>
     <string name="something_went_wrong">Qualcosa è andato storto. Per favore riprova.</string>
 
     <!-- Settings Page -->

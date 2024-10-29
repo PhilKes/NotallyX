@@ -112,7 +112,6 @@
     <string name="choose_another_folder">Wybierz inny katalog</string>
     <string name="cant_find_folder">Nie można znaleźć katalogu. Być może został przeniesiony lub usunięty</string>
     <string name="invalid_backup">Niewłaściwy plik kopii zapasowej</string>
-    <string name="imported_backup">Kopia zapasowa została przywrócona</string>
     <string name="exporting_backup">Wykonywanie kopii zapasowej</string>
     <string name="importing_backup">Przywracanie kopii zapasowej</string>
     <string name="calculating">Obliczanie…</string>

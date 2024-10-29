@@ -151,14 +151,14 @@ object XMLUtils {
         val monospace = parser.getAttributeValue(null, "monospace")?.toBoolean() ?: false
         val strikethrough = parser.getAttributeValue(null, "strike")?.toBoolean() ?: false
         return SpanRepresentation(
+            start,
+            end,
             bold,
             link,
             linkData,
             italic,
             monospace,
             strikethrough,
-            start,
-            end,
         )
     }
 }

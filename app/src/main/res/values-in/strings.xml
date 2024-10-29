@@ -67,7 +67,6 @@
     <string name="empty_list">Daftar kosong</string>
     <string name="cant_open_link">Tidak bisa membuka tautan</string>
     <string name="invalid_backup">Cadangan tidak valid</string>
-    <string name="imported_backup">Cadangan yang diimpor</string>
     <string name="something_went_wrong">Telah terjadi kesalahan. Silakan coba lagi.</string>
     <string name="install_a_browser">Pasang peramban untuk membuka tautan ini</string>
 

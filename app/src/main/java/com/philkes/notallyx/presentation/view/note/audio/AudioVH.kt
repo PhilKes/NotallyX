@@ -18,6 +18,6 @@ class AudioVH(
 
     fun bind(audio: Audio) {
         binding.Date.text = formatter.format(audio.timestamp)
-        binding.Length.text = DateUtils.formatElapsedTime(audio.duration / 1000)
+        binding.Length.text = audio.duration?.let { DateUtils.formatElapsedTime(it / 1000) } ?: "-"
     }
 }

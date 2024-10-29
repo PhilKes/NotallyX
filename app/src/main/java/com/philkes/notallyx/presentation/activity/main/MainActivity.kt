@@ -41,6 +41,7 @@ import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.applySpans
+import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
@@ -217,7 +218,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         val ids = model.moveBaseNotes(folderTo)
         Snackbar.make(
                 findViewById(R.id.DrawerLayout),
-                resources.getQuantityString(folderTo.movedToResId(), ids.size, ids.size),
+                getQuantityString(folderTo.movedToResId(), ids.size),
                 Snackbar.LENGTH_SHORT,
             )
             .apply { setAction(R.string.undo) { model.moveBaseNotes(ids, folderFrom) } }

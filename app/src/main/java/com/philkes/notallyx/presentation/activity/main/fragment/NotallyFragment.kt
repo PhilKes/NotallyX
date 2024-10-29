@@ -25,6 +25,7 @@ import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FO
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
+import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
@@ -103,7 +104,7 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
                     val folderTo = Folder.valueOf(data.getStringExtra(FOLDER_TO)!!)
                     Snackbar.make(
                             binding!!.root,
-                            resources.getQuantityString(folderTo.movedToResId(), 1, 1),
+                            requireContext().getQuantityString(folderTo.movedToResId(), 1),
                             Snackbar.LENGTH_SHORT,
                         )
                         .apply {

@@ -22,6 +22,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.imports.ImportSource
 import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.NotesSortDialogBinding
@@ -30,6 +31,7 @@ import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
 import com.philkes.notallyx.presentation.checkedTag
+import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
@@ -49,6 +51,7 @@ import com.philkes.notallyx.presentation.view.misc.NotesSorting
 import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
 import com.philkes.notallyx.presentation.view.misc.SortDirection
 import com.philkes.notallyx.presentation.view.misc.TextSize
+import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
 import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
@@ -60,6 +63,8 @@ import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 class SettingsFragment : Fragment() {
 
     private val model: BaseNoteModel by activityViewModels()
+
+    private lateinit var selectedImportSource: ImportSource
 
     private fun setupBinding(binding: FragmentSettingsBinding) {
         model.preferences.apply {
@@ -113,13 +118,14 @@ class SettingsFragment : Fragment() {
         }
 
         binding.ImportBackup.setOnClickListener { importBackup() }
+        binding.ImportOther.setOnClickListener { importOther() }
 
         binding.ExportBackup.setOnClickListener { exportBackup() }
 
         binding.ClearData.setOnClickListener { clearData() }
 
         model.exportProgress.setupProgressDialog(this, R.string.exporting_backup)
-        model.importProgress.setupProgressDialog(this, R.string.importing_backup)
+        model.importProgress.setupImportProgressDialog(this, R.string.importing_backup)
         model.deletionProgress.setupProgressDialog(this, R.string.deleting_files)
 
         binding.GitHub.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
@@ -150,6 +156,7 @@ class SettingsFragment : Fragment() {
                     REQUEST_IMPORT_BACKUP -> importBackup(uri)
                     REQUEST_EXPORT_BACKUP -> model.exportBackup(uri)
                     REQUEST_CHOOSE_FOLDER -> model.setAutoBackupPath(uri)
+                    REQUEST_IMPORT_OTHER -> model.importFromOtherApp(uri, selectedImportSource)
                 }
                 return
             }
@@ -219,6 +226,47 @@ class SettingsFragment : Fragment() {
             .setMessage(R.string.clear_data_message)
             .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAllBaseNotes() }
             .setNegativeButton(R.string.cancel) { _, _ -> }
+            .show()
+    }
+
+    private fun importOther() {
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.choose_other_app)
+            .setAdapter(
+                TextWithIconAdapter(
+                    requireContext(),
+                    ImportSource.entries.toMutableList(),
+                    { item -> getString(item.displayNameResId) },
+                    ImportSource::iconResId,
+                )
+            ) { _, which ->
+                selectedImportSource = ImportSource.entries[which]
+                MaterialAlertDialogBuilder(requireContext())
+                    .setMessage(selectedImportSource.helpTextResId)
+                    .setPositiveButton(R.string.import_action) { dialog, _ ->
+                        dialog.cancel()
+                        val intent =
+                            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                type = "ap/*"
+                                putExtra(
+                                    Intent.EXTRA_MIME_TYPES,
+                                    arrayOf(selectedImportSource.mimeType),
+                                )
+                                addCategory(Intent.CATEGORY_OPENABLE)
+                            }
+                        startActivityForResult(intent, REQUEST_IMPORT_OTHER)
+                    }
+                    .setNegativeButton(R.string.help) { _, _ ->
+                        val intent =
+                            Intent(Intent.ACTION_VIEW).apply {
+                                data = Uri.parse(selectedImportSource.documentationUrl)
+                            }
+                        startActivity(intent)
+                    }
+                    .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
+                    .show()
+            }
+            .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
@@ -396,7 +444,7 @@ class SettingsFragment : Fragment() {
 
         Value.transformationMethod =
             if (password != emptyPassword) PasswordTransformationMethod.getInstance() else null
-        Value.text = password
+        Value.text = if (password != emptyPassword) password else getText(R.string.tap_to_set_up)
         root.setOnClickListener {
             val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
             layout.InputText.apply {
@@ -601,5 +649,6 @@ class SettingsFragment : Fragment() {
         private const val REQUEST_CHOOSE_FOLDER = 22
         private const val REQUEST_SETUP_LOCK = 23
         private const val REQUEST_DISABLE_LOCK = 24
+        private const val REQUEST_IMPORT_OTHER = 25
     }
 }

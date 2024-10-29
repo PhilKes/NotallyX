@@ -22,5 +22,28 @@
 -keep class ** extends androidx.navigation.Navigator
 -keep class ** implements org.ocpsoft.prettytime.TimeUnit
 
+# SQLCipher
 -keep class net.sqlcipher.** { *; }
 -keep class net.sqlcipher.database.** { *; }
+
+# SimpleXML
+-keepattributes Signature
+-keepattributes *Annotation
+-keep interface org.simpleframework.xml.core.Label {
+   public *;
+}
+-keep class * implements org.simpleframework.xml.core.Label {
+   public *;
+}
+-keep interface org.simpleframework.xml.core.Parameter {
+   public *;
+}
+-keep class * implements org.simpleframework.xml.core.Parameter {
+   public *;
+}
+-keep interface org.simpleframework.xml.core.Extractor {
+   public *;
+}
+-keep class * implements org.simpleframework.xml.core.Extractor {
+   public *;
+}

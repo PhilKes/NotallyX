@@ -34,6 +34,7 @@ import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
+import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
@@ -518,7 +519,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             } else {
                 R.plurals.cant_add_files
             }
-        val title = resources.getQuantityString(message, errors.size, errors.size)
+        val title = getQuantityString(message, errors.size)
         MaterialAlertDialogBuilder(this)
             .setTitle(title)
             .setView(recyclerView)

@@ -165,7 +165,6 @@
     <string name="choose_another_folder">Kies een andere map</string>
     <string name="cant_find_folder">Kan map niet vinden. Deze is mogelijk verplaatst of verwijderd</string>
     <string name="invalid_backup">Ongeldige back-up</string>
-    <string name="imported_backup">Geïmporteerde back-up</string>
     <string name="exporting_backup">Back-up exporteren</string>
     <string name="importing_backup">Back-up importeren</string>
     <string name="calculating">Berekenen…</string>

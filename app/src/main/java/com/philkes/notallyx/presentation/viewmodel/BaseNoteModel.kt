@@ -19,6 +19,10 @@ import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.dao.CommonDao
 import com.philkes.notallyx.data.dao.LabelDao
+import com.philkes.notallyx.data.imports.ImportException
+import com.philkes.notallyx.data.imports.ImportProgress
+import com.philkes.notallyx.data.imports.ImportSource
+import com.philkes.notallyx.data.imports.NotesImporter
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
@@ -33,6 +37,7 @@ import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.SearchResult
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.applySpans
+import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
 import com.philkes.notallyx.presentation.view.misc.ListInfo
 import com.philkes.notallyx.presentation.view.misc.Progress
@@ -106,7 +111,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val fileRoot = app.getExternalFilesDirectory()
     private val audioRoot = app.getExternalAudioDirectory()
 
-    val importProgress = MutableLiveData<Progress>()
+    val importProgress = MutableLiveData<ImportProgress>()
     val exportProgress = MutableLiveData<Progress>()
     val deletionProgress = MutableLiveData<Progress>()
 
@@ -126,7 +131,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
         allNotes?.removeObserver(allNotesObserver!!)
         allNotesObserver = Observer { list -> Cache.list = list }
-        allNotes = baseNoteDao.getAll()
+        allNotes = baseNoteDao.getAllAsync()
         allNotes!!.observeForever(allNotesObserver!!)
 
         if (baseNotes == null) {
@@ -216,8 +221,15 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun importZipBackup(uri: Uri, password: String) {
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            Operations.log(app, throwable)
+            Toast.makeText(app, R.string.invalid_backup, Toast.LENGTH_LONG).show()
+        }
+
         val backupDir = app.getBackupDir()
-        viewModelScope.launch { importZip(app, uri, backupDir, password, importProgress) }
+        viewModelScope.launch(exceptionHandler) {
+            importZip(app, uri, backupDir, password, importProgress)
+        }
     }
 
     fun importXmlBackup(uri: Uri) {
@@ -227,12 +239,39 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
 
         viewModelScope.launch(exceptionHandler) {
-            withContext(Dispatchers.IO) {
-                val stream = requireNotNull(app.contentResolver.openInputStream(uri))
-                val backup = XMLUtils.readBackupFromStream(stream)
-                commonDao.importBackup(backup.first, backup.second)
-            }
-            Toast.makeText(app, R.string.imported_backup, Toast.LENGTH_LONG).show()
+            val importedNotes =
+                withContext(Dispatchers.IO) {
+                    val stream = requireNotNull(app.contentResolver.openInputStream(uri))
+                    val (baseNotes, labels) = XMLUtils.readBackupFromStream(stream)
+                    commonDao.importBackup(baseNotes, labels)
+                    baseNotes.size
+                }
+            val message = app.getQuantityString(R.plurals.imported_notes, importedNotes)
+            Toast.makeText(app, message, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    fun importFromOtherApp(uri: Uri, importSource: ImportSource) {
+        val database = NotallyDatabase.getDatabase(app).value
+
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            Toast.makeText(
+                    app,
+                    if (throwable is ImportException) {
+                        throwable.textResId
+                    } else R.string.invalid_backup,
+                    Toast.LENGTH_LONG,
+                )
+                .show()
+            Operations.log(app, throwable)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            val importedNotes =
+                withContext(Dispatchers.IO) {
+                    NotesImporter(app, database).import(uri, importSource, importProgress)
+                }
+            val message = app.getQuantityString(R.plurals.imported_notes, importedNotes)
+            Toast.makeText(app, message, Toast.LENGTH_LONG).show()
         }
     }
 

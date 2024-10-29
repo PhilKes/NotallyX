@@ -68,7 +68,6 @@
 
     <!-- Messages -->
     <string name="invalid_backup">Copia de seguridad inválida</string>
-    <string name="imported_backup">Copia de seguridad importada</string>
     <string name="install_an_email">Instale una aplicación de correo electrónico para enviar comentarios</string>
     <string name="install_a_browser">Instala un navegador para abrir este enlace</string>
 

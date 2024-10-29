@@ -9,6 +9,8 @@ import androidx.core.database.getLongOrNull
 import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
+import com.philkes.notallyx.data.imports.ImportProgress
+import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Converters
@@ -16,7 +18,7 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.presentation.view.misc.Progress
+import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.utils.IO.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.IO.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.IO.SUBFOLDER_IMAGES
@@ -46,93 +48,115 @@ object Import {
         zipFileUri: Uri,
         databaseFolder: File,
         zipPassword: String,
-        importingBackup: MutableLiveData<Progress>? = null,
+        importingBackup: MutableLiveData<ImportProgress>? = null,
     ) {
-        importingBackup?.postValue(Progress(indeterminate = true))
+        importingBackup?.postValue(ImportProgress(indeterminate = true))
         try {
-            withContext(Dispatchers.IO) {
-                val stream = requireNotNull(app.contentResolver.openInputStream(zipFileUri))
-                val tempZipFile = File(databaseFolder, "TEMP.zip")
-                stream.copyToFile(tempZipFile)
-                val zipFile = ZipFile(tempZipFile)
-                if (zipFile.isEncrypted) {
-                    zipFile.setPassword(zipPassword.toCharArray())
-                }
-                zipFile.extractFile(
-                    NotallyDatabase.DatabaseName,
-                    databaseFolder.path,
-                    NotallyDatabase.DatabaseName,
-                )
-
-                val database =
-                    SQLiteDatabase.openDatabase(
-                        File(databaseFolder, NotallyDatabase.DatabaseName).path,
-                        null,
-                        SQLiteDatabase.OPEN_READONLY,
-                    )
-
-                val labelCursor = database.query("Label", null, null, null, null, null, null)
-                val baseNoteCursor = database.query("BaseNote", null, null, null, null, null, null)
-
-                val labels = labelCursor.toList { cursor -> cursor.toLabel() }
-                val baseNotes = baseNoteCursor.toList { cursor -> cursor.toBaseNote() }
-
-                delay(1000)
-
-                val total =
-                    baseNotes.fold(0) { acc, baseNote ->
-                        acc + baseNote.images.size + baseNote.files.size + baseNote.audios.size
+            val importedNotes =
+                withContext(Dispatchers.IO) {
+                    val stream = requireNotNull(app.contentResolver.openInputStream(zipFileUri))
+                    val tempZipFile = File(databaseFolder, "TEMP.zip")
+                    stream.copyToFile(tempZipFile)
+                    val zipFile = ZipFile(tempZipFile)
+                    if (zipFile.isEncrypted) {
+                        zipFile.setPassword(zipPassword.toCharArray())
                     }
-                importingBackup?.postValue(Progress(0, total))
+                    zipFile.extractFile(
+                        NotallyDatabase.DatabaseName,
+                        databaseFolder.path,
+                        NotallyDatabase.DatabaseName,
+                    )
 
-                val current = AtomicInteger(1)
-                val imageRoot = app.getExternalImagesDirectory()
-                val fileRoot = app.getExternalFilesDirectory()
-                val audioRoot = app.getExternalAudioDirectory()
-                baseNotes.forEach { baseNote ->
-                    importFiles(
-                        app,
-                        baseNote.images,
-                        SUBFOLDER_IMAGES,
-                        imageRoot,
-                        zipFile,
-                        current,
-                        total,
+                    val database =
+                        SQLiteDatabase.openDatabase(
+                            File(databaseFolder, NotallyDatabase.DatabaseName).path,
+                            null,
+                            SQLiteDatabase.OPEN_READONLY,
+                        )
+
+                    val labelCursor = database.query("Label", null, null, null, null, null, null)
+                    val baseNoteCursor =
+                        database.query("BaseNote", null, null, null, null, null, null)
+
+                    val labels = labelCursor.toList { cursor -> cursor.toLabel() }
+
+                    var total = baseNoteCursor.count
+                    var counter = 1
+                    importingBackup?.postValue(ImportProgress(0, total))
+                    val baseNotes =
+                        baseNoteCursor.toList { cursor ->
+                            val baseNote = cursor.toBaseNote()
+                            importingBackup?.postValue(ImportProgress(counter++, total))
+                            baseNote
+                        }
+
+                    delay(1000)
+
+                    total =
+                        baseNotes.fold(0) { acc, baseNote ->
+                            acc + baseNote.images.size + baseNote.files.size + baseNote.audios.size
+                        }
+                    importingBackup?.postValue(
+                        ImportProgress(0, total, stage = ImportStage.IMPORT_FILES)
                     )
-                    importFiles(
-                        app,
-                        baseNote.files,
-                        SUBFOLDER_FILES,
-                        fileRoot,
-                        zipFile,
-                        current,
-                        total,
-                    )
-                    baseNote.audios.forEach { audio ->
-                        try {
-                            val audioFilePath = "$SUBFOLDER_AUDIOS/${audio.name}"
-                            val entry = zipFile.getFileHeader(audioFilePath)
-                            if (entry != null) {
-                                val name = "${UUID.randomUUID()}.m4a"
-                                zipFile.extractFile(audioFilePath, audioRoot!!.path, name)
-                                audio.name = name
+
+                    val current = AtomicInteger(1)
+                    val imageRoot = app.getExternalImagesDirectory()
+                    val fileRoot = app.getExternalFilesDirectory()
+                    val audioRoot = app.getExternalAudioDirectory()
+                    baseNotes.forEach { baseNote ->
+                        importFiles(
+                            app,
+                            baseNote.images,
+                            SUBFOLDER_IMAGES,
+                            imageRoot,
+                            zipFile,
+                            current,
+                            total,
+                            importingBackup,
+                        )
+                        importFiles(
+                            app,
+                            baseNote.files,
+                            SUBFOLDER_FILES,
+                            fileRoot,
+                            zipFile,
+                            current,
+                            total,
+                            importingBackup,
+                        )
+                        baseNote.audios.forEach { audio ->
+                            try {
+                                val audioFilePath = "$SUBFOLDER_AUDIOS/${audio.name}"
+                                val entry = zipFile.getFileHeader(audioFilePath)
+                                if (entry != null) {
+                                    val name = "${UUID.randomUUID()}.m4a"
+                                    zipFile.extractFile(audioFilePath, audioRoot!!.path, name)
+                                    audio.name = name
+                                }
+                            } catch (exception: Exception) {
+                                Operations.log(app, exception)
+                            } finally {
+                                importingBackup?.postValue(
+                                    ImportProgress(
+                                        current.getAndIncrement(),
+                                        total,
+                                        stage = ImportStage.IMPORT_FILES,
+                                    )
+                                )
                             }
-                        } catch (exception: Exception) {
-                            Operations.log(app, exception)
-                        } finally {
-                            importingBackup?.postValue(Progress(current.get(), total))
-                            current.getAndIncrement()
                         }
                     }
-                }
 
-                NotallyDatabase.getDatabase(app)
-                    .value
-                    .getCommonDao()
-                    .importBackup(baseNotes, labels)
-            }
+                    NotallyDatabase.getDatabase(app)
+                        .value
+                        .getCommonDao()
+                        .importBackup(baseNotes, labels)
+                    baseNotes.size
+                }
             databaseFolder.clearDirectory()
-            Toast.makeText(app, R.string.imported_backup, Toast.LENGTH_LONG).show()
+            val message = app.getQuantityString(R.plurals.imported_notes, importedNotes)
+            Toast.makeText(app, message, Toast.LENGTH_LONG).show()
         } catch (e: ZipException) {
             if (e.type == ZipException.Type.WRONG_PASSWORD) {
                 Toast.makeText(app, R.string.wrong_password, Toast.LENGTH_LONG).show()
@@ -144,7 +168,7 @@ object Import {
             Toast.makeText(app, R.string.invalid_backup, Toast.LENGTH_LONG).show()
             Operations.log(app, e)
         } finally {
-            importingBackup?.value = Progress(inProgress = false)
+            importingBackup?.value = ImportProgress(inProgress = false)
         }
     }
 
@@ -156,7 +180,7 @@ object Import {
         zipFile: ZipFile,
         current: AtomicInteger,
         total: Int,
-        importingBackup: MutableLiveData<Progress>? = null,
+        importingBackup: MutableLiveData<ImportProgress>? = null,
     ) {
         files.forEach { file ->
             try {
@@ -170,8 +194,13 @@ object Import {
             } catch (exception: Exception) {
                 Operations.log(app, exception)
             } finally {
-                importingBackup?.postValue(Progress(current.get(), total))
-                current.getAndIncrement()
+                importingBackup?.postValue(
+                    ImportProgress(
+                        current.getAndIncrement(),
+                        total,
+                        stage = ImportStage.IMPORT_FILES,
+                    )
+                )
             }
         }
     }

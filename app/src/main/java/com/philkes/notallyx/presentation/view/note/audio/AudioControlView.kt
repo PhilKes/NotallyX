@@ -22,7 +22,7 @@ class AudioControlView(context: Context, attrs: AttributeSet) : RelativeLayout(c
     private var running = false
 
     private var base = 0L
-    private var duration = 0L
+    private var duration: Long? = null
     private val recycle = StringBuilder(8)
 
     private var seeking = false
@@ -58,10 +58,10 @@ class AudioControlView(context: Context, attrs: AttributeSet) : RelativeLayout(c
         setCurrentPosition(0)
     }
 
-    fun setDuration(milliseconds: Long) {
+    fun setDuration(milliseconds: Long?) {
         duration = milliseconds
-        progress.valueTo = milliseconds.toFloat()
-        length.text = DateUtils.formatElapsedTime(recycle, milliseconds / 1000)
+        progress.valueTo = milliseconds?.toFloat() ?: Int.MAX_VALUE.toFloat()
+        length.text = milliseconds?.let { DateUtils.formatElapsedTime(recycle, it / 1000) } ?: "-"
     }
 
     fun setCurrentPosition(position: Int) {
@@ -78,8 +78,10 @@ class AudioControlView(context: Context, attrs: AttributeSet) : RelativeLayout(c
     @Synchronized
     private fun updateComponents(now: Long) {
         var milliseconds = now - base
-        if (milliseconds > duration) {
-            milliseconds = duration
+        duration?.let {
+            if (milliseconds > it) {
+                milliseconds = it
+            }
         }
         chronometer.text = DateUtils.formatElapsedTime(recycle, milliseconds / 1000)
         if (!seeking) {

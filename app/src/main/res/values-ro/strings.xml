@@ -72,7 +72,6 @@
     <string name="cant_open_link">Nu se poate deschide link-ul</string>
     <string name="invalid_image">Imagine invalidă</string>
     <string name="invalid_backup">Backup invalid</string>
-    <string name="imported_backup">Backup importat</string>
     <string name="something_went_wrong">Ceva a mers nu cum trebuie. Vă rog să încercați din nou.</string>
     <string name="image_format_not_supported">Formatul imaginii nu este acceptat</string>
     <string name="install_an_email">Instalați o aplicație de e-mail pentru a trimite feedback</string>

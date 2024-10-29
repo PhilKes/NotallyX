@@ -1,23 +1,23 @@
 #!/bin/sh
 
-# Count the number of staged Kotlin files
-staged_files_count=$(git diff --name-only --cached --numstat -- '*.kt' | wc -l)
+# Capture the list of initially staged Kotlin files
+initial_staged_files=$(git diff --name-only --cached -- '*.kt')
 
-# Format only if there are Kotlin files in git's index
-if [ "$staged_files_count" -gt 0 ]; then
-    # Format the staged Kotlin files and remove the "app/" prefix
-    formatted_files=$(git diff --name-only --cached  -- '*.kt' | sed 's|^app/||' | paste -sd ",")
-    ./gradlew ktfmtPrecommit --include-only="$formatted_files"
-
-    # Check if the formatting command was successful
-    if [ $? -ne 0 ]; then
-        echo "Kotlin formatting failed. Please fix the issues."
-        exit 1
-    fi
-
-    # Add the formatted Kotlin files to the staging area
-    git add -A $(git diff --name-only -- '*.kt')
-    echo "Kotlin files formatted and changes staged."
+if [ -z "$initial_staged_files" ]; then
+    echo "No Kotlin files staged for commit."
+    exit 0
 fi
 
-exit 0
+formatted_files=$(echo "$initial_staged_files" | sed 's|^app/||' | paste -sd "," -)
+echo "Formatting Kotlin files: $formatted_files"
+./gradlew ktfmtPrecommit --include-only="$formatted_files"
+
+if [ $? -ne 0 ]; then
+    echo "Kotlin formatting failed. Please fix the issues."
+    exit 1
+fi
+
+# Re-stage only the initially staged Kotlin files
+echo "$initial_staged_files" | xargs git add
+
+echo "Kotlin files formatted"

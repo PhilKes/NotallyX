@@ -93,6 +93,13 @@
             android:text="@string/import_backup" />
 
         <TextView
+          android:id="@+id/ImportOther"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/import_other" />
+
+        <TextView
             android:id="@+id/ExportBackup"
             style="@style/Preference"
             android:layout_width="match_parent"

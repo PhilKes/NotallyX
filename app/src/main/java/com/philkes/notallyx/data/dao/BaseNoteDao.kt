@@ -40,7 +40,9 @@ interface BaseNoteDao {
     @Query("SELECT * FROM BaseNote WHERE folder = 'NOTES' ORDER BY pinned DESC, timestamp DESC")
     suspend fun getAllNotes(): List<BaseNote>
 
-    @Query("SELECT * FROM BaseNote") fun getAll(): LiveData<List<BaseNote>>
+    @Query("SELECT * FROM BaseNote") fun getAllAsync(): LiveData<List<BaseNote>>
+
+    @Query("SELECT * FROM BaseNote") fun getAll(): List<BaseNote>
 
     @Query("SELECT * FROM BaseNote WHERE id IN (:ids)") fun getByIds(ids: LongArray): List<BaseNote>
 

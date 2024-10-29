@@ -116,7 +116,6 @@
     <string name="choose_another_folder">选择另一个文件夹</string>
     <string name="cant_find_folder">找不到该文件夹。可能被移动或删除了。</string>
     <string name="invalid_backup">无效的备份</string>
-    <string name="imported_backup">已导入备份</string>
 
     <!-- Widget -->
     <string name="single_note_or_list">单条笔记</string>
