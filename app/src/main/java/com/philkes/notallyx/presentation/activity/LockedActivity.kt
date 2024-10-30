@@ -7,6 +7,8 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.philkes.notallyx.NotallyXApplication
@@ -18,6 +20,8 @@ import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
     private lateinit var notallyXApplication: NotallyXApplication
+    private lateinit var biometricAuthenticationActivityResultLauncher:
+        ActivityResultLauncher<Intent>
 
     protected lateinit var binding: T
     protected lateinit var preferences: Preferences
@@ -26,6 +30,16 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         notallyXApplication = (application as NotallyXApplication)
         preferences = Preferences.getInstance(application)
+
+        biometricAuthenticationActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    notallyXApplication.isLocked = false
+                    show()
+                } else {
+                    finish()
+                }
+            }
     }
 
     override fun onResume() {
@@ -47,23 +61,11 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_BIOMETRIC_AUTHENTICATION) {
-            if (resultCode == Activity.RESULT_OK) {
-                notallyXApplication.isLocked = false
-                show()
-            } else {
-                finish()
-            }
-        }
-    }
-
     open fun showLockScreen() {
         showBiometricOrPinPrompt(
             true,
             preferences.iv!!,
-            REQUEST_BIOMETRIC_AUTHENTICATION,
+            biometricAuthenticationActivityResultLauncher,
             R.string.unlock,
             onSuccess = {
                 notallyXApplication.isLocked = false
@@ -90,9 +92,5 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         } else {
             false
         }
-    }
-
-    companion object {
-        private const val REQUEST_BIOMETRIC_AUTHENTICATION = 11
     }
 }

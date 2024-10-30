@@ -6,6 +6,7 @@ import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
@@ -15,6 +16,8 @@ import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
@@ -43,6 +46,8 @@ private const val UNNAMED_NOTE_PLACEHOLDER = "Unnamed Note"
 class EditNoteActivity : EditActivity(Type.NOTE) {
 
     private lateinit var selectedSpan: URLSpan
+    private lateinit var pickNoteNewActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var pickNoteUpdateActivityResultLauncher: ActivityResultLauncher<Intent>
 
     override suspend fun saveNote() {
         super.saveNote()
@@ -60,23 +65,33 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK) {
-            when (requestCode) {
-                REQUEST_CODE_PICK_NOTE_NEW -> {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        setupActivityResultLaunchers()
+    }
+
+    private fun setupActivityResultLaunchers() {
+        pickNoteNewActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val data = result.data
                     val noteId = data?.getLongExtra(PICKED_NOTE_ID, -1L)!!
                     if (noteId == -1L) {
-                        return
+                        return@registerForActivityResult
                     }
                     val noteTitle = data.getStringExtra(PICKED_NOTE_TITLE)!!
                     val noteType = Type.valueOf(data.getStringExtra(PICKED_NOTE_TYPE)!!)
                     binding.EnterBody.addSpan(noteTitle, URLSpan(noteId.createNoteUrl(noteType)))
                 }
-                REQUEST_CODE_PICK_NOTE_UPDATE -> {
+            }
+        pickNoteUpdateActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    val data = result.data
                     val noteId = data?.getLongExtra(PICKED_NOTE_ID, -1L)!!
                     if (noteId == -1L) {
-                        return
+                        return@registerForActivityResult
                     }
                     // TODO: If the linked note title changes the link display text does not change
                     val noteTitle =
@@ -88,7 +103,6 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     binding.EnterBody.updateSpan(selectedSpan, URLSpan(noteUrl), noteTitle)
                 }
             }
-        }
     }
 
     override fun setupListeners() {
@@ -208,7 +222,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         try {
                             menu?.apply {
                                 add(R.string.link_note, 0) {
-                                    startPickNote(REQUEST_CODE_PICK_NOTE_NEW)
+                                    startPickNote(pickNoteNewActivityResultLauncher)
                                     mode?.finish()
                                 }
                             }
@@ -232,10 +246,12 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
         }
     }
 
-    private fun EditNoteActivity.startPickNote(requestCode: Int) {
+    private fun EditNoteActivity.startPickNote(
+        activityResultLauncher: ActivityResultLauncher<Intent>
+    ) {
         val intent =
             Intent(this, PickNoteActivity::class.java).apply { putExtra(EXCLUDE_NOTE_ID, model.id) }
-        startActivityForResult(intent, requestCode)
+        activityResultLauncher.launch(intent)
     }
 
     private fun setupMovementMethod() {
@@ -271,7 +287,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         1 ->
                             if (span.url.isNoteUrl()) {
                                 selectedSpan = span
-                                startPickNote(REQUEST_CODE_PICK_NOTE_UPDATE)
+                                startPickNote(pickNoteUpdateActivityResultLauncher)
                             } else {
                                 copyToClipBoard(span.url)
                                 Toast.makeText(this, R.string.copied_link, Toast.LENGTH_LONG).show()
@@ -334,7 +350,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
     private fun goToActivity(activity: Class<out Activity>, noteId: Long) {
         val intent = Intent(this, activity)
         intent.putExtra(Constants.SelectedBaseNote, noteId)
-        startActivityForResult(intent, -1)
+        startActivity(intent)
     }
 
     private fun showEditLinkDialog(
@@ -362,10 +378,5 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                 onSuccess.invoke(null, displayTextBefore)
             }
             .showAndFocus(layout.InputText2)
-    }
-
-    companion object {
-        const val REQUEST_CODE_PICK_NOTE_NEW = 50
-        const val REQUEST_CODE_PICK_NOTE_UPDATE = 51
     }
 }

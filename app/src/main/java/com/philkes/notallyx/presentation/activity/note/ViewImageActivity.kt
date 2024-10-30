@@ -5,6 +5,8 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -18,6 +20,8 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.databinding.ActivityViewImageBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.getParcelableArrayListCompat
+import com.philkes.notallyx.presentation.getParcelableCompat
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
@@ -32,20 +36,26 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
 
     private var currentImage: FileAttachment? = null
     private lateinit var deletedImages: ArrayList<FileAttachment>
+    private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityViewImageBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val savedList = savedInstanceState?.getParcelableArrayList<FileAttachment>(DELETED_IMAGES)
+        val savedList =
+            savedInstanceState?.getParcelableArrayListCompat(
+                DELETED_IMAGES,
+                FileAttachment::class.java,
+            )
         deletedImages = savedList ?: ArrayList()
 
-        val result = Intent()
-        result.putExtra(DELETED_IMAGES, deletedImages)
-        setResult(RESULT_OK, result)
+        val resultIntent = Intent()
+        resultIntent.putExtra(DELETED_IMAGES, deletedImages)
+        setResult(RESULT_OK, resultIntent)
 
-        val savedImage = savedInstanceState?.getParcelable<FileAttachment>(CURRENT_IMAGE)
+        val savedImage =
+            savedInstanceState?.getParcelableCompat(CURRENT_IMAGE, FileAttachment::class.java)
         if (savedImage != null) {
             currentImage = savedImage
         }
@@ -76,6 +86,13 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
                 setupToolbar(binding, adapter)
             }
         }
+
+        exportFileActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> writeImageToUri(uri) }
+                }
+            }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -83,13 +100,6 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         outState.apply {
             putParcelable(CURRENT_IMAGE, currentImage)
             putParcelableArrayList(DELETED_IMAGES, deletedImages)
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == REQUEST_EXPORT_FILE && resultCode == RESULT_OK) {
-            data?.data?.let { uri -> writeImageToUri(uri) }
         }
     }
 
@@ -173,7 +183,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
                     putExtra(Intent.EXTRA_TITLE, "NotallyX Image")
                 }
             currentImage = image
-            startActivityForResult(intent, REQUEST_EXPORT_FILE)
+            exportFileActivityResultLauncher.launch(intent)
         }
     }
 
@@ -217,6 +227,5 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         const val POSITION = "POSITION"
         const val CURRENT_IMAGE = "CURRENT_IMAGE"
         const val DELETED_IMAGES = "DELETED_IMAGES"
-        private const val REQUEST_EXPORT_FILE = 40
     }
 }

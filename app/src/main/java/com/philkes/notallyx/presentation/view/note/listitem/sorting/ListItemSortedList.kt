@@ -155,9 +155,9 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
     }
 
     private fun updateChildInParent(position: Int, item: ListItem) {
-        var childIndex: Int? = null
-        var parentInfo = findParent(item)
-        var parent: ListItem? = null
+        val childIndex: Int?
+        val parentInfo = findParent(item)
+        val parent: ListItem?
         if (parentInfo == null) {
             val parentPosition = findLastIsNotChild(position - 1)!!
             childIndex = position - parentPosition - 1

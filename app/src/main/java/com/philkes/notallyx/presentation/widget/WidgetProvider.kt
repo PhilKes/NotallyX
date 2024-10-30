@@ -7,6 +7,7 @@ import android.appwidget.AppWidgetProvider
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.widget.RemoteViews
 import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
@@ -49,7 +50,10 @@ class WidgetProvider : AppWidgetProvider() {
     private fun checkChanged(intent: Intent, context: Context) {
         val noteId = intent.getLongExtra(Constants.SelectedBaseNote, 0)
         val position = intent.getIntExtra(EXTRA_POSITION, 0)
-        val checked = intent.getBooleanExtra(RemoteViews.EXTRA_CHECKED, false)
+        val checked =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                intent.getBooleanExtra(RemoteViews.EXTRA_CHECKED, false)
+            } else false
         val database = NotallyDatabase.getDatabase(context.applicationContext as Application).value
         val pendingResult = goAsync()
         GlobalScope.launch {

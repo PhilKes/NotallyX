@@ -10,6 +10,7 @@ import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
 import android.os.CancellationSignal
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.fragment.app.Fragment
 import com.philkes.notallyx.R
 import javax.crypto.Cipher
@@ -17,7 +18,7 @@ import javax.crypto.Cipher
 fun Activity.showBiometricOrPinPrompt(
     isForDecrypt: Boolean,
     cipherIv: ByteArray? = null,
-    requestCode: Int,
+    activityResultLauncher: ActivityResultLauncher<Intent>,
     titleResId: Int,
     descriptionResId: Int? = null,
     onSuccess: (cipher: Cipher) -> Unit,
@@ -26,7 +27,7 @@ fun Activity.showBiometricOrPinPrompt(
     showBiometricOrPinPrompt(
         isForDecrypt,
         this,
-        requestCode,
+        activityResultLauncher,
         titleResId,
         descriptionResId,
         cipherIv,
@@ -38,7 +39,7 @@ fun Activity.showBiometricOrPinPrompt(
 
 fun Fragment.showBiometricOrPinPrompt(
     isForDecrypt: Boolean,
-    requestCode: Int,
+    activityResultLauncher: ActivityResultLauncher<Intent>,
     titleResId: Int,
     descriptionResId: Int,
     cipherIv: ByteArray? = null,
@@ -48,7 +49,7 @@ fun Fragment.showBiometricOrPinPrompt(
     showBiometricOrPinPrompt(
         isForDecrypt,
         requireContext(),
-        requestCode,
+        activityResultLauncher,
         titleResId,
         descriptionResId,
         cipherIv,
@@ -61,7 +62,7 @@ fun Fragment.showBiometricOrPinPrompt(
 private fun showBiometricOrPinPrompt(
     isForDecrypt: Boolean,
     context: Context,
-    requestCode: Int,
+    activityResultLauncher: ActivityResultLauncher<Intent>,
     titleResId: Int,
     descriptionResId: Int? = null,
     cipherIv: ByteArray? = null,
@@ -159,7 +160,7 @@ private fun showBiometricOrPinPrompt(
             } else {
                 promptPinAuthentication(
                     context,
-                    requestCode,
+                    activityResultLauncher,
                     titleResId,
                     startActivityForResult,
                     onFailure,
@@ -171,7 +172,7 @@ private fun showBiometricOrPinPrompt(
             // API 21-22: No biometric support, fallback to PIN/Password
             promptPinAuthentication(
                 context,
-                requestCode,
+                activityResultLauncher,
                 titleResId,
                 startActivityForResult,
                 onFailure,
@@ -190,7 +191,7 @@ private fun getCancellationSignal(context: Context): CancellationSignal {
 
 private fun promptPinAuthentication(
     context: Context,
-    requestCode: Int,
+    activityResultLauncher: ActivityResultLauncher<Intent>,
     titleResId: Int,
     startActivityForResult: (intent: Intent, requestCode: Int) -> Unit,
     onFailure: () -> Unit,
@@ -205,7 +206,7 @@ private fun promptPinAuthentication(
                     null,
                 )
             if (intent != null) {
-                startActivityForResult(intent, requestCode)
+                activityResultLauncher.launch(intent)
             } else {
                 onFailure.invoke()
             }
@@ -221,7 +222,7 @@ private fun promptPinAuthentication(
                     null,
                 )
             if (intent != null) {
-                startActivityForResult(intent, requestCode)
+                activityResultLauncher.launch(intent)
             } else {
                 onFailure.invoke()
             }

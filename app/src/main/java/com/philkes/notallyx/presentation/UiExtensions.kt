@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.hardware.biometrics.BiometricManager
@@ -14,6 +15,8 @@ import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STR
 import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
+import android.os.Parcelable
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.InputType
@@ -485,4 +488,42 @@ fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
 
 fun Context.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {
     return resources.getQuantityString(id, quantity, quantity, *formatArgs)
+}
+
+fun <T : Parcelable> Bundle?.getParcelableCompat(key: String, clazz: Class<T>): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this?.getParcelable(key, clazz)
+    } else {
+        this?.getParcelable(key)
+    }
+}
+
+fun <T : Parcelable> Bundle?.getParcelableArrayListCompat(
+    key: String,
+    clazz: Class<T>,
+): ArrayList<T>? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this?.getParcelableArrayList(key, clazz)
+    } else {
+        this?.getParcelableArrayList(key)
+    }
+}
+
+fun <T : Parcelable> Intent?.getParcelableArrayListExtraCompat(
+    key: String,
+    clazz: Class<T>,
+): ArrayList<T>? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this?.getParcelableArrayListExtra(key, clazz)
+    } else {
+        this?.getParcelableArrayListExtra(key)
+    }
+}
+
+fun <T : Parcelable> Intent?.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        this?.getParcelableExtra(key, clazz)
+    } else {
+        this?.getParcelableExtra(key)
+    }
 }

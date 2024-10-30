@@ -6,6 +6,7 @@ import android.media.MediaRecorder
 import android.os.Build
 import android.os.SystemClock
 import androidx.annotation.RequiresApi
+import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.utils.IO.getTempAudioFile
 import com.philkes.notallyx.utils.audio.Status.PAUSED
 import com.philkes.notallyx.utils.audio.Status.READY
@@ -14,7 +15,7 @@ import com.philkes.notallyx.utils.audio.Status.RECORDING
 @RequiresApi(24)
 class AudioRecordService : Service() {
 
-    var status = READY
+    var status = BetterLiveData(READY)
     private var lastStart = 0L
     private var audioDuration = 0L
 
@@ -45,19 +46,19 @@ class AudioRecordService : Service() {
 
     fun start() {
         recorder.start()
-        status = RECORDING
+        status.value = RECORDING
         lastStart = SystemClock.elapsedRealtime()
     }
 
     fun resume() {
         recorder.resume()
-        status = RECORDING
+        status.value = RECORDING
         lastStart = SystemClock.elapsedRealtime()
     }
 
     fun pause() {
         recorder.pause()
-        status = PAUSED
+        status.value = PAUSED
         audioDuration += SystemClock.elapsedRealtime() - lastStart
         lastStart = 0L
     }

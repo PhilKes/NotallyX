@@ -105,7 +105,7 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
         val item = listManager.getItem(viewHolder.adapterPosition)
         if (!item.isChild) {
             childViewHolders =
-                item.children.mapIndexedNotNull { index, listItem ->
+                item.children.mapIndexedNotNull { index, _ ->
                     recyclerView.findViewHolderForAdapterPosition(
                         viewHolder.adapterPosition + index + 1
                     )
