@@ -1,6 +1,7 @@
 package com.philkes.notallyx.presentation.activity.note
 
 import android.os.Build
+import android.os.Bundle
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import com.philkes.notallyx.Preferences
@@ -15,7 +16,6 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSo
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
-import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 
 class EditListActivity : EditActivity(Type.LIST) {
@@ -25,10 +25,14 @@ class EditListActivity : EditActivity(Type.LIST) {
 
     private lateinit var listManager: ListManager
 
-    override suspend fun saveNote() {
-        super.saveNote()
-        model.saveNote(items.toMutableList())
-        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
+    override fun finish() {
+        model.setItems(items.toMutableList())
+        super.finish()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        model.setItems(items.toMutableList())
+        super.onSaveInstanceState(outState)
     }
 
     override fun setupToolbar() {

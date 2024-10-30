@@ -247,8 +247,23 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    suspend fun saveNote(items: List<ListItem> = this.items): Long {
-        return withContext(Dispatchers.IO) { baseNoteDao.insert(getBaseNote(items)) }
+    fun setItems(items: List<ListItem>) {
+        this.items.clear()
+        this.items.addAll(items)
+    }
+
+    suspend fun saveNote(): Long {
+        return withContext(Dispatchers.IO) { baseNoteDao.insert(getBaseNote()) }
+    }
+
+    fun isEmpty(): Boolean {
+        return title.isEmpty() &&
+            body.isEmpty() &&
+            items.none { item -> item.body.isNotEmpty() } &&
+            labels.isEmpty() &&
+            files.value.isEmpty() &&
+            images.value.isEmpty() &&
+            audios.value.isEmpty()
     }
 
     private suspend fun updateImages() {
@@ -263,10 +278,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         withContext(Dispatchers.IO) { baseNoteDao.updateAudios(id, audios.value) }
     }
 
-    private fun getBaseNote(currentItems: List<ListItem> = this.items): BaseNote {
+    private fun getBaseNote(): BaseNote {
         val spans = getFilteredSpans(body)
         val body = this.body.trimEnd().toString()
-        val items = currentItems.filter { item -> item.body.isNotEmpty() }
+        val nonEmptyItems = this.items.filter { item -> item.body.isNotEmpty() }
         return BaseNote(
             id,
             type,
@@ -279,7 +294,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             labels,
             body,
             spans,
-            items,
+            nonEmptyItems,
             images.value,
             files.value,
             audios.value,
