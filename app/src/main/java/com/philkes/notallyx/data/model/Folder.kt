@@ -1,6 +1,8 @@
 package com.philkes.notallyx.data.model
 
-enum class Folder {
+import java.io.Serializable
+
+enum class Folder : Serializable {
     NOTES,
     DELETED,
     ARCHIVED,

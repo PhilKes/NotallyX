@@ -35,12 +35,29 @@
     <fragment
         android:id="@+id/Deleted"
         android:name="com.philkes.notallyx.presentation.activity.main.fragment.DeletedFragment"
-        android:label="@string/deleted" />
+      android:label="@string/deleted" >
+
+        <action
+          android:id="@+id/DeletedToSearch"
+          app:destination="@id/Search"
+          app:enterAnim="@anim/nav_default_enter_anim"
+          app:exitAnim="@anim/nav_default_exit_anim"
+          app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+          app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/Archived"
         android:name="com.philkes.notallyx.presentation.activity.main.fragment.ArchivedFragment"
-        android:label="@string/archived" />
+      android:label="@string/archived" >
+        <action
+          android:id="@+id/ArchivedToSearch"
+          app:destination="@id/Search"
+          app:enterAnim="@anim/nav_default_enter_anim"
+          app:exitAnim="@anim/nav_default_exit_anim"
+          app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+          app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+    </fragment>
 
     <fragment
         android:id="@+id/Settings"
@@ -49,7 +66,11 @@
 
     <fragment
         android:id="@+id/Search"
-        android:name="com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment" />
+        android:name="com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment">
+        <argument
+          android:name="initialFolder"
+          app:argType="com.philkes.notallyx.data.model.Folder" />
+    </fragment>
 
     <fragment
         android:id="@+id/DisplayLabel"
