@@ -1,8 +1,8 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.lastIndex
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.map
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertIds
 import com.philkes.notallyx.test.assertOrder
@@ -12,7 +12,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo moves`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.move(0, 4)
         listManager.move(2, 3)
         listManager.move(4, 1)
@@ -34,7 +34,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo changeChecked`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeChecked(0, true)
         listManager.changeChecked(3, true)
         listManager.changeChecked(0, false)
@@ -55,7 +55,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo changeChecked if auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeChecked(0, true)
         listManager.changeChecked(3, true)
         listManager.changeChecked(0, false)
@@ -79,7 +79,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo changeChecked false on child item`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(2, true)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(1, checked = true, pushChange = true)
@@ -96,7 +96,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo changeIsChild`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
         listManager.changeIsChild(4, true)
@@ -120,7 +120,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo add parents with children`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.addWithChildren(0, "Parent1", "Child1")
         listManager.addWithChildren(4, "Parent2")
         listManager.addWithChildren(0, "Parent3")
@@ -150,7 +150,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo delete parents with children`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(3, true)
         listManager.changeIsChild(4, true)
@@ -174,7 +174,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo check all with auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
@@ -191,7 +191,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo uncheck all with auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
@@ -208,7 +208,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo delete checked with auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
@@ -225,7 +225,7 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
 
     @Test
     fun `undo and redo various changes with auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(3, true)
         listManager.changeIsChild(4, true)

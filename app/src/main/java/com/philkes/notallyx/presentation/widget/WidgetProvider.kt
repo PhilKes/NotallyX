@@ -9,7 +9,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.widget.RemoteViews
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
@@ -21,6 +20,7 @@ import com.philkes.notallyx.presentation.activity.ConfigureWidgetActivity
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.view.Constants
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -110,7 +110,7 @@ class WidgetProvider : AppWidgetProvider() {
 
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         val app = context.applicationContext as Application
-        val preferences = Preferences.getInstance(app)
+        val preferences = NotallyXPreferences.getInstance(app)
 
         appWidgetIds.forEach { id -> preferences.deleteWidget(id) }
     }
@@ -121,7 +121,7 @@ class WidgetProvider : AppWidgetProvider() {
         appWidgetIds: IntArray,
     ) {
         val app = context.applicationContext as Application
-        val preferences = Preferences.getInstance(app)
+        val preferences = NotallyXPreferences.getInstance(app)
 
         appWidgetIds.forEach { id ->
             val noteId = preferences.getWidgetData(id)
@@ -134,7 +134,7 @@ class WidgetProvider : AppWidgetProvider() {
 
         fun updateWidgets(context: Context, noteIds: LongArray? = null, locked: Boolean = false) {
             val app = context.applicationContext as Application
-            val preferences = Preferences.getInstance(app)
+            val preferences = NotallyXPreferences.getInstance(app)
 
             val manager = AppWidgetManager.getInstance(context)
             val updatableWidgets = preferences.getUpdatableWidgets(noteIds)

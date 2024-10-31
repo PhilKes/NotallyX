@@ -4,14 +4,15 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
 class ListItemAdapter(
-    private val textSize: String,
+    private val textSize: TextSize,
     elevation: Float,
-    private val preferences: Preferences,
+    private val preferences: NotallyXPreferences,
     private val listManager: ListManager,
 ) : RecyclerView.Adapter<ListItemVH>() {
 

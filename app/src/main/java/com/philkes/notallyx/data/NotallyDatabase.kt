@@ -10,16 +10,16 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SimpleSQLiteQuery
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.dao.CommonDao
 import com.philkes.notallyx.data.dao.LabelDao
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.Label
-import com.philkes.notallyx.presentation.observeForeverSkipFirst
-import com.philkes.notallyx.presentation.view.misc.BetterLiveData
-import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
+import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
+import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.observeForeverSkipFirst
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import net.sqlcipher.database.SupportFactory
 
@@ -37,20 +37,20 @@ abstract class NotallyDatabase : RoomDatabase() {
         getBaseNoteDao().query(SimpleSQLiteQuery("pragma wal_checkpoint(FULL)"))
     }
 
-    private var observer: Observer<String>? = null
+    private var biometricLockObserver: Observer<BiometricLock>? = null
 
     companion object {
 
         const val DatabaseName = "NotallyDatabase"
 
-        @Volatile private var instance: BetterLiveData<NotallyDatabase>? = null
+        @Volatile private var instance: NotNullLiveData<NotallyDatabase>? = null
 
-        fun getDatabase(app: Application): BetterLiveData<NotallyDatabase> {
+        fun getDatabase(app: Application): NotNullLiveData<NotallyDatabase> {
             return instance
                 ?: synchronized(this) {
-                    val preferences = Preferences.getInstance(app)
+                    val preferences = NotallyXPreferences.getInstance(app)
                     this.instance =
-                        BetterLiveData(
+                        NotNullLiveData(
                             createInstance(app, preferences, preferences.biometricLock.value)
                         )
                     return this.instance!!
@@ -59,31 +59,33 @@ abstract class NotallyDatabase : RoomDatabase() {
 
         private fun createInstance(
             app: Application,
-            preferences: Preferences,
-            biometrickLock: String,
+            preferences: NotallyXPreferences,
+            biometrickLock: BiometricLock,
         ): NotallyDatabase {
             val instanceBuilder =
                 Room.databaseBuilder(app, NotallyDatabase::class.java, DatabaseName)
                     .addMigrations(Migration2, Migration3, Migration4, Migration5, Migration6)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                if (biometrickLock == enabled) {
-                    val initializationVector = preferences.iv!!
+                if (biometrickLock == BiometricLock.ENABLED) {
+                    val initializationVector = preferences.iv.value!!
                     val cipher = getInitializedCipherForDecryption(iv = initializationVector)
-                    val encryptedPassphrase = preferences.getDatabasePassphrase()
+                    val encryptedPassphrase = preferences.databaseEncryptionKey.value
                     val passphrase = cipher.doFinal(encryptedPassphrase)
                     val factory = SupportFactory(passphrase)
                     instanceBuilder.openHelperFactory(factory)
                 }
                 val instance = instanceBuilder.build()
-                instance.observer = Observer { newBiometrickLock ->
-                    NotallyDatabase.instance?.value?.observer?.let {
+                instance.biometricLockObserver = Observer { newBiometrickLock ->
+                    NotallyDatabase.instance?.value?.biometricLockObserver?.let {
                         preferences.biometricLock.removeObserver(it)
                     }
                     val newInstance = createInstance(app, preferences, newBiometrickLock)
                     NotallyDatabase.instance?.postValue(newInstance)
-                    preferences.biometricLock.observeForeverSkipFirst(newInstance.observer!!)
+                    preferences.biometricLock.observeForeverSkipFirst(
+                        newInstance.biometricLockObserver!!
+                    )
                 }
-                preferences.biometricLock.observeForeverSkipFirst(instance.observer!!)
+                preferences.biometricLock.observeForeverSkipFirst(instance.biometricLockObserver!!)
                 return instance
             }
             return instanceBuilder.build()

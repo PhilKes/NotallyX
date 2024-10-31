@@ -13,17 +13,19 @@ import com.philkes.notallyx.databinding.RecyclerHeaderBinding
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteCreationDateSort
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteModifiedDateSort
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteTitleSort
-import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
-import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByTitle
-import com.philkes.notallyx.presentation.view.misc.SortDirection
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
+import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
+import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
 
 class BaseNoteAdapter(
     private val selectedIds: Set<Long>,
-    private val dateFormat: String,
-    private val sortedBy: String,
-    private val textSize: String,
+    private val dateFormat: DateFormat,
+    private val sortedBy: NotesSortBy,
+    private val textSize: TextSize,
     private val maxItems: Int,
     private val maxLines: Int,
     private val maxTitle: Int,
@@ -82,12 +84,12 @@ class BaseNoteAdapter(
         }
     }
 
-    fun setSorting(sortBy: String, sortDirection: SortDirection) {
+    fun setSorting(notesSort: NotesSort) {
         val sortCallback =
-            when (sortBy) {
-                autoSortByTitle -> BaseNoteTitleSort(this, sortDirection)
-                autoSortByModifiedDate -> BaseNoteModifiedDateSort(this, sortDirection)
-                else -> BaseNoteCreationDateSort(this, sortDirection)
+            when (notesSort.sortedBy) {
+                NotesSortBy.TITLE -> BaseNoteTitleSort(this, notesSort.sortDirection)
+                NotesSortBy.MODIFIED_DATE -> BaseNoteModifiedDateSort(this, notesSort.sortDirection)
+                else -> BaseNoteCreationDateSort(this, notesSort.sortDirection)
             }
         replaceSorting(sortCallback)
     }

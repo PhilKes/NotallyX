@@ -105,6 +105,7 @@ dependencies {
     implementation 'net.lingala.zip4j:zip4j:2.11.5'
 
     implementation "androidx.work:work-runtime:2.9.1"
+    implementation "androidx.preference:preference-ktx:1.2.1"
 
     //noinspection GradleDependency
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"

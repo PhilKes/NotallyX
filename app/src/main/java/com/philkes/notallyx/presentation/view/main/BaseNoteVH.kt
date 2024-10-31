@@ -28,17 +28,17 @@ import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getQuantityString
-import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
-import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
-import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
+import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import com.philkes.notallyx.utils.Operations
 import java.io.File
 
 class BaseNoteVH(
     private val binding: RecyclerBaseNoteBinding,
-    private val dateFormat: String,
-    private val textSize: String,
+    private val dateFormat: DateFormat,
+    private val textSize: TextSize,
     private val maxItems: Int,
     maxLines: Int,
     maxTitle: Int,
@@ -46,8 +46,8 @@ class BaseNoteVH(
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
-        val title = TextSize.getDisplayTitleSize(textSize)
-        val body = TextSize.getDisplayBodySize(textSize)
+        val title = textSize.displayTitleSize
+        val body = textSize.displayBodySize
 
         binding.apply {
             Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, title)
@@ -75,7 +75,7 @@ class BaseNoteVH(
         binding.root.isChecked = checked
     }
 
-    fun bind(baseNote: BaseNote, imageRoot: File?, checked: Boolean, sortBy: String) {
+    fun bind(baseNote: BaseNote, imageRoot: File?, checked: Boolean, sortBy: NotesSortBy) {
         updateCheck(checked)
 
         when (baseNote.type) {
@@ -84,8 +84,9 @@ class BaseNoteVH(
         }
         val (date, datePrefixResId) =
             when (sortBy) {
-                autoSortByCreationDate -> Pair(baseNote.timestamp, R.string.creation_date)
-                autoSortByModifiedDate -> Pair(baseNote.modifiedTimestamp, R.string.modified_date)
+                NotesSortBy.CREATION_DATE -> Pair(baseNote.timestamp, R.string.creation_date)
+                NotesSortBy.MODIFIED_DATE ->
+                    Pair(baseNote.modifiedTimestamp, R.string.modified_date)
                 else -> Pair(null, null)
             }
         binding.Date.displayFormattedTimestamp(date, dateFormat, datePrefixResId)

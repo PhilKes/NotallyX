@@ -1,6 +1,6 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assert
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
@@ -14,7 +14,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked checks item`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
@@ -24,7 +24,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked unchecks item and updates order`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeChecked(0, true)
         listManager.changeChecked(0, checked = false, pushChange = true)
 
@@ -35,7 +35,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked does nothing when state is unchanged`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeChecked(0, true)
 
         listManager.changeChecked(0, checked = true, pushChange = true)
@@ -46,7 +46,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked on child item`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true)
 
         listManager.changeChecked(1, checked = true, pushChange = true)
@@ -61,7 +61,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked on parent item checks all children`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
 
@@ -79,7 +79,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked on child item and does not move when auto-sort is enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(1, true)
 
         listManager.changeChecked(1, checked = true, pushChange = true)
@@ -94,7 +94,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked true on parent item checks all children and moves when auto-sort is enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
 
@@ -115,7 +115,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked false on parent item unchecks all children and moves when auto-sort is enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
         listManager.changeChecked(0, checked = true, pushChange = true)
@@ -137,7 +137,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked false on parent item after add another item when auto-sort is enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
         listManager.changeChecked(0, checked = true, pushChange = true)
@@ -155,7 +155,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeChecked false on child item also unchecks parent`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(2, true)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(1, checked = true, pushChange = true)
@@ -176,7 +176,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeCheckedForAll true checks all unchecked items`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeChecked(1, true)
         listManager.changeChecked(3, true)
 
@@ -189,7 +189,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeCheckedForAll false unchecks all unchecked items`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(2, true)
         listManager.changeChecked(1, true)
         listManager.changeChecked(3, true)
@@ -203,7 +203,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeCheckedForAll true correct order with auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
@@ -217,7 +217,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
     @Test
     fun `changeCheckedForAll false correct order with auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)

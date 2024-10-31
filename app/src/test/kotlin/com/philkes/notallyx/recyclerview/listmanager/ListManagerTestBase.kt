@@ -3,10 +3,7 @@ package com.philkes.notallyx.recyclerview.listmanager
 import android.view.inputmethod.InputMethodManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.data.model.ListItem
-import com.philkes.notallyx.presentation.view.misc.BetterLiveData
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
@@ -15,6 +12,9 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSort
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.indexOfFirst
+import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.test.assertChildren
 import com.philkes.notallyx.test.createListItem
 import com.philkes.notallyx.test.mockAndroidLog
@@ -34,7 +34,7 @@ open class ListManagerTestBase {
     protected lateinit var inputMethodManager: InputMethodManager
     protected lateinit var changeHistory: ChangeHistory
     protected lateinit var listItemVH: ListItemVH
-    protected lateinit var preferences: Preferences
+    protected lateinit var preferences: NotallyXPreferences
     protected lateinit var listItemDragCallback: ListItemDragCallback
 
     protected lateinit var items: ListItemSortedList
@@ -49,17 +49,17 @@ open class ListManagerTestBase {
         inputMethodManager = mock(InputMethodManager::class.java)
         changeHistory = ChangeHistory() {}
         listItemVH = mock(ListItemVH::class.java)
-        preferences = mock(Preferences::class.java)
+        preferences = mock(NotallyXPreferences::class.java)
         listManager = ListManager(recyclerView, changeHistory, preferences, inputMethodManager)
         listManager.adapter = adapter as RecyclerView.Adapter<ListItemVH>
         // Prepare view holder
         `when`(recyclerView.findViewHolderForAdapterPosition(anyInt())).thenReturn(listItemVH)
     }
 
-    protected fun setSorting(sorting: String) {
+    protected fun setSorting(sorting: ListItemSort) {
         val sortCallback =
             when (sorting) {
-                ListItemSorting.autoSortByChecked -> ListItemSortedByCheckedCallback(adapter)
+                ListItemSort.AUTO_SORT_BY_CHECKED -> ListItemSortedByCheckedCallback(adapter)
                 else -> ListItemNoSortCallback(adapter)
             }
         items = ListItemSortedList(sortCallback)
@@ -76,7 +76,10 @@ open class ListManagerTestBase {
         )
         listManager.initList(items)
         listItemDragCallback = ListItemDragCallback(1.0f, listManager)
-        `when`(preferences.listItemSorting).thenReturn(BetterLiveData(sorting))
+        val listItemSortingPreference = mock(EnumPreference::class.java)
+        `when`(listItemSortingPreference.value).thenReturn(sorting)
+        `when`(preferences.listItemSorting)
+            .thenReturn(listItemSortingPreference as EnumPreference<ListItemSort>)
     }
 
     protected operator fun List<ListItem>.get(body: String): ListItem {

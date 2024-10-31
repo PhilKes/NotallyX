@@ -12,9 +12,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.viewbinding.ViewBinding
 import com.philkes.notallyx.NotallyXApplication
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
-import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
+import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 
 abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
@@ -24,12 +24,12 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         ActivityResultLauncher<Intent>
 
     protected lateinit var binding: T
-    protected lateinit var preferences: Preferences
+    protected lateinit var preferences: NotallyXPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         notallyXApplication = (application as NotallyXApplication)
-        preferences = Preferences.getInstance(application)
+        preferences = NotallyXPreferences.getInstance(application)
 
         biometricAuthenticationActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -42,7 +42,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
     }
 
     override fun onResume() {
-        if (preferences.biometricLock.value == enabled) {
+        if (preferences.biometricLock.value == BiometricLock.ENABLED) {
             if (hasToAuthenticateWithBiometric()) {
                 hide()
                 showLockScreen()
@@ -55,7 +55,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (preferences.biometricLock.value == enabled) {
+        if (preferences.biometricLock.value == BiometricLock.ENABLED) {
             hide()
         }
     }
@@ -63,7 +63,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
     open fun showLockScreen() {
         showBiometricOrPinPrompt(
             true,
-            preferences.iv!!,
+            preferences.iv.value!!,
             biometricAuthenticationActivityResultLauncher,
             R.string.unlock,
             onSuccess = { unlock() },

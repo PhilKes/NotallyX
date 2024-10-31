@@ -8,13 +8,13 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
-import com.philkes.notallyx.presentation.view.misc.BackupPassword.emptyPassword
-import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.presentation.view.misc.Progress
+import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
+import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.IO.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.IO.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.IO.SUBFOLDER_IMAGES
@@ -43,28 +43,28 @@ object Export {
         backupProgress?.postValue(Progress(indeterminate = true))
         val database = NotallyDatabase.getDatabase(app).value
         database.checkpoint()
-        val preferences = Preferences.getInstance(app)
+        val preferences = NotallyXPreferences.getInstance(app)
         val backupPassword = preferences.backupPassword.value
 
         val tempFile = File.createTempFile("export", "tmp", app.cacheDir)
         val zipFile =
             ZipFile(
                 tempFile,
-                if (backupPassword != emptyPassword) backupPassword.toCharArray() else null,
+                if (backupPassword != PASSWORD_EMPTY) backupPassword.toCharArray() else null,
             )
         val zipParameters =
             ZipParameters().apply {
-                isEncryptFiles = backupPassword != emptyPassword
+                isEncryptFiles = backupPassword != PASSWORD_EMPTY
                 compressionLevel = CompressionLevel.NO_COMPRESSION
                 encryptionMethod = EncryptionMethod.AES
             }
 
         if (
-            preferences.biometricLock.value == enabled &&
+            preferences.biometricLock.value == BiometricLock.ENABLED &&
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
         ) {
-            val cipher = getInitializedCipherForDecryption(iv = preferences.iv!!)
-            val passphrase = cipher.doFinal(preferences.getDatabasePassphrase())
+            val cipher = getInitializedCipherForDecryption(iv = preferences.iv.value!!)
+            val passphrase = cipher.doFinal(preferences.databaseEncryptionKey.value)
             val decryptedFile = File.createTempFile("decrypted", "tmp", app.cacheDir)
             decryptDatabase(app, passphrase, decryptedFile)
             zipFile.addFile(decryptedFile, zipParameters.copy(NotallyDatabase.DatabaseName))

@@ -6,8 +6,8 @@ import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.philkes.notallyx.Preferences
-import com.philkes.notallyx.presentation.view.misc.AutoBackup
+import com.philkes.notallyx.presentation.viewmodel.preference.Constants.BACKUP_PATH_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.backup.Export.exportAsZip
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -17,11 +17,11 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
 
     override fun doWork(): Result {
         val app = context.applicationContext as Application
-        val preferences = Preferences.getInstance(app)
+        val preferences = NotallyXPreferences.getInstance(app)
         val backupPath = preferences.autoBackupPath.value
-        val maxBackups = preferences.autoBackupMax
+        val maxBackups = preferences.autoBackupMax.value
 
-        if (backupPath != AutoBackup.emptyPath) {
+        if (backupPath != BACKUP_PATH_EMPTY) {
             val uri = Uri.parse(backupPath)
             val folder = requireNotNull(DocumentFile.fromTreeUri(app, uri))
 
