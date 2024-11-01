@@ -35,27 +35,20 @@ import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
 import com.philkes.notallyx.presentation.checkedTag
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
-import com.philkes.notallyx.presentation.view.misc.AutoBackup
-import com.philkes.notallyx.presentation.view.misc.AutoBackupMax
-import com.philkes.notallyx.presentation.view.misc.AutoBackupPeriodDays
-import com.philkes.notallyx.presentation.view.misc.BackupPassword
-import com.philkes.notallyx.presentation.view.misc.BackupPassword.emptyPassword
-import com.philkes.notallyx.presentation.view.misc.BiometricLock
-import com.philkes.notallyx.presentation.view.misc.BiometricLock.disabled
-import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
-import com.philkes.notallyx.presentation.view.misc.DateFormat
-import com.philkes.notallyx.presentation.view.misc.ListInfo
-import com.philkes.notallyx.presentation.view.misc.MaxItems
-import com.philkes.notallyx.presentation.view.misc.MaxLines
-import com.philkes.notallyx.presentation.view.misc.MaxTitle
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
-import com.philkes.notallyx.presentation.view.misc.NotesSorting
-import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
-import com.philkes.notallyx.presentation.view.misc.SortDirection
-import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
-import com.philkes.notallyx.presentation.view.misc.Theme
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
+import com.philkes.notallyx.presentation.viewmodel.preference.Constants.BACKUP_PATH_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
+import com.philkes.notallyx.presentation.viewmodel.preference.StringPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.TextProvider
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.decryptDatabase
@@ -76,22 +69,20 @@ class SettingsFragment : Fragment() {
 
     private fun setupBinding(binding: FragmentSettingsBinding) {
         model.preferences.apply {
-            view.observe(viewLifecycleOwner) { value ->
-                binding.View.setup(com.philkes.notallyx.presentation.view.misc.View, value)
-            }
+            notesView.observe(viewLifecycleOwner) { value -> binding.View.setup(notesView, value) }
 
-            theme.observe(viewLifecycleOwner) { value -> binding.Theme.setup(Theme, value) }
+            theme.observe(viewLifecycleOwner) { value -> binding.Theme.setup(theme, value) }
 
             dateFormat.observe(viewLifecycleOwner) { value ->
-                binding.DateFormat.setup(DateFormat, value)
+                binding.DateFormat.setup(dateFormat, value)
             }
 
             textSize.observe(viewLifecycleOwner) { value ->
-                binding.TextSize.setup(TextSize, value)
+                binding.TextSize.setup(textSize, value)
             }
 
-            notesSorting.observe(viewLifecycleOwner) { (sortBy, sortDirection) ->
-                binding.NotesSortOrder.setup(NotesSorting, sortBy, sortDirection)
+            notesSorting.observe(viewLifecycleOwner) { notesSort ->
+                binding.NotesSortOrder.setup(notesSorting, notesSort)
             }
 
             // TODO: Hide for now until checked auto-sort is working reliably
@@ -99,29 +90,29 @@ class SettingsFragment : Fragment() {
             //                binding.CheckedListItemSorting.setup(ListItemSorting, value)
             //            }
 
-            binding.MaxItems.setup(MaxItems, maxItems)
+            binding.MaxItems.setup(maxItems)
 
-            binding.MaxLines.setup(MaxLines, maxLines)
+            binding.MaxLines.setup(maxLines)
 
-            binding.MaxTitle.setup(MaxTitle, maxTitle)
+            binding.MaxTitle.setup(maxTitle)
 
-            binding.AutoBackupMax.setup(AutoBackupMax, autoBackupMax)
+            binding.AutoBackupMax.setup(autoBackupMax)
 
             autoBackupPath.observe(viewLifecycleOwner) { value ->
-                binding.AutoBackup.setup(AutoBackup, value)
+                binding.AutoBackup.setupAutoBackup(autoBackupPath, value)
             }
 
             autoBackupPeriodDays.observe(viewLifecycleOwner) { value ->
-                binding.AutoBackupPeriodDays.setup(AutoBackupPeriodDays, value)
+                binding.AutoBackupPeriodDays.setup(autoBackupPeriodDays, value)
                 scheduleAutoBackup(value.toLong(), requireContext())
             }
 
             backupPassword.observe(viewLifecycleOwner) { value ->
-                binding.BackupPassword.setup(BackupPassword, value)
+                binding.BackupPassword.setupBackupPassword(backupPassword, value)
             }
 
             biometricLock.observe(viewLifecycleOwner) { value ->
-                binding.BiometricLock.setup(BiometricLock, value)
+                binding.BiometricLock.setup(biometricLock, value)
             }
         }
 
@@ -209,7 +200,7 @@ class SettingsFragment : Fragment() {
                 val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
                 val password = model.preferences.backupPassword.value
                 layout.InputText.apply {
-                    if (password != emptyPassword) {
+                    if (password != PASSWORD_EMPTY) {
                         setText(password)
                     }
                     transformationMethod = PasswordTransformationMethod.getInstance()
@@ -384,24 +375,23 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    private fun PreferenceBinding.setup(info: ListInfo, value: String) {
-        Title.setText(info.title)
-
-        val entries = info.getEntries(requireContext())
-        val entryValues = info.getEntryValues()
-
-        val checked = entryValues.indexOf(value)
-        val displayValue = entries[checked]
-
-        Value.text = displayValue
-
+    private inline fun <reified T> PreferenceBinding.setup(
+        enumPreference: EnumPreference<T>,
+        value: T,
+    ) where T : Enum<T>, T : TextProvider {
+        Title.setText(enumPreference.titleResId!!)
+        val context = requireContext()
+        Value.text = value.getText(context)
+        val enumEntries = T::class.java.enumConstants!!.toList()
+        val entries = enumEntries.map { it.getText(requireContext()) }.toTypedArray()
+        val checked = enumEntries.indexOfFirst { it == value }
         root.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(info.title)
+            MaterialAlertDialogBuilder(context)
+                .setTitle(enumPreference.titleResId)
                 .setSingleChoiceItems(entries, checked) { dialog, which ->
                     dialog.cancel()
-                    val newValue = entryValues[which]
-                    model.savePreference(info, newValue)
+                    val newValue = enumEntries[which]
+                    model.savePreference(enumPreference, newValue)
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
@@ -409,35 +399,73 @@ class SettingsFragment : Fragment() {
     }
 
     private fun PreferenceBinding.setup(
-        info: NotesSorting,
-        sortBy: String,
-        sortDirection: SortDirection,
+        preference: EnumPreference<BiometricLock>,
+        value: BiometricLock,
     ) {
-        Title.setText(info.title)
+        Title.setText(preference.titleResId!!)
 
-        val entries = info.getEntries(requireContext())
-        val entryValues = info.getEntryValues()
+        val context = requireContext()
+        Value.text = value.getText(context)
+        val enumEntries = BiometricLock.entries
+        val entries = enumEntries.map { context.getString(it.textResId) }.toTypedArray()
+        val checked = enumEntries.indexOfFirst { it == value }
 
-        val checked = entryValues.indexOf(sortBy)
-        val displayValue = entries[checked]
+        root.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle(preference.titleResId)
+                .setSingleChoiceItems(entries, checked) { dialog, which ->
+                    dialog.cancel()
+                    val newValue = enumEntries[which]
+                    if (newValue == BiometricLock.ENABLED) {
+                        when (requireContext().canAuthenticateWithBiometrics()) {
+                            BiometricManager.BIOMETRIC_SUCCESS -> showEnableBiometricLock()
+                            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
+                                showNoBiometricsSupportToast()
 
-        Value.text = "$displayValue (${requireContext().getString(sortDirection.textResId)})"
+                            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
+                                showBiometricsNotSetupDialog()
+                        }
+                    } else {
+                        when (requireContext().canAuthenticateWithBiometrics()) {
+                            BiometricManager.BIOMETRIC_SUCCESS -> showDisableBiometricLock()
+                            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
+                                showNoBiometricsSupportToast()
+                                model.savePreference(
+                                    model.preferences.biometricLock,
+                                    BiometricLock.DISABLED,
+                                )
+                            }
+
+                            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
+                                showBiometricsNotSetupDialog()
+                                model.savePreference(
+                                    model.preferences.biometricLock,
+                                    BiometricLock.DISABLED,
+                                )
+                            }
+                        }
+                    }
+                }
+                .setNegativeButton(R.string.cancel, null)
+                .show()
+        }
+    }
+
+    private fun PreferenceBinding.setup(preference: NotesSortPreference, value: NotesSort) {
+        Title.setText(preference.titleResId!!)
+
+        Value.text = value.getText(requireContext())
 
         root.setOnClickListener {
             val layout = NotesSortDialogBinding.inflate(layoutInflater, null, false)
-            entries.zip(entryValues).forEachIndexed { idx, (choiceText, sortByValue) ->
+            NotesSortBy.entries.forEachIndexed { idx, notesSortBy ->
                 ChoiceItemBinding.inflate(layoutInflater).root.apply {
                     id = idx
-                    text = choiceText
-                    tag = sortByValue
+                    text = requireContext().getString(notesSortBy.textResId)
+                    tag = notesSortBy
                     layout.NotesSortByRadioGroup.addView(this)
-                    setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        NotesSorting.getSortIconResId(sortByValue),
-                        0,
-                        0,
-                        0,
-                    )
-                    if (sortByValue == sortBy) {
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(notesSortBy.iconResId, 0, 0, 0)
+                    if (notesSortBy == value.sortedBy) {
                         layout.NotesSortByRadioGroup.check(this.id)
                     }
                 }
@@ -450,37 +478,43 @@ class SettingsFragment : Fragment() {
                     tag = sortDir
                     setCompoundDrawablesRelativeWithIntrinsicBounds(sortDir.iconResId, 0, 0, 0)
                     layout.NotesSortDirectionRadioGroup.addView(this)
-                    if (sortDir == sortDirection) {
+                    if (sortDir == value.sortDirection) {
                         layout.NotesSortDirectionRadioGroup.check(this.id)
                     }
                 }
             }
 
             MaterialAlertDialogBuilder(requireContext())
-                .setTitle(info.title)
+                .setTitle(preference.titleResId)
                 .setView(layout.root)
                 .setPositiveButton(R.string.save) { dialog, _ ->
                     dialog.cancel()
-                    val newSortBy = layout.NotesSortByRadioGroup.checkedTag() as String
+                    val newSortBy = layout.NotesSortByRadioGroup.checkedTag() as NotesSortBy
                     val newSortDirection =
                         layout.NotesSortDirectionRadioGroup.checkedTag() as SortDirection
-                    model.preferences.savePreference(info, newSortBy, newSortDirection)
+                    model.savePreference(
+                        model.preferences.notesSorting,
+                        NotesSort(newSortBy, newSortDirection),
+                    )
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .show()
         }
     }
 
-    private fun PreferenceBinding.setup(info: BackupPassword, password: String) {
-        Title.setText(info.title)
+    private fun PreferenceBinding.setupBackupPassword(
+        preference: StringPreference,
+        password: String,
+    ) {
+        Title.setText(preference.titleResId!!)
 
         Value.transformationMethod =
-            if (password != emptyPassword) PasswordTransformationMethod.getInstance() else null
-        Value.text = if (password != emptyPassword) password else getText(R.string.tap_to_set_up)
+            if (password != PASSWORD_EMPTY) PasswordTransformationMethod.getInstance() else null
+        Value.text = if (password != PASSWORD_EMPTY) password else getText(R.string.tap_to_set_up)
         root.setOnClickListener {
             val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
             layout.InputText.apply {
-                if (password != emptyPassword) {
+                if (password != PASSWORD_EMPTY) {
                     setText(password)
                 }
                 transformationMethod = PasswordTransformationMethod.getInstance()
@@ -491,62 +525,18 @@ class SettingsFragment : Fragment() {
                 visibility = View.VISIBLE
             }
             MaterialAlertDialogBuilder(requireContext())
-                .setTitle(info.title)
+                .setTitle(preference.titleResId)
                 .setView(layout.root)
                 .setPositiveButton(R.string.save) { dialog, _ ->
                     dialog.cancel()
                     val updatedPassword = layout.InputText.text.toString()
-                    model.preferences.savePreference(info, updatedPassword)
+                    model.savePreference(preference, updatedPassword)
                 }
                 .setNegativeButton(R.string.cancel, null)
                 .setNeutralButton(R.string.clear) { dialog, _ ->
                     dialog.cancel()
-                    model.preferences.savePreference(info, emptyPassword)
+                    model.savePreference(preference, PASSWORD_EMPTY)
                 }
-                .show()
-        }
-    }
-
-    private fun PreferenceBinding.setup(info: BiometricLock, value: String) {
-        Title.setText(info.title)
-
-        val entries = info.getEntries(requireContext())
-        val entryValues = info.getEntryValues()
-
-        val checked = entryValues.indexOf(value)
-        val displayValue = entries[checked]
-
-        Value.text = displayValue
-
-        root.setOnClickListener {
-            MaterialAlertDialogBuilder(requireContext())
-                .setTitle(info.title)
-                .setSingleChoiceItems(entries, checked) { dialog, which ->
-                    dialog.cancel()
-                    val newValue = entryValues[which]
-                    if (newValue == enabled) {
-                        when (requireContext().canAuthenticateWithBiometrics()) {
-                            BiometricManager.BIOMETRIC_SUCCESS -> showEnableBiometricLock()
-                            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE ->
-                                showNoBiometricsSupportToast()
-                            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED ->
-                                showBiometricsNotSetupDialog()
-                        }
-                    } else {
-                        when (requireContext().canAuthenticateWithBiometrics()) {
-                            BiometricManager.BIOMETRIC_SUCCESS -> showDisableBiometricLock()
-                            BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE -> {
-                                showNoBiometricsSupportToast()
-                                model.preferences.biometricLock.value = disabled
-                            }
-                            BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED -> {
-                                showBiometricsNotSetupDialog()
-                                model.preferences.biometricLock.value = disabled
-                            }
-                        }
-                    }
-                }
-                .setNegativeButton(R.string.cancel, null)
                 .show()
         }
     }
@@ -559,10 +549,10 @@ class SettingsFragment : Fragment() {
             R.string.enable_lock_description,
             onSuccess = { cipher ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    model.preferences.iv = cipher.iv
-                    val passphrase = model.preferences.generatePassphrase(cipher)
+                    model.savePreference(model.preferences.iv, cipher.iv)
+                    val passphrase = model.preferences.databaseEncryptionKey.init(cipher)
                     encryptDatabase(requireContext(), passphrase)
-                    model.savePreference(BiometricLock, enabled)
+                    model.savePreference(model.preferences.biometricLock, BiometricLock.ENABLED)
                 }
                 val app = (activity?.application as NotallyXApplication)
                 app.locked.value = false
@@ -579,14 +569,14 @@ class SettingsFragment : Fragment() {
             disableLockActivityResultLauncher,
             R.string.disable_lock_title,
             R.string.disable_lock_description,
-            model.preferences.iv!!,
+            model.preferences.iv.value!!,
             onSuccess = { cipher ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    val encryptedPassphrase = model.preferences.getDatabasePassphrase()
+                    val encryptedPassphrase = model.preferences.databaseEncryptionKey.value
                     val passphrase = cipher.doFinal(encryptedPassphrase)
                     model.closeDatabase()
                     decryptDatabase(requireContext(), passphrase)
-                    model.savePreference(BiometricLock, disabled)
+                    model.savePreference(model.preferences.biometricLock, BiometricLock.DISABLED)
                 }
                 showBiometricsDisabledToast()
             },
@@ -632,10 +622,10 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    private fun PreferenceBinding.setup(info: AutoBackup, value: String) {
-        Title.setText(info.title)
+    private fun PreferenceBinding.setupAutoBackup(preference: StringPreference, value: String) {
+        Title.setText(preference.titleResId!!)
 
-        if (value == info.emptyPath) {
+        if (value == BACKUP_PATH_EMPTY) {
             Value.setText(R.string.tap_to_set_up)
 
             root.setOnClickListener { displayChooseFolderDialog() }
@@ -655,14 +645,17 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun PreferenceSeekbarBinding.setup(info: SeekbarInfo, initialValue: Int) {
-        Title.setText(info.title)
+    private fun PreferenceSeekbarBinding.setup(
+        preference: IntPreference,
+        value: Int = preference.value,
+    ) {
+        Title.setText(preference.titleResId!!)
 
         Slider.apply {
-            valueTo = info.max.toFloat()
-            valueFrom = info.min.toFloat()
-            value = initialValue.toFloat()
-            addOnChangeListener { _, value, _ -> model.savePreference(info, value.toInt()) }
+            valueTo = preference.max.toFloat()
+            valueFrom = preference.min.toFloat()
+            this@apply.value = value.toFloat()
+            addOnChangeListener { _, value, _ -> model.savePreference(preference, value.toInt()) }
         }
     }
 

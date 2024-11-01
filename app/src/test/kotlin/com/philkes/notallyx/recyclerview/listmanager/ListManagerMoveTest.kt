@@ -1,7 +1,7 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.lastIndex
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assert
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.createListItem
@@ -18,7 +18,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `move parent without children`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         val newPosition = listManager.move(3, 1)
 
         items.assertOrder("A", "D", "B")
@@ -28,7 +28,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `move parent with children into other parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
         listManager.changeIsChild(4, true, false)
@@ -46,7 +46,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `move parent with children to bottom`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
         items.printList("Before")
@@ -63,7 +63,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `move parent with children to top`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
         listManager.add(0, createListItem("G"))
@@ -81,7 +81,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `move child to other parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
 
         val newPosition = listManager.move(3, 1)
@@ -94,7 +94,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `move child above other child`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
         listManager.changeIsChild(5, true, false)
@@ -109,7 +109,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `move child to top`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
 
         val newPosition = listManager.move(3, 0)
@@ -122,7 +122,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `dont move parent into own children`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true)
         listManager.changeIsChild(4, true)
 
@@ -135,7 +135,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `dont move parent under checked item if auto-sort enabled`() {
-        setSorting(ListItemSorting.autoSortByChecked)
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeChecked(5, true)
 
         val newPosition = listManager.move(2, 5)
@@ -150,7 +150,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `undoMove parent without children`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         val newPosition = listManager.move(1, 4)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
 
@@ -161,7 +161,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `undoMove parent with children into other parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(2, true, false)
         val newPosition = listManager.move(1, 3)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
@@ -175,7 +175,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `undoMove move parent with children to bottom`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
         val newPosition = listManager.move(0, items.lastIndex)!!
@@ -191,7 +191,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `undoMove parent with children to top`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
         items.printList("Before")
@@ -208,7 +208,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `undoMove child to other parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         val newPosition = listManager.move(3, 1)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
@@ -222,7 +222,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `undoMove child above other child`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
         listManager.changeIsChild(5, true, false)
@@ -239,7 +239,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `undoMove child to top`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         val newPosition = listManager.move(3, 0)!!
         val itemBeforeMove = (changeHistory.lookUp() as ListMoveChange).itemBeforeMove
@@ -256,7 +256,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `endDrag parent without children`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listItemDragCallback.simulateDrag(3, 1, "D".itemCount)
 
         items.assertOrder("A", "D", "B")
@@ -265,7 +265,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `endDrag parent with children into other parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
         listManager.changeIsChild(5, true, false)
@@ -300,7 +300,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `endDrag parent with children to bottom`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
         items.printList("Before")
@@ -316,7 +316,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `endDrag parent with children to top`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
         items.printList("Before")
@@ -332,7 +332,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `endDrag child to other parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
 
         listItemDragCallback.simulateDrag(3, 1, "D".itemCount)
@@ -344,7 +344,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `endDrag child above other child`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
         listManager.changeIsChild(5, true, false)
@@ -358,7 +358,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     @Test
     fun `endDrag child to top`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
 
         listItemDragCallback.simulateDrag(3, 0, "D".itemCount)

@@ -5,7 +5,7 @@ import androidx.recyclerview.widget.SortedListAdapterCallback
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.data.model.Item
-import com.philkes.notallyx.presentation.view.misc.SortDirection
+import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 
 abstract class BaseNoteSort(
     adapter: RecyclerView.Adapter<*>?,

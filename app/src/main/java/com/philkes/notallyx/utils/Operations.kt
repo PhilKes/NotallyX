@@ -19,7 +19,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.LabelBinding
-import com.philkes.notallyx.presentation.view.misc.TextSize
+import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStreamWriter
@@ -99,7 +99,7 @@ object Operations {
         }
     }
 
-    fun bindLabels(group: ChipGroup, labels: List<String>, textSize: String) {
+    fun bindLabels(group: ChipGroup, labels: List<String>, textSize: TextSize) {
         if (labels.isEmpty()) {
             group.visibility = View.GONE
         } else {
@@ -107,7 +107,7 @@ object Operations {
             group.removeAllViews()
 
             val inflater = LayoutInflater.from(group.context)
-            val labelSize = TextSize.getDisplayBodySize(textSize)
+            val labelSize = textSize.displayBodySize
 
             for (label in labels) {
                 val view = LabelBinding.inflate(inflater, group, true).root

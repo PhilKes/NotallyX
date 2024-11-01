@@ -40,14 +40,12 @@ import com.philkes.notallyx.presentation.getParcelableExtraCompat
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.Constants
-import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByCreationDate
-import com.philkes.notallyx.presentation.view.misc.NotesSorting.autoSortByModifiedDate
-import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
 import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.Operations
@@ -282,13 +280,12 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
     open fun setStateFromModel() {
         val (date, datePrefixResId) =
-            when (preferences.notesSorting.value.first) {
-                autoSortByCreationDate -> Pair(model.timestamp, R.string.creation_date)
-                autoSortByModifiedDate -> Pair(model.modifiedTimestamp, R.string.modified_date)
+            when (preferences.notesSorting.value.sortedBy) {
+                NotesSortBy.CREATION_DATE -> Pair(model.timestamp, R.string.creation_date)
+                NotesSortBy.MODIFIED_DATE -> Pair(model.modifiedTimestamp, R.string.modified_date)
                 else -> Pair(null, null)
             }
         binding.Date.displayFormattedTimestamp(date, preferences.dateFormat.value, datePrefixResId)
-
         binding.EnterTitle.setText(model.title)
         Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
 
@@ -602,9 +599,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             }
         }
 
-        val title = TextSize.getEditTitleSize(model.textSize)
-        val date = TextSize.getDisplayBodySize(model.textSize)
-        val body = TextSize.getEditBodySize(model.textSize)
+        val title = model.textSize.editTitleSize
+        val date = model.textSize.displayBodySize
+        val body = model.textSize.editBodySize
 
         binding.EnterTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, title)
         binding.Date.setTextSize(TypedValue.COMPLEX_UNIT_SP, date)

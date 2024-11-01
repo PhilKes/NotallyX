@@ -5,11 +5,9 @@ import android.util.Log
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.areAllChecked
 import com.philkes.notallyx.data.model.plus
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.deleteItem
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.filter
@@ -24,6 +22,8 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.setCheckedWi
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.setIsChild
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.shiftItemOrders
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableString
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.changehistory.ChangeCheckedForAllChange
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
@@ -41,7 +41,7 @@ import com.philkes.notallyx.utils.changehistory.ListMoveChange
 class ListManager(
     private val recyclerView: RecyclerView,
     private val changeHistory: ChangeHistory,
-    private val preferences: Preferences,
+    private val preferences: NotallyXPreferences,
     private val inputMethodManager: InputMethodManager,
 ) {
 
@@ -396,7 +396,7 @@ class ListManager(
     }
 
     private fun isAutoSortByCheckedEnabled() =
-        preferences.listItemSorting.value == ListItemSorting.autoSortByChecked
+        preferences.listItemSorting.value == ListItemSort.AUTO_SORT_BY_CHECKED
 
     private val Int.isBeforeChildItemOfOtherParent: Boolean
         get() {

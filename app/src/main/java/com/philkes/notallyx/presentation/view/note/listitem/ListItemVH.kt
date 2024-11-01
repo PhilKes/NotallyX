@@ -14,22 +14,22 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
 import com.philkes.notallyx.presentation.setOnNextAction
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.misc.SwipeLayout.SwipeActionsListener
-import com.philkes.notallyx.presentation.view.misc.TextSize
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
+import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
 class ListItemVH(
     val binding: RecyclerListItemBinding,
     val listManager: ListManager,
     touchHelper: ItemTouchHelper,
-    textSize: String,
+    textSize: TextSize,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var editTextWatcher: TextWatcher
     private var dragHandleInitialY: Float = 0f
 
     init {
-        val body = TextSize.getEditBodySize(textSize)
+        val body = textSize.editBodySize
         binding.EditText.apply {
             setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
@@ -62,7 +62,7 @@ class ListItemVH(
         }
     }
 
-    fun bind(item: ListItem, firstItem: Boolean, autoSort: String) {
+    fun bind(item: ListItem, firstItem: Boolean, autoSort: ListItemSort) {
         updateEditText(item)
 
         updateCheckBox(item)
@@ -70,7 +70,7 @@ class ListItemVH(
         updateDeleteButton(item)
 
         updateSwipe(item.isChild, !firstItem && !item.checked)
-        if (item.checked && autoSort == ListItemSorting.autoSortByChecked) {
+        if (item.checked && autoSort == ListItemSort.AUTO_SORT_BY_CHECKED) {
             binding.DragHandle.visibility = INVISIBLE
         } else {
             binding.DragHandle.visibility = VISIBLE

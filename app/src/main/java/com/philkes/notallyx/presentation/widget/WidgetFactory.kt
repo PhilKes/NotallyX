@@ -8,12 +8,11 @@ import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.philkes.notallyx.NotallyXApplication
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.presentation.view.misc.TextSize
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getSelectNoteIntent
 
 class WidgetFactory(
@@ -24,7 +23,7 @@ class WidgetFactory(
 
     private var baseNote: BaseNote? = null
     private lateinit var database: NotallyDatabase
-    private val preferences = Preferences.getInstance(app)
+    private val preferences = NotallyXPreferences.getInstance(app)
 
     init {
         NotallyDatabase.getDatabase(app).observeForever { database = it }
@@ -64,14 +63,11 @@ class WidgetFactory(
 
     private fun getNoteView(note: BaseNote): RemoteViews {
         return RemoteViews(app.packageName, R.layout.widget_note).apply {
-            setTextViewTextSize(
-                R.id.Title,
-                TypedValue.COMPLEX_UNIT_SP,
-                TextSize.getDisplayTitleSize(preferences.textSize.value),
-            )
+            val textSize = preferences.textSize.value
+            setTextViewTextSize(R.id.Title, TypedValue.COMPLEX_UNIT_SP, textSize.displayTitleSize)
             setTextViewText(R.id.Title, note.title)
 
-            val bodyTextSize = TextSize.getDisplayBodySize(preferences.textSize.value)
+            val bodyTextSize = textSize.displayBodySize
 
             setTextViewTextSize(R.id.Note, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
             if (note.body.isNotEmpty()) {
@@ -91,7 +87,7 @@ class WidgetFactory(
             setTextViewTextSize(
                 R.id.Title,
                 TypedValue.COMPLEX_UNIT_SP,
-                TextSize.getDisplayTitleSize(preferences.textSize.value),
+                preferences.textSize.value.displayTitleSize,
             )
             setTextViewText(R.id.Title, list.title)
 
@@ -116,7 +112,7 @@ class WidgetFactory(
             setTextViewTextSize(
                 R.id.CheckBox,
                 TypedValue.COMPLEX_UNIT_SP,
-                TextSize.getDisplayBodySize(preferences.textSize.value),
+                preferences.textSize.value.displayBodySize,
             )
             setTextViewText(R.id.CheckBox, item.body)
             setInt(

@@ -1,6 +1,6 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assert
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.utils.changehistory.ListIsChildChange
@@ -12,7 +12,7 @@ class ListManagerIsChildTest : ListManagerTestBase() {
 
     @Test
     fun `changeIsChild changes parent to child and pushes change`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, isChild = true)
 
         items.assertOrder("A", "B")
@@ -22,7 +22,7 @@ class ListManagerIsChildTest : ListManagerTestBase() {
 
     @Test
     fun `changeIsChild changes child to parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, isChild = true)
 
         listManager.changeIsChild(1, isChild = false)
@@ -34,7 +34,7 @@ class ListManagerIsChildTest : ListManagerTestBase() {
 
     @Test
     fun `changeIsChild adds all child items when item becomes a parent`() {
-        setSorting(ListItemSorting.noAutoSort)
+        setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true)
         listManager.changeIsChild(2, true)
 

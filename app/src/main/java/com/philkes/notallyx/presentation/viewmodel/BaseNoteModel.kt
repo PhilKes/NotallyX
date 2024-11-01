@@ -13,7 +13,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
@@ -38,10 +37,10 @@ import com.philkes.notallyx.data.model.SearchResult
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
-import com.philkes.notallyx.presentation.view.misc.AutoBackup
-import com.philkes.notallyx.presentation.view.misc.ListInfo
 import com.philkes.notallyx.presentation.view.misc.Progress
-import com.philkes.notallyx.presentation.view.misc.SeekbarInfo
+import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
+import com.philkes.notallyx.presentation.viewmodel.preference.Constants.BACKUP_PATH_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.IO.deleteAttachments
@@ -105,7 +104,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     private val pinned = Header(app.getString(R.string.pinned))
     private val others = Header(app.getString(R.string.others))
 
-    val preferences = Preferences.getInstance(app)
+    val preferences = NotallyXPreferences.getInstance(app)
 
     val imageRoot = app.getExternalImagesDirectory()
     val fileRoot = app.getExternalFilesDirectory()
@@ -181,24 +180,20 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     private fun transform(list: List<BaseNote>) = transform(list, pinned, others)
 
-    fun savePreference(info: SeekbarInfo, value: Int) = executeAsync {
-        preferences.savePreference(info, value)
-    }
-
-    fun savePreference(info: ListInfo, value: String) = executeAsync {
-        preferences.savePreference(info, value)
-    }
-
     fun disableAutoBackup() {
         clearPersistedUriPermissions()
-        executeAsync { preferences.savePreference(AutoBackup, AutoBackup.emptyPath) }
+        savePreference(preferences.autoBackupPath, BACKUP_PATH_EMPTY)
     }
 
     fun setAutoBackupPath(uri: Uri) {
         clearPersistedUriPermissions()
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         app.contentResolver.takePersistableUriPermission(uri, flags)
-        executeAsync { preferences.savePreference(AutoBackup, uri.toString()) }
+        savePreference(preferences.autoBackupPath, uri.toString())
+    }
+
+    fun <T> savePreference(preference: BasePreference<T>, value: T) {
+        executeAsync { preference.save(value) }
     }
 
     /**

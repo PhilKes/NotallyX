@@ -4,18 +4,18 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.setOnNextAction
-import com.philkes.notallyx.presentation.view.misc.ListItemSorting
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 
 class EditListActivity : EditActivity(Type.LIST) {
@@ -102,12 +102,12 @@ class EditListActivity : EditActivity(Type.LIST) {
             ListItemAdapter(
                 model.textSize,
                 elevation,
-                Preferences.getInstance(application),
+                NotallyXPreferences.getInstance(application),
                 listManager,
             )
         val sortCallback =
             when (preferences.listItemSorting.value) {
-                ListItemSorting.autoSortByChecked -> ListItemSortedByCheckedCallback(adapter)
+                ListItemSort.AUTO_SORT_BY_CHECKED -> ListItemSortedByCheckedCallback(adapter)
                 else -> ListItemNoSortCallback(adapter)
             }
         items = ListItemSortedList(sortCallback)

@@ -18,6 +18,8 @@ if [ $? -ne 0 ]; then
 fi
 
 # Re-stage only the initially staged Kotlin files
-echo "$initial_staged_files" | xargs git add
+for file in $initial_staged_files; do
+    git add "$file"
+done
 
 echo "Kotlin files formatted"

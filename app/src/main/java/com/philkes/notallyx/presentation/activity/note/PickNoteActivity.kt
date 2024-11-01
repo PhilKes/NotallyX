@@ -6,7 +6,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
@@ -14,9 +13,10 @@ import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.databinding.ActivityPickNoteBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
-import com.philkes.notallyx.presentation.view.misc.View
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesView
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import java.util.Collections
 import kotlinx.coroutines.Dispatchers
@@ -37,18 +37,18 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ListIte
         val result = Intent()
         setResult(RESULT_CANCELED, result)
 
-        val preferences = Preferences.getInstance(application)
+        val preferences = NotallyXPreferences.getInstance(application)
 
         adapter =
             with(preferences) {
                 BaseNoteAdapter(
                     Collections.emptySet(),
                     dateFormat.value,
-                    notesSorting.value.first,
+                    notesSorting.value.sortedBy,
                     textSize.value,
-                    maxItems,
-                    maxLines,
-                    maxTitle,
+                    maxItems.value,
+                    maxLines.value,
+                    maxTitle.value,
                     application.getExternalImagesDirectory(),
                     this@PickNoteActivity,
                 )
@@ -58,7 +58,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ListIte
             adapter = this@PickNoteActivity.adapter
             setHasFixedSize(true)
             layoutManager =
-                if (preferences.view.value == View.grid) {
+                if (preferences.notesView.value == NotesView.GRID) {
                     StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
                 } else LinearLayoutManager(this@PickNoteActivity)
         }

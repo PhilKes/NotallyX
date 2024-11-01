@@ -46,9 +46,7 @@ import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
 import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
@@ -57,10 +55,10 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.getUrl
 import com.philkes.notallyx.databinding.DialogProgressBinding
-import com.philkes.notallyx.presentation.view.misc.DateFormat
 import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
 import java.io.File
@@ -198,10 +196,10 @@ fun Menu.add(
 
 fun TextView.displayFormattedTimestamp(
     timestamp: Long?,
-    dateFormat: String,
+    dateFormat: DateFormat,
     prefixResId: Int? = null,
 ) {
-    if (dateFormat != DateFormat.none && timestamp != null) {
+    if (dateFormat != DateFormat.NONE && timestamp != null) {
         visibility = View.VISIBLE
         text =
             "${prefixResId?.let { getString(it) } ?: ""} ${formatTimestamp(timestamp, dateFormat)}"
@@ -324,22 +322,6 @@ fun Context.canAuthenticateWithBiometrics(): Int {
     return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
 }
 
-fun <T> LiveData<T>.observeForeverSkipFirst(observer: Observer<T>) {
-    var isFirstEvent = true
-    this.observeForever { value ->
-        if (isFirstEvent) {
-            isFirstEvent = false
-        } else {
-            observer.onChanged(value)
-        }
-    }
-}
-
-fun String.fileNameWithoutExtension(): String {
-    return this.substringAfterLast("/") // Remove the path
-        .substringBeforeLast(".") // Remove the extension
-}
-
 fun Context.getFileName(uri: Uri): String? =
     when (uri.scheme) {
         ContentResolver.SCHEME_CONTENT -> getContentFileName(uri)
@@ -458,10 +440,10 @@ fun Activity.checkNotificationPermission(
     } else onSuccess()
 }
 
-private fun formatTimestamp(timestamp: Long, dateFormat: String): String {
+private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
     val date = Date(timestamp)
     return when (dateFormat) {
-        DateFormat.relative -> PrettyTime().format(date)
+        DateFormat.RELATIVE -> PrettyTime().format(date)
         else -> java.text.DateFormat.getDateInstance(java.text.DateFormat.FULL).format(date)
     }
 }

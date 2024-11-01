@@ -31,9 +31,9 @@ import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
-import com.philkes.notallyx.presentation.view.misc.View as ViewPref
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.presentation.viewmodel.preference.NotesView
 
 abstract class NotallyFragment : Fragment(), ListItemListener {
 
@@ -139,11 +139,11 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
                 BaseNoteAdapter(
                     model.actionMode.selectedIds,
                     dateFormat.value,
-                    notesSorting.value.first,
+                    notesSorting.value.sortedBy,
                     textSize.value,
-                    maxItems,
-                    maxLines,
-                    maxTitle,
+                    maxItems.value,
+                    maxLines.value,
+                    maxTitle.value,
                     model.imageRoot,
                     this@NotallyFragment,
                 )
@@ -170,8 +170,8 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
             binding?.ImageView?.isVisible = list.isEmpty()
         }
 
-        model.preferences.notesSorting.observe(viewLifecycleOwner) { (sortBy, sortDirection) ->
-            notesAdapter?.setSorting(sortBy, sortDirection)
+        model.preferences.notesSorting.observe(viewLifecycleOwner) { notesSort ->
+            notesAdapter?.setSorting(notesSort)
         }
 
         model.actionMode.closeListener.observe(viewLifecycleOwner) { event ->
@@ -187,7 +187,7 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
 
     private fun setupRecyclerView() {
         binding?.RecyclerView?.layoutManager =
-            if (model.preferences.view.value == ViewPref.grid) {
+            if (model.preferences.notesView.value == NotesView.GRID) {
                 StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
             } else LinearLayoutManager(requireContext())
     }

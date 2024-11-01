@@ -16,7 +16,6 @@ import androidx.core.text.getSpans
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.DataUtil
 import com.philkes.notallyx.data.NotallyDatabase
@@ -30,8 +29,9 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.applySpans
-import com.philkes.notallyx.presentation.view.misc.BetterLiveData
+import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
@@ -51,7 +51,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     private val database = NotallyDatabase.getDatabase(app)
     private lateinit var baseNoteDao: BaseNoteDao
 
-    val textSize = Preferences.getInstance(app).textSize.value
+    val textSize = NotallyXPreferences.getInstance(app).textSize.value
 
     var isNewNote = true
 
@@ -71,9 +71,9 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     var body: Editable = SpannableStringBuilder()
 
     val items = ArrayList<ListItem>()
-    val images = BetterLiveData<List<FileAttachment>>(emptyList())
-    val files = BetterLiveData<List<FileAttachment>>(emptyList())
-    val audios = BetterLiveData<List<Audio>>(emptyList())
+    val images = NotNullLiveData<List<FileAttachment>>(emptyList())
+    val files = NotNullLiveData<List<FileAttachment>>(emptyList())
+    val audios = NotNullLiveData<List<Audio>>(emptyList())
 
     val addingFiles = MutableLiveData<Progress>()
     val eventBus = MutableLiveData<Event<List<FileError>>>()

@@ -2,7 +2,7 @@ package com.philkes.notallyx.presentation.view.main.sorting
 
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.presentation.view.misc.SortDirection
+import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 
 class BaseNoteTitleSort(adapter: RecyclerView.Adapter<*>?, sortDirection: SortDirection) :
     BaseNoteSort(adapter, sortDirection) {
