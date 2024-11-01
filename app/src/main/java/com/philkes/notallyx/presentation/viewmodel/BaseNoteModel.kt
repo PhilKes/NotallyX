@@ -93,7 +93,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     var keyword = String()
         set(value) {
-            if (field != value) {
+            if (field != value || searchResults?.value?.isEmpty() == true) {
                 field = value
                 searchResults!!.fetch(keyword, folder)
             }

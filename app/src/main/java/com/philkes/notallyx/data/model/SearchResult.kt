@@ -26,10 +26,10 @@ class SearchResult(
         liveData?.removeObserver(observer)
         job =
             scope.launch {
-                if (keyword.isNotEmpty()) {
-                    liveData = baseNoteDao.getBaseNotesByKeyword(keyword, folder)
-                    liveData?.observeForever(observer)
-                } else value = emptyList()
+                liveData =
+                    if (keyword.isNotEmpty()) baseNoteDao.getBaseNotesByKeyword(keyword, folder)
+                    else baseNoteDao.getFrom(folder)
+                liveData?.observeForever(observer)
             }
     }
 }
