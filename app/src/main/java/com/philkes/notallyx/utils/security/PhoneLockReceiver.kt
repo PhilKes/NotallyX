@@ -9,7 +9,7 @@ class UnlockReceiver(private val application: NotallyXApplication) : BroadcastRe
 
     override fun onReceive(context: Context?, intent: Intent) {
         if (intent.action == Intent.ACTION_SCREEN_OFF) {
-            application.isLocked = true
+            application.locked.value = true
         }
     }
 }

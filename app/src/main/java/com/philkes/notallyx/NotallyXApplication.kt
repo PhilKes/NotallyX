@@ -5,8 +5,10 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
+import com.philkes.notallyx.presentation.view.misc.BetterLiveData
 import com.philkes.notallyx.presentation.view.misc.BiometricLock.enabled
 import com.philkes.notallyx.presentation.view.misc.Theme
+import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.UnlockReceiver
 
@@ -16,7 +18,7 @@ class NotallyXApplication : Application() {
     private lateinit var preferences: Preferences
     private var unlockReceiver: UnlockReceiver? = null
 
-    var isLocked = true
+    val locked = BetterLiveData(true)
 
     override fun onCreate() {
         super.onCreate()
@@ -47,5 +49,7 @@ class NotallyXApplication : Application() {
             }
         }
         preferences.biometricLock.observeForever(biometricLockObserver)
+
+        locked.observeForever { isLocked -> WidgetProvider.updateWidgets(this, locked = isLocked) }
     }
 }

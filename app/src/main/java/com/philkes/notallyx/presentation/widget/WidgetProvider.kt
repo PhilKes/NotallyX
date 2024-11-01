@@ -14,6 +14,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.findChildrenPositions
 import com.philkes.notallyx.data.model.findParentPosition
 import com.philkes.notallyx.presentation.activity.ConfigureWidgetActivity
@@ -107,27 +108,6 @@ class WidgetProvider : AppWidgetProvider() {
         }
     }
 
-    private fun updateWidgets(context: Context, noteIds: LongArray) {
-        val app = context.applicationContext as Application
-        val preferences = Preferences.getInstance(app)
-
-        val manager = AppWidgetManager.getInstance(context)
-        val updatableWidgets = preferences.getUpdatableWidgets(noteIds)
-
-        updatableWidgets.forEach { pair -> updateWidget(context, manager, pair.first, pair.second) }
-    }
-
-    private fun openActivity(context: Context, originalIntent: Intent, clazz: Class<*>) {
-        val id = originalIntent.getLongExtra(Constants.SelectedBaseNote, 0)
-        val widgetId = originalIntent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
-        val intent = Intent(context, clazz)
-        intent.putExtra(Constants.SelectedBaseNote, id)
-        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
-        intent.data = originalIntent.data
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
-        context.startActivity(intent)
-    }
-
     override fun onDeleted(context: Context, appWidgetIds: IntArray) {
         val app = context.applicationContext as Application
         val preferences = Preferences.getInstance(app)
@@ -145,13 +125,40 @@ class WidgetProvider : AppWidgetProvider() {
 
         appWidgetIds.forEach { id ->
             val noteId = preferences.getWidgetData(id)
-            updateWidget(context, appWidgetManager, id, noteId)
+            val noteType = preferences.getWidgetNoteType(id)
+            updateWidget(context, appWidgetManager, id, noteId, noteType)
         }
     }
 
     companion object {
 
-        fun updateWidget(context: Context, manager: AppWidgetManager, id: Int, noteId: Long) {
+        fun updateWidgets(context: Context, noteIds: LongArray? = null, locked: Boolean = false) {
+            val app = context.applicationContext as Application
+            val preferences = Preferences.getInstance(app)
+
+            val manager = AppWidgetManager.getInstance(context)
+            val updatableWidgets = preferences.getUpdatableWidgets(noteIds)
+
+            updatableWidgets.forEach { (id, noteId) ->
+                updateWidget(
+                    context,
+                    manager,
+                    id,
+                    noteId,
+                    preferences.getWidgetNoteType(id),
+                    locked = locked,
+                )
+            }
+        }
+
+        fun updateWidget(
+            context: Context,
+            manager: AppWidgetManager,
+            id: Int,
+            noteId: Long,
+            noteType: Type?,
+            locked: Boolean = false,
+        ) {
             // Widgets displaying the same note share the same factory since only the noteId is
             // embedded
             val intent = Intent(context, WidgetService::class.java)
@@ -159,17 +166,73 @@ class WidgetProvider : AppWidgetProvider() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
             embedIntentExtras(intent)
 
-            val view = RemoteViews(context.packageName, R.layout.widget)
-            view.setRemoteAdapter(R.id.ListView, intent)
-            view.setEmptyView(R.id.ListView, R.id.Empty)
-
-            view.setOnClickFillInIntent(R.id.Empty, getSelectNoteIntent(id))
-
-            val openNote = getOpenNoteIntent(context, noteId)
-            view.setPendingIntentTemplate(R.id.ListView, openNote)
-
+            val view =
+                if (!locked) {
+                    RemoteViews(context.packageName, R.layout.widget).apply {
+                        setRemoteAdapter(R.id.ListView, intent)
+                        setEmptyView(R.id.ListView, R.id.Empty)
+                        setOnClickFillInIntent(R.id.Empty, getSelectNoteIntent(id))
+                        setPendingIntentTemplate(R.id.ListView, getOpenNoteIntent(context, noteId))
+                    }
+                } else {
+                    RemoteViews(context.packageName, R.layout.widget_locked).apply {
+                        noteType?.let {
+                            val openNoteIntent =
+                                when (it) {
+                                    Type.NOTE -> Intent(context, EditNoteActivity::class.java)
+                                    Type.LIST -> Intent(context, EditListActivity::class.java)
+                                }.apply {
+                                    putExtra(Constants.SelectedBaseNote, noteId)
+                                    addFlags(
+                                        Intent.FLAG_ACTIVITY_NEW_TASK or
+                                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                    )
+                                }
+                            val lockedPendingIntent =
+                                PendingIntent.getActivity(
+                                    context,
+                                    0,
+                                    openNoteIntent,
+                                    PendingIntent.FLAG_UPDATE_CURRENT or
+                                        PendingIntent.FLAG_IMMUTABLE,
+                                )
+                            setOnClickPendingIntent(R.id.Layout, lockedPendingIntent)
+                            setOnClickPendingIntent(R.id.Text, lockedPendingIntent)
+                        }
+                        setTextViewCompoundDrawablesRelative(
+                            R.id.Text,
+                            0,
+                            R.drawable.lock_big,
+                            0,
+                            0,
+                        )
+                    }
+                }
             manager.updateAppWidget(id, view)
-            manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
+            if (!locked) {
+                manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
+            }
+        }
+
+        private fun openActivity(context: Context, originalIntent: Intent, clazz: Class<*>) {
+            val id = originalIntent.getLongExtra(Constants.SelectedBaseNote, 0)
+            val widgetId = originalIntent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
+            context.startActivity(createIntent(context, clazz, id, widgetId, originalIntent))
+        }
+
+        private fun createIntent(
+            context: Context,
+            clazz: Class<*>,
+            noteId: Long,
+            widgetId: Int,
+            originalIntent: Intent? = null,
+        ): Intent {
+            val intent = Intent(context, clazz)
+            intent.putExtra(Constants.SelectedBaseNote, noteId)
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
+            originalIntent?.let { intent.data = it.data }
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+            return intent
         }
 
         fun sendBroadcast(app: Application, ids: LongArray) {
