@@ -1,6 +1,5 @@
 package com.philkes.notallyx.presentation.widget
 
-import android.app.Application
 import android.content.Intent
 import android.graphics.Paint
 import android.os.Build
@@ -8,6 +7,7 @@ import android.util.TypedValue
 import android.view.View
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
+import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.Preferences
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
@@ -16,8 +16,11 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.view.misc.TextSize
 import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getSelectNoteIntent
 
-class WidgetFactory(private val app: Application, private val id: Long, private val widgetId: Int) :
-    RemoteViewsService.RemoteViewsFactory {
+class WidgetFactory(
+    private val app: NotallyXApplication,
+    private val id: Long,
+    private val widgetId: Int,
+) : RemoteViewsService.RemoteViewsFactory {
 
     private var baseNote: BaseNote? = null
     private lateinit var database: NotallyDatabase

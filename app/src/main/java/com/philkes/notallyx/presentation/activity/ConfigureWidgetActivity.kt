@@ -28,11 +28,11 @@ class ConfigureWidgetActivity : PickNoteActivity() {
     override fun onClick(position: Int) {
         if (position != -1) {
             val preferences = Preferences.getInstance(application)
-            val noteId = (adapter.getItem(position) as BaseNote).id
-            preferences.updateWidget(id, noteId)
+            val baseNote = adapter.getItem(position) as BaseNote
+            preferences.updateWidget(id, baseNote.id, baseNote.type)
 
             val manager = AppWidgetManager.getInstance(this)
-            WidgetProvider.updateWidget(this, manager, id, noteId)
+            WidgetProvider.updateWidget(this, manager, id, baseNote.id, baseNote.type)
 
             val success = Intent()
             success.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)

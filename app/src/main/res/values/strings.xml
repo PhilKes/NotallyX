@@ -163,6 +163,7 @@
     <string name="security">Security</string>
 
     <string name="biometric_lock">Lock app with device biometric or PIN</string>
+    <string name="locked">Locked</string>
     <string name="enabled">Enabled</string>
     <string name="disabled">Disabled</string>
 

@@ -34,8 +34,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         biometricAuthenticationActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                    notallyXApplication.isLocked = false
-                    show()
+                   unlock()
                 } else {
                     finish()
                 }
@@ -67,13 +66,15 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
             preferences.iv!!,
             biometricAuthenticationActivityResultLauncher,
             R.string.unlock,
-            onSuccess = {
-                notallyXApplication.isLocked = false
-                show()
-            },
+            onSuccess = { unlock() },
         ) {
             finish()
         }
+    }
+
+    private fun unlock() {
+        notallyXApplication.locked.value = false
+        show()
     }
 
     protected fun show() {
@@ -88,7 +89,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         val keyguardManager: KeyguardManager =
             this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            (keyguardManager.isDeviceLocked || notallyXApplication.isLocked)
+            (keyguardManager.isDeviceLocked || notallyXApplication.locked.value)
         } else {
             false
         }

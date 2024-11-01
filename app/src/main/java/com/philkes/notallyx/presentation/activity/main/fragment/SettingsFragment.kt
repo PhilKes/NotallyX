@@ -564,7 +564,8 @@ class SettingsFragment : Fragment() {
                     encryptDatabase(requireContext(), passphrase)
                     model.savePreference(BiometricLock, enabled)
                 }
-                (activity?.application as NotallyXApplication).isLocked = false
+                val app = (activity?.application as NotallyXApplication)
+                app.locked.value = false
                 showBiometricsEnabledToast()
             },
         ) {

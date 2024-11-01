@@ -5,6 +5,7 @@ import android.os.Build
 import android.preference.PreferenceManager
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.toPreservedByteArray
 import com.philkes.notallyx.data.model.toPreservedString
 import com.philkes.notallyx.presentation.view.misc.AutoBackup
@@ -127,17 +128,22 @@ class Preferences private constructor(app: Application) {
 
     fun getWidgetData(id: Int) = preferences.getLong("widget:$id", 0)
 
+    fun getWidgetNoteType(id: Int) =
+        preferences.getString("widgetNoteType:$id", null)?.let { Type.valueOf(it) }
+
     fun deleteWidget(id: Int) {
         editor.remove("widget:$id")
+        editor.remove("widgetNoteType:$id")
         editor.commit()
     }
 
-    fun updateWidget(id: Int, noteId: Long) {
+    fun updateWidget(id: Int, noteId: Long, noteType: Type) {
         editor.putLong("widget:$id", noteId)
+        editor.putString("widgetNoteType:$id", noteType.name)
         editor.commit()
     }
 
-    fun getUpdatableWidgets(noteIds: LongArray): List<Pair<Int, Long>> {
+    fun getUpdatableWidgets(noteIds: LongArray? = null): List<Pair<Int, Long>> {
         val updatableWidgets = ArrayList<Pair<Int, Long>>()
         val pairs = preferences.all
         pairs.keys.forEach { key ->
@@ -148,7 +154,7 @@ class Preferences private constructor(app: Application) {
                 if (id != null) {
                     val value = pairs[key] as? Long
                     if (value != null) {
-                        if (noteIds.contains(value)) {
+                        if (noteIds == null || noteIds.contains(value)) {
                             updatableWidgets.add(Pair(id, value))
                         }
                     }
