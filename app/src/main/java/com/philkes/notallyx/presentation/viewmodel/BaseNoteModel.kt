@@ -331,9 +331,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         PostPDFGenerator.create(file, html, app, onResult)
     }
 
-    fun pinBaseNote(pinned: Boolean) {
+    fun pinBaseNotes(pinned: Boolean) {
         val id = actionMode.selectedIds.toLongArray()
-        actionMode.close(false)
+        actionMode.close(true)
         executeAsync { baseNoteDao.updatePinned(id, pinned) }
     }
 

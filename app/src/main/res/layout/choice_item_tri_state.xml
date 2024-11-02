@@ -1,0 +1,28 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/Layout"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="horizontal"
+  android:paddingStart="24dp"
+  android:paddingEnd="16dp"
+  android:paddingTop="4dp"
+  android:paddingBottom="4dp"
+  android:gravity="center_vertical">
+
+  <com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
+    android:id="@+id/CheckBox"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical"
+    android:layout_marginEnd="8dp"
+    android:theme="@style/AppTheme" />
+
+  <TextView
+    android:id="@+id/Text"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_gravity="center_vertical"
+    android:textAppearance="?textAppearanceBody2"/>
+
+</LinearLayout>

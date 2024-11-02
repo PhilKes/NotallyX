@@ -47,6 +47,8 @@ import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
+import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
+import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
@@ -144,14 +146,18 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
 
         val menu = binding.ActionMode.menu
-        val pinned = menu.add(R.string.pin, R.drawable.pin) {}
+        val pinned = menu.add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) {}
         val share = menu.add(R.string.share, R.drawable.share) { share() }
-        val labels = menu.add(R.string.labels, R.drawable.label) { label() }
+        val labels =
+            menu.add(R.string.labels, R.drawable.label, MenuItem.SHOW_AS_ACTION_ALWAYS) { label() }
 
         val export = createExportMenu(menu)
 
         val changeColor = menu.add(R.string.change_color, R.drawable.change_color) { changeColor() }
-        val delete = menu.add(R.string.delete, R.drawable.delete) { moveNotes(Folder.DELETED) }
+        val delete =
+            menu.add(R.string.delete, R.drawable.delete, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                moveNotes(Folder.DELETED)
+            }
         val archive = menu.add(R.string.archive, R.drawable.archive) { moveNotes(Folder.ARCHIVED) }
         val restore = menu.add(R.string.restore, R.drawable.restore) { moveNotes(Folder.NOTES) }
         val unarchive =
@@ -164,25 +170,25 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             } else {
                 binding.ActionMode.title = count.toString()
 
-                val baseNote = model.actionMode.getFirstNote()
-                if (count == 1) {
-                    if (baseNote.pinned) {
-                        pinned.setTitle(R.string.unpin)
-                        pinned.setIcon(R.drawable.unpin)
-                    } else {
-                        pinned.setTitle(R.string.pin)
-                        pinned.setIcon(R.drawable.pin)
+                val baseNotes = model.actionMode.selectedNotes.values
+                val showPin = baseNotes.any { !it.pinned }
+                if (showPin) {
+                    pinned.setTitle(R.string.pin).setIcon(R.drawable.pin).onClick {
+                        model.pinBaseNotes(true)
                     }
-                    pinned.onClick { model.pinBaseNote(!baseNote.pinned) }
+                } else {
+                    pinned.setTitle(R.string.unpin).setIcon(R.drawable.unpin).onClick {
+                        model.pinBaseNotes(false)
+                    }
                 }
 
-                pinned.setVisible(count == 1)
+                pinned.setVisible(true)
                 share.setVisible(count == 1)
-                labels.setVisible(count == 1)
+                labels.setVisible(true)
                 export.setVisible(count == 1)
                 changeColor.setVisible(true)
 
-                val folder = baseNote.folder
+                val folder = baseNotes.first().folder
                 delete.setVisible(folder == Folder.NOTES || folder == Folder.ARCHIVED)
                 archive.setVisible(folder == Folder.NOTES)
                 restore.setVisible(folder == Folder.DELETED)
@@ -267,11 +273,11 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     }
 
     private fun label() {
-        val baseNote = model.actionMode.getFirstNote()
+        val baseNotes = model.actionMode.selectedNotes.values
         lifecycleScope.launch {
             val labels = model.getAllLabels()
             if (labels.isNotEmpty()) {
-                displaySelectLabelsDialog(labels, baseNote)
+                displaySelectLabelsDialog(labels, baseNotes)
             } else {
                 model.actionMode.close(true)
                 navigateWithAnimation(R.id.Labels)
@@ -279,25 +285,57 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
     }
 
-    private fun displaySelectLabelsDialog(labels: Array<String>, baseNote: BaseNote) {
+    private fun displaySelectLabelsDialog(labels: Array<String>, baseNotes: Collection<BaseNote>) {
         val checkedPositions =
-            BooleanArray(labels.size) { index -> baseNote.labels.contains(labels[index]) }
+            labels
+                .map { label ->
+                    if (baseNotes.all { it.labels.contains(label) }) {
+                        TriStateCheckBox.State.CHECKED
+                    } else if (baseNotes.any { it.labels.contains(label) }) {
+                        TriStateCheckBox.State.PARTIALLY_CHECKED
+                    } else {
+                        TriStateCheckBox.State.UNCHECKED
+                    }
+                }
+                .toTypedArray()
 
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.labels)
             .setNegativeButton(R.string.cancel, null)
-            .setMultiChoiceItems(labels, checkedPositions) { _, which, isChecked ->
-                checkedPositions[which] = isChecked
+            .setMultiChoiceTriStateItems(this, labels, checkedPositions) { idx, state ->
+                checkedPositions[idx] = state
             }
             .setPositiveButton(R.string.save) { _, _ ->
-                val new = ArrayList<String>()
-                checkedPositions.forEachIndexed { index, checked ->
-                    if (checked) {
-                        val label = labels[index]
-                        new.add(label)
+                val checkedLabels =
+                    checkedPositions.mapIndexedNotNull { index, checked ->
+                        if (checked == TriStateCheckBox.State.CHECKED) {
+                            labels[index]
+                        } else null
                     }
+                val uncheckedLabels =
+                    checkedPositions.mapIndexedNotNull { index, checked ->
+                        if (checked == TriStateCheckBox.State.UNCHECKED) {
+                            labels[index]
+                        } else null
+                    }
+                val updatedBaseNotesLabels =
+                    baseNotes.map { baseNote ->
+                        val noteLabels = baseNote.labels.toMutableList()
+                        checkedLabels.forEach { checkedLabel ->
+                            if (!noteLabels.contains(checkedLabel)) {
+                                noteLabels.add(checkedLabel)
+                            }
+                        }
+                        uncheckedLabels.forEach { uncheckedLabel ->
+                            if (noteLabels.contains(uncheckedLabel)) {
+                                noteLabels.remove(uncheckedLabel)
+                            }
+                        }
+                        noteLabels
+                    }
+                baseNotes.zip(updatedBaseNotesLabels).forEach { (baseNote, updatedLabels) ->
+                    model.updateBaseNoteLabels(updatedLabels, baseNote.id)
                 }
-                model.updateBaseNoteLabels(new, baseNote.id)
             }
             .show()
     }

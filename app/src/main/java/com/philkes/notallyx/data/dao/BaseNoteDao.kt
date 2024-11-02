@@ -82,6 +82,9 @@ interface BaseNoteDao {
     @Query("UPDATE BaseNote SET labels = :labels WHERE id = :id")
     suspend fun updateLabels(id: Long, labels: List<String>)
 
+    @Query("UPDATE BaseNote SET labels = :labels WHERE id IN (:ids)")
+    suspend fun updateLabels(ids: LongArray, labels: List<String>)
+
     @Query("UPDATE BaseNote SET items = :items WHERE id = :id")
     suspend fun updateItems(id: Long, items: List<ListItem>)
 
