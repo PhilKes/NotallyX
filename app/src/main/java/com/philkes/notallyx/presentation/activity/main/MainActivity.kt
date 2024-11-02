@@ -476,6 +476,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         if (destination.id == R.id.Search) {
             binding.EnterSearchKeyword.apply {
+                setText("")
                 visibility = View.VISIBLE
                 requestFocus()
                 inputManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
