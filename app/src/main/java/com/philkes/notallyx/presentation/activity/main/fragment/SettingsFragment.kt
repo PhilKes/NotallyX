@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.activity.main.fragment
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.hardware.biometrics.BiometricManager
 import android.net.Uri
 import android.os.Build
@@ -136,6 +137,13 @@ class SettingsFragment : Fragment() {
         }
 
         binding.SendFeedback.setOnClickListener { sendFeedback() }
+
+        try {
+            val pInfo =
+                requireContext().packageManager.getPackageInfo(requireContext().packageName, 0)
+            val version = pInfo.versionName
+            binding.VersionText.text = "v$version"
+        } catch (_: PackageManager.NameNotFoundException) {}
     }
 
     override fun onCreateView(

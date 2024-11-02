@@ -5,9 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.databinding.RecyclerColorBinding
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 
-class ColorAdapter(private val listener: ListItemListener) : RecyclerView.Adapter<ColorVH>() {
+class ColorAdapter(private val listener: ItemListener) : RecyclerView.Adapter<ColorVH>() {
 
     private val colors = Color.entries.toTypedArray()
 

@@ -4,6 +4,7 @@
     <!-- Fragment Titles -->
     <string name="notes">Notes</string>
     <string name="labels">Labels</string>
+    <string name="more">%d more</string>
     <string name="deleted">Deleted</string>
     <string name="archived">Archived</string>
     <string name="settings">Settings</string>

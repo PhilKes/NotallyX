@@ -13,7 +13,7 @@ import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.databinding.ActivityPickNoteBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesView
@@ -23,7 +23,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ListItemListener {
+open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemListener {
 
     protected lateinit var adapter: BaseNoteAdapter
 

@@ -28,7 +28,7 @@ import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getQuantityString
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
@@ -42,7 +42,7 @@ class BaseNoteVH(
     private val maxItems: Int,
     maxLines: Int,
     maxTitle: Int,
-    listener: ListItemListener,
+    listener: ItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {

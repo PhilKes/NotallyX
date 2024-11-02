@@ -1,7 +1,6 @@
 package com.philkes.notallyx.presentation.activity.main
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.print.PostPDFGenerator
@@ -32,6 +31,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.platform.MaterialFade
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
@@ -45,11 +45,12 @@ import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
+import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.utils.Operations
 import java.io.File
@@ -102,20 +103,50 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private fun setupMenu() {
         binding.NavigationView.menu.apply {
             add(0, R.id.Notes, 0, R.string.notes).setCheckable(true).setIcon(R.drawable.home)
-            add(1, R.id.Labels, 0, R.string.labels).setCheckable(true).setIcon(R.drawable.label)
-            add(2, R.id.Deleted, 0, R.string.deleted).setCheckable(true).setIcon(R.drawable.delete)
-            add(2, R.id.Archived, 0, R.string.archived)
+            NotallyDatabase.getDatabase(application).value.getLabelDao().getAll().observe(
+                this@MainActivity
+            ) { labels ->
+                removeGroup(1)
+                add(1, R.id.Labels, 1, R.string.labels)
+                    .setCheckable(true)
+                    .setIcon(R.drawable.label_more)
+                labels.take(MAX_LABELS_TO_DISPLAY).forEachIndexed { index, label ->
+                    add(1, R.id.DisplayLabel, 2 + index, label)
+                        .setCheckable(true)
+                        .setIcon(R.drawable.label)
+                        .setOnMenuItemClickListener {
+                            val bundle =
+                                Bundle().apply { putString(Constants.SelectedLabel, label) }
+                            navController.navigate(R.id.DisplayLabel, bundle)
+                            false
+                        }
+                }
+                if (labels.size > MAX_LABELS_TO_DISPLAY) {
+                    add(
+                            1,
+                            R.id.Labels,
+                            MAX_LABELS_TO_DISPLAY + 1,
+                            getString(R.string.more, labels.size - MAX_LABELS_TO_DISPLAY),
+                        )
+                        .setCheckable(true)
+                        .setIcon(R.drawable.label)
+                }
+
+                configuration =
+                    AppBarConfiguration(binding.NavigationView.menu, binding.DrawerLayout)
+                setupActionBarWithNavController(navController, configuration)
+            }
+
+            add(2, R.id.Deleted, MAX_LABELS_TO_DISPLAY + 3, R.string.deleted)
+                .setCheckable(true)
+                .setIcon(R.drawable.delete)
+            add(2, R.id.Archived, MAX_LABELS_TO_DISPLAY + 4, R.string.archived)
                 .setCheckable(true)
                 .setIcon(R.drawable.archive)
-            add(3, R.id.Settings, 0, R.string.settings)
+            add(3, R.id.Settings, MAX_LABELS_TO_DISPLAY + 5, R.string.settings)
                 .setCheckable(true)
                 .setIcon(R.drawable.settings)
         }
-        try {
-            val pInfo = packageManager.getPackageInfo(packageName, 0)
-            val version = pInfo.versionName
-            binding.Version.text = "v$version"
-        } catch (_: PackageManager.NameNotFoundException) {}
     }
 
     private fun setupActionMode() {
@@ -246,7 +277,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
         val colorAdapter =
             ColorAdapter(
-                object : ListItemListener {
+                object : ItemListener {
                     override fun onClick(position: Int) {
                         dialog.dismiss()
                         val color = Color.entries[position]
@@ -517,5 +548,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     result.data?.data?.let { uri -> model.writeCurrentFileToUri(uri) }
                 }
             }
+    }
+
+    companion object {
+        const val MAX_LABELS_TO_DISPLAY = 10
     }
 }

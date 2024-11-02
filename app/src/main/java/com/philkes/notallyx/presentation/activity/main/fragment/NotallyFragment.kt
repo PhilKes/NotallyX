@@ -31,11 +31,11 @@ import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesView
 
-abstract class NotallyFragment : Fragment(), ListItemListener {
+abstract class NotallyFragment : Fragment(), ItemListener {
 
     private var notesAdapter: BaseNoteAdapter? = null
     private lateinit var openNoteActivityResultLauncher: ActivityResultLauncher<Intent>

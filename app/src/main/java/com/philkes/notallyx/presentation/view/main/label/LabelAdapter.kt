@@ -1,13 +1,12 @@
-package com.philkes.notallyx.presentation.view.main
+package com.philkes.notallyx.presentation.view.main.label
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import com.philkes.notallyx.databinding.RecyclerLabelBinding
 import com.philkes.notallyx.presentation.view.misc.StringDiffCallback
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
 
-class LabelAdapter(private val listener: ListItemListener) :
+class LabelAdapter(private val listener: LabelListener) :
     ListAdapter<String, LabelVH>(StringDiffCallback()) {
 
     override fun onBindViewHolder(holder: LabelVH, position: Int) {
