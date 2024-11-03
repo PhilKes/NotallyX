@@ -8,3 +8,6 @@
 .externalNativeBuild
 .cxx
 */.attach_pid*
+fastlane/*
+!fastlane/metadata
+Gemfile
