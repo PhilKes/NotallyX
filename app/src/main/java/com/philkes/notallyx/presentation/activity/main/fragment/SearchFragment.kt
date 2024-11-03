@@ -37,7 +37,6 @@ class SearchFragment : NotallyFragment() {
             }
             check(checked)
         }
-        model.keyword = model.keyword // Triggers initial search results
     }
 
     override fun getBackground() = R.drawable.search
