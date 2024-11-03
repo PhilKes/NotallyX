@@ -39,6 +39,7 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
 
     private var notesAdapter: BaseNoteAdapter? = null
     private lateinit var openNoteActivityResultLauncher: ActivityResultLauncher<Intent>
+    private var lastSelectedNotePosition = -1
 
     internal var binding: FragmentNotesBinding? = null
 
@@ -117,9 +118,26 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
 
     override fun onLongClick(position: Int) {
         if (position != -1) {
-            notesAdapter?.getItem(position)?.let { item ->
-                if (item is BaseNote) {
-                    handleNoteSelection(item.id, position, item)
+            if (model.actionMode.selectedNotes.isNotEmpty()) {
+                if (lastSelectedNotePosition > position) {
+                        position..lastSelectedNotePosition
+                    } else {
+                        lastSelectedNotePosition..position
+                    }
+                    .forEach { pos ->
+                        notesAdapter!!.getItem(pos)?.let { item ->
+                            if (item is BaseNote) {
+                                if (!model.actionMode.selectedNotes.contains(item.id)) {
+                                    handleNoteSelection(item.id, pos, item)
+                                }
+                            }
+                        }
+                    }
+            } else {
+                notesAdapter?.getItem(position)?.let { item ->
+                    if (item is BaseNote) {
+                        handleNoteSelection(item.id, position, item)
+                    }
                 }
             }
         }
@@ -128,12 +146,14 @@ abstract class NotallyFragment : Fragment(), ListItemListener {
     private fun handleNoteSelection(id: Long, position: Int, baseNote: BaseNote) {
         if (model.actionMode.selectedNotes.contains(id)) {
             model.actionMode.remove(id)
-        } else model.actionMode.add(id, baseNote)
+        } else {
+            model.actionMode.add(id, baseNote)
+            lastSelectedNotePosition = position
+        }
         notesAdapter?.notifyItemChanged(position, 0)
     }
 
     private fun setupAdapter() {
-
         notesAdapter =
             with(model.preferences) {
                 BaseNoteAdapter(
