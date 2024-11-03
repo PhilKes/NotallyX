@@ -13,7 +13,7 @@ import com.philkes.notallyx.databinding.RecyclerHeaderBinding
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteCreationDateSort
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteModifiedDateSort
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteTitleSort
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
@@ -30,7 +30,7 @@ class BaseNoteAdapter(
     private val maxLines: Int,
     private val maxTitle: Int,
     private val imageRoot: File?,
-    private val listener: ListItemListener,
+    private val listener: ItemListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var list =

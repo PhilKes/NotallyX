@@ -172,6 +172,14 @@
             android:layout_height="wrap_content"
             android:text="@string/rate" />
 
+        <TextView
+          android:id="@+id/VersionText"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:textAppearance="?attr/textAppearanceCaption"
+          android:gravity="start"
+          android:padding="16dp" />
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

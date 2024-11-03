@@ -3,10 +3,10 @@ package com.philkes.notallyx.presentation.view.main
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.databinding.RecyclerColorBinding
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.utils.Operations
 
-class ColorVH(private val binding: RecyclerColorBinding, listener: ListItemListener) :
+class ColorVH(private val binding: RecyclerColorBinding, listener: ItemListener) :
     RecyclerView.ViewHolder(binding.root) {
 
     init {

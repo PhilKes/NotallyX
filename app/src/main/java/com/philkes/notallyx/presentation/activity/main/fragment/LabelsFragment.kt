@@ -22,12 +22,11 @@ import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.view.Constants
-import com.philkes.notallyx.presentation.view.main.LabelAdapter
-import com.philkes.notallyx.presentation.view.misc.MenuDialog
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemListener
+import com.philkes.notallyx.presentation.view.main.label.LabelAdapter
+import com.philkes.notallyx.presentation.view.main.label.LabelListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 
-class LabelsFragment : Fragment(), ListItemListener {
+class LabelsFragment : Fragment(), LabelListener {
 
     private var labelAdapter: LabelAdapter? = null
     private var binding: FragmentNotesBinding? = null
@@ -78,13 +77,12 @@ class LabelsFragment : Fragment(), ListItemListener {
         }
     }
 
-    override fun onLongClick(position: Int) {
-        labelAdapter?.currentList?.get(position)?.let { value ->
-            MenuDialog(requireContext())
-                .add(R.string.edit) { displayEditLabelDialog(value) }
-                .add(R.string.delete) { confirmDeletion(value) }
-                .show()
-        }
+    override fun onEdit(position: Int) {
+        labelAdapter?.currentList?.get(position)?.let { value -> displayEditLabelDialog(value) }
+    }
+
+    override fun onDelete(position: Int) {
+        labelAdapter?.currentList?.get(position)?.let { value -> confirmDeletion(value) }
     }
 
     private fun setupObserver() {
