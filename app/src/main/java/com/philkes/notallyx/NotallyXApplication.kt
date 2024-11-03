@@ -6,10 +6,12 @@ import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
+import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.presentation.widget.WidgetProvider
+import com.philkes.notallyx.utils.backup.Export.cancelAutoBackup
 import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.UnlockReceiver
 
@@ -38,13 +40,27 @@ class NotallyXApplication : Application() {
             }
         }
 
-        scheduleAutoBackup(preferences.autoBackupPeriodDays.value.toLong(), this)
+        preferences.autoBackup.observeForeverWithPrevious { (prevAutoBackup, autoBackup) ->
+            if (
+                prevAutoBackup == null ||
+                    prevAutoBackup.path != autoBackup.path ||
+                    prevAutoBackup.periodInDays != autoBackup.periodInDays
+            ) {
+                if (autoBackup.path != AutoBackup.BACKUP_PATH_EMPTY) {
+                    scheduleAutoBackup(autoBackup.periodInDays.toLong(), this)
+                } else {
+                    cancelAutoBackup(this)
+                }
+            }
+        }
 
-        val filter = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF) }
         biometricLockObserver = Observer {
             if (it == BiometricLock.ENABLED) {
                 unlockReceiver = UnlockReceiver(this)
-                registerReceiver(unlockReceiver, filter)
+                registerReceiver(
+                    unlockReceiver,
+                    IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF) },
+                )
             } else if (unlockReceiver != null) {
                 unregisterReceiver(unlockReceiver)
             }

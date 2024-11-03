@@ -3,11 +3,14 @@ package com.philkes.notallyx.utils.backup
 import android.app.Application
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.documentfile.provider.DocumentFile
+import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.philkes.notallyx.presentation.viewmodel.preference.Constants.BACKUP_PATH_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.Export.exportAsZip
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -18,27 +21,35 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
     override fun doWork(): Result {
         val app = context.applicationContext as Application
         val preferences = NotallyXPreferences.getInstance(app)
-        val backupPath = preferences.autoBackupPath.value
-        val maxBackups = preferences.autoBackupMax.value
+        val (path, _, maxBackups) = preferences.autoBackup.value
 
-        if (backupPath != BACKUP_PATH_EMPTY) {
-            val uri = Uri.parse(backupPath)
+        if (path != AutoBackup.BACKUP_PATH_EMPTY) {
+            val uri = Uri.parse(path)
             val folder = requireNotNull(DocumentFile.fromTreeUri(app, uri))
 
             if (folder.exists()) {
                 val formatter = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ENGLISH)
                 val backupFilePrefix = "NotallyX_Backup_"
                 val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
-                exportAsZip(requireNotNull(folder.createFile("application/zip", name)).uri, app)
-                val backupFiles = folder.listZipFiles(backupFilePrefix)
-                backupFiles.drop(maxBackups).forEach {
-                    if (it.exists()) {
-                        it.delete()
+                try {
+                    val zipUri = requireNotNull(folder.createFile("application/zip", name)).uri
+                    exportAsZip(zipUri, app)
+                    val backupFiles = folder.listZipFiles(backupFilePrefix)
+                    backupFiles.drop(maxBackups).forEach {
+                        if (it.exists()) {
+                            it.delete()
+                        }
                     }
+                    return Result.success(
+                        Data.Builder().putString("backupUri", zipUri.path!!).build()
+                    )
+                } catch (e: Exception) {
+                    Log.e(TAG, "doWork: ", e)
+                    Operations.log(app, e)
+                    return Result.success(Data.Builder().putString("exception", e.message).build())
                 }
             }
         }
-
         return Result.success()
     }
 
@@ -51,5 +62,9 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
                     file.name?.startsWith(prefix, ignoreCase = true) == true
             }
         return zipFiles.sortedByDescending { it.lastModified() }
+    }
+
+    companion object {
+        private const val TAG = "AutoBackupWorker"
     }
 }

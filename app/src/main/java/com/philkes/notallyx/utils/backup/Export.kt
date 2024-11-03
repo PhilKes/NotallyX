@@ -34,6 +34,7 @@ import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.EncryptionMethod
 
 object Export {
+    private const val AUTO_BACKUP_WORK_NAME = "Auto Backup"
 
     fun exportAsZip(
         fileUri: Uri,
@@ -161,15 +162,20 @@ object Export {
             PeriodicWorkRequest.Builder(AutoBackupWorker::class.java, periodInDays, TimeUnit.DAYS)
                 .build()
         try {
+            cancelAutoBackup(context)
             WorkManager.getInstance(context)
                 .enqueueUniquePeriodicWork(
-                    "Auto Backup",
+                    AUTO_BACKUP_WORK_NAME,
                     ExistingPeriodicWorkPolicy.UPDATE,
                     request,
                 )
         } catch (e: IllegalStateException) {
             // only happens in Unit-Tests
         }
+    }
+
+    fun cancelAutoBackup(context: Context) {
+        WorkManager.getInstance(context).cancelUniqueWork(AUTO_BACKUP_WORK_NAME)
     }
 
     private fun backupFile(
