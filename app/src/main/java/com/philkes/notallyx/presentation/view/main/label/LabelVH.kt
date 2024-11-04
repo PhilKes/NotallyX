@@ -19,7 +19,7 @@ class LabelVH(private val binding: RecyclerLabelBinding, listener: LabelListener
     fun bind(value: LabelData) {
         binding.LabelText.text = value.label
         binding.VisibilityButton.setImageResource(
-            if (value.visibleInNavigation) R.drawable.visibility_off else R.drawable.visibility
+            if (value.visibleInNavigation) R.drawable.visibility else R.drawable.visibility_off
         )
     }
 }

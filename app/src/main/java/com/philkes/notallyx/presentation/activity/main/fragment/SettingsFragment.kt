@@ -92,6 +92,8 @@ class SettingsFragment : Fragment() {
             //                binding.CheckedListItemSorting.setup(ListItemSorting, value)
             //            }
 
+            binding.MaxLabels.setup(maxLabels)
+
             binding.MaxItems.setup(maxItems)
 
             binding.MaxLines.setup(maxLines)
