@@ -1,8 +1,10 @@
 package com.philkes.notallyx
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import androidx.work.Configuration
@@ -56,15 +58,20 @@ class NotallyXApplication : Application(), Configuration.Provider {
             }
         }
 
-        biometricLockObserver = Observer {
-            if (it == BiometricLock.ENABLED) {
+        val filter = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF) }
+        biometricLockObserver = Observer { biometricLock ->
+            if (biometricLock == BiometricLock.ENABLED) {
                 unlockReceiver = UnlockReceiver(this)
-                registerReceiver(
-                    unlockReceiver,
-                    IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF) },
-                )
-            } else if (unlockReceiver != null) {
-                unregisterReceiver(unlockReceiver)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    registerReceiver(unlockReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+                } else {
+                    registerReceiver(unlockReceiver, filter)
+                }
+            } else {
+                unlockReceiver?.let { unregisterReceiver(it) }
+                if (locked.value) {
+                    locked.postValue(false)
+                }
             }
         }
         preferences.biometricLock.observeForever(biometricLockObserver)
