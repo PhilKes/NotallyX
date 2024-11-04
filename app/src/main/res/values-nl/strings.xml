@@ -182,8 +182,6 @@
     <string name="rate">Beoordeel deze app</string>
     <string name="send_feedback">Stuur feedback</string>
 
-    <string name="github" translatable="false">GitHub</string>
-
     <!-- Widget -->
     <string name="single_note_or_list">Enkele notitie of lijst</string>
     <string name="select_note">Selecteer notitie</string>
