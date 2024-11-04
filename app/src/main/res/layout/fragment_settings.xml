@@ -155,11 +155,18 @@
           android:text="@string/send_feedback" />
 
         <TextView
-            android:id="@+id/GitHub"
+          android:id="@+id/CreateIssue"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/create_github_issue" />
+
+        <TextView
+            android:id="@+id/SourceCode"
             style="@style/Preference"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/github" />
+            android:text="@string/source_code" />
 
         <TextView
             android:id="@+id/Libraries"

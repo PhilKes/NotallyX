@@ -18,6 +18,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -124,7 +125,7 @@ class SettingsFragment : Fragment() {
         model.importProgress.setupImportProgressDialog(this, R.string.importing_backup)
         model.deletionProgress.setupProgressDialog(this, R.string.deleting_files)
 
-        binding.GitHub.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
+        binding.SourceCode.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
 
         binding.Libraries.setOnClickListener { displayLibraries() }
 
@@ -132,7 +133,8 @@ class SettingsFragment : Fragment() {
             openLink("https://play.google.com/store/apps/details?id=com.philkes.notallyx")
         }
 
-        binding.SendFeedback.setOnClickListener { sendFeedback() }
+        binding.SendFeedback.setOnClickListener { sendEmailWithLog() }
+        binding.CreateIssue.setOnClickListener { createIssue() }
 
         try {
             val pInfo =
@@ -321,12 +323,12 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    private fun sendFeedback() {
+    private fun createIssue() {
         MaterialAlertDialogBuilder(requireContext())
         val options =
             arrayOf(getString(R.string.report_bug), getString(R.string.make_feature_request))
         MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.send_feedback)
+            .setTitle(R.string.create_github_issue)
             .setItems(options) { _, which ->
                 val intent =
                     when (which) {
@@ -336,7 +338,7 @@ class SettingsFragment : Fragment() {
                             Intent(
                                 Intent.ACTION_VIEW,
                                 Uri.parse(
-                                    "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml&logs=$logs"
+                                    "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${logs?.let { "&logs=$it" } ?: ""}"
                                         .take(2000)
                                 ),
                             )
@@ -358,6 +360,27 @@ class SettingsFragment : Fragment() {
             }
             .setNegativeButton(R.string.cancel, null)
             .show()
+    }
+
+    private fun sendEmailWithLog() {
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
+
+        intent.putExtra(Intent.EXTRA_EMAIL, arrayOf("notallyx@yahoo.com"))
+        intent.putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
+
+        val app = requireContext().applicationContext as Application
+        val log = Operations.getLog(app)
+        if (log.exists()) {
+            val uri = FileProvider.getUriForFile(app, "${app.packageName}.provider", log)
+            intent.putExtra(Intent.EXTRA_STREAM, uri)
+        }
+
+        try {
+            startActivity(intent)
+        } catch (exception: ActivityNotFoundException) {
+            Toast.makeText(requireContext(), R.string.install_an_email, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun displayLibraries() {
