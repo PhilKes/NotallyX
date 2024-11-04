@@ -7,7 +7,6 @@ import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.presentation.viewmodel.preference.Constants.BACKUP_PATH_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 
 class NotallyXPreferences private constructor(app: Application) {
@@ -69,11 +68,7 @@ class NotallyXPreferences private constructor(app: Application) {
             R.string.max_lines_to_display_title,
         )
 
-    val autoBackupPath =
-        StringPreference("autoBackup", preferences, BACKUP_PATH_EMPTY, R.string.auto_backup)
-    val autoBackupPeriodDays =
-        IntPreference("autoBackupPeriodDays", preferences, 1, 1, 31, R.string.backup_period_days)
-    val autoBackupMax = IntPreference("maxBackups", preferences, 3, 1, 10, R.string.max_backups)
+    val autoBackup = AutoBackupPreference(preferences)
 
     val backupPassword by lazy {
         StringPreference(

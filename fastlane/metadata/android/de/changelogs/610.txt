@@ -1,0 +1,8 @@
+Importieren von Google Notizen und Evernote
+Füge Links zu anderen Notizen hinzu
+Schnelle Navigation to Labels
+Mehrfachauswahl von Notizen per langem Klick
+Passwort geschütze ZIP Backups
+Leere Notizen automatisch verweffen
+Widgets automatisch sperren, wenn die App gesperrt ist
+Viele weitere kleine Quality of Life Verbesserungen

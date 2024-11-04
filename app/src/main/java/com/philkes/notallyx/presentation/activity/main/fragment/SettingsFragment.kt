@@ -39,8 +39,10 @@ import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
+import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup.Companion.BACKUP_PATH_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackupPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
-import com.philkes.notallyx.presentation.viewmodel.preference.Constants.BACKUP_PATH_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
@@ -51,7 +53,6 @@ import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 import com.philkes.notallyx.presentation.viewmodel.preference.StringPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.TextProvider
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
@@ -97,15 +98,8 @@ class SettingsFragment : Fragment() {
 
             binding.MaxTitle.setup(maxTitle)
 
-            binding.AutoBackupMax.setup(autoBackupMax)
-
-            autoBackupPath.observe(viewLifecycleOwner) { value ->
-                binding.AutoBackup.setupAutoBackup(autoBackupPath, value)
-            }
-
-            autoBackupPeriodDays.observe(viewLifecycleOwner) { value ->
-                binding.AutoBackupPeriodDays.setup(autoBackupPeriodDays, value)
-                scheduleAutoBackup(value.toLong(), requireContext())
+            autoBackup.observe(viewLifecycleOwner) { value ->
+                setupAutoBackup(binding, value, autoBackup)
             }
 
             backupPassword.observe(viewLifecycleOwner) { value ->
@@ -159,6 +153,30 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupActivityResultLaunchers()
+    }
+
+    private fun setupAutoBackup(
+        binding: FragmentSettingsBinding,
+        value: AutoBackup,
+        preference: AutoBackupPreference,
+    ) {
+        binding.AutoBackupMax.setup(
+            value.maxBackups,
+            R.string.max_backups,
+            AutoBackup.BACKUP_MAX_MIN,
+            AutoBackup.BACKUP_MAX_MAX,
+        ) { newValue ->
+            model.savePreference(preference, preference.value.copy(maxBackups = newValue))
+        }
+        binding.AutoBackup.setupAutoBackup(value.path)
+        binding.AutoBackupPeriodDays.setup(
+            value.periodInDays,
+            R.string.backup_period_days,
+            AutoBackup.BACKUP_PERIOD_DAYS_MIN,
+            AutoBackup.BACKUP_PERIOD_DAYS_MAX,
+        ) { newValue ->
+            model.savePreference(preference, preference.value.copy(periodInDays = newValue))
+        }
     }
 
     private fun setupActivityResultLaunchers() {
@@ -255,7 +273,7 @@ class SettingsFragment : Fragment() {
     private fun clearData() {
         MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.clear_data_message)
-            .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAllBaseNotes() }
+            .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAll() }
             .setNegativeButton(R.string.cancel) { _, _ -> }
             .show()
     }
@@ -630,8 +648,8 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    private fun PreferenceBinding.setupAutoBackup(preference: StringPreference, value: String) {
-        Title.setText(preference.titleResId!!)
+    private fun PreferenceBinding.setupAutoBackup(value: String) {
+        Title.setText(R.string.auto_backup)
 
         if (value == BACKUP_PATH_EMPTY) {
             Value.setText(R.string.tap_to_set_up)
@@ -657,13 +675,25 @@ class SettingsFragment : Fragment() {
         preference: IntPreference,
         value: Int = preference.value,
     ) {
-        Title.setText(preference.titleResId!!)
+        setup(value, preference.titleResId!!, preference.min, preference.max) { newValue ->
+            model.savePreference(preference, newValue)
+        }
+    }
+
+    private fun PreferenceSeekbarBinding.setup(
+        value: Int,
+        titleResId: Int,
+        min: Int,
+        max: Int,
+        onChange: (newValue: Int) -> Unit,
+    ) {
+        Title.setText(titleResId)
 
         Slider.apply {
-            valueTo = preference.max.toFloat()
-            valueFrom = preference.min.toFloat()
+            valueTo = max.toFloat()
+            valueFrom = min.toFloat()
             this@apply.value = value.toFloat()
-            addOnChangeListener { _, value, _ -> model.savePreference(preference, value.toInt()) }
+            addOnChangeListener { _, value, _ -> onChange(value.toInt()) }
         }
     }
 

@@ -47,3 +47,5 @@
 -keep class * implements org.simpleframework.xml.core.Extractor {
    public *;
 }
+
+-keep class * implements java.io.Serializable

@@ -21,9 +21,9 @@ Support for Lollipop devices and up
 <b>Convenience</b>
 
 • Dark mode
-• Completely free
+• Completely free (+ no Ads!)
 • Adjustable text size
-• Auto save and auto-backups
+• Auto save and auto-backups (optionally password-protected)
 • Add notes and lists to your home screen with widgets
 
 <b>Privacy</b>

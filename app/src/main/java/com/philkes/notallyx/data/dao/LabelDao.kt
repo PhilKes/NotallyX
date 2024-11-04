@@ -16,6 +16,8 @@ interface LabelDao {
 
     @Query("DELETE FROM Label WHERE value = :value") suspend fun delete(value: String)
 
+    @Query("DELETE FROM Label") suspend fun deleteAll()
+
     @Query("UPDATE Label SET value = :newValue WHERE value = :oldValue")
     suspend fun update(oldValue: String, newValue: String)
 

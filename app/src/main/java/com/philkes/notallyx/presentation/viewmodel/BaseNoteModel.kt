@@ -38,8 +38,8 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.view.misc.Progress
+import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
-import com.philkes.notallyx.presentation.viewmodel.preference.Constants.BACKUP_PATH_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
@@ -182,14 +182,20 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun disableAutoBackup() {
         clearPersistedUriPermissions()
-        savePreference(preferences.autoBackupPath, BACKUP_PATH_EMPTY)
+        savePreference(
+            preferences.autoBackup,
+            preferences.autoBackup.value.copy(path = AutoBackup.BACKUP_PATH_EMPTY),
+        )
     }
 
     fun setAutoBackupPath(uri: Uri) {
         clearPersistedUriPermissions()
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         app.contentResolver.takePersistableUriPermission(uri, flags)
-        savePreference(preferences.autoBackupPath, uri.toString())
+        savePreference(
+            preferences.autoBackup,
+            preferences.autoBackup.value.copy(path = uri.toString()),
+        )
     }
 
     fun <T> savePreference(preference: BasePreference<T>, value: T) {
@@ -363,9 +369,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         deleteBaseNotes(LongArray(actionMode.selectedNotes.size))
     }
 
-    fun deleteAllBaseNotes() {
+    fun deleteAll() {
         viewModelScope.launch {
             deleteBaseNotes(withContext(Dispatchers.IO) { baseNoteDao.getAllIds().toLongArray() })
+            withContext(Dispatchers.IO) { labelDao.deleteAll() }
             Toast.makeText(app, R.string.cleared_data, Toast.LENGTH_LONG).show()
         }
     }

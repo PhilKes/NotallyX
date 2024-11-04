@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.toPreservedByteArray
@@ -68,6 +69,18 @@ abstract class BasePreference<T>(
 
     fun removeObservers(lifecycleOwner: LifecycleOwner) {
         getData().removeObservers(lifecycleOwner)
+    }
+
+    fun observeForeverWithPrevious(observer: Observer<Pair<T?, T>>) {
+        val mediator = MediatorLiveData<Pair<T?, T>>()
+        var previousValue: T? = null
+
+        mediator.addSource(getData()) { currentValue ->
+            mediator.value = Pair(previousValue, currentValue!!)
+            previousValue = currentValue
+        }
+
+        mediator.observeForever(observer)
     }
 }
 
@@ -294,7 +307,6 @@ enum class BiometricLock(override val textResId: Int) : StaticTextProvider {
 }
 
 object Constants {
-    const val BACKUP_PATH_EMPTY = "emptyPath"
     const val PASSWORD_EMPTY = "None"
 }
 
