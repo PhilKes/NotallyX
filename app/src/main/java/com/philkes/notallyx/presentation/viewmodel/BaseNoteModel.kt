@@ -369,9 +369,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         deleteBaseNotes(LongArray(actionMode.selectedNotes.size))
     }
 
-    fun deleteAllBaseNotes() {
+    fun deleteAll() {
         viewModelScope.launch {
             deleteBaseNotes(withContext(Dispatchers.IO) { baseNoteDao.getAllIds().toLongArray() })
+            withContext(Dispatchers.IO) { labelDao.deleteAll() }
             Toast.makeText(app, R.string.cleared_data, Toast.LENGTH_LONG).show()
         }
     }

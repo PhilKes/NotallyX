@@ -273,7 +273,7 @@ class SettingsFragment : Fragment() {
     private fun clearData() {
         MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.clear_data_message)
-            .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAllBaseNotes() }
+            .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAll() }
             .setNegativeButton(R.string.cancel) { _, _ -> }
             .show()
     }
