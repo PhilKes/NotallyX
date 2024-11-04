@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.print.PostPDFGenerator
 import android.transition.TransitionManager
 import android.view.Menu
+import android.view.Menu.CATEGORY_CONTAINER
+import android.view.Menu.CATEGORY_SYSTEM
 import android.view.MenuItem
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -100,19 +102,48 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
     }
 
+    private var labelsMenuItems: List<MenuItem> = listOf()
+    private var labelsMoreMenuItem: MenuItem? = null
+    private var labels: List<String> = listOf()
+
     private fun setupMenu() {
         binding.NavigationView.menu.apply {
             add(0, R.id.Notes, 0, R.string.notes).setCheckable(true).setIcon(R.drawable.home)
             NotallyDatabase.getDatabase(application).value.getLabelDao().getAll().observe(
                 this@MainActivity
             ) { labels ->
-                removeGroup(1)
-                add(1, R.id.Labels, 1, R.string.labels)
-                    .setCheckable(true)
-                    .setIcon(R.drawable.label_more)
-                labels.take(MAX_LABELS_TO_DISPLAY).forEachIndexed { index, label ->
-                    add(1, R.id.DisplayLabel, 2 + index, label)
+                this@MainActivity.labels = labels
+                setupLabelsMenuItems(labels, preferences.maxLabels.value)
+            }
+            add(2, R.id.Deleted, CATEGORY_SYSTEM + 1, R.string.deleted)
+                .setCheckable(true)
+                .setIcon(R.drawable.delete)
+            add(2, R.id.Archived, CATEGORY_SYSTEM + 2, R.string.archived)
+                .setCheckable(true)
+                .setIcon(R.drawable.archive)
+            add(3, R.id.Settings, CATEGORY_SYSTEM + 3, R.string.settings)
+                .setCheckable(true)
+                .setIcon(R.drawable.settings)
+        }
+        model.preferences.labelsHiddenInNavigation.observe(this) { hiddenLabels ->
+            hideLabelsInNavigation(hiddenLabels, model.preferences.maxLabels.value)
+        }
+        model.preferences.maxLabels.observe(this) { maxLabels ->
+            binding.NavigationView.menu.setupLabelsMenuItems(labels, maxLabels)
+        }
+    }
+
+    private fun Menu.setupLabelsMenuItems(labels: List<String>, maxLabelsToDisplay: Int) {
+        removeGroup(1)
+        add(1, R.id.Labels, CATEGORY_CONTAINER + 1, R.string.labels)
+            .setCheckable(true)
+            .setIcon(R.drawable.label_more)
+        labelsMenuItems =
+            labels
+                .mapIndexed { index, label ->
+                    add(1, R.id.DisplayLabel, CATEGORY_CONTAINER + index + 2, label)
                         .setCheckable(true)
+                        .setVisible(index < maxLabelsToDisplay)
                         .setIcon(R.drawable.label)
                         .setOnMenuItemClickListener {
                             val bundle =
@@ -121,32 +152,35 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                             false
                         }
                 }
-                if (labels.size > MAX_LABELS_TO_DISPLAY) {
-                    add(
-                            1,
-                            R.id.Labels,
-                            MAX_LABELS_TO_DISPLAY + 1,
-                            getString(R.string.more, labels.size - MAX_LABELS_TO_DISPLAY),
-                        )
-                        .setCheckable(true)
-                        .setIcon(R.drawable.label)
-                }
+                .toList()
 
-                configuration =
-                    AppBarConfiguration(binding.NavigationView.menu, binding.DrawerLayout)
-                setupActionBarWithNavController(navController, configuration)
+        labelsMoreMenuItem =
+            if (labelsMenuItems.size > maxLabelsToDisplay) {
+                add(
+                        1,
+                        R.id.Labels,
+                        CATEGORY_CONTAINER + labelsMenuItems.size + 2,
+                        getString(R.string.more, labelsMenuItems.size - maxLabelsToDisplay),
+                    )
+                    .setCheckable(true)
+                    .setIcon(R.drawable.label)
+            } else null
+        configuration = AppBarConfiguration(binding.NavigationView.menu, binding.DrawerLayout)
+        setupActionBarWithNavController(navController, configuration)
+        hideLabelsInNavigation(model.preferences.labelsHiddenInNavigation.value, maxLabelsToDisplay)
+    }
+
+    private fun hideLabelsInNavigation(hiddenLabels: Set<String>, maxLabelsToDisplay: Int) {
+        var visibleLabels = 0
+        labelsMenuItems.forEachIndexed { idx, menuItem ->
+            val visible =
+                !hiddenLabels.contains(menuItem.title) && visibleLabels < maxLabelsToDisplay
+            menuItem.setVisible(visible)
+            if (visible) {
+                visibleLabels++
             }
-
-            add(2, R.id.Deleted, MAX_LABELS_TO_DISPLAY + 3, R.string.deleted)
-                .setCheckable(true)
-                .setIcon(R.drawable.delete)
-            add(2, R.id.Archived, MAX_LABELS_TO_DISPLAY + 4, R.string.archived)
-                .setCheckable(true)
-                .setIcon(R.drawable.archive)
-            add(3, R.id.Settings, MAX_LABELS_TO_DISPLAY + 5, R.string.settings)
-                .setCheckable(true)
-                .setIcon(R.drawable.settings)
         }
+        labelsMoreMenuItem?.setTitle(getString(R.string.more, labels.size - visibleLabels))
     }
 
     private fun setupActionMode() {
@@ -548,9 +582,5 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     result.data?.data?.let { uri -> model.writeCurrentFileToUri(uri) }
                 }
             }
-    }
-
-    companion object {
-        const val MAX_LABELS_TO_DISPLAY = 10
     }
 }

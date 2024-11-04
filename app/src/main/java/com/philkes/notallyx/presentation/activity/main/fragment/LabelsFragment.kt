@@ -23,6 +23,7 @@ import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.label.LabelAdapter
+import com.philkes.notallyx.presentation.view.main.label.LabelData
 import com.philkes.notallyx.presentation.view.main.label.LabelListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 
@@ -70,24 +71,45 @@ class LabelsFragment : Fragment(), LabelListener {
     }
 
     override fun onClick(position: Int) {
-        labelAdapter?.currentList?.get(position)?.let { value ->
+        labelAdapter?.currentList?.get(position)?.let { (label, _) ->
             val bundle = Bundle()
-            bundle.putString(Constants.SelectedLabel, value)
+            bundle.putString(Constants.SelectedLabel, label)
             findNavController().navigate(R.id.LabelsToDisplayLabel, bundle)
         }
     }
 
     override fun onEdit(position: Int) {
-        labelAdapter?.currentList?.get(position)?.let { value -> displayEditLabelDialog(value) }
+        labelAdapter?.currentList?.get(position)?.let { (label, _) ->
+            displayEditLabelDialog(label)
+        }
     }
 
     override fun onDelete(position: Int) {
-        labelAdapter?.currentList?.get(position)?.let { value -> confirmDeletion(value) }
+        labelAdapter?.currentList?.get(position)?.let { (label, _) -> confirmDeletion(label) }
+    }
+
+    override fun onToggleVisibility(position: Int) {
+        labelAdapter?.currentList?.get(position)?.let { value ->
+            val hiddenLabels = model.preferences.labelsHiddenInNavigation.value.toMutableSet()
+            if (value.visibleInNavigation) {
+                hiddenLabels.add(value.label)
+            } else {
+                hiddenLabels.remove(value.label)
+            }
+            model.savePreference(model.preferences.labelsHiddenInNavigation, hiddenLabels)
+
+            val currentList = labelAdapter!!.currentList.toMutableList()
+            currentList[position] =
+                currentList[position].copy(visibleInNavigation = !value.visibleInNavigation)
+            labelAdapter!!.submitList(currentList)
+        }
     }
 
     private fun setupObserver() {
         model.labels.observe(viewLifecycleOwner) { labels ->
-            labelAdapter?.submitList(labels)
+            val hiddenLabels = model.preferences.labelsHiddenInNavigation.value
+            val labelsData = labels.map { label -> LabelData(label, !hiddenLabels.contains(label)) }
+            labelAdapter?.submitList(labelsData)
             binding?.ImageView?.isVisible = labels.isEmpty()
         }
     }

@@ -132,6 +132,22 @@ T : TextProvider {
     }
 }
 
+class StringSetPreference(
+    private val key: String,
+    sharedPreferences: SharedPreferences,
+    defaultValue: Set<String>,
+    titleResId: Int? = null,
+) : BasePreference<Set<String>>(sharedPreferences, defaultValue, titleResId) {
+
+    override fun getValue(sharedPreferences: SharedPreferences): Set<String> {
+        return sharedPreferences.getStringSet(key, defaultValue)!!
+    }
+
+    override fun SharedPreferences.Editor.put(value: Set<String>) {
+        putStringSet(key, value)
+    }
+}
+
 inline fun <reified T> createEnumPreference(
     sharedPreferences: SharedPreferences,
     key: String,

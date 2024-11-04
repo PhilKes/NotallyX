@@ -23,6 +23,7 @@
     android:padding="8dp"
     android:background="?attr/selectableItemBackground"
     android:contentDescription="@string/label_visibility"
+    android:tooltipText="@string/label_visibility"
     app:srcCompat="@drawable/visibility"
     app:tint="?attr/colorControlNormal" />
 

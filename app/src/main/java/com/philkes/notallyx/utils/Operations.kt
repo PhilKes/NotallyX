@@ -32,9 +32,13 @@ object Operations {
 
     const val extraCharSequence = "com.philkes.notallyx.extra.charSequence"
 
-    fun getLastExceptionLog(app: Application): String {
-        val logContents = getLog(app).readText().substringAfterLast("[Start]")
-        return URLEncoder.encode(logContents, StandardCharsets.UTF_8.toString())
+    fun getLastExceptionLog(app: Application): String? {
+        val logFile = getLog(app)
+        if (logFile.exists()) {
+            val logContents = logFile.readText().substringAfterLast("[Start]")
+            return URLEncoder.encode(logContents, StandardCharsets.UTF_8.toString())
+        }
+        return null
     }
 
     fun log(app: Application, throwable: Throwable) {
@@ -118,7 +122,7 @@ object Operations {
         }
     }
 
-    private fun getLog(app: Application): File {
+    fun getLog(app: Application): File {
         val folder = File(app.filesDir, "logs")
         folder.mkdir()
         return File(folder, "Log.v1.txt")

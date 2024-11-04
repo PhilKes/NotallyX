@@ -7,8 +7,6 @@ import android.content.IntentFilter
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
-import androidx.work.Configuration
-import androidx.work.WorkManager
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
@@ -19,7 +17,7 @@ import com.philkes.notallyx.utils.backup.Export.cancelAutoBackup
 import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.UnlockReceiver
 
-class NotallyXApplication : Application(), Configuration.Provider {
+class NotallyXApplication : Application() {
 
     private lateinit var biometricLockObserver: Observer<BiometricLock>
     private lateinit var preferences: NotallyXPreferences
@@ -29,8 +27,6 @@ class NotallyXApplication : Application(), Configuration.Provider {
 
     override fun onCreate() {
         super.onCreate()
-
-        WorkManager.initialize(this, workManagerConfiguration)
         preferences = NotallyXPreferences.getInstance(this)
         preferences.theme.observeForever { theme ->
             when (theme) {
@@ -78,7 +74,4 @@ class NotallyXApplication : Application(), Configuration.Provider {
 
         locked.observeForever { isLocked -> WidgetProvider.updateWidgets(this, locked = isLocked) }
     }
-
-    override val workManagerConfiguration: Configuration
-        get() = Configuration.Builder().setMinimumLoggingLevel(android.util.Log.DEBUG).build()
 }
