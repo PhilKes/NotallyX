@@ -1,0 +1,8 @@
+Import from GoogleKeep and Evernote
+Add Links to other Notes
+Quick navigation to Labels
+Multi-select Notes with long click
+Password-protect ZIP Backups
+Auto-discard empty notes
+Lock the widgets automatically if the app is locked
+Many minor quality of life improvements

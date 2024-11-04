@@ -21,7 +21,7 @@ Unterstützung für Geräte ab Android Lollipop.
 <b>Komfort</b>
 
 • Dunkelmodus
-• Vollständig kostenlos
+• Vollständig kostenlos (+ keine Werbung!)
 • Einstellbare Schriftgröße
 • Automatisches Speichern und automatische Backups
 • Füge Notizen und Listen per Widgets zum Home-Screen hinzu
