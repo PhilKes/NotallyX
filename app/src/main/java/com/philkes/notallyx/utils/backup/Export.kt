@@ -159,10 +159,8 @@ object Export {
 
     fun scheduleAutoBackup(periodInDays: Long, context: Context) {
         val request =
-            PeriodicWorkRequest.Builder(AutoBackupWorker::class.java, periodInDays, TimeUnit.DAYS)
-                .build()
+            PeriodicWorkRequest.Builder(AutoBackupWorker::class.java, 15, TimeUnit.MINUTES).build()
         try {
-            cancelAutoBackup(context)
             WorkManager.getInstance(context)
                 .enqueueUniquePeriodicWork(
                     AUTO_BACKUP_WORK_NAME,

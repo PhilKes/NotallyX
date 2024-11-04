@@ -19,6 +19,7 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
     Worker(context, params) {
 
     override fun doWork(): Result {
+        Log.i(TAG, "AutoBackupWorker: Start")
         val app = context.applicationContext as Application
         val preferences = NotallyXPreferences.getInstance(app)
         val (path, _, maxBackups) = preferences.autoBackup.value
@@ -40,11 +41,13 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
                             it.delete()
                         }
                     }
+
+                    Log.i(TAG, "AutoBackupWorker: Success")
                     return Result.success(
                         Data.Builder().putString("backupUri", zipUri.path!!).build()
                     )
                 } catch (e: Exception) {
-                    Log.e(TAG, "doWork: ", e)
+                    Log.e(TAG, "AutoBackupWorker: Failure", e)
                     Operations.log(app, e)
                     return Result.success(Data.Builder().putString("exception", e.message).build())
                 }

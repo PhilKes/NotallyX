@@ -5,6 +5,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
+import androidx.work.Configuration
+import androidx.work.WorkManager
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
@@ -15,7 +17,7 @@ import com.philkes.notallyx.utils.backup.Export.cancelAutoBackup
 import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.UnlockReceiver
 
-class NotallyXApplication : Application() {
+class NotallyXApplication : Application(), Configuration.Provider {
 
     private lateinit var biometricLockObserver: Observer<BiometricLock>
     private lateinit var preferences: NotallyXPreferences
@@ -26,6 +28,7 @@ class NotallyXApplication : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        WorkManager.initialize(this, workManagerConfiguration)
         preferences = NotallyXPreferences.getInstance(this)
         preferences.theme.observeForever { theme ->
             when (theme) {
@@ -41,16 +44,15 @@ class NotallyXApplication : Application() {
         }
 
         preferences.autoBackup.observeForeverWithPrevious { (prevAutoBackup, autoBackup) ->
-            if (
-                prevAutoBackup == null ||
-                    prevAutoBackup.path != autoBackup.path ||
-                    prevAutoBackup.periodInDays != autoBackup.periodInDays
-            ) {
-                if (autoBackup.path != AutoBackup.BACKUP_PATH_EMPTY) {
-                    scheduleAutoBackup(autoBackup.periodInDays.toLong(), this)
-                } else {
+            if (autoBackup.path == AutoBackup.BACKUP_PATH_EMPTY) {
+                cancelAutoBackup(this)
+            } else {
+                if (
+                    prevAutoBackup != null && prevAutoBackup.periodInDays != autoBackup.periodInDays
+                ) {
                     cancelAutoBackup(this)
                 }
+                scheduleAutoBackup(autoBackup.periodInDays.toLong(), this)
             }
         }
 
@@ -69,4 +71,7 @@ class NotallyXApplication : Application() {
 
         locked.observeForever { isLocked -> WidgetProvider.updateWidgets(this, locked = isLocked) }
     }
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().setMinimumLoggingLevel(android.util.Log.DEBUG).build()
 }
