@@ -421,13 +421,29 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     suspend fun getAllLabels() = withContext(Dispatchers.IO) { labelDao.getArrayOfAll() }
 
-    fun deleteLabel(value: String) = executeAsync { commonDao.deleteLabel(value) }
+    fun deleteLabel(value: String) {
+        executeAsync { commonDao.deleteLabel(value) }
+        val labelsHiddenPreference = preferences.labelsHiddenInNavigation
+        val labelsHidden = labelsHiddenPreference.value.toMutableSet()
+        if (labelsHidden.contains(value)) {
+            labelsHidden.remove(value)
+            savePreference(labelsHiddenPreference, labelsHidden)
+        }
+    }
 
     fun insertLabel(label: Label, onComplete: (success: Boolean) -> Unit) =
         executeAsyncWithCallback({ labelDao.insert(label) }, onComplete)
 
-    fun updateLabel(oldValue: String, newValue: String, onComplete: (success: Boolean) -> Unit) =
+    fun updateLabel(oldValue: String, newValue: String, onComplete: (success: Boolean) -> Unit) {
         executeAsyncWithCallback({ commonDao.updateLabel(oldValue, newValue) }, onComplete)
+        val labelsHiddenPreference = preferences.labelsHiddenInNavigation
+        val labelsHidden = labelsHiddenPreference.value.toMutableSet()
+        if (labelsHidden.contains(oldValue)) {
+            labelsHidden.remove(oldValue)
+            labelsHidden.add(newValue)
+            savePreference(labelsHiddenPreference, labelsHidden)
+        }
+    }
 
     fun closeDatabase() {
         database.close()

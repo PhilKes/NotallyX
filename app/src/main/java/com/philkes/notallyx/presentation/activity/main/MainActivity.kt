@@ -100,41 +100,22 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
     }
 
+    private var labelsMenuItems: Map<String, MenuItem> = mapOf()
+    private var labelsMoreMenuItem: MenuItem? = null
+    private var labelsTotal: Int = 0
+
     private fun setupMenu() {
         binding.NavigationView.menu.apply {
             add(0, R.id.Notes, 0, R.string.notes).setCheckable(true).setIcon(R.drawable.home)
             NotallyDatabase.getDatabase(application).value.getLabelDao().getAll().observe(
                 this@MainActivity
             ) { labels ->
-                removeGroup(1)
-                add(1, R.id.Labels, 1, R.string.labels)
-                    .setCheckable(true)
-                    .setIcon(R.drawable.label_more)
-                labels.take(MAX_LABELS_TO_DISPLAY).forEachIndexed { index, label ->
-                    add(1, R.id.DisplayLabel, 2 + index, label)
-                        .setCheckable(true)
-                        .setIcon(R.drawable.label)
-                        .setOnMenuItemClickListener {
-                            val bundle =
-                                Bundle().apply { putString(Constants.SelectedLabel, label) }
-                            navController.navigate(R.id.DisplayLabel, bundle)
-                            false
-                        }
-                }
-                if (labels.size > MAX_LABELS_TO_DISPLAY) {
-                    add(
-                            1,
-                            R.id.Labels,
-                            MAX_LABELS_TO_DISPLAY + 1,
-                            getString(R.string.more, labels.size - MAX_LABELS_TO_DISPLAY),
-                        )
-                        .setCheckable(true)
-                        .setIcon(R.drawable.label)
-                }
-
+                labelsTotal = labels.size
+                labelsMenuItems = setupLabelsMenuItems(labels)
                 configuration =
                     AppBarConfiguration(binding.NavigationView.menu, binding.DrawerLayout)
                 setupActionBarWithNavController(navController, configuration)
+                hideLabelsInNavigation(model.preferences.labelsHiddenInNavigation.value)
             }
 
             add(2, R.id.Deleted, MAX_LABELS_TO_DISPLAY + 3, R.string.deleted)
@@ -147,6 +128,58 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 .setCheckable(true)
                 .setIcon(R.drawable.settings)
         }
+        model.preferences.labelsHiddenInNavigation.observe(this) { hiddenLabels ->
+            hideLabelsInNavigation(hiddenLabels)
+        }
+    }
+
+    private fun hideLabelsInNavigation(hiddenLabels: Set<String>) {
+        var amountHiddenLabels = 0
+        labelsMenuItems.forEach {
+            val hidden = hiddenLabels.contains(it.key)
+            it.value.setVisible(!hidden)
+            if (hidden) {
+                amountHiddenLabels++
+            }
+        }
+        labelsMoreMenuItem?.setTitle(
+            getString(R.string.more, labelsTotal - MAX_LABELS_TO_DISPLAY + amountHiddenLabels)
+        )
+    }
+
+    /**
+     * Adds [MenuItem] for each label. A maximum of [MAX_LABELS_TO_DISPLAY] [MenuItem] is added, if
+     * there are more labels, another [MenuItem] is added to indicate that.
+     *
+     * @return Map containing Label -> MenuItem mapping
+     */
+    private fun Menu.setupLabelsMenuItems(labels: List<String>): Map<String, MenuItem> {
+        val items = mutableMapOf<String, MenuItem>()
+        removeGroup(1)
+        add(1, R.id.Labels, 1, R.string.labels).setCheckable(true).setIcon(R.drawable.label_more)
+        labels.take(MAX_LABELS_TO_DISPLAY).forEachIndexed { index, label ->
+            items[label] =
+                add(1, R.id.DisplayLabel, 2 + index, label)
+                    .setCheckable(true)
+                    .setIcon(R.drawable.label)
+                    .setOnMenuItemClickListener {
+                        val bundle = Bundle().apply { putString(Constants.SelectedLabel, label) }
+                        navController.navigate(R.id.DisplayLabel, bundle)
+                        false
+                    }
+        }
+        labelsMoreMenuItem =
+            if (labels.size > MAX_LABELS_TO_DISPLAY) {
+                add(
+                        1,
+                        R.id.Labels,
+                        MAX_LABELS_TO_DISPLAY + 1,
+                        getString(R.string.more, labels.size - MAX_LABELS_TO_DISPLAY),
+                    )
+                    .setCheckable(true)
+                    .setIcon(R.drawable.label)
+            } else null
+        return items
     }
 
     private fun setupActionMode() {

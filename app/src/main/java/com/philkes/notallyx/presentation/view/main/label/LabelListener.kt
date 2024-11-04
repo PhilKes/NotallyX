@@ -7,4 +7,6 @@ interface LabelListener {
     fun onEdit(position: Int)
 
     fun onDelete(position: Int)
+
+    fun onToggleVisibility(position: Int)
 }

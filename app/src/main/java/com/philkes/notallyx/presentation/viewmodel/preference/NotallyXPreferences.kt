@@ -67,6 +67,8 @@ class NotallyXPreferences private constructor(app: Application) {
             10,
             R.string.max_lines_to_display_title,
         )
+    val labelsHiddenInNavigation =
+        StringSetPreference("labelsHiddenInNavigation", preferences, setOf())
 
     val autoBackup = AutoBackupPreference(preferences)
 
