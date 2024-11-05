@@ -6,8 +6,6 @@
 
         <item name="colorPrimaryDark">?attr/colorSurface</item>
 
-        <item name="android:navigationBarColor">@color/Black</item>
-
         <item name="windowActionModeOverlay">true</item>
 
         <item name="textAppearanceButton">@style/TextAppearance.Subtitle2</item>
