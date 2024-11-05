@@ -10,4 +10,4 @@
 */.attach_pid*
 fastlane/*
 !fastlane/metadata
-Gemfile
+Gemfile*
