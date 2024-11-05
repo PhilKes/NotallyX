@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.FileProvider
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -20,8 +21,6 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.databinding.ActivityViewImageBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
-import com.philkes.notallyx.presentation.getParcelableArrayListCompat
-import com.philkes.notallyx.presentation.getParcelableCompat
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
@@ -44,10 +43,9 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         setContentView(binding.root)
 
         val savedList =
-            savedInstanceState?.getParcelableArrayListCompat(
-                DELETED_IMAGES,
-                FileAttachment::class.java,
-            )
+            savedInstanceState?.let {
+                BundleCompat.getParcelableArrayList(it, DELETED_IMAGES, FileAttachment::class.java)
+            }
         deletedImages = savedList ?: ArrayList()
 
         val resultIntent = Intent()
@@ -55,7 +53,9 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         setResult(RESULT_OK, resultIntent)
 
         val savedImage =
-            savedInstanceState?.getParcelableCompat(CURRENT_IMAGE, FileAttachment::class.java)
+            savedInstanceState?.let {
+                BundleCompat.getParcelable(it, CURRENT_IMAGE, FileAttachment::class.java)
+            }
         if (savedImage != null) {
             currentImage = savedImage
         }

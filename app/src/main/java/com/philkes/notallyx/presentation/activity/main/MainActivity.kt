@@ -16,6 +16,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.core.view.forEach
@@ -538,18 +539,18 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             binding.MakeList.hide()
         }
 
-        val inputManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        val inputManager = ContextCompat.getSystemService(this, InputMethodManager::class.java)
         if (destination.id == R.id.Search) {
             binding.EnterSearchKeyword.apply {
                 setText("")
                 visibility = View.VISIBLE
                 requestFocus()
-                inputManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+                inputManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
             }
         } else {
             binding.EnterSearchKeyword.apply {
                 visibility = View.GONE
-                inputManager.hideSoftInputFromWindow(this.windowToken, 0)
+                inputManager?.hideSoftInputFromWindow(this.windowToken, 0)
             }
         }
     }

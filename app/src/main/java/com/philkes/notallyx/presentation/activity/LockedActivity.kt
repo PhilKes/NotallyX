@@ -10,6 +10,7 @@ import android.view.View.VISIBLE
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.viewbinding.ViewBinding
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
@@ -34,7 +35,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
         biometricAuthenticationActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == Activity.RESULT_OK) {
-                   unlock()
+                    unlock()
                 } else {
                     finish()
                 }
@@ -86,12 +87,12 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
     }
 
     private fun hasToAuthenticateWithBiometric(): Boolean {
-        val keyguardManager: KeyguardManager =
-            this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-            (keyguardManager.isDeviceLocked || notallyXApplication.locked.value)
-        } else {
-            false
-        }
+        return ContextCompat.getSystemService(this, KeyguardManager::class.java)?.let {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+                (it.isDeviceLocked || notallyXApplication.locked.value)
+            } else {
+                false
+            }
+        } ?: false
     }
 }

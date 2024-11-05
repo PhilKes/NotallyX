@@ -7,7 +7,6 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Typeface
 import android.hardware.biometrics.BiometricManager
@@ -15,8 +14,6 @@ import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STR
 import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
-import android.os.Parcelable
 import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.InputType
@@ -42,8 +39,7 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity.INPUT_METHOD_SERVICE
-import androidx.appcompat.app.AppCompatActivity.KEYGUARD_SERVICE
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -300,13 +296,12 @@ fun RadioGroup.checkedTag(): Any {
 fun Context.canAuthenticateWithBiometrics(): Int {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val keyguardManager: KeyguardManager =
-                this.getSystemService(KEYGUARD_SERVICE) as KeyguardManager
+            val keyguardManager = ContextCompat.getSystemService(this, KeyguardManager::class.java)
             val packageManager: PackageManager = this.packageManager
             if (!packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
                 return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
             }
-            if (!keyguardManager.isKeyguardSecure) {
+            if (keyguardManager?.isKeyguardSecure == false) {
                 return BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
             }
         } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
@@ -340,8 +335,8 @@ fun Context.getContentFileName(uri: Uri): String? =
         .getOrNull()
 
 fun Activity.showKeyboard(view: View) {
-    val inputMethodManager = getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-    inputMethodManager.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
+    ContextCompat.getSystemService(this, InputMethodManager::class.java)
+        ?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
 }
 
 fun MutableLiveData<out Progress>.setupProgressDialog(activity: Activity, titleId: Int) {
@@ -449,10 +444,10 @@ private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
 }
 
 fun Activity.copyToClipBoard(text: CharSequence) {
-    val clipboard: ClipboardManager =
-        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-    val clip = ClipData.newPlainText("label", text)
-    clipboard.setPrimaryClip(clip)
+    ContextCompat.getSystemService(this, ClipboardManager::class.java)?.let {
+        val clip = ClipData.newPlainText("label", text)
+        it.setPrimaryClip(clip)
+    }
 }
 
 fun ClipboardManager.getLatestText(): CharSequence? {
@@ -470,42 +465,4 @@ fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
 
 fun Context.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {
     return resources.getQuantityString(id, quantity, quantity, *formatArgs)
-}
-
-fun <T : Parcelable> Bundle?.getParcelableCompat(key: String, clazz: Class<T>): T? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this?.getParcelable(key, clazz)
-    } else {
-        this?.getParcelable(key)
-    }
-}
-
-fun <T : Parcelable> Bundle?.getParcelableArrayListCompat(
-    key: String,
-    clazz: Class<T>,
-): ArrayList<T>? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this?.getParcelableArrayList(key, clazz)
-    } else {
-        this?.getParcelableArrayList(key)
-    }
-}
-
-fun <T : Parcelable> Intent?.getParcelableArrayListExtraCompat(
-    key: String,
-    clazz: Class<T>,
-): ArrayList<T>? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this?.getParcelableArrayListExtra(key, clazz)
-    } else {
-        this?.getParcelableArrayListExtra(key)
-    }
-}
-
-fun <T : Parcelable> Intent?.getParcelableExtraCompat(key: String, clazz: Class<T>): T? {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        this?.getParcelableExtra(key, clazz)
-    } else {
-        this?.getParcelableExtra(key)
-    }
 }

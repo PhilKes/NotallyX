@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.CancellationSignal
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.philkes.notallyx.R
 import javax.crypto.Cipher
@@ -32,7 +33,6 @@ fun Activity.showBiometricOrPinPrompt(
         descriptionResId,
         cipherIv,
         onSuccess,
-        ::startActivityForResult,
         onFailure,
     )
 }
@@ -54,7 +54,6 @@ fun Fragment.showBiometricOrPinPrompt(
         descriptionResId,
         cipherIv,
         onSuccess,
-        ::startActivityForResult,
         onFailure,
     )
 }
@@ -67,7 +66,6 @@ private fun showBiometricOrPinPrompt(
     descriptionResId: Int? = null,
     cipherIv: ByteArray? = null,
     onSuccess: (cipher: Cipher) -> Unit,
-    startActivityForResult: (intent: Intent, requestCode: Int) -> Unit,
     onFailure: () -> Unit,
 ) {
     when {
@@ -119,9 +117,9 @@ private fun showBiometricOrPinPrompt(
         }
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
             val fingerprintManager =
-                context.getSystemService(Context.FINGERPRINT_SERVICE) as FingerprintManager
+                ContextCompat.getSystemService(context, FingerprintManager::class.java)
             if (
-                fingerprintManager.isHardwareDetected &&
+                fingerprintManager?.isHardwareDetected == true &&
                     fingerprintManager.hasEnrolledFingerprints()
             ) {
                 val cipher =
@@ -158,25 +156,13 @@ private fun showBiometricOrPinPrompt(
                     null,
                 )
             } else {
-                promptPinAuthentication(
-                    context,
-                    activityResultLauncher,
-                    titleResId,
-                    startActivityForResult,
-                    onFailure,
-                )
+                promptPinAuthentication(context, activityResultLauncher, titleResId, onFailure)
             }
         }
 
         else -> {
             // API 21-22: No biometric support, fallback to PIN/Password
-            promptPinAuthentication(
-                context,
-                activityResultLauncher,
-                titleResId,
-                startActivityForResult,
-                onFailure,
-            )
+            promptPinAuthentication(context, activityResultLauncher, titleResId, onFailure)
         }
     }
 }
@@ -193,13 +179,12 @@ private fun promptPinAuthentication(
     context: Context,
     activityResultLauncher: ActivityResultLauncher<Intent>,
     titleResId: Int,
-    startActivityForResult: (intent: Intent, requestCode: Int) -> Unit,
     onFailure: () -> Unit,
 ) {
-    val keyguardManager = context.getSystemService(Context.KEYGUARD_SERVICE) as KeyguardManager
+    val keyguardManager = ContextCompat.getSystemService(context, KeyguardManager::class.java)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         // For API 23 and above, use isDeviceSecure
-        if (keyguardManager.isDeviceSecure) {
+        if (keyguardManager?.isDeviceSecure == true) {
             val intent =
                 keyguardManager.createConfirmDeviceCredentialIntent(
                     context.getString(titleResId),
@@ -215,7 +200,7 @@ private fun promptPinAuthentication(
         }
     } else {
         // For API 21-22, use isKeyguardSecure
-        if (keyguardManager.isKeyguardSecure) {
+        if (keyguardManager?.isKeyguardSecure == true) {
             val intent =
                 keyguardManager.createConfirmDeviceCredentialIntent(
                     context.getString(titleResId),

@@ -4,6 +4,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.add
@@ -96,7 +97,7 @@ class EditListActivity : EditActivity(Type.LIST) {
                 binding.RecyclerView,
                 changeHistory,
                 preferences,
-                getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager,
+                ContextCompat.getSystemService(baseContext, InputMethodManager::class.java),
             )
         adapter =
             ListItemAdapter(

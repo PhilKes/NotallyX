@@ -18,6 +18,7 @@ import android.view.MenuItem
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
@@ -156,14 +157,11 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                 }
 
                 private fun showAddLinkDialog(mode: ActionMode?) {
-                    val urlFromClipboard =
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            baseContext
-                                .getSystemService(ClipboardManager::class.java)!!
-                                .getLatestText()
-                                .let { if (it.isWebUrl()) it.toString() else "" }
-                        } else ""
-                    val displayTextBefore = binding.EnterBody.getSelectionText()!!
+                    val urlFromClipboard: String =
+                        ContextCompat.getSystemService(baseContext, ClipboardManager::class.java)
+                            ?.getLatestText()
+                            ?.let { if (it.isWebUrl()) it.toString() else "" } ?: ""
+                    val displayTextBefore = binding.EnterBody.getSelectionText() ?: ""
                     this@EditNoteActivity.showEditLinkDialog(urlFromClipboard, displayTextBefore) {
                         urlAfter,
                         displayTextAfter ->

@@ -20,6 +20,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.FileProvider
+import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,8 +36,6 @@ import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
-import com.philkes.notallyx.presentation.getParcelableArrayListExtraCompat
-import com.philkes.notallyx.presentation.getParcelableExtraCompat
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.Constants
@@ -143,10 +142,13 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     val list =
-                        result.data?.getParcelableArrayListExtraCompat(
-                            ViewImageActivity.DELETED_IMAGES,
-                            FileAttachment::class.java,
-                        )
+                        result.data?.let {
+                            IntentCompat.getParcelableArrayListExtra(
+                                it,
+                                ViewImageActivity.DELETED_IMAGES,
+                                FileAttachment::class.java,
+                            )
+                        }
                     if (!list.isNullOrEmpty()) {
                         model.deleteImages(list)
                     }
@@ -167,10 +169,13 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     val audio =
-                        result.data?.getParcelableExtraCompat(
-                            PlayAudioActivity.AUDIO,
-                            Audio::class.java,
-                        )
+                        result.data?.let {
+                            IntentCompat.getParcelableExtra(
+                                it,
+                                PlayAudioActivity.AUDIO,
+                                Audio::class.java,
+                            )
+                        }
                     if (audio != null) {
                         model.deleteAudio(audio)
                     }

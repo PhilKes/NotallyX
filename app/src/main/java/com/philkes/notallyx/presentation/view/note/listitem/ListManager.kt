@@ -42,7 +42,7 @@ class ListManager(
     private val recyclerView: RecyclerView,
     private val changeHistory: ChangeHistory,
     private val preferences: NotallyXPreferences,
-    private val inputMethodManager: InputMethodManager,
+    private val inputMethodManager: InputMethodManager?,
 ) {
 
     private var nextItemId: Int = 0
@@ -71,7 +71,7 @@ class ListManager(
             val viewHolder =
                 recyclerView.findViewHolderForAdapterPosition(positionAfterAdd) as ListItemVH?
             if (!item.checked && viewHolder != null) {
-                viewHolder.focusEditText(inputMethodManager = inputMethodManager)
+                inputMethodManager?.let { viewHolder.focusEditText(inputMethodManager = it) }
             }
         }
     }

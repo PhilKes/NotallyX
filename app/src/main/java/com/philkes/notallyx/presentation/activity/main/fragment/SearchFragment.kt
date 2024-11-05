@@ -3,17 +3,17 @@ package com.philkes.notallyx.presentation.activity.main.fragment
 import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.core.os.BundleCompat
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Folder
 
 class SearchFragment : NotallyFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-
         val initialFolder =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                arguments?.getSerializable(EXTRA_INITIAL_FOLDER, Folder::class.java)
-            else arguments?.getSerializable(EXTRA_INITIAL_FOLDER) as? Folder
+            arguments?.let {
+                BundleCompat.getSerializable(it, EXTRA_INITIAL_FOLDER, Folder::class.java)
+            }
         binding?.ChipGroup?.visibility = View.VISIBLE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             binding?.RecyclerView?.scrollIndicators = View.SCROLL_INDICATOR_TOP
