@@ -42,7 +42,7 @@ object Export {
         backupProgress: MutableLiveData<Progress>? = null,
     ) {
         backupProgress?.postValue(Progress(indeterminate = true))
-        val database = NotallyDatabase.getDatabase(app).value
+        val database = NotallyDatabase.getDatabase(app, observeBiometricLock = false).value
         database.checkpoint()
         val preferences = NotallyXPreferences.getInstance(app)
         val backupPassword = preferences.backupPassword.value
