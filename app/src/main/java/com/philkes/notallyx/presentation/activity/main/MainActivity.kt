@@ -22,6 +22,7 @@ import androidx.core.view.GravityCompat
 import androidx.core.view.forEach
 import androidx.core.widget.doAfterTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -106,16 +107,22 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private var labelsMenuItems: List<MenuItem> = listOf()
     private var labelsMoreMenuItem: MenuItem? = null
     private var labels: List<String> = listOf()
+    private var labelsLiveData: LiveData<List<String>>? = null
 
     private fun setupMenu() {
         binding.NavigationView.menu.apply {
             add(0, R.id.Notes, 0, R.string.notes).setCheckable(true).setIcon(R.drawable.home)
-            NotallyDatabase.getDatabase(application).value.getLabelDao().getAll().observe(
-                this@MainActivity
-            ) { labels ->
-                this@MainActivity.labels = labels
-                setupLabelsMenuItems(labels, preferences.maxLabels.value)
+            NotallyDatabase.getDatabase(application).observe(this@MainActivity) { database ->
+                labelsLiveData?.removeObservers(this@MainActivity)
+                labelsLiveData =
+                    database.getLabelDao().getAll().also {
+                        it.observe(this@MainActivity) { labels ->
+                            this@MainActivity.labels = labels
+                            setupLabelsMenuItems(labels, preferences.maxLabels.value)
+                        }
+                    }
             }
+
             add(2, R.id.Deleted, CATEGORY_SYSTEM + 1, R.string.deleted)
                 .setCheckable(true)
                 .setIcon(R.drawable.delete)

@@ -55,7 +55,12 @@ class WidgetProvider : AppWidgetProvider() {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 intent.getBooleanExtra(RemoteViews.EXTRA_CHECKED, false)
             } else false
-        val database = NotallyDatabase.getDatabase(context.applicationContext as Application).value
+        val database =
+            NotallyDatabase.getDatabase(
+                    context.applicationContext as Application,
+                    observeBiometricLock = false,
+                )
+                .value
         val pendingResult = goAsync()
         GlobalScope.launch {
             withContext(Dispatchers.IO) {

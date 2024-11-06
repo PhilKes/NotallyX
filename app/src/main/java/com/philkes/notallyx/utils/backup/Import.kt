@@ -148,7 +148,7 @@ object Import {
                         }
                     }
 
-                    NotallyDatabase.getDatabase(app)
+                    NotallyDatabase.getDatabase(app, observeBiometricLock = false)
                         .value
                         .getCommonDao()
                         .importBackup(baseNotes, labels)

@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.os.Build
+import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -30,6 +31,8 @@ import java.text.DateFormat
 
 object Operations {
 
+    private const val TAG = "Operations"
+
     const val extraCharSequence = "com.philkes.notallyx.extra.charSequence"
 
     fun getLastExceptionLog(app: Application): String? {
@@ -42,8 +45,9 @@ object Operations {
     }
 
     fun log(app: Application, throwable: Throwable) {
+        Log.e(TAG, "Exception occurred", throwable)
         val file = getLog(app)
-        val output = FileOutputStream(file, true)
+        val output = FileOutputStream(file, !file.exists() || !file.isLargerThan(2048))
         val writer = PrintWriter(OutputStreamWriter(output, Charsets.UTF_8))
 
         val formatter = DateFormat.getDateTimeInstance()
@@ -141,5 +145,9 @@ object Operations {
         drawable.strokeColor = ContextCompat.getColorStateList(context, R.color.chip_stroke)
 
         return drawable
+    }
+
+    private fun File.isLargerThan(kilobytes: Long): Boolean {
+        return (length() / 1024) > kilobytes
     }
 }

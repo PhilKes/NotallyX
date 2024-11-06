@@ -45,13 +45,21 @@ abstract class NotallyDatabase : RoomDatabase() {
 
         @Volatile private var instance: NotNullLiveData<NotallyDatabase>? = null
 
-        fun getDatabase(app: Application): NotNullLiveData<NotallyDatabase> {
+        fun getDatabase(
+            app: Application,
+            observeBiometricLock: Boolean = true,
+        ): NotNullLiveData<NotallyDatabase> {
             return instance
                 ?: synchronized(this) {
                     val preferences = NotallyXPreferences.getInstance(app)
                     this.instance =
                         NotNullLiveData(
-                            createInstance(app, preferences, preferences.biometricLock.value)
+                            createInstance(
+                                app,
+                                preferences,
+                                preferences.biometricLock.value,
+                                observeBiometricLock,
+                            )
                         )
                     return this.instance!!
                 }
@@ -61,6 +69,7 @@ abstract class NotallyDatabase : RoomDatabase() {
             app: Application,
             preferences: NotallyXPreferences,
             biometrickLock: BiometricLock,
+            observeBiometricLock: Boolean,
         ): NotallyDatabase {
             val instanceBuilder =
                 Room.databaseBuilder(app, NotallyDatabase::class.java, DatabaseName)
@@ -75,17 +84,21 @@ abstract class NotallyDatabase : RoomDatabase() {
                     instanceBuilder.openHelperFactory(factory)
                 }
                 val instance = instanceBuilder.build()
-                instance.biometricLockObserver = Observer { newBiometrickLock ->
-                    NotallyDatabase.instance?.value?.biometricLockObserver?.let {
-                        preferences.biometricLock.removeObserver(it)
+                if (observeBiometricLock) {
+                    instance.biometricLockObserver = Observer { newBiometrickLock ->
+                        NotallyDatabase.instance?.value?.biometricLockObserver?.let {
+                            preferences.biometricLock.removeObserver(it)
+                        }
+                        val newInstance = createInstance(app, preferences, newBiometrickLock, true)
+                        NotallyDatabase.instance?.postValue(newInstance)
+                        preferences.biometricLock.observeForeverSkipFirst(
+                            newInstance.biometricLockObserver!!
+                        )
                     }
-                    val newInstance = createInstance(app, preferences, newBiometrickLock)
-                    NotallyDatabase.instance?.postValue(newInstance)
                     preferences.biometricLock.observeForeverSkipFirst(
-                        newInstance.biometricLockObserver!!
+                        instance.biometricLockObserver!!
                     )
                 }
-                preferences.biometricLock.observeForeverSkipFirst(instance.biometricLockObserver!!)
                 return instance
             }
             return instanceBuilder.build()
