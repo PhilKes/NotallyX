@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.activity.main.fragment
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuInflater
+import android.view.View
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
@@ -11,6 +12,11 @@ import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.C
 import com.philkes.notallyx.presentation.add
 
 class DeletedFragment : NotallyFragment() {
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        model.folder.value = Folder.DELETED
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         menu.add(R.string.delete_all, R.drawable.delete_all) { deleteAllNotes() }

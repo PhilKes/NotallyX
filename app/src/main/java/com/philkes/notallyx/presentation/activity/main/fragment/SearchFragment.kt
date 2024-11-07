@@ -21,7 +21,7 @@ class SearchFragment : NotallyFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         val checked =
-            when (initialFolder ?: model.folder) {
+            when (initialFolder ?: model.folder.value) {
                 Folder.NOTES -> R.id.Notes
                 Folder.DELETED -> R.id.Deleted
                 Folder.ARCHIVED -> R.id.Archived
@@ -30,9 +30,9 @@ class SearchFragment : NotallyFragment() {
         binding?.ChipGroup?.apply {
             setOnCheckedStateChangeListener { _, checkedId ->
                 when (checkedId.first()) {
-                    R.id.Notes -> model.folder = Folder.NOTES
-                    R.id.Deleted -> model.folder = Folder.DELETED
-                    R.id.Archived -> model.folder = Folder.ARCHIVED
+                    R.id.Notes -> model.folder.value = Folder.NOTES
+                    R.id.Deleted -> model.folder.value = Folder.DELETED
+                    R.id.Archived -> model.folder.value = Folder.ARCHIVED
                 }
             }
             check(checked)

@@ -19,10 +19,11 @@ import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
-import androidx.core.view.forEach
 import androidx.core.widget.doAfterTextChanged
 import androidx.drawerlayout.widget.DrawerLayout
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -53,6 +54,7 @@ import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
+import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
@@ -219,77 +221,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
 
         val menu = binding.ActionMode.menu
-        val pinned = menu.add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) {}
-        val share = menu.add(R.string.share, R.drawable.share) { share() }
-        val labels =
-            menu.add(R.string.labels, R.drawable.label, MenuItem.SHOW_AS_ACTION_ALWAYS) { label() }
-
-        val export = createExportMenu(menu)
-
-        val changeColor = menu.add(R.string.change_color, R.drawable.change_color) { changeColor() }
-        val delete =
-            menu.add(R.string.delete, R.drawable.delete, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                moveNotes(Folder.DELETED)
-            }
-        val archive = menu.add(R.string.archive, R.drawable.archive) { moveNotes(Folder.ARCHIVED) }
-        val restore = menu.add(R.string.restore, R.drawable.restore) { moveNotes(Folder.NOTES) }
-        val unarchive =
-            menu.add(R.string.unarchive, R.drawable.unarchive) { moveNotes(Folder.NOTES) }
-        val deleteForever = menu.add(R.string.delete_forever, R.drawable.delete) { deleteForever() }
-
-        model.actionMode.count.observe(this) { count ->
-            if (count == 0) {
-                menu.forEach { item -> item.setVisible(false) }
-            } else {
-                binding.ActionMode.title = count.toString()
-
-                val baseNotes = model.actionMode.selectedNotes.values
-                val showPin = baseNotes.any { !it.pinned }
-                if (showPin) {
-                    pinned.setTitle(R.string.pin).setIcon(R.drawable.pin).onClick {
-                        model.pinBaseNotes(true)
-                    }
-                } else {
-                    pinned.setTitle(R.string.unpin).setIcon(R.drawable.unpin).onClick {
-                        model.pinBaseNotes(false)
-                    }
-                }
-
-                pinned.setVisible(true)
-                share.setVisible(count == 1)
-                labels.setVisible(true)
-                export.setVisible(count == 1)
-                changeColor.setVisible(true)
-
-                val folder = baseNotes.first().folder
-                delete.setVisible(folder == Folder.NOTES || folder == Folder.ARCHIVED)
-                archive.setVisible(folder == Folder.NOTES)
-                restore.setVisible(folder == Folder.DELETED)
-                unarchive.setVisible(folder == Folder.ARCHIVED)
-                deleteForever.setVisible(folder == Folder.DELETED)
-            }
-        }
-    }
-
-    private fun createExportMenu(menu: Menu): MenuItem {
-        return menu
-            .addSubMenu(R.string.export)
-            .apply {
-                setIcon(R.drawable.export)
-                item.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM)
-                add("PDF").onClick { exportToPDF() }
-                add("TXT").onClick { exportToTXT() }
-                add("JSON").onClick { exportToJSON() }
-                add("HTML").onClick { exportToHTML() }
-            }
-            .item
-    }
-
-    fun MenuItem.onClick(function: () -> Unit) {
-        setOnMenuItemClickListener {
-            function()
-            return@setOnMenuItemClickListener false
-        }
+        model.folder.observe(this@MainActivity, ModelFolderObserver(menu, model))
     }
 
     private fun moveNotes(folderTo: Folder) {
@@ -590,5 +522,153 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     result.data?.data?.let { uri -> model.writeCurrentFileToUri(uri) }
                 }
             }
+    }
+
+    private inner class ModelFolderObserver(
+        private val menu: Menu,
+        private val model: BaseNoteModel,
+    ) : Observer<Folder> {
+        override fun onChanged(value: Folder) {
+            menu.clear()
+            model.actionMode.count.removeObservers(this@MainActivity)
+            when (value) {
+                Folder.NOTES -> {
+                    val pinned = menu.addPinned(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    menu.addLabels(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    menu.addDelete(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    menu.add(R.string.archive, R.drawable.archive) { moveNotes(Folder.ARCHIVED) }
+                    menu.addChangeColor()
+                    val share = menu.addShare()
+                    val export = menu.addExportMenu()
+                    model.actionMode.count.observeCountAndPinned(
+                        this@MainActivity,
+                        share,
+                        export,
+                        pinned,
+                    )
+                }
+
+                Folder.ARCHIVED -> {
+                    menu.add(
+                        R.string.unarchive,
+                        R.drawable.unarchive,
+                        MenuItem.SHOW_AS_ACTION_ALWAYS,
+                    ) {
+                        moveNotes(Folder.NOTES)
+                    }
+                    menu.addDelete(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    val export = menu.addExportMenu(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    val pinned = menu.addPinned()
+                    menu.addLabels()
+                    menu.addChangeColor()
+                    val share = menu.addShare()
+                    model.actionMode.count.observeCountAndPinned(
+                        this@MainActivity,
+                        share,
+                        export,
+                        pinned,
+                    )
+                }
+
+                Folder.DELETED -> {
+                    menu.add(R.string.restore, R.drawable.restore, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                        moveNotes(Folder.NOTES)
+                    }
+                    menu.add(
+                        R.string.delete_forever,
+                        R.drawable.delete,
+                        MenuItem.SHOW_AS_ACTION_ALWAYS,
+                    ) {
+                        deleteForever()
+                    }
+                    val export = menu.addExportMenu()
+                    menu.addChangeColor()
+                    val share = menu.add(R.string.share, R.drawable.share) { share() }
+                    model.actionMode.count.observeCount(this@MainActivity, share, export)
+                }
+            }
+        }
+
+        private fun Menu.addPinned(showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM): MenuItem {
+            return add(R.string.pin, R.drawable.pin, showAsAction) {}
+        }
+
+        private fun Menu.addLabels(showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM): MenuItem {
+            return add(R.string.labels, R.drawable.label, showAsAction) { label() }
+        }
+
+        private fun Menu.addChangeColor(
+            showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM
+        ): MenuItem {
+            return add(R.string.change_color, R.drawable.change_color, showAsAction) {
+                changeColor()
+            }
+        }
+
+        private fun Menu.addDelete(showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM): MenuItem {
+            return add(R.string.delete, R.drawable.delete, showAsAction) {
+                moveNotes(Folder.DELETED)
+            }
+        }
+
+        private fun Menu.addShare(showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM): MenuItem {
+            return add(R.string.share, R.drawable.share, showAsAction) { share() }
+        }
+
+        private fun Menu.addExportMenu(
+            showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM
+        ): MenuItem {
+            return addSubMenu(R.string.export)
+                .apply {
+                    setIcon(R.drawable.export)
+                    item.setShowAsAction(showAsAction)
+                    add("PDF").onClick { exportToPDF() }
+                    add("TXT").onClick { exportToTXT() }
+                    add("JSON").onClick { exportToJSON() }
+                    add("HTML").onClick { exportToHTML() }
+                }
+                .item
+        }
+
+        fun MenuItem.onClick(function: () -> Unit) {
+            setOnMenuItemClickListener {
+                function()
+                return@setOnMenuItemClickListener false
+            }
+        }
+
+        private fun NotNullLiveData<Int>.observeCount(
+            lifecycleOwner: LifecycleOwner,
+            share: MenuItem,
+            export: MenuItem,
+            onCountChange: ((Int) -> Unit)? = null,
+        ) {
+            observe(lifecycleOwner) { count ->
+                binding.ActionMode.title = count.toString()
+                onCountChange?.invoke(count)
+                share.setVisible(count == 1)
+                export.setVisible(count == 1)
+            }
+        }
+
+        private fun NotNullLiveData<Int>.observeCountAndPinned(
+            lifecycleOwner: LifecycleOwner,
+            share: MenuItem,
+            export: MenuItem,
+            pinned: MenuItem,
+        ) {
+            observeCount(lifecycleOwner, share, export) {
+                val baseNotes = model.actionMode.selectedNotes.values
+                if (baseNotes.any { !it.pinned }) {
+                    pinned.setTitle(R.string.pin).setIcon(R.drawable.pin).onClick {
+                        model.pinBaseNotes(true)
+                    }
+                } else {
+                    pinned.setTitle(R.string.unpin).setIcon(R.drawable.unpin).onClick {
+                        model.pinBaseNotes(false)
+                    }
+                }
+            }
+        }
     }
 }

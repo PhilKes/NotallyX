@@ -37,6 +37,7 @@ import com.philkes.notallyx.data.model.SearchResult
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
@@ -83,19 +84,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     var deletedNotes: Content? = null
     var archivedNotes: Content? = null
 
-    var folder = Folder.NOTES
-        set(value) {
-            if (field != value) {
-                field = value
-                searchResults!!.fetch(keyword, folder)
-            }
-        }
+    val folder = NotNullLiveData(Folder.NOTES)
 
     var keyword = String()
         set(value) {
             if (field != value || searchResults?.value?.isEmpty() == true) {
                 field = value
-                searchResults!!.fetch(keyword, folder)
+                searchResults!!.fetch(keyword, folder.value)
             }
         }
 
@@ -118,6 +113,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     init {
         NotallyDatabase.getDatabase(app).observeForever(::init)
+        folder.observeForever { newFolder -> searchResults!!.fetch(keyword, newFolder) }
     }
 
     private fun init(database: NotallyDatabase) {
@@ -366,7 +362,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun deleteSelectedBaseNotes() {
-        deleteBaseNotes(LongArray(actionMode.selectedNotes.size))
+        deleteBaseNotes(actionMode.selectedIds.toLongArray())
     }
 
     fun deleteAll() {
