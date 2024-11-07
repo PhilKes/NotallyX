@@ -362,7 +362,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun deleteSelectedBaseNotes() {
-        deleteBaseNotes(LongArray(actionMode.selectedNotes.size))
+        deleteBaseNotes(actionMode.selectedIds.toLongArray())
     }
 
     fun deleteAll() {
