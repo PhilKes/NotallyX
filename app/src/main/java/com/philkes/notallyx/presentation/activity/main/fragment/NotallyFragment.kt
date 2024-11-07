@@ -159,7 +159,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                 BaseNoteAdapter(
                     model.actionMode.selectedIds,
                     dateFormat.value,
-                    notesSorting.value.sortedBy,
+                    notesSorting.value,
                     textSize.value,
                     maxItems.value,
                     maxLines.value,
@@ -191,7 +191,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         }
 
         model.preferences.notesSorting.observe(viewLifecycleOwner) { notesSort ->
-            notesAdapter?.setSorting(notesSort)
+            notesAdapter?.setNotesSort(notesSort)
         }
 
         model.actionMode.closeListener.observe(viewLifecycleOwner) { event ->

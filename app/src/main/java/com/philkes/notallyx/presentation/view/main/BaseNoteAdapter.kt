@@ -17,14 +17,13 @@ import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
-import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
 
 class BaseNoteAdapter(
     private val selectedIds: Set<Long>,
     private val dateFormat: DateFormat,
-    private val sortedBy: NotesSortBy,
+    private var notesSort: NotesSort,
     private val textSize: TextSize,
     private val maxItems: Int,
     private val maxLines: Int,
@@ -33,8 +32,7 @@ class BaseNoteAdapter(
     private val listener: ItemListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var list =
-        SortedList(Item::class.java, BaseNoteCreationDateSort(this, SortDirection.ASC))
+    private var list = SortedList(Item::class.java, notesSort.createCallback())
 
     override fun getItemViewType(position: Int): Int {
         return when (list[position]) {
@@ -55,7 +53,7 @@ class BaseNoteAdapter(
                     item,
                     imageRoot,
                     selectedIds.contains(item.id),
-                    sortedBy,
+                    notesSort.sortedBy,
                 )
         }
     }
@@ -84,14 +82,9 @@ class BaseNoteAdapter(
         }
     }
 
-    fun setSorting(notesSort: NotesSort) {
-        val sortCallback =
-            when (notesSort.sortedBy) {
-                NotesSortBy.TITLE -> BaseNoteTitleSort(this, notesSort.sortDirection)
-                NotesSortBy.MODIFIED_DATE -> BaseNoteModifiedDateSort(this, notesSort.sortDirection)
-                else -> BaseNoteCreationDateSort(this, notesSort.sortDirection)
-            }
-        replaceSorting(sortCallback)
+    fun setNotesSort(notesSort: NotesSort) {
+        this.notesSort = notesSort
+        replaceSortCallback(notesSort.createCallback())
     }
 
     fun getItem(position: Int): Item? {
@@ -105,7 +98,15 @@ class BaseNoteAdapter(
         list.replaceAll(items)
     }
 
-    private fun replaceSorting(sortCallback: SortedListAdapterCallback<Item>) {
+    private fun NotesSort.createCallback() =
+        when (sortedBy) {
+            NotesSortBy.TITLE -> BaseNoteTitleSort(this@BaseNoteAdapter, sortDirection)
+            NotesSortBy.MODIFIED_DATE ->
+                BaseNoteModifiedDateSort(this@BaseNoteAdapter, sortDirection)
+            else -> BaseNoteCreationDateSort(this@BaseNoteAdapter, sortDirection)
+        }
+
+    private fun replaceSortCallback(sortCallback: SortedListAdapterCallback<Item>) {
         val mutableList = mutableListOf<Item>()
         for (i in 0 until list.size()) {
             mutableList.add(list[i])

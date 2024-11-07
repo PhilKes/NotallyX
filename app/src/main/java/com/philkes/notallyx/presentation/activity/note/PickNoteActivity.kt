@@ -44,7 +44,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
                 BaseNoteAdapter(
                     Collections.emptySet(),
                     dateFormat.value,
-                    notesSorting.value.sortedBy,
+                    notesSorting.value,
                     textSize.value,
                     maxItems.value,
                     maxLines.value,
