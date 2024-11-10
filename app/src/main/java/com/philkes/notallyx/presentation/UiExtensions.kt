@@ -451,7 +451,7 @@ fun Activity.copyToClipBoard(text: CharSequence) {
 }
 
 fun ClipboardManager.getLatestText(): CharSequence? {
-    return if (primaryClip!!.itemCount > 0) primaryClip!!.getItemAt(0)!!.text else null
+    return primaryClip?.let { if (it.itemCount > 0) it.getItemAt(0)!!.text else null }
 }
 
 fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {

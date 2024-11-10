@@ -107,6 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:background="@null"
+                android:minHeight="48dp"
                 android:hint="@string/note"
                 android:inputType="textMultiLine|textCapSentences"
                 android:paddingStart="24dp"
@@ -122,7 +123,7 @@
                 android:overScrollMode="never"
                 android:paddingTop="4dp"
                 android:paddingStart="14dp"
-                android:paddingEnd="14dp"
+                android:paddingEnd="4dp"
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
             <TextView

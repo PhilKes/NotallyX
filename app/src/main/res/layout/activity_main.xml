@@ -15,6 +15,9 @@
             android:id="@+id/Toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:contentDescription="Toolbar"
+            app:collapseContentDescription="ToolbarCollapse"
+            app:navigationContentDescription="ToolbarNavigation"
             app:contentInsetEnd="16dp">
 
             <EditText

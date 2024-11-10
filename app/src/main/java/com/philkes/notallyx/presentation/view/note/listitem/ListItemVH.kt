@@ -62,18 +62,22 @@ class ListItemVH(
         }
     }
 
-    fun bind(item: ListItem, firstItem: Boolean, autoSort: ListItemSort) {
-        updateEditText(item)
+    fun bind(item: ListItem, position: Int, autoSort: ListItemSort) {
+        updateEditText(item, position)
 
-        updateCheckBox(item)
+        updateCheckBox(item, position)
 
-        updateDeleteButton(item)
+        updateDeleteButton(item, position)
 
-        updateSwipe(item.isChild, !firstItem && !item.checked)
-        if (item.checked && autoSort == ListItemSort.AUTO_SORT_BY_CHECKED) {
-            binding.DragHandle.visibility = INVISIBLE
-        } else {
-            binding.DragHandle.visibility = VISIBLE
+        updateSwipe(item.isChild, position != 0 && !item.checked)
+        binding.DragHandle.apply {
+            visibility =
+                if (item.checked && autoSort == ListItemSort.AUTO_SORT_BY_CHECKED) {
+                    INVISIBLE
+                } else {
+                    VISIBLE
+                }
+            contentDescription = "Drag$position"
         }
     }
 
@@ -88,14 +92,15 @@ class ListItemVH(
         }
     }
 
-    private fun updateDeleteButton(item: ListItem) {
+    private fun updateDeleteButton(item: ListItem, position: Int) {
         binding.Delete.apply {
             visibility = if (item.checked) VISIBLE else INVISIBLE
             setOnClickListener { listManager.delete(adapterPosition) }
+            contentDescription = "Delete$position"
         }
     }
 
-    private fun updateEditText(item: ListItem) {
+    private fun updateEditText(item: ListItem, position: Int) {
         binding.EditText.apply {
             removeTextChangedListener(editTextWatcher)
             setText(item.body)
@@ -111,12 +116,13 @@ class ListItemVH(
                     false
                 }
             }
+            contentDescription = "EditText$position"
         }
     }
 
     private var checkBoxListener: OnCheckedChangeListener? = null
 
-    private fun updateCheckBox(item: ListItem) {
+    private fun updateCheckBox(item: ListItem, position: Int) {
         if (checkBoxListener == null) {
             checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
                 buttonView!!.setOnCheckedChangeListener(null)
@@ -128,6 +134,7 @@ class ListItemVH(
             setOnCheckedChangeListener(null)
             isChecked = item.checked
             setOnCheckedChangeListener(checkBoxListener)
+            contentDescription = "CheckBox$position"
         }
     }
 

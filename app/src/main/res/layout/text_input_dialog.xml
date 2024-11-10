@@ -31,7 +31,8 @@
           android:layout_gravity="center_horizontal"
           android:singleLine="true"
           android:scrollHorizontally="true"
-          android:textSize="16sp" />
+          android:textSize="16sp"
+          android:contentDescription="Input"/>
 
     </com.google.android.material.textfield.TextInputLayout>
 

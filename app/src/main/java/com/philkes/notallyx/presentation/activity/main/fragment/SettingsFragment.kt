@@ -719,6 +719,7 @@ class SettingsFragment : Fragment() {
             valueFrom = min.toFloat()
             this@apply.value = value.toFloat()
             addOnChangeListener { _, value, _ -> onChange(value.toInt()) }
+            contentDescription = getString(titleResId)
         }
     }
 

@@ -49,14 +49,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_toEndOf="@id/DragHandle"
-            android:minWidth="0dp"
-            android:minHeight="0dp" />
+            android:layout_toEndOf="@id/DragHandle" />
 
         <com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
             android:id="@+id/EditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_centerVertical="true"
             android:layout_toEndOf="@id/CheckBox"
             android:layout_alignParentEnd="true"
@@ -64,8 +63,7 @@
             android:hint="@string/item"
             android:imeOptions="actionNext"
             android:inputType="textMultiLine"
-            android:padding="8dp"
-            android:layout_marginEnd="40dp"
+            android:layout_marginEnd="48dp"
             android:textAppearance="?attr/textAppearanceBody1" />
     </RelativeLayout>
     </com.philkes.notallyx.presentation.view.misc.SwipeLayout>
@@ -79,7 +77,8 @@
         android:background="?attr/selectableItemBackground"
         android:contentDescription="@string/delete"
         android:visibility="invisible"
-        android:padding="8dp"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
         app:srcCompat="@drawable/delete"
         app:tint="?attr/colorControlNormal" />
 

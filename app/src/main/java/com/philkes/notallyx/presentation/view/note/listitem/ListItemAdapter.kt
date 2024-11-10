@@ -28,7 +28,7 @@ class ListItemAdapter(
 
     override fun onBindViewHolder(holder: ListItemVH, position: Int) {
         val item = list[position]
-        holder.bind(item, position == 0, preferences.listItemSorting.value)
+        holder.bind(item, position, preferences.listItemSorting.value)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListItemVH {

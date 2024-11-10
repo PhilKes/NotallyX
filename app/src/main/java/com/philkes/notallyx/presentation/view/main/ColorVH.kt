@@ -16,5 +16,6 @@ class ColorVH(private val binding: RecyclerColorBinding, listener: ItemListener)
     fun bind(color: Color) {
         val value = Operations.extractColor(color, binding.root.context)
         binding.CardView.setCardBackgroundColor(value)
+        binding.CardView.contentDescription = color.name
     }
 }
