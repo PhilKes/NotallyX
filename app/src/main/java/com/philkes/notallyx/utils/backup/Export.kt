@@ -42,8 +42,6 @@ object Export {
         backupProgress: MutableLiveData<Progress>? = null,
     ) {
         backupProgress?.postValue(Progress(indeterminate = true))
-        val database = NotallyDatabase.getDatabase(app, observeBiometricLock = false).value
-        database.checkpoint()
         val preferences = NotallyXPreferences.getInstance(app)
         val backupPassword = preferences.backupPassword.value
 
@@ -60,30 +58,17 @@ object Export {
                 encryptionMethod = EncryptionMethod.AES
             }
 
-        if (
-            preferences.biometricLock.value == BiometricLock.ENABLED &&
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-        ) {
-            val cipher = getInitializedCipherForDecryption(iv = preferences.iv.value!!)
-            val passphrase = cipher.doFinal(preferences.databaseEncryptionKey.value)
-            val decryptedFile = File.createTempFile("decrypted", "tmp", app.cacheDir)
-            decryptDatabase(app, passphrase, decryptedFile)
-            zipFile.addFile(decryptedFile, zipParameters.copy(NotallyDatabase.DatabaseName))
-            decryptedFile.delete()
-        } else {
-            zipFile.addFile(
-                app.getDatabasePath(NotallyDatabase.DatabaseName),
-                zipParameters.copy(NotallyDatabase.DatabaseName),
-            )
-        }
+        val (databaseOriginal, databaseCopy) = app.copyDatabase()
+        zipFile.addFile(databaseCopy, zipParameters.copy(NotallyDatabase.DatabaseName))
+        databaseCopy.delete()
 
         val imageRoot = app.getExternalImagesDirectory()
         val fileRoot = app.getExternalFilesDirectory()
         val audioRoot = app.getExternalAudioDirectory()
 
-        val images = database.getBaseNoteDao().getAllImages().toFileAttachments()
-        val files = database.getBaseNoteDao().getAllFiles().toFileAttachments()
-        val audios = database.getBaseNoteDao().getAllAudios()
+        val images = databaseOriginal.getBaseNoteDao().getAllImages().toFileAttachments()
+        val files = databaseOriginal.getBaseNoteDao().getAllFiles().toFileAttachments()
+        val audios = databaseOriginal.getBaseNoteDao().getAllAudios()
         val total = images.count() + files.count() + audios.size
         backupProgress?.postValue(Progress(0, total))
 
@@ -130,6 +115,31 @@ object Export {
             zipFile.file.delete()
         }
         backupProgress?.postValue(Progress(inProgress = false))
+    }
+
+    private fun Application.copyDatabase(): Pair<NotallyDatabase, File> {
+        val database = NotallyDatabase.getDatabase(this, observePreferences = false).value
+        database.checkpoint()
+        val preferences = NotallyXPreferences.getInstance(this)
+        return if (
+            preferences.biometricLock.value == BiometricLock.ENABLED &&
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        ) {
+            val cipher = getInitializedCipherForDecryption(iv = preferences.iv.value!!)
+            val passphrase = cipher.doFinal(preferences.databaseEncryptionKey.value)
+            val decryptedFile = File.createTempFile("decrypted", "tmp", cacheDir)
+            decryptDatabase(
+                this,
+                passphrase,
+                decryptedFile,
+                NotallyDatabase.getCurrentDatabaseName(this),
+            )
+            Pair(database, decryptedFile)
+        } else {
+            val dbFile = File.createTempFile("database", "tmp", cacheDir)
+            NotallyDatabase.getCurrentDatabaseFile(this).copyTo(dbFile, overwrite = true)
+            Pair(database, dbFile)
+        }
     }
 
     private fun List<String>.toFileAttachments(): Sequence<FileAttachment> {

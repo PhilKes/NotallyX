@@ -216,6 +216,10 @@
     <string name="weekly">Weekly</string>
     <string name="monthly">Monthly</string>
 
+    <string name="data_on_external">Store Data on External Storage</string>
+    <string name="external_data_message">By enabling this, the app’s internal database will be moved into the app’s external storage (Android/media/com.philkes.notallyx).\nIn combination with file synchronization apps this can be used to synchronize NotallyX data between multiple devices.</string>
+    <string name="disable_external_data">Move data back to internal storage</string>
+
     <string name="about">About</string>
     <string name="libraries">Libraries</string>
     <string name="choose_other_app">Choose which app to import from</string>

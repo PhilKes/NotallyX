@@ -39,9 +39,9 @@ import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
-import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.IO.deleteAttachments
@@ -177,21 +177,50 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     private fun transform(list: List<BaseNote>) = transform(list, pinned, others)
 
     fun disableAutoBackup() {
-        clearPersistedUriPermissions()
-        savePreference(
-            preferences.autoBackup,
-            preferences.autoBackup.value.copy(path = AutoBackup.BACKUP_PATH_EMPTY),
-        )
+        val value = preferences.autoBackup.value
+        if (value.path != EMPTY_PATH) {
+            clearPersistedUriPermissions(value.path)
+        }
+        savePreference(preferences.autoBackup, value.copy(path = EMPTY_PATH))
     }
 
     fun setAutoBackupPath(uri: Uri) {
-        clearPersistedUriPermissions()
+        val value = preferences.autoBackup.value
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         app.contentResolver.takePersistableUriPermission(uri, flags)
-        savePreference(
-            preferences.autoBackup,
-            preferences.autoBackup.value.copy(path = uri.toString()),
-        )
+        if (value.path != EMPTY_PATH) {
+            clearPersistedUriPermissions(value.path)
+        }
+        savePreference(preferences.autoBackup, value.copy(path = uri.toString()))
+    }
+
+    fun enableExternalData() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
+                database.checkpoint()
+                NotallyDatabase.getCurrentDatabaseFile(app)
+                    .copyTo(NotallyDatabase.getExternalDatabaseFile(app), overwrite = true)
+            }
+            savePreference(preferences.dataOnExternalStorage, true)
+        }
+    }
+
+    fun disableExternalData() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
+                database.checkpoint()
+                NotallyDatabase.getCurrentDatabaseFile(app)
+                    .copyTo(NotallyDatabase.getInternalDatabaseFile(app), overwrite = true)
+                NotallyDatabase.getExternalDatabaseFiles(app).forEach {
+                    if (it.exists()) {
+                        it.delete()
+                    }
+                }
+            }
+            savePreference(preferences.dataOnExternalStorage, false)
+        }
     }
 
     fun <T> savePreference(preference: BasePreference<T>, value: T) {
@@ -203,10 +232,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
      * 11, 512 after Check ->
      * https://commonsware.com/blog/2020/06/13/count-your-saf-uri-permission-grants.html
      */
-    private fun clearPersistedUriPermissions() {
+    private fun clearPersistedUriPermissions(folderPath: String) {
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         app.contentResolver.persistedUriPermissions.forEach { permission ->
-            app.contentResolver.releasePersistableUriPermission(permission.uri, flags)
+            val uriPath = permission.uri.path
+            if (uriPath?.contains(folderPath) == true) {
+                app.contentResolver.releasePersistableUriPermission(permission.uri, flags)
+            }
         }
     }
 

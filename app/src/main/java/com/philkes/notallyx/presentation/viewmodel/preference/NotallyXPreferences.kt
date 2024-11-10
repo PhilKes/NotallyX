@@ -102,6 +102,9 @@ class NotallyXPreferences private constructor(app: Application) {
     val databaseEncryptionKey =
         EncryptedPassphrasePreference("database_encryption_key", preferences, ByteArray(0))
 
+    val dataOnExternalStorage =
+        BooleanPreference("dataOnExternalStorage", preferences, false, R.string.data_on_external)
+
     fun getWidgetData(id: Int) = preferences.getLong("widget:$id", 0)
 
     fun getWidgetNoteType(id: Int) =
@@ -148,6 +151,7 @@ class NotallyXPreferences private constructor(app: Application) {
     }
 
     companion object {
+        const val EMPTY_PATH = "emptyPath"
 
         @Volatile private var instance: NotallyXPreferences? = null
 

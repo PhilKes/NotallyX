@@ -8,9 +8,9 @@ import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
-import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.backup.Export.cancelAutoBackup
@@ -42,7 +42,7 @@ class NotallyXApplication : Application() {
         }
 
         preferences.autoBackup.observeForeverWithPrevious { (prevAutoBackup, autoBackup) ->
-            if (autoBackup.path == AutoBackup.BACKUP_PATH_EMPTY) {
+            if (autoBackup.path == EMPTY_PATH) {
                 cancelAutoBackup(this)
             } else {
                 if (

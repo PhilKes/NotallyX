@@ -8,8 +8,8 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.work.Data
 import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.Export.exportAsZip
 import java.text.SimpleDateFormat
@@ -24,7 +24,7 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
         val preferences = NotallyXPreferences.getInstance(app)
         val (path, _, maxBackups) = preferences.autoBackup.value
 
-        if (path != AutoBackup.BACKUP_PATH_EMPTY) {
+        if (path != EMPTY_PATH) {
             val uri = Uri.parse(path)
             val folder = requireNotNull(DocumentFile.fromTreeUri(app, uri))
 

@@ -7,6 +7,9 @@
         name="logs"
         path="/logs" />
     <external-media-path
+      name="."
+      path="." />
+    <external-media-path
         name="images"
         path="/Images" />
     <external-media-path

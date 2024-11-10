@@ -58,7 +58,7 @@ class WidgetProvider : AppWidgetProvider() {
         val database =
             NotallyDatabase.getDatabase(
                     context.applicationContext as Application,
-                    observeBiometricLock = false,
+                    observePreferences = false,
                 )
                 .value
         val pendingResult = goAsync()
