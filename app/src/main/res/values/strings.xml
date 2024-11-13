@@ -190,6 +190,7 @@
     <string name="help">Help</string>
     <string name="google_keep_help">In order to import your Notes from Google Keep you must download your Google Takeout ZIP file. Click Help to get more information.\n\nIf you already have a Takeout ZIP file, click Import and choose the ZIP file.</string>
     <string name="evernote_help">In order to import your Notes from Evernote you must export your Evernote Notebook as ENEX. Click Help to get more information.\n\nIf you already have a ENEX file, click Import and choose it.</string>
+    <string name="plain_text_files_help">In order to import your Notes from plain text files, click Import and choose the folder containing the text files.\n\nEvery file is imported as a separate note, the file’s name becomes the note’s title.\nIf the text contents start with Markdown list syntax (e.g. ’- [x] Task1’) it will be converted to a List note.</string>
     <plurals name="imported_notes">
         <item quantity="one">Imported %s Note</item>
         <item quantity="other">Imported %s Notes</item>
@@ -204,6 +205,7 @@
 
     <string name="google_keep">Google Keep</string>
     <string name="evernote">Evernote</string>
+    <string name="plain_text_files">Plain Text Files</string>
 
     <string name="export_backup">Export backup</string>
     <string name="import_backup">Import backup</string>

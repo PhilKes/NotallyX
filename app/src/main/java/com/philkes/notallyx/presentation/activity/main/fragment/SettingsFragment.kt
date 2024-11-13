@@ -26,6 +26,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.imports.FOLDER_MIMETYPE
 import com.philkes.notallyx.data.imports.ImportSource
 import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
@@ -315,22 +316,32 @@ class SettingsFragment : Fragment() {
                     .setPositiveButton(R.string.import_action) { dialog, _ ->
                         dialog.cancel()
                         val intent =
-                            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                                type = "ap/*"
-                                putExtra(
-                                    Intent.EXTRA_MIME_TYPES,
-                                    arrayOf(selectedImportSource.mimeType),
-                                )
-                                addCategory(Intent.CATEGORY_OPENABLE)
+                            when (selectedImportSource.mimeType) {
+                                FOLDER_MIMETYPE ->
+                                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                                        addCategory(Intent.CATEGORY_DEFAULT)
+                                    }
+
+                                else ->
+                                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                        type = "application/*"
+                                        putExtra(
+                                            Intent.EXTRA_MIME_TYPES,
+                                            arrayOf(selectedImportSource.mimeType),
+                                        )
+                                        addCategory(Intent.CATEGORY_OPENABLE)
+                                    }
                             }
                         importOtherActivityResultLauncher.launch(intent)
                     }
-                    .setNegativeButton(R.string.help) { _, _ ->
-                        val intent =
-                            Intent(Intent.ACTION_VIEW).apply {
-                                data = Uri.parse(selectedImportSource.documentationUrl)
+                    .also {
+                        selectedImportSource.documentationUrl?.let { docUrl ->
+                            it.setNegativeButton(R.string.help) { _, _ ->
+                                val intent =
+                                    Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(docUrl) }
+                                startActivity(intent)
                             }
-                        startActivity(intent)
+                        }
                     }
                     .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
                     .show()
