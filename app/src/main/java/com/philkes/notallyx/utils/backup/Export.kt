@@ -4,20 +4,28 @@ import android.app.Application
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.print.PostPDFGenerator
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.philkes.notallyx.data.NotallyDatabase
+import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
+import com.philkes.notallyx.data.model.toHtml
+import com.philkes.notallyx.data.model.toJson
+import com.philkes.notallyx.data.model.toTxt
 import com.philkes.notallyx.presentation.view.misc.Progress
+import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.IO.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.IO.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.IO.SUBFOLDER_IMAGES
+import com.philkes.notallyx.utils.IO.getExportedPath
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
@@ -26,8 +34,11 @@ import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import java.io.File
 import java.io.FileInputStream
+import java.io.OutputStreamWriter
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.model.enums.CompressionLevel
@@ -206,5 +217,84 @@ object Export {
 
     private fun ZipParameters.copy(fileNameInZip: String? = this.fileNameInZip): ZipParameters {
         return ZipParameters(this).apply { this@apply.fileNameInZip = fileNameInZip }
+    }
+
+    fun exportPdfFile(
+        app: Application,
+        note: BaseNote,
+        folder: DocumentFile,
+        fileName: String = "${note.title}.${ExportMimeType.PDF.fileExtension}",
+        onResult: PostPDFGenerator.OnResult? = null,
+        progress: MutableLiveData<Progress>? = null,
+        counter: AtomicInteger? = null,
+        total: Int? = null,
+    ) {
+        folder.findFile(fileName)?.delete()
+        folder.createFile(ExportMimeType.PDF.mimeType, fileName)?.let {
+            val file = DocumentFile.fromFile(File(app.getExportedPath(), fileName))
+            val html = note.toHtml(NotallyXPreferences.getInstance(app).showDateCreated())
+            PostPDFGenerator.create(
+                file,
+                html,
+                app,
+                object : PostPDFGenerator.OnResult {
+                    override fun onSuccess(file: DocumentFile) {
+                        app.contentResolver.openOutputStream(it.uri)?.use { outStream ->
+                            app.contentResolver.openInputStream(file.uri)?.copyTo(outStream)
+                        }
+                        progress?.postValue(
+                            Progress(current = counter!!.incrementAndGet(), total = total!!)
+                        )
+                        onResult?.onSuccess(file)
+                    }
+
+                    override fun onFailure(message: CharSequence?) {
+                        onResult?.onFailure(message)
+                    }
+                },
+            )
+        }
+    }
+
+    suspend fun exportPlainTextFile(
+        app: Application,
+        note: BaseNote,
+        exportType: ExportMimeType,
+        folder: DocumentFile,
+        fileName: String = "${note.title}.${exportType.fileExtension}",
+        progress: MutableLiveData<Progress>? = null,
+        counter: AtomicInteger? = null,
+        total: Int? = null,
+    ): DocumentFile? {
+        return withContext(Dispatchers.IO) {
+            folder.findFile(fileName)?.delete()
+            val file =
+                folder.createFile(exportType.mimeType, fileName)?.let {
+                    app.contentResolver.openOutputStream(it.uri)?.use { stream ->
+                        OutputStreamWriter(stream).use { writer ->
+                            writer.write(
+                                when (exportType) {
+                                    ExportMimeType.TXT ->
+                                        note.toTxt(
+                                            includeTitle = false,
+                                            includeCreationDate = false,
+                                        )
+
+                                    ExportMimeType.JSON -> note.toJson()
+                                    ExportMimeType.HTML ->
+                                        note.toHtml(
+                                            NotallyXPreferences.getInstance(app).showDateCreated()
+                                        )
+
+                                    else -> TODO("Unsupported MimeType for Export")
+                                }
+                            )
+                        }
+                    }
+                    it
+                }
+            progress?.postValue(Progress(current = counter!!.incrementAndGet(), total = total!!))
+            return@withContext file
+        }
     }
 }

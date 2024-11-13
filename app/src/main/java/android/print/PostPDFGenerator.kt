@@ -1,10 +1,11 @@
 package android.print
 
+import android.content.ContentResolver
 import android.content.Context
-import android.os.ParcelFileDescriptor
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import java.io.File
+import androidx.documentfile.provider.DocumentFile
+import com.philkes.notallyx.presentation.nameWithoutExtension
 
 /**
  * This class needs to be in android.print package to access the package private methods of
@@ -12,20 +13,25 @@ import java.io.File
  */
 object PostPDFGenerator {
 
-    fun create(file: File, content: String, context: Context, onResult: OnResult) {
+    fun create(file: DocumentFile, content: String, context: Context, onResult: OnResult) {
         val webView = WebView(context)
         webView.loadDataWithBaseURL(null, content, "text/html", "utf-8", null)
         webView.webViewClient =
             object : WebViewClient() {
 
                 override fun onPageFinished(view: WebView?, url: String?) {
-                    val adapter = webView.createPrintDocumentAdapter(file.nameWithoutExtension)
-                    print(file, adapter, onResult)
+                    val adapter = webView.createPrintDocumentAdapter(file.nameWithoutExtension!!)
+                    print(context.contentResolver, file, adapter, onResult)
                 }
             }
     }
 
-    private fun print(file: File, adapter: PrintDocumentAdapter, onResult: OnResult) {
+    private fun print(
+        contentResolver: ContentResolver,
+        file: DocumentFile,
+        adapter: PrintDocumentAdapter,
+        onResult: OnResult,
+    ) {
         val onLayoutResult =
             object : PrintDocumentAdapter.LayoutResultCallback() {
 
@@ -34,14 +40,19 @@ object PostPDFGenerator {
                 }
 
                 override fun onLayoutFinished(info: PrintDocumentInfo?, changed: Boolean) {
-                    writeToFile(file, adapter, onResult)
+                    writeToFile(contentResolver, file, adapter, onResult)
                 }
             }
 
         adapter.onLayout(null, getPrintAttributes(), null, onLayoutResult, null)
     }
 
-    private fun writeToFile(file: File, adapter: PrintDocumentAdapter, onResult: OnResult) {
+    private fun writeToFile(
+        contentResolver: ContentResolver,
+        file: DocumentFile,
+        adapter: PrintDocumentAdapter,
+        onResult: OnResult,
+    ) {
         val onWriteResult =
             object : PrintDocumentAdapter.WriteResultCallback() {
 
@@ -55,10 +66,7 @@ object PostPDFGenerator {
             }
 
         val pages = arrayOf(PageRange.ALL_PAGES)
-        if (!file.exists()) {
-            file.createNewFile()
-        }
-        val fileDescriptor = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_WRITE)
+        val fileDescriptor = contentResolver.openFileDescriptor(file.uri, "rw")
         adapter.onWrite(pages, fileDescriptor, null, onWriteResult)
     }
 
@@ -72,7 +80,7 @@ object PostPDFGenerator {
 
     interface OnResult {
 
-        fun onSuccess(file: File)
+        fun onSuccess(file: DocumentFile)
 
         fun onFailure(message: CharSequence?)
     }

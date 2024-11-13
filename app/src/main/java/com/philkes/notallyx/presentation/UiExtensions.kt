@@ -40,6 +40,8 @@ import android.widget.RadioGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
+import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
@@ -475,3 +477,9 @@ fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
 fun Context.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {
     return resources.getQuantityString(id, quantity, quantity, *formatArgs)
 }
+
+fun Context.getUriForFile(file: File): Uri =
+    FileProvider.getUriForFile(this, "${packageName}.provider", file)
+
+val DocumentFile.nameWithoutExtension: String?
+    get() = name?.substringBeforeLast(".")

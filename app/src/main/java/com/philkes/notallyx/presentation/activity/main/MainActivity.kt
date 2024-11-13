@@ -17,9 +17,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.GravityCompat
 import androidx.core.widget.doAfterTextChanged
+import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -49,7 +49,9 @@ import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.movedToResId
+import com.philkes.notallyx.presentation.nameWithoutExtension
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.ItemListener
@@ -58,7 +60,11 @@ import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
+import com.philkes.notallyx.utils.IO.getExportedPath
 import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.backup.Export.exportPdfFile
+import com.philkes.notallyx.utils.backup.Export.exportPlainTextFile
 import java.io.File
 import kotlinx.coroutines.launch
 
@@ -67,6 +73,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private lateinit var navController: NavController
     private lateinit var configuration: AppBarConfiguration
     private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private val model: BaseNoteModel by viewModels()
     private val actionModeCancelCallback =
@@ -182,7 +189,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     private fun hideLabelsInNavigation(hiddenLabels: Set<String>, maxLabelsToDisplay: Int) {
         var visibleLabels = 0
-        labelsMenuItems.forEachIndexed { idx, menuItem ->
+        labelsMenuItems.forEach { menuItem ->
             val visible =
                 !hiddenLabels.contains(menuItem.title) && visibleLabels < maxLabelsToDisplay
             menuItem.setVisible(visible)
@@ -345,58 +352,62 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             .show()
     }
 
-    private fun exportToPDF() {
-        val baseNote = model.actionMode.getFirstNote()
-        model.getPDFFile(
-            baseNote,
-            object : PostPDFGenerator.OnResult {
+    private fun exportSelectedNotes(mimeType: ExportMimeType) {
+        if (model.actionMode.count.value == 1) {
+            val baseNote = model.actionMode.getFirstNote()
+            when (mimeType) {
+                ExportMimeType.PDF -> {
+                    exportPdfFile(
+                        application,
+                        baseNote,
+                        DocumentFile.fromFile(application.getExportedPath()),
+                        "Untitled.${mimeType.fileExtension}",
+                        object : PostPDFGenerator.OnResult {
 
-                override fun onSuccess(file: File) {
-                    showFileOptionsDialog(file, "application/pdf")
+                            override fun onSuccess(file: DocumentFile) {
+                                showFileOptionsDialog(file, ExportMimeType.PDF.mimeType)
+                            }
+
+                            override fun onFailure(message: CharSequence?) {
+                                Toast.makeText(
+                                        this@MainActivity,
+                                        R.string.something_went_wrong,
+                                        Toast.LENGTH_SHORT,
+                                    )
+                                    .show()
+                            }
+                        },
+                    )
                 }
-
-                override fun onFailure(message: CharSequence?) {
-                    Toast.makeText(
-                            this@MainActivity,
-                            R.string.something_went_wrong,
-                            Toast.LENGTH_SHORT,
-                        )
-                        .show()
-                }
-            },
-        )
-    }
-
-    private fun exportToTXT() {
-        val baseNote = model.actionMode.getFirstNote()
-        lifecycleScope.launch {
-            val file = model.getTXTFile(baseNote)
-            showFileOptionsDialog(file, "text/plain")
+                ExportMimeType.TXT,
+                ExportMimeType.JSON,
+                ExportMimeType.HTML ->
+                    lifecycleScope.launch {
+                        exportPlainTextFile(
+                                application,
+                                baseNote,
+                                mimeType,
+                                DocumentFile.fromFile(application.getExportedPath()),
+                                "Untitled.${mimeType.fileExtension}",
+                            )
+                            ?.let { showFileOptionsDialog(it, mimeType.mimeType) }
+                    }
+            }
+        } else {
+            lifecycleScope.launch {
+                val intent =
+                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                        addCategory(Intent.CATEGORY_DEFAULT)
+                    }
+                model.selectedExportMimeType = mimeType
+                exportNotesActivityResultLauncher.launch(intent)
+            }
         }
     }
 
-    private fun exportToJSON() {
-        val baseNote = model.actionMode.getFirstNote()
-        lifecycleScope.launch {
-            val file = model.getJSONFile(baseNote)
-            showFileOptionsDialog(file, "application/json")
-        }
-    }
-
-    private fun exportToHTML() {
-        val baseNote = model.actionMode.getFirstNote()
-        lifecycleScope.launch {
-            val file = model.getHTMLFile(baseNote)
-            showFileOptionsDialog(file, "text/html")
-        }
-    }
-
-    private fun showFileOptionsDialog(file: File, mimeType: String) {
-        val uri = FileProvider.getUriForFile(this, "${packageName}.provider", file)
-
+    private fun showFileOptionsDialog(file: DocumentFile, mimeType: String) {
         MenuDialog(this)
-            .add(R.string.share) { shareFile(uri, mimeType) }
-            .add(R.string.view_file) { viewFile(uri, mimeType) }
+            .add(R.string.view_file) { viewFile(getUriForFile(File(file.uri.path!!)), mimeType) }
             .add(R.string.save_to_device) { saveFileToDevice(file, mimeType) }
             .show()
     }
@@ -412,25 +423,14 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         startActivity(chooser)
     }
 
-    private fun shareFile(uri: Uri, mimeType: String) {
-        val intent =
-            Intent(Intent.ACTION_SEND).apply {
-                type = mimeType
-                putExtra(Intent.EXTRA_STREAM, uri)
-            }
-
-        val chooser = Intent.createChooser(intent, null)
-        startActivity(chooser)
-    }
-
-    private fun saveFileToDevice(file: File, mimeType: String) {
+    private fun saveFileToDevice(file: DocumentFile, mimeType: String) {
         val intent =
             Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
                 type = mimeType
                 addCategory(Intent.CATEGORY_OPENABLE)
-                putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension)
+                putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension!!)
             }
-        model.currentFile = file
+        model.selectedExportFile = file
         exportFileActivityResultLauncher.launch(intent)
     }
 
@@ -519,7 +519,13 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         exportFileActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> model.writeCurrentFileToUri(uri) }
+                    result.data?.data?.let { uri -> model.exportSelectedFileToUri(uri) }
+                }
+            }
+        exportNotesActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> model.exportSelectedNotesToFolder(uri) }
                 }
             }
     }
@@ -539,13 +545,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     menu.add(R.string.archive, R.drawable.archive) { moveNotes(Folder.ARCHIVED) }
                     menu.addChangeColor()
                     val share = menu.addShare()
-                    val export = menu.addExportMenu()
-                    model.actionMode.count.observeCountAndPinned(
-                        this@MainActivity,
-                        share,
-                        export,
-                        pinned,
-                    )
+                    menu.addExportMenu()
+                    model.actionMode.count.observeCountAndPinned(this@MainActivity, share, pinned)
                 }
 
                 Folder.ARCHIVED -> {
@@ -557,17 +558,12 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                         moveNotes(Folder.NOTES)
                     }
                     menu.addDelete(MenuItem.SHOW_AS_ACTION_ALWAYS)
-                    val export = menu.addExportMenu(MenuItem.SHOW_AS_ACTION_ALWAYS)
+                    menu.addExportMenu(MenuItem.SHOW_AS_ACTION_ALWAYS)
                     val pinned = menu.addPinned()
                     menu.addLabels()
                     menu.addChangeColor()
                     val share = menu.addShare()
-                    model.actionMode.count.observeCountAndPinned(
-                        this@MainActivity,
-                        share,
-                        export,
-                        pinned,
-                    )
+                    model.actionMode.count.observeCountAndPinned(this@MainActivity, share, pinned)
                 }
 
                 Folder.DELETED -> {
@@ -581,10 +577,10 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     ) {
                         deleteForever()
                     }
-                    val export = menu.addExportMenu()
+                    menu.addExportMenu()
                     menu.addChangeColor()
                     val share = menu.add(R.string.share, R.drawable.share) { share() }
-                    model.actionMode.count.observeCount(this@MainActivity, share, export)
+                    model.actionMode.count.observeCount(this@MainActivity, share)
                 }
             }
         }
@@ -622,10 +618,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 .apply {
                     setIcon(R.drawable.export)
                     item.setShowAsAction(showAsAction)
-                    add("PDF").onClick { exportToPDF() }
-                    add("TXT").onClick { exportToTXT() }
-                    add("JSON").onClick { exportToJSON() }
-                    add("HTML").onClick { exportToHTML() }
+                    ExportMimeType.entries.forEach {
+                        add(it.name).onClick { exportSelectedNotes(it) }
+                    }
                 }
                 .item
         }
@@ -640,24 +635,21 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         private fun NotNullLiveData<Int>.observeCount(
             lifecycleOwner: LifecycleOwner,
             share: MenuItem,
-            export: MenuItem,
             onCountChange: ((Int) -> Unit)? = null,
         ) {
             observe(lifecycleOwner) { count ->
                 binding.ActionMode.title = count.toString()
                 onCountChange?.invoke(count)
                 share.setVisible(count == 1)
-                export.setVisible(count == 1)
             }
         }
 
         private fun NotNullLiveData<Int>.observeCountAndPinned(
             lifecycleOwner: LifecycleOwner,
             share: MenuItem,
-            export: MenuItem,
             pinned: MenuItem,
         ) {
-            observeCount(lifecycleOwner, share, export) {
+            observeCount(lifecycleOwner, share) {
                 val baseNotes = model.actionMode.selectedNotes.values
                 if (baseNotes.any { !it.pinned }) {
                     pinned.setTitle(R.string.pin).setIcon(R.drawable.pin).onClick {

@@ -9,7 +9,6 @@ import android.os.IBinder
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.FileProvider
 import androidx.core.content.IntentCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -18,6 +17,7 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.ActivityPlayAudioBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.audio.AudioPlayService
 import com.philkes.notallyx.utils.audio.LocalBinder
@@ -112,7 +112,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         val audioRoot = application.getExternalAudioDirectory()
         val file = if (audioRoot != null) File(audioRoot, audio.name) else null
         if (file != null && file.exists()) {
-            val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
+            val uri = getUriForFile(file)
 
             val intent =
                 Intent(Intent.ACTION_SEND).apply {
