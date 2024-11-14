@@ -1,0 +1,1 @@
+Kleinere Fixes bezüglich Touch-Größen und Beschreibungen
