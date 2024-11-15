@@ -57,7 +57,7 @@ class NotesImporterTest {
                     val imageFile =
                         File(
                             importOutputFolder,
-                            "Android/media/com.philkes.notallyx.debug/Images/${it.localName}",
+                            "Android/media/${application.packageName}/Images/${it.localName}",
                         )
                     assertThat(imageFile)
                         .exists()
@@ -75,7 +75,7 @@ class NotesImporterTest {
                     assertThat(
                             File(
                                 importOutputFolder,
-                                "Android/media/com.philkes.notallyx.debug/Files/${it.localName}",
+                                "Android/media/${application.packageName}/Files/${it.localName}",
                             )
                         )
                         .exists()
@@ -84,7 +84,7 @@ class NotesImporterTest {
                     val audioFile =
                         File(
                             importOutputFolder,
-                            "Android/media/com.philkes.notallyx.debug/Audios/${it.name}",
+                            "Android/media/${application.packageName}/Audios/${it.name}",
                         )
                     assertThat(audioFile).exists()
                     // TODO: Metadata is not properly stored

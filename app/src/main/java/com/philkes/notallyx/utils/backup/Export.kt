@@ -174,7 +174,11 @@ object Export {
     }
 
     fun cancelAutoBackup(context: Context) {
-        WorkManager.getInstance(context).cancelUniqueWork(AUTO_BACKUP_WORK_NAME)
+        try {
+            WorkManager.getInstance(context).cancelUniqueWork(AUTO_BACKUP_WORK_NAME)
+        } catch (e: IllegalStateException) {
+            // only happens in Unit-Tests
+        }
     }
 
     private fun backupFile(

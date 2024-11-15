@@ -100,6 +100,11 @@ tasks.register('installLocalGitHooks', Copy) {
 }
 preBuild.dependsOn installLocalGitHooks
 
+afterEvaluate {
+    bundleRelease.dependsOn testReleaseUnitTest
+    assembleRelease.dependsOn testReleaseUnitTest
+}
+
 dependencies {
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'junit:junit:4.13.2'
