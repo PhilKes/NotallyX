@@ -103,6 +103,8 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
             if (model.isNewNote && intent.action == Intent.ACTION_SEND) {
                 handleSharedNote()
+            } else if (model.isNewNote) {
+                intent.getStringExtra(Constants.SelectedLabel)?.let { model.setLabels(listOf(it)) }
             }
 
             setupToolbar()

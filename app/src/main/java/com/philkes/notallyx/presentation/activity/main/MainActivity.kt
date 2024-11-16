@@ -44,6 +44,7 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityMainBinding
 import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
@@ -105,12 +106,25 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private fun setupFAB() {
         binding.TakeNote.setOnClickListener {
             val intent = Intent(this, EditNoteActivity::class.java)
-            startActivity(intent)
+            startActivity(prepareNewNoteIntent(intent))
         }
         binding.MakeList.setOnClickListener {
             val intent = Intent(this, EditListActivity::class.java)
-            startActivity(intent)
+            startActivity(prepareNewNoteIntent(intent))
         }
+    }
+
+    private fun prepareNewNoteIntent(intent: Intent): Intent {
+        return supportFragmentManager
+            .findFragmentById(R.id.NavHostFragment)
+            ?.childFragmentManager
+            ?.fragments
+            ?.firstOrNull()
+            ?.let { fragment ->
+                return if (fragment is NotallyFragment) {
+                    fragment.prepareNewNoteIntent(intent)
+                } else intent
+            } ?: intent
     }
 
     private var labelsMenuItems: List<MenuItem> = listOf()
@@ -470,12 +484,16 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     }
 
     private fun handleDestinationChange(destination: NavDestination) {
-        if (destination.id == R.id.Notes) {
-            binding.TakeNote.show()
-            binding.MakeList.show()
-        } else {
-            binding.TakeNote.hide()
-            binding.MakeList.hide()
+        when (destination.id) {
+            R.id.Notes,
+            R.id.DisplayLabel -> {
+                binding.TakeNote.show()
+                binding.MakeList.show()
+            }
+            else -> {
+                binding.TakeNote.hide()
+                binding.MakeList.hide()
+            }
         }
 
         val inputManager = ContextCompat.getSystemService(this, InputMethodManager::class.java)
