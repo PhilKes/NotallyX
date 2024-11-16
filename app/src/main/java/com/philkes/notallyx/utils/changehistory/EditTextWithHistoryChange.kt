@@ -5,19 +5,19 @@ import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
 
 class EditTextWithHistoryChange(
     private val editText: EditTextWithHistory,
-    textBefore: Editable,
-    textAfter: Editable,
+    before: EditTextState,
+    after: EditTextState,
     private val updateModel: (newValue: Editable) -> Unit,
-) : ValueChange<Editable>(textAfter, textBefore) {
+) : ValueChange<EditTextState>(after, before) {
 
-    private val cursorPosition = editText.selectionStart
-
-    override fun update(value: Editable, isUndo: Boolean) {
+    override fun update(value: EditTextState, isUndo: Boolean) {
         editText.applyWithoutTextWatcher {
-            text = value
-            updateModel.invoke(value)
+            setText(value.text)
+            updateModel.invoke(value.text)
             requestFocus()
-            setSelection(Math.min(value.length, cursorPosition + (if (isUndo) 1 else 0)))
+            setSelection(value.cursorPos)
         }
     }
 }
+
+data class EditTextState(val text: Editable, val cursorPos: Int)

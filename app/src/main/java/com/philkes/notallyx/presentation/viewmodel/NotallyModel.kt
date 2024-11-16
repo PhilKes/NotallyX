@@ -82,6 +82,8 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     var audioRoot = app.getExternalAudioDirectory()
     var filesRoot = app.getExternalFilesDirectory()
 
+    private lateinit var originalNote: BaseNote
+
     init {
         database.observeForever { baseNoteDao = it.getBaseNoteDao() }
     }
@@ -208,6 +210,8 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             val baseNote = cachedNote ?: withContext(Dispatchers.IO) { baseNoteDao.get(id) }
 
             if (baseNote != null) {
+                originalNote = baseNote
+
                 this.id = id
                 folder = baseNote.folder
                 color = baseNote.color
@@ -228,14 +232,16 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 files.value = baseNote.files
                 audios.value = baseNote.audios
             } else {
-                createBaseNote()
+                originalNote = createBaseNote()
                 Toast.makeText(app, R.string.cant_find_note, Toast.LENGTH_LONG).show()
             }
-        } else createBaseNote()
+        } else originalNote = createBaseNote()
     }
 
-    private suspend fun createBaseNote() {
-        id = withContext(Dispatchers.IO) { baseNoteDao.insert(getBaseNote()) }
+    private suspend fun createBaseNote(): BaseNote {
+        val baseNote = getBaseNote()
+        id = withContext(Dispatchers.IO) { baseNoteDao.insert(baseNote) }
+        return baseNote.copy(id = id)
     }
 
     suspend fun deleteBaseNote() {
@@ -266,6 +272,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             audios.value.isEmpty()
     }
 
+    fun isModified(): Boolean {
+        return getBaseNote() != originalNote
+    }
+
     private suspend fun updateImages() {
         withContext(Dispatchers.IO) { baseNoteDao.updateImages(id, images.value) }
     }
@@ -280,7 +290,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     private fun getBaseNote(): BaseNote {
         val spans = getFilteredSpans(body)
-        val body = this.body.trimEnd().toString()
+        val body = this.body.toString()
         val nonEmptyItems = this.items.filter { item -> item.body.isNotEmpty() }
         return BaseNote(
             id,

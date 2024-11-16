@@ -14,6 +14,7 @@ import com.philkes.notallyx.presentation.clone
 import com.philkes.notallyx.presentation.createTextWatcherWithHistory
 import com.philkes.notallyx.presentation.removeSelectionFromSpan
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
 
 /**
@@ -78,6 +79,10 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
 
     override fun setText(text: CharSequence?, type: BufferType?) {
         applyWithoutTextWatcher { super.setText(text, type) }
+    }
+
+    fun setText(text: Editable) {
+        super.setText(text, BufferType.EDITABLE)
     }
 
     fun applyWithoutTextWatcher(
@@ -173,10 +178,16 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
      * to [changeHistory]. This method is used by all other members functions.
      */
     fun changeTextWithHistory(callback: (text: Editable) -> Unit) {
+        val cursorPosBefore = selectionStart
         val (textBefore, textAfter) = changeText(callback)
-        updateModel?.invoke(textAfter.clone())
+        val textAfterClone = textAfter.clone()
+        updateModel?.invoke(textAfterClone)
         changeHistory?.push(
-            EditTextWithHistoryChange(this, textBefore, textAfter) { text ->
+            EditTextWithHistoryChange(
+                this,
+                EditTextState(textBefore.clone(), cursorPosBefore),
+                EditTextState(textAfterClone, selectionStart),
+            ) { text ->
                 updateModel?.invoke(text.clone())
             }
         )

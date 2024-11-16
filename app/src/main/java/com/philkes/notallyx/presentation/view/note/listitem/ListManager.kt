@@ -27,6 +27,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.utils.changehistory.ChangeCheckedForAllChange
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
+import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.ListAddChange
 import com.philkes.notallyx.utils.changehistory.ListCheckedChange
 import com.philkes.notallyx.utils.changehistory.ListDeleteChange
@@ -221,15 +222,15 @@ class ListManager(
         editText: EditText,
         listener: TextWatcher,
         position: Int,
-        textBefore: String,
-        textAfter: String,
+        value: EditTextState,
+        before: EditTextState? = null,
         pushChange: Boolean = true,
     ) {
         val item = items[position]
-        item.body = textAfter
+        item.body = value.text.toString()
         if (pushChange) {
             changeHistory.push(
-                ListEditTextChange(editText, position, textBefore, textAfter, listener, this)
+                ListEditTextChange(editText, position, before!!, value, listener, this)
             )
         }
     }

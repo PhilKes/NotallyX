@@ -56,6 +56,7 @@ import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
 import java.io.File
 import java.util.Date
@@ -92,6 +93,16 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
         }
     }
     return editable
+}
+
+fun String.truncate(limit: Int): String {
+    return if (length > limit) {
+        val truncated = take(limit)
+        val remainingCharacters = length - limit
+        "$truncated... ($remainingCharacters more characters)"
+    } else {
+        this
+    }
 }
 
 /**
@@ -220,10 +231,10 @@ fun Int.dp(context: Context): Int =
  */
 fun EditText.createListTextWatcherWithHistory(listManager: ListManager, positionGetter: () -> Int) =
     object : TextWatcher {
-        private lateinit var currentTextBefore: String
+        private lateinit var stateBefore: EditTextState
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            currentTextBefore = s.toString()
+            stateBefore = EditTextState(getText()!!.clone(), selectionStart)
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
@@ -233,8 +244,8 @@ fun EditText.createListTextWatcherWithHistory(listManager: ListManager, position
                 this@createListTextWatcherWithHistory,
                 this,
                 positionGetter.invoke(),
-                currentTextBefore,
-                requireNotNull(s).toString(),
+                EditTextState(getText()!!.clone(), selectionStart),
+                before = stateBefore,
             )
         }
     }
@@ -245,10 +256,10 @@ fun EditTextWithHistory.createTextWatcherWithHistory(
     updateModel: (text: Editable) -> Unit,
 ) =
     object : TextWatcher {
-        private lateinit var currentTextBefore: Editable
+        private lateinit var stateBefore: EditTextState
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            currentTextBefore = this@createTextWatcherWithHistory.getTextClone()
+            stateBefore = EditTextState(getTextClone(), selectionStart)
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -256,15 +267,13 @@ fun EditTextWithHistory.createTextWatcherWithHistory(
         }
 
         override fun afterTextChanged(s: Editable?) {
-            val textBefore = currentTextBefore.clone()
             val textAfter = requireNotNull(s).clone()
             updateModel.invoke(textAfter)
-
             changeHistory.push(
                 EditTextWithHistoryChange(
                     this@createTextWatcherWithHistory,
-                    textBefore,
-                    textAfter,
+                    stateBefore,
+                    EditTextState(textAfter, selectionStart),
                     updateModel,
                 )
             )

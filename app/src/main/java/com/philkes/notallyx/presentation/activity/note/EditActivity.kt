@@ -68,7 +68,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         lifecycleScope.launch(Dispatchers.Main) {
             if (model.isEmpty()) {
                 model.deleteBaseNote()
-            } else if (changeHistory.canUndo()) {
+            } else if (model.isModified()) {
                 saveNote()
             }
             super.finish()
@@ -78,7 +78,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong("id", model.id)
-        if (changeHistory.canUndo()) {
+        if (model.isModified()) {
             lifecycleScope.launch { saveNote() }
         }
     }
