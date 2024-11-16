@@ -2,9 +2,12 @@
     <img src="fastlane/metadata/android/en-US/images/icon.png" alt="icon" width="90"/>
     <br />
     <b>NotallyX | Minimalistic note taking app</b>
-    
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" alt="Get it on F-Droid" height="70"/>](https://f-droid.org/en/packages/com.philkes.notallyx/)
-
+    <p>
+        <center>
+            <a href="https://f-droid.org/en/packages/com.philkes.notallyx"><img alt='IzzyOnDroid' height='70' src='https://fdroid.gitlab.io/artwork/badge/get-it-on.png' /></a>
+            <a href="https://apt.izzysoft.de/fdroid/index/apk/com.philkes.notallyx"><img alt='F-Droid' height='70' src='https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png' /></a>
+        </center>
+    </p>
 </h2>
 
 <div style="display: flex; justify-content: space-between; width: 100%;">
