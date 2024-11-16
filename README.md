@@ -4,8 +4,8 @@
     <b>NotallyX | Minimalistic note taking app</b>
     <p>
         <center>
-            <a href="https://f-droid.org/en/packages/com.philkes.notallyx"><img alt='IzzyOnDroid' height='70' src='https://fdroid.gitlab.io/artwork/badge/get-it-on.png' /></a>
-            <a href="https://apt.izzysoft.de/fdroid/index/apk/com.philkes.notallyx"><img alt='F-Droid' height='70' src='https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png' /></a>
+            <a href="https://f-droid.org/en/packages/com.philkes.notallyx"><img alt='IzzyOnDroid' height='80' src='https://fdroid.gitlab.io/artwork/badge/get-it-on.png' /></a>
+            <a href="https://apt.izzysoft.de/fdroid/index/apk/com.philkes.notallyx"><img alt='F-Droid' height='80' src='https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png' /></a>
         </center>
     </p>
 </h2>
