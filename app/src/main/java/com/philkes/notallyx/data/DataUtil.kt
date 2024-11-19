@@ -10,7 +10,6 @@ import androidx.documentfile.provider.DocumentFile
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
-import com.philkes.notallyx.presentation.getFileName
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel.FileType
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.IO.copyToFile
@@ -19,6 +18,7 @@ import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.IO.rename
 import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.getFileName
 import java.io.File
 import java.io.FileInputStream
 import java.util.UUID

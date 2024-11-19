@@ -69,6 +69,14 @@ class EditListActivity : EditActivity(Type.LIST) {
         }
     }
 
+    override fun highlightSearchResults(search: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    override fun selectSearchResult(resultPos: Int) {
+        TODO("Not yet implemented")
+    }
+
     override fun initActionManager(undo: MenuItem, redo: MenuItem) {
         changeHistory = ChangeHistory {
             undo.isEnabled = changeHistory.canUndo()

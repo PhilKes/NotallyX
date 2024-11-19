@@ -11,6 +11,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.toPreservedByteArray
 import com.philkes.notallyx.data.model.toPreservedString
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
+import com.philkes.notallyx.utils.createObserverSkipFirst
 import java.security.SecureRandom
 import java.util.Date
 import java.util.Locale
@@ -85,14 +86,7 @@ abstract class BasePreference<T>(
 }
 
 fun <T> BasePreference<T>.observeForeverSkipFirst(observer: Observer<T>) {
-    var isFirstEvent = true
-    this.observeForever { value ->
-        if (isFirstEvent) {
-            isFirstEvent = false
-        } else {
-            observer.onChanged(value)
-        }
-    }
+    this.observeForever(createObserverSkipFirst(observer))
 }
 
 interface TextProvider {
