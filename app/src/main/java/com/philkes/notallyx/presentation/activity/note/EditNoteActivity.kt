@@ -33,13 +33,14 @@ import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companio
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TITLE
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TYPE
 import com.philkes.notallyx.presentation.add
-import com.philkes.notallyx.presentation.copyToClipBoard
-import com.philkes.notallyx.presentation.getLatestText
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.utils.LinkMovementMethod
+import com.philkes.notallyx.utils.copyToClipBoard
+import com.philkes.notallyx.utils.findAllOccurrences
+import com.philkes.notallyx.utils.getLatestText
 
 private const val UNNAMED_NOTE_PLACEHOLDER = "Unnamed Note"
 
@@ -48,6 +49,9 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
     private lateinit var selectedSpan: URLSpan
     private lateinit var pickNoteNewActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var pickNoteUpdateActivityResultLauncher: ActivityResultLauncher<Intent>
+
+    private var searchResultIndices: List<Pair<Int, Int>>? = null
+    private var search = ""
 
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { binding.EnterBody.requestFocus() }
@@ -99,9 +103,35 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
             }
     }
 
+    override fun highlightSearchResults(search: String): Int {
+        this.search = search
+        binding.EnterBody.clearHighlights()
+        if (search.isEmpty()) {
+            return 0
+        }
+        searchResultIndices =
+            model.body.toString().findAllOccurrences(search).onEach { (startIdx, endIdx) ->
+                binding.EnterBody.highlight(startIdx, endIdx, false)
+            }
+        return searchResultIndices!!.size
+    }
+
+    override fun selectSearchResult(resultPos: Int) {
+        searchResultIndices?.get(resultPos)?.let { (startIdx, endIdx) ->
+            binding.EnterBody.highlight(startIdx, endIdx, true)
+        }
+    }
+
     override fun setupListeners() {
         super.setupListeners()
-        binding.EnterBody.initHistory(changeHistory) { text -> model.body = text }
+        binding.EnterBody.initHistory(changeHistory) { text ->
+            val textChanged = !model.body.toString().contentEquals(text)
+            model.body = text
+            if (textChanged && searchResultIndices?.isNotEmpty() == true) {
+                val amount = highlightSearchResults(search)
+                setSearchResultsAmount(amount)
+            }
+        }
     }
 
     override fun setStateFromModel() {

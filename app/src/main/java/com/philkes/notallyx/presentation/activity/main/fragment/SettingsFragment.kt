@@ -34,7 +34,6 @@ import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceBooleanDialogBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
-import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
 import com.philkes.notallyx.presentation.checkedTag
 import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.setupImportProgressDialog
@@ -57,6 +56,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 import com.philkes.notallyx.presentation.viewmodel.preference.StringPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.TextProvider
 import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt

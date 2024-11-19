@@ -13,7 +13,9 @@ import android.text.Editable
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
 import android.view.ViewGroup.LayoutParams
+import android.view.ViewGroup.VISIBLE
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -21,6 +23,7 @@ import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.PagerSnapHelper
@@ -39,7 +42,9 @@ import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showColorSelectDialog
+import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.view.Constants
+import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
 import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
@@ -50,6 +55,8 @@ import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.mergeSkipFirst
+import com.philkes.notallyx.utils.observeSkipFirst
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -61,6 +68,11 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     private lateinit var selectLabelsActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var playAudioActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var attachFilesActivityResultLauncher: ActivityResultLauncher<Intent>
+
+    private lateinit var searchPosPrev: MenuItem
+    private lateinit var searchPosNext: MenuItem
+    private val searchResultPos = NotNullLiveData(-1)
+    private val searchResultsAmount = NotNullLiveData(-1)
 
     internal val model: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
@@ -230,12 +242,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         binding.Toolbar.setNavigationOnClickListener { finish() }
 
         binding.Toolbar.menu.apply {
-            val pin =
-                add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { item ->
-                    pin(item)
-                }
-            bindPinned(pin)
-
+            add(R.string.search, R.drawable.search, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                startSearch()
+            }
             val undo =
                 add(R.string.undo, R.drawable.undo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
                     changeHistory.undo()
@@ -249,6 +258,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
             undo.isEnabled = changeHistory.canUndo()
             redo.isEnabled = changeHistory.canRedo()
+
+            val pin = add(R.string.pin, R.drawable.pin) { item -> pin(item) }
+            bindPinned(pin)
 
             add(R.string.share, R.drawable.share) { share() }
             add(R.string.labels, R.drawable.label) { label() }
@@ -283,6 +295,93 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 }
             }
         }
+
+        searchResultsAmount.mergeSkipFirst(searchResultPos).observe(this) { (amount, pos) ->
+            val hasResults = amount > 0
+            binding.SearchResults.text = if (hasResults) "${pos + 1}/$amount" else "0"
+            searchPosNext.isEnabled = hasResults
+            searchPosPrev.isEnabled = hasResults
+        }
+
+        searchResultPos.observeSkipFirst(this) { pos -> selectSearchResult(pos) }
+
+        binding.EnterSearchKeyword.apply {
+            doAfterTextChanged { text ->
+                val amount = highlightSearchResults(text.toString())
+                searchResultsAmount.value = amount
+                if (amount > 0) {
+                    searchResultPos.value = 0
+                }
+            }
+        }
+    }
+
+    protected fun setSearchResultsAmount(amount: Int) {
+        searchResultsAmount.value = amount
+        if (searchResultPos.value >= amount) {
+            searchResultPos.value = amount - 1
+        }
+    }
+
+    /**
+     * Visibly highlights found search results in the UI.
+     *
+     * @return amount of search results found
+     */
+    abstract fun highlightSearchResults(search: String): Int
+
+    abstract fun selectSearchResult(resultPos: Int)
+
+    private fun startSearch() {
+        binding.Toolbar.apply {
+            menu.clear()
+            searchPosNext =
+                menu
+                    .add(R.string.previous, R.drawable.arrow_upward) {
+                        searchResultPos.apply {
+                            if (value > 0) {
+                                value -= 1
+                            } else {
+                                value = searchResultsAmount.value - 1
+                            }
+                        }
+                    }
+                    .setEnabled(false)
+            searchPosPrev =
+                menu
+                    .add(R.string.next, R.drawable.arrow_downward) {
+                        searchResultPos.apply {
+                            if (value < searchResultsAmount.value - 1) {
+                                value += 1
+                            } else {
+                                value = 0
+                            }
+                        }
+                    }
+                    .setEnabled(false)
+            setNavigationOnClickListener { endSearch() }
+        }
+        binding.EnterSearchKeyword.apply {
+            visibility = VISIBLE
+            requestFocus()
+            showKeyboard(this)
+        }
+        binding.SearchResults.apply {
+            text = ""
+            visibility = VISIBLE
+        }
+    }
+
+    private fun endSearch() {
+        binding.EnterSearchKeyword.apply {
+            visibility = GONE
+            setText("")
+        }
+        binding.SearchResults.apply {
+            visibility = GONE
+            text = ""
+        }
+        setupToolbar()
     }
 
     abstract fun configureUI()
