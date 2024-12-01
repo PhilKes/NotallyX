@@ -40,26 +40,26 @@ class EditListActivity : EditActivity(Type.LIST) {
         super.setupToolbar()
         binding.Toolbar.menu.apply {
             add(
-                1,
                 R.string.delete_checked_items,
                 R.drawable.delete_all,
                 MenuItem.SHOW_AS_ACTION_IF_ROOM,
+                groupId = 1,
             ) {
                 listManager.deleteCheckedItems()
             }
             add(
-                1,
                 R.string.check_all_items,
                 R.drawable.checkbox_fill,
                 MenuItem.SHOW_AS_ACTION_IF_ROOM,
+                groupId = 1,
             ) {
                 listManager.changeCheckedForAll(true)
             }
             add(
-                1,
                 R.string.uncheck_all_items,
                 R.drawable.checkbox,
                 MenuItem.SHOW_AS_ACTION_IF_ROOM,
+                groupId = 1,
             ) {
                 listManager.changeCheckedForAll(false)
             }

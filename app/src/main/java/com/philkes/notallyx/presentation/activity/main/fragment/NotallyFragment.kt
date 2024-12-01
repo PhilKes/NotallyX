@@ -221,4 +221,8 @@ abstract class NotallyFragment : Fragment(), ItemListener {
     abstract fun getBackground(): Int
 
     abstract fun getObservable(): LiveData<List<Item>>
+
+    open fun prepareNewNoteIntent(intent: Intent): Intent {
+        return intent
+    }
 }

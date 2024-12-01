@@ -266,7 +266,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         return title.isEmpty() &&
             body.isEmpty() &&
             items.none { item -> item.body.isNotEmpty() } &&
-            labels.isEmpty() &&
             files.value.isEmpty() &&
             images.value.isEmpty() &&
             audios.value.isEmpty()
