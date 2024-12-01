@@ -10,6 +10,7 @@ import com.philkes.notallyx.data.DataUtil
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.imports.evernote.EvernoteImporter
 import com.philkes.notallyx.data.imports.google.GoogleKeepImporter
+import com.philkes.notallyx.data.imports.txt.PlainTextImporter
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Label
@@ -34,6 +35,7 @@ class NotesImporter(private val app: Application, private val database: NotallyD
                     when (importSource) {
                         ImportSource.GOOGLE_KEEP -> GoogleKeepImporter()
                         ImportSource.EVERNOTE -> EvernoteImporter()
+                        ImportSource.PLAIN_TEXT -> PlainTextImporter()
                     }.import(app, uri, tempDir, progress)
                 } catch (e: Exception) {
                     Log.e(TAG, "import: failed", e)
@@ -49,23 +51,11 @@ class NotesImporter(private val app: Application, private val database: NotallyD
             progress?.postValue(
                 ImportProgress(total = totalFiles, stage = ImportStage.IMPORT_FILES)
             )
-            importFiles(
-                files,
-                importDataFolder,
-                NotallyModel.FileType.ANY,
-                progress,
-                totalFiles,
-                counter,
-            )
-            importFiles(
-                images,
-                importDataFolder,
-                NotallyModel.FileType.IMAGE,
-                progress,
-                totalFiles,
-                counter,
-            )
-            importAudios(audios, importDataFolder, progress, totalFiles, counter)
+            importDataFolder?.let {
+                importFiles(files, it, NotallyModel.FileType.ANY, progress, totalFiles, counter)
+                importFiles(images, it, NotallyModel.FileType.IMAGE, progress, totalFiles, counter)
+                importAudios(audios, it, progress, totalFiles, counter)
+            }
             database.getBaseNoteDao().insert(notes)
             progress?.postValue(ImportProgress(inProgress = false))
             return notes.size
@@ -137,7 +127,7 @@ enum class ImportSource(
     val displayNameResId: Int,
     val mimeType: String,
     val helpTextResId: Int,
-    val documentationUrl: String,
+    val documentationUrl: String?,
     val iconResId: Int,
 ) {
     GOOGLE_KEEP(
@@ -154,4 +144,13 @@ enum class ImportSource(
         "https://help.evernote.com/hc/en-us/articles/209005557-Export-notes-and-notebooks-as-ENEX-or-HTML",
         R.drawable.icon_evernote,
     ),
+    PLAIN_TEXT(
+        R.string.plain_text_files,
+        FOLDER_MIMETYPE,
+        R.string.plain_text_files_help,
+        null,
+        R.drawable.text_file,
+    ),
 }
+
+const val FOLDER_MIMETYPE = "FOLDER"

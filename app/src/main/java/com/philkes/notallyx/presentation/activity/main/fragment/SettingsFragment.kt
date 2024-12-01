@@ -18,7 +18,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -26,6 +25,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.imports.FOLDER_MIMETYPE
 import com.philkes.notallyx.data.imports.ImportSource
 import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
@@ -36,6 +36,7 @@ import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
 import com.philkes.notallyx.presentation.checkedTag
+import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
@@ -315,22 +316,32 @@ class SettingsFragment : Fragment() {
                     .setPositiveButton(R.string.import_action) { dialog, _ ->
                         dialog.cancel()
                         val intent =
-                            Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                                type = "ap/*"
-                                putExtra(
-                                    Intent.EXTRA_MIME_TYPES,
-                                    arrayOf(selectedImportSource.mimeType),
-                                )
-                                addCategory(Intent.CATEGORY_OPENABLE)
+                            when (selectedImportSource.mimeType) {
+                                FOLDER_MIMETYPE ->
+                                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                                        addCategory(Intent.CATEGORY_DEFAULT)
+                                    }
+
+                                else ->
+                                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                        type = "application/*"
+                                        putExtra(
+                                            Intent.EXTRA_MIME_TYPES,
+                                            arrayOf(selectedImportSource.mimeType),
+                                        )
+                                        addCategory(Intent.CATEGORY_OPENABLE)
+                                    }
                             }
                         importOtherActivityResultLauncher.launch(intent)
                     }
-                    .setNegativeButton(R.string.help) { _, _ ->
-                        val intent =
-                            Intent(Intent.ACTION_VIEW).apply {
-                                data = Uri.parse(selectedImportSource.documentationUrl)
+                    .also {
+                        selectedImportSource.documentationUrl?.let { docUrl ->
+                            it.setNegativeButton(R.string.help) { _, _ ->
+                                val intent =
+                                    Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(docUrl) }
+                                startActivity(intent)
                             }
-                        startActivity(intent)
+                        }
                     }
                     .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
                     .show()
@@ -388,7 +399,7 @@ class SettingsFragment : Fragment() {
         val app = requireContext().applicationContext as Application
         val log = Operations.getLog(app)
         if (log.exists()) {
-            val uri = FileProvider.getUriForFile(app, "${app.packageName}.provider", log)
+            val uri = app.getUriForFile(log)
             intent.putExtra(Intent.EXTRA_STREAM, uri)
         }
 

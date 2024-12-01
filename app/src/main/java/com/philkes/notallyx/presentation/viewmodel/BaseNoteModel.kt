@@ -3,10 +3,8 @@ package com.philkes.notallyx.presentation.viewmodel
 import android.app.Application
 import android.content.Intent
 import android.net.Uri
-import android.print.PostPDFGenerator
-import android.text.Html
 import android.widget.Toast
-import androidx.core.text.toHtml
+import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -34,8 +32,6 @@ import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.SearchResult
-import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
@@ -46,25 +42,17 @@ import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.IO.deleteAttachments
 import com.philkes.notallyx.utils.IO.getBackupDir
-import com.philkes.notallyx.utils.IO.getExportedPath
-import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
-import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
 import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.backup.Export.exportAsZip
-import com.philkes.notallyx.utils.backup.Import.importZip
+import com.philkes.notallyx.utils.backup.Export
+import com.philkes.notallyx.utils.backup.Import
 import com.philkes.notallyx.utils.backup.Migrations
 import com.philkes.notallyx.utils.backup.XMLUtils
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
-import java.text.DateFormat
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.json.JSONArray
-import org.json.JSONObject
 
 class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
@@ -75,11 +63,12 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     private val labelCache = HashMap<String, Content>()
 
-    var currentFile: File? = null
+    var selectedExportFile: DocumentFile? = null
+    lateinit var selectedExportMimeType: ExportMimeType
 
     lateinit var labels: LiveData<List<String>>
-    var allNotes: LiveData<List<BaseNote>>? = null
-    var allNotesObserver: Observer<List<BaseNote>>? = null
+    private var allNotes: LiveData<List<BaseNote>>? = null
+    private var allNotesObserver: Observer<List<BaseNote>>? = null
     var baseNotes: Content? = null
     var deletedNotes: Content? = null
     var archivedNotes: Content? = null
@@ -102,8 +91,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val preferences = NotallyXPreferences.getInstance(app)
 
     val imageRoot = app.getExternalImagesDirectory()
-    val fileRoot = app.getExternalFilesDirectory()
-    private val audioRoot = app.getExternalAudioDirectory()
 
     val importProgress = MutableLiveData<ImportProgress>()
     val exportProgress = MutableLiveData<Progress>()
@@ -244,7 +231,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun exportBackup(uri: Uri) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) { exportAsZip(uri, app, exportProgress) }
+            withContext(Dispatchers.IO) { Export.exportAsZip(uri, app, exportProgress) }
             Toast.makeText(app, R.string.saved_to_device, Toast.LENGTH_LONG).show()
         }
     }
@@ -257,7 +244,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
         val backupDir = app.getBackupDir()
         viewModelScope.launch(exceptionHandler) {
-            importZip(app, uri, backupDir, password, importProgress)
+            Import.importZip(app, uri, backupDir, password, importProgress)
         }
     }
 
@@ -304,65 +291,60 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun writeCurrentFileToUri(uri: Uri) {
+    fun exportSelectedFileToUri(uri: Uri) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val output = app.contentResolver.openOutputStream(uri) as FileOutputStream
-                output.channel.truncate(0)
-                val input = FileInputStream(requireNotNull(currentFile))
-                input.copyTo(output)
-                input.close()
-                output.close()
+                app.contentResolver.openOutputStream(uri)?.use { output ->
+                    app.contentResolver.openInputStream(selectedExportFile!!.uri)?.copyTo(output)
+                }
             }
             Toast.makeText(app, R.string.saved_to_device, Toast.LENGTH_LONG).show()
         }
     }
 
-    suspend fun getJSONFile(baseNote: BaseNote) =
-        withContext(Dispatchers.IO) {
-            val file = File(app.getExportedPath(), "Untitled.json")
-            val json = getJSON(baseNote)
-            file.writeText(json)
-            file
+    fun exportSelectedNotesToFolder(folderUri: Uri) {
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            Operations.log(app, throwable)
+            actionMode.close(true)
+            exportProgress.postValue(Progress(inProgress = false))
+            Toast.makeText(app, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
         }
+        viewModelScope.launch(exceptionHandler) {
+            val notes = actionMode.selectedNotes.values
+            val counter = AtomicInteger(0)
+            for (note in notes) {
+                exportProgress.postValue(Progress(total = notes.size))
+                when (selectedExportMimeType) {
+                    ExportMimeType.TXT,
+                    ExportMimeType.JSON,
+                    ExportMimeType.HTML -> {
+                        Export.exportPlainTextFile(
+                            app,
+                            note,
+                            selectedExportMimeType,
+                            DocumentFile.fromTreeUri(app, folderUri)!!,
+                            progress = exportProgress,
+                            counter = counter,
+                            total = notes.size,
+                        )
+                    }
 
-    suspend fun getTXTFile(baseNote: BaseNote) =
-        withContext(Dispatchers.IO) {
-            val file = File(app.getExportedPath(), "Untitled.txt")
-            val writer = file.bufferedWriter()
-
-            val date = DateFormat.getDateInstance(DateFormat.FULL).format(baseNote.timestamp)
-
-            val body =
-                when (baseNote.type) {
-                    Type.NOTE -> baseNote.body
-                    Type.LIST -> Operations.getBody(baseNote.items)
+                    ExportMimeType.PDF -> {
+                        Export.exportPdfFile(
+                            app,
+                            note,
+                            DocumentFile.fromTreeUri(app, folderUri)!!,
+                            progress = exportProgress,
+                            counter = counter,
+                            total = notes.size,
+                        )
+                    }
                 }
-
-            if (baseNote.title.isNotEmpty()) {
-                writer.append("${baseNote.title}\n\n")
             }
-            if (preferences.showDateCreated()) {
-                writer.append("$date\n\n")
-            }
-            writer.append(body)
-            writer.close()
-
-            file
+            actionMode.close(true)
+            exportProgress.postValue(Progress(inProgress = false))
+            Toast.makeText(app, R.string.saved_to_device, Toast.LENGTH_LONG).show()
         }
-
-    suspend fun getHTMLFile(baseNote: BaseNote) =
-        withContext(Dispatchers.IO) {
-            val file = File(app.getExportedPath(), "Untitled.html")
-            val html = getHTML(baseNote, preferences.showDateCreated())
-            file.writeText(html)
-            file
-        }
-
-    fun getPDFFile(baseNote: BaseNote, onResult: PostPDFGenerator.OnResult) {
-        val file = File(app.getExportedPath(), "Untitled.pdf")
-        val html = getHTML(baseNote, preferences.showDateCreated())
-        PostPDFGenerator.create(file, html, app, onResult)
     }
 
     fun pinBaseNotes(pinned: Boolean) {
@@ -477,63 +459,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         database.close()
     }
 
-    private fun getJSON(baseNote: BaseNote): String {
-        val jsonObject =
-            JSONObject()
-                .put("type", baseNote.type.name)
-                .put("color", baseNote.color.name)
-                .put("title", baseNote.title)
-                .put("pinned", baseNote.pinned)
-                .put("date-created", baseNote.timestamp)
-                .put("labels", JSONArray(baseNote.labels))
-
-        when (baseNote.type) {
-            Type.NOTE -> {
-                jsonObject.put("body", baseNote.body)
-                jsonObject.put("spans", Converters.spansToJSONArray(baseNote.spans))
-            }
-
-            Type.LIST -> {
-                jsonObject.put("items", Converters.itemsToJSONArray(baseNote.items))
-            }
-        }
-
-        return jsonObject.toString(2)
-    }
-
-    private fun getHTML(baseNote: BaseNote, showDateCreated: Boolean) = buildString {
-        val date = DateFormat.getDateInstance(DateFormat.FULL).format(baseNote.timestamp)
-        val title = Html.escapeHtml(baseNote.title)
-
-        append("<!DOCTYPE html>")
-        append("<html><head>")
-        append("<meta charset=\"UTF-8\"><title>$title</title>")
-        append("</head><body>")
-        append("<h2>$title</h2>")
-
-        if (showDateCreated) {
-            append("<p>$date</p>")
-        }
-
-        when (baseNote.type) {
-            Type.NOTE -> {
-                val body = baseNote.body.applySpans(baseNote.spans).toHtml()
-                append(body)
-            }
-
-            Type.LIST -> {
-                append("<ol style=\"list-style: none; padding: 0;\">")
-                baseNote.items.forEach { item ->
-                    val body = Html.escapeHtml(item.body)
-                    val checked = if (item.checked) "checked" else ""
-                    append("<li><input type=\"checkbox\" $checked>$body</li>")
-                }
-                append("</ol>")
-            }
-        }
-        append("</body></html>")
-    }
-
     private fun executeAsync(function: suspend () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) { function() }
     }
@@ -561,4 +486,11 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
         }
     }
+}
+
+enum class ExportMimeType(val mimeType: String, val fileExtension: String) {
+    TXT("text/plain", "txt"),
+    PDF("application/pdf", "pdf"),
+    JSON("application/json", "json"),
+    HTML("text/html", "html"),
 }

@@ -19,7 +19,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
-import androidx.core.content.FileProvider
 import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -37,6 +36,7 @@ import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
@@ -491,12 +491,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 val intent =
                     Intent(Intent.ACTION_VIEW).apply {
                         val file = File(model.filesRoot, fileAttachment.localName)
-                        val uri =
-                            FileProvider.getUriForFile(
-                                this@EditActivity,
-                                "${packageName}.provider",
-                                file,
-                            )
+                        val uri = this@EditActivity.getUriForFile(file)
                         setDataAndType(uri, fileAttachment.mimeType)
                         addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                     }
