@@ -212,7 +212,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         // ActionMode implementation
                         try {
                             menu?.apply {
-                                add(R.string.link_note, 0) {
+                                add(R.string.link_note, 0, order = Menu.CATEGORY_CONTAINER + 1) {
                                     startPickNote(pickNoteNewActivityResultLauncher)
                                     mode?.finish()
                                 }
