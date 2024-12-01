@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:orientation="vertical"
+  android:paddingTop="8dp"
+  android:paddingStart="26dp"
+  android:paddingEnd="26dp"
+  >
+
+  <TextView
+    android:id="@+id/Title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?attr/textAppearanceSubtitle2"
+    android:textSize="16sp"
+    android:paddingBottom="8dp"
+    android:layout_marginTop="12dp"
+    />
+
+  <TextView
+    android:id="@+id/Message"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:textAppearance="?attr/textAppearanceCaption"
+    android:textSize="16sp"
+    android:paddingBottom="8dp"
+    android:layout_marginTop="12dp"
+    />
+
+  <RadioGroup
+    android:id="@+id/RadioGroup"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    >
+    <RadioButton
+      android:id="@+id/EnabledButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:minHeight="?attr/listPreferredItemHeightSmall"
+      android:textAppearance="?android:attr/textAppearanceMedium"
+      android:textColor="?attr/textColorAlertDialogListItem"
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/abc_select_dialog_padding_start_material"
+      android:paddingRight="?attr/dialogPreferredPadding"
+      android:paddingStart="@dimen/abc_select_dialog_padding_start_material"
+      android:paddingEnd="?attr/dialogPreferredPadding"
+      android:drawablePadding="4dp"
+      android:ellipsize="marquee"
+      android:text="@string/enabled"/>
+
+    <RadioButton
+      android:id="@+id/DisabledButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:minHeight="?attr/listPreferredItemHeightSmall"
+      android:textAppearance="?android:attr/textAppearanceMedium"
+      android:textColor="?attr/textColorAlertDialogListItem"
+      android:gravity="center_vertical"
+      android:paddingLeft="@dimen/abc_select_dialog_padding_start_material"
+      android:paddingRight="?attr/dialogPreferredPadding"
+      android:paddingStart="@dimen/abc_select_dialog_padding_start_material"
+      android:paddingEnd="?attr/dialogPreferredPadding"
+      android:drawablePadding="4dp"
+      android:ellipsize="marquee"
+      android:text="@string/disabled" />
+  </RadioGroup>
+
+
+</LinearLayout>

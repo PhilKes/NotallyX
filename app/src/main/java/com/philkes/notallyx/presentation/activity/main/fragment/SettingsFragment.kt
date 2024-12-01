@@ -31,6 +31,7 @@ import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
+import com.philkes.notallyx.databinding.PreferenceBooleanDialogBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.canAuthenticateWithBiometrics
@@ -41,12 +42,13 @@ import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
-import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup.Companion.BACKUP_PATH_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackupPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
+import com.philkes.notallyx.presentation.viewmodel.preference.BooleanPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortPreference
@@ -64,7 +66,7 @@ class SettingsFragment : Fragment() {
     private lateinit var importBackupActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var importOtherActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var exportBackupActivityResultLauncher: ActivityResultLauncher<Intent>
-    private lateinit var chooseFolderActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var chooseBackupFolderActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var setupLockActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var disableLockActivityResultLauncher: ActivityResultLauncher<Intent>
 
@@ -111,6 +113,20 @@ class SettingsFragment : Fragment() {
 
             biometricLock.observe(viewLifecycleOwner) { value ->
                 binding.BiometricLock.setup(biometricLock, value)
+            }
+
+            dataOnExternalStorage.observe(viewLifecycleOwner) { value ->
+                binding.ExternalDataFolder.setup(
+                    dataOnExternalStorage,
+                    value,
+                    R.string.external_data_message,
+                ) { enabled ->
+                    if (enabled) {
+                        model.enableExternalData()
+                    } else {
+                        model.disableExternalData()
+                    }
+                }
             }
         }
 
@@ -204,7 +220,7 @@ class SettingsFragment : Fragment() {
                     result.data?.data?.let { uri -> model.exportBackup(uri) }
                 }
             }
-        chooseFolderActivityResultLauncher =
+        chooseBackupFolderActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri -> model.setAutoBackupPath(uri) }
@@ -416,12 +432,12 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    private fun displayChooseFolderDialog() {
+    private fun displayChooseBackupFolderDialog() {
         MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.notes_will_be)
             .setPositiveButton(R.string.choose_folder) { _, _ ->
                 val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                chooseFolderActivityResultLauncher.launch(intent)
+                chooseBackupFolderActivityResultLauncher.launch(intent)
             }
             .show()
     }
@@ -553,6 +569,51 @@ class SettingsFragment : Fragment() {
         }
     }
 
+    private fun PreferenceBinding.setup(
+        preference: BooleanPreference,
+        value: Boolean,
+        messageResId: Int? = null,
+        onSave: ((newValue: Boolean) -> Unit)?,
+    ) {
+        Title.setText(preference.titleResId!!)
+
+        val context = requireContext()
+        val enabledText = context.getString(R.string.enabled)
+        val disabledText = context.getString(R.string.disabled)
+        Value.text = if (value) enabledText else disabledText
+        root.setOnClickListener {
+            val layout =
+                PreferenceBooleanDialogBinding.inflate(layoutInflater, null, false).apply {
+                    Title.setText(preference.titleResId)
+                    messageResId?.let { Message.setText(it) }
+                    if (value) {
+                        EnabledButton.isChecked = true
+                    } else {
+                        DisabledButton.isChecked = true
+                    }
+                }
+            val dialog =
+                MaterialAlertDialogBuilder(requireContext())
+                    .setView(layout.root)
+                    .setNegativeButton(R.string.cancel, null)
+                    .show()
+            layout.apply {
+                EnabledButton.setOnClickListener {
+                    dialog.cancel()
+                    if (!value) {
+                        onSave?.invoke(true) ?: model.savePreference(preference, true)
+                    }
+                }
+                DisabledButton.setOnClickListener {
+                    dialog.cancel()
+                    if (value) {
+                        onSave?.invoke(false) ?: model.savePreference(preference, false)
+                    }
+                }
+            }
+        }
+    }
+
     private fun PreferenceBinding.setupBackupPassword(
         preference: StringPreference,
         password: String,
@@ -676,10 +737,10 @@ class SettingsFragment : Fragment() {
     private fun PreferenceBinding.setupAutoBackup(value: String) {
         Title.setText(R.string.auto_backup)
 
-        if (value == BACKUP_PATH_EMPTY) {
+        if (value == EMPTY_PATH) {
             Value.setText(R.string.tap_to_set_up)
 
-            root.setOnClickListener { displayChooseFolderDialog() }
+            root.setOnClickListener { displayChooseBackupFolderDialog() }
         } else {
             val uri = Uri.parse(value)
             val folder = requireNotNull(DocumentFile.fromTreeUri(requireContext(), uri))
@@ -690,7 +751,7 @@ class SettingsFragment : Fragment() {
             root.setOnClickListener {
                 MenuDialog(requireContext())
                     .add(R.string.disable_auto_backup) { model.disableAutoBackup() }
-                    .add(R.string.choose_another_folder) { displayChooseFolderDialog() }
+                    .add(R.string.choose_another_folder) { displayChooseBackupFolderDialog() }
                     .show()
             }
         }

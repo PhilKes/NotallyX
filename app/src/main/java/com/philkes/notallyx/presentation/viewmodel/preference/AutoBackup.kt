@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.viewmodel.preference
 
 import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 
 class AutoBackupPreference(sharedPreferences: SharedPreferences) :
     BasePreference<AutoBackup>(sharedPreferences, AutoBackup()) {
@@ -28,12 +29,11 @@ class AutoBackupPreference(sharedPreferences: SharedPreferences) :
 }
 
 data class AutoBackup(
-    val path: String = BACKUP_PATH_EMPTY,
+    val path: String = EMPTY_PATH,
     val periodInDays: Int = BACKUP_PERIOD_DAYS_MIN,
     val maxBackups: Int = 3,
 ) {
     companion object {
-        const val BACKUP_PATH_EMPTY = "emptyPath"
 
         const val BACKUP_PERIOD_DAYS_MIN = 1
         const val BACKUP_PERIOD_DAYS_MAX = 31

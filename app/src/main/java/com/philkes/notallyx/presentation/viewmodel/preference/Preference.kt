@@ -191,6 +191,22 @@ class StringPreference(
     }
 }
 
+class BooleanPreference(
+    private val key: String,
+    sharedPreferences: SharedPreferences,
+    defaultValue: Boolean,
+    titleResId: Int? = null,
+) : BasePreference<Boolean>(sharedPreferences, defaultValue, titleResId) {
+
+    override fun getValue(sharedPreferences: SharedPreferences): Boolean {
+        return sharedPreferences.getBoolean(key, defaultValue)
+    }
+
+    override fun SharedPreferences.Editor.put(value: Boolean) {
+        putBoolean(key, value)
+    }
+}
+
 class ByteArrayPreference(
     private val key: String,
     sharedPreferences: SharedPreferences,

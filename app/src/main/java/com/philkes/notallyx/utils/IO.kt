@@ -15,6 +15,7 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.isImage
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.widget.WidgetProvider
+import com.philkes.notallyx.utils.IO.createDirectory
 import java.io.File
 import java.io.FileOutputStream
 import java.io.InputStream
@@ -28,11 +29,13 @@ object IO {
     const val SUBFOLDER_FILES = "Files"
     const val SUBFOLDER_AUDIOS = "Audios"
 
-    fun Application.getExternalImagesDirectory() = getExternalDirectory(SUBFOLDER_IMAGES)
+    fun Application.getExternalImagesDirectory() = getExternalMediaDirectory(SUBFOLDER_IMAGES)
 
-    fun Application.getExternalAudioDirectory() = getExternalDirectory(SUBFOLDER_AUDIOS)
+    fun Application.getExternalAudioDirectory() = getExternalMediaDirectory(SUBFOLDER_AUDIOS)
 
-    fun Application.getExternalFilesDirectory() = getExternalDirectory(SUBFOLDER_FILES)
+    fun Application.getExternalFilesDirectory() = getExternalMediaDirectory(SUBFOLDER_FILES)
+
+    fun Application.getExternalMediaDirectory() = getExternalMediaDirectory("")
 
     fun Context.getTempAudioFile(): File {
         return File(externalCacheDir, "Temp.m4a")
@@ -130,20 +133,20 @@ object IO {
 
     fun Application.getExportedPath() = getEmptyFolder("exported")
 
-    private fun Application.getExternalDirectory(name: String): File? {
-        var file: File? = null
+    private fun Application.getExternalMediaDirectory(name: String): File? {
+        return externalMediaDirs.firstOrNull()?.let { getDirectory(it, name) }
+    }
 
+    private fun getDirectory(dir: File, name: String): File? {
+        var file: File? = null
         try {
-            val mediaDir = externalMediaDirs.firstOrNull()
-            if (mediaDir != null) {
-                file = File(mediaDir, name)
-                if (file.exists()) {
-                    if (!file.isDirectory) {
-                        file.delete()
-                        file.createDirectory()
-                    }
-                } else file.createDirectory()
-            }
+            file = File(dir, name)
+            if (file.exists()) {
+                if (!file.isDirectory) {
+                    file.delete()
+                    file.createDirectory()
+                }
+            } else file.createDirectory()
         } catch (exception: Exception) {
             exception.printStackTrace()
         }
