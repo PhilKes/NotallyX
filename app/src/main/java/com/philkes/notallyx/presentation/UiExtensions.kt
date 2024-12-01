@@ -173,32 +173,19 @@ fun EditText.setOnNextAction(onNext: () -> Unit) {
     }
 }
 
-fun Menu.add(title: Int, drawable: Int, onClick: (item: MenuItem) -> Unit): MenuItem {
-    return add(Menu.NONE, title, drawable, MenuItem.SHOW_AS_ACTION_IF_ROOM, onClick)
-}
-
 fun Menu.add(
     title: Int,
     drawable: Int,
-    showAsAction: Int,
+    showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM,
+    groupId: Int = Menu.NONE,
+    order: Int = Menu.NONE,
     onClick: (item: MenuItem) -> Unit,
 ): MenuItem {
-    return add(Menu.NONE, title, drawable, showAsAction, onClick)
-}
-
-fun Menu.add(
-    groupId: Int,
-    title: Int,
-    drawable: Int,
-    showAsAction: Int,
-    onClick: (item: MenuItem) -> Unit,
-): MenuItem {
-    val menuItem = add(groupId, Menu.NONE, Menu.NONE, title)
-    menuItem.setIcon(drawable)
-    menuItem.setOnMenuItemClickListener { item ->
-        onClick(item)
-        return@setOnMenuItemClickListener false
-    }
+    val menuItem =
+        add(groupId, Menu.NONE, order, title).setIcon(drawable).setOnMenuItemClickListener { item ->
+            onClick(item)
+            return@setOnMenuItemClickListener false
+        }
     menuItem.setShowAsAction(showAsAction)
     return menuItem
 }
