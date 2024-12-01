@@ -38,6 +38,7 @@ import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.setupProgressDialog
+import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
 import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
@@ -272,6 +273,13 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 Folder.ARCHIVED -> {
                     add(R.string.delete, R.drawable.delete) { delete() }
                     add(R.string.unarchive, R.drawable.unarchive) { restore() }
+                }
+            }
+
+            add(R.string.change_color, R.drawable.change_color) {
+                showColorSelectDialog { selectedColor ->
+                    model.color = selectedColor
+                    setColor()
                 }
             }
         }
@@ -586,6 +594,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         }
         binding.root.setBackgroundColor(color)
         binding.RecyclerView.setBackgroundColor(color)
+        binding.RecyclerView.adapter?.notifyDataSetChanged()
         binding.Toolbar.backgroundTintList = ColorStateList.valueOf(color)
     }
 
