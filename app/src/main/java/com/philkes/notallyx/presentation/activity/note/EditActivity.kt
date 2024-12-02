@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
@@ -236,12 +237,15 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             undo.isEnabled = changeHistory.canUndo()
             redo.isEnabled = changeHistory.canRedo()
         }
+        undo.isEnabled = changeHistory.canUndo()
+        redo.isEnabled = changeHistory.canRedo()
     }
 
     protected open fun setupToolbar() {
         binding.Toolbar.setNavigationOnClickListener { finish() }
 
         binding.Toolbar.menu.apply {
+            clear()
             add(R.string.search, R.drawable.search, MenuItem.SHOW_AS_ACTION_ALWAYS) {
                 startSearch()
             }
@@ -255,9 +259,6 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 }
 
             initActionManager(undo, redo)
-
-            undo.isEnabled = changeHistory.canUndo()
-            redo.isEnabled = changeHistory.canRedo()
 
             val pin = add(R.string.pin, R.drawable.pin) { item -> pin(item) }
             bindPinned(pin)
@@ -332,7 +333,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
     abstract fun selectSearchResult(resultPos: Int)
 
-    private fun startSearch() {
+    private var navigationIconBeforeSearch: Drawable? = null
+
+    protected fun startSearch() {
         binding.Toolbar.apply {
             menu.clear()
             searchPosNext =
@@ -360,6 +363,8 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     }
                     .setEnabled(false)
             setNavigationOnClickListener { endSearch() }
+            navigationIconBeforeSearch = navigationIcon
+            setNavigationIcon(R.drawable.close)
         }
         binding.EnterSearchKeyword.apply {
             visibility = VISIBLE
@@ -372,7 +377,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         }
     }
 
-    private fun endSearch() {
+    protected fun endSearch() {
         binding.EnterSearchKeyword.apply {
             visibility = GONE
             setText("")
@@ -382,6 +387,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             text = ""
         }
         setupToolbar()
+        binding.Toolbar.navigationIcon = navigationIconBeforeSearch
     }
 
     abstract fun configureUI()

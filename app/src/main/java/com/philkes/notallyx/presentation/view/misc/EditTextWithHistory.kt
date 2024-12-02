@@ -4,18 +4,15 @@ import android.content.Context
 import android.text.Editable
 import android.text.Spanned
 import android.text.TextWatcher
-import android.text.style.BackgroundColorSpan
 import android.text.style.CharacterStyle
 import android.text.style.URLSpan
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
 import com.philkes.notallyx.data.model.isNoteUrl
 import com.philkes.notallyx.data.model.isWebUrl
-import com.philkes.notallyx.presentation.animateScroll
 import com.philkes.notallyx.presentation.clone
 import com.philkes.notallyx.presentation.createTextWatcherWithHistory
 import com.philkes.notallyx.presentation.removeSelectionFromSpan
-import com.philkes.notallyx.presentation.withAlpha
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
@@ -25,7 +22,7 @@ import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
  * *
  */
 class EditTextWithHistory(context: Context, attrs: AttributeSet) :
-    AppCompatEditText(context, attrs) {
+    HighlightableEditText(context, attrs) {
 
     var isActionModeOn = false
     private var changeHistory: ChangeHistory? = null
@@ -45,6 +42,7 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
             createTextWatcherWithHistory(
                 changeHistory,
                 { text, start, count ->
+                    clearHighlights()
                     val changedText = text.substring(start, start + count)
                     if (changedText.isWebUrl() || changedText.isNoteUrl()) {
                         super.getText()
@@ -97,11 +95,6 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
         callback()
         editTextWatcher?.let { addTextChangedListener(it) }
         return Pair(textBefore, super.getText()!!.clone())
-    }
-
-    fun getSpanRange(span: CharacterStyle): Pair<Int, Int> {
-        val text = super.getText()!!
-        return Pair(text.getSpanStart(span), text.getSpanEnd(span))
     }
 
     fun getSpanText(span: CharacterStyle): String {
@@ -218,50 +211,5 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
      */
     fun changeText(callback: (text: Editable) -> Unit): Pair<Editable, Editable> {
         return applyWithoutTextWatcher { callback(super.getText()!!) }
-    }
-
-    private val highlightedSpans: MutableList<CharacterStyle> = mutableListOf()
-    private var selectedHighlightedSpan: CharacterStyle? = null
-
-    fun clearHighlights() {
-        highlightedSpans.apply {
-            forEach { span -> removeSpan(span, pushChange = false) }
-            clear()
-        }
-        selectedHighlightedSpan = null
-    }
-
-    fun highlight(startIdx: Int, endIdx: Int, selected: Boolean) {
-        // TODO: Could be replaced with EditText.highlights? (API >= 34)
-        if (selected) {
-            selectedHighlightedSpan?.let {
-                val (previousHighlightedStartIdx, previousHighlightedEndIdx) = getSpanRange(it)
-                removeSpan(it, pushChange = false)
-                highlight(previousHighlightedStartIdx, previousHighlightedEndIdx, false)
-            }
-        }
-        highlightedSpans
-            .filter { getSpanRange(it) == Pair(startIdx, endIdx) }
-            .forEach {
-                removeSpan(it)
-                highlightedSpans.remove(it)
-            }
-        val span =
-            BackgroundColorSpan(if (selected) highlightColor else highlightColor.withAlpha(0.1f))
-        applySpan(span, startIdx, endIdx, pushChange = false)
-        highlightedSpans.add(span)
-        if (selected) {
-            selectedHighlightedSpan = span
-            layout?.apply {
-                post {
-                    val line = getLineForOffset(startIdx)
-                    val targetY = getLineTop(line)
-                    //                    scrollY = 0
-                    //                    scrollY = targetY
-                    //                scrollTo(0, targetY)
-                    animateScroll(targetY)
-                }
-            }
-        }
     }
 }

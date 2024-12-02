@@ -118,7 +118,8 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
 
     override fun selectSearchResult(resultPos: Int) {
         searchResultIndices?.get(resultPos)?.let { (startIdx, endIdx) ->
-            binding.EnterBody.highlight(startIdx, endIdx, true)
+            val selectedLineTop = binding.EnterBody.highlight(startIdx, endIdx, true)
+            selectedLineTop?.let { binding.ScrollView.scrollTo(0, it) }
         }
     }
 

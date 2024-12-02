@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.activity.note
 import android.os.Build
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View.GONE
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.philkes.notallyx.R
@@ -14,10 +15,12 @@ import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.findAllOccurrences
 
 class EditListActivity : EditActivity(Type.LIST) {
 
@@ -70,11 +73,30 @@ class EditListActivity : EditActivity(Type.LIST) {
     }
 
     override fun highlightSearchResults(search: String): Int {
-        TODO("Not yet implemented")
+        var resultPos = 0
+        adapter.clearHighlights()
+        return items
+            .mapIndexed { idx, item ->
+                val occurrences = item.body.findAllOccurrences(search)
+                occurrences.onEach { (startIdx, endIdx) ->
+                    adapter.highlightText(
+                        ListItemAdapter.ListItemHighlight(idx, resultPos++, startIdx, endIdx, false)
+                    )
+                }
+                occurrences.size
+            }
+            .sum()
     }
 
     override fun selectSearchResult(resultPos: Int) {
-        TODO("Not yet implemented")
+        val selectedItemPos = adapter.selectHighlight(resultPos)
+        if (selectedItemPos != -1) {
+            binding.RecyclerView.post {
+                binding.RecyclerView.findViewHolderForAdapterPosition(selectedItemPos)
+                    ?.itemView
+                    ?.let { binding.ScrollView.scrollTo(0, binding.RecyclerView.top + it.top) }
+            }
+        }
     }
 
     override fun initActionManager(undo: MenuItem, redo: MenuItem) {
@@ -106,7 +128,11 @@ class EditListActivity : EditActivity(Type.LIST) {
                 changeHistory,
                 preferences,
                 ContextCompat.getSystemService(baseContext, InputMethodManager::class.java),
-            )
+            ) {
+                if (binding.EnterSearchKeyword.visibility != GONE) {
+                    endSearch()
+                }
+            }
         adapter =
             ListItemAdapter(
                 model.textSize,
