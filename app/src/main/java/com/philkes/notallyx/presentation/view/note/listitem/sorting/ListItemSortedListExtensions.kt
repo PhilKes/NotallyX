@@ -246,6 +246,10 @@ fun <R> ListItemSortedList.map(transform: (ListItem) -> R): List<R> {
     return (0 until this.size()).map { transform.invoke(this[it]) }
 }
 
+fun <R> ListItemSortedList.mapIndexed(transform: (Int, ListItem) -> R): List<R> {
+    return (0 until this.size()).mapIndexed { idx, it -> transform.invoke(idx, this[it]) }
+}
+
 fun ListItemSortedList.forEach(function: (item: ListItem) -> Unit) {
     return (0 until this.size()).forEach { function.invoke(this[it]) }
 }

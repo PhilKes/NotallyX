@@ -128,8 +128,14 @@ fun String.truncate(limit: Int): String {
     }
 }
 
-fun String.findAllOccurrences(search: String): List<Pair<Int, Int>> {
+fun String.findAllOccurrences(
+    search: String,
+    caseSensitive: Boolean = false,
+): List<Pair<Int, Int>> {
     if (search.isEmpty()) return emptyList()
-    val regex = Regex(Regex.escape(search))
-    return regex.findAll(this).map { match -> match.range.first to match.range.last + 1 }.toList()
+    val regex = Regex(Regex.escape(if (caseSensitive) search else search.lowercase()))
+    return regex
+        .findAll(if (caseSensitive) this else this.lowercase())
+        .map { match -> match.range.first to match.range.last + 1 }
+        .toList()
 }

@@ -147,4 +147,5 @@
         <item quantity="few">Nie można dodać %d obrazów</item>
         <item quantity="many">Nie można dodać %d obrazów</item>
     </plurals>
+  <string name="creation_date">Utworzono</string>
 </resources>

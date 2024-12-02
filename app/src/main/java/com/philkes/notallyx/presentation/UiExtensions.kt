@@ -3,9 +3,9 @@ package com.philkes.notallyx.presentation
 import android.Manifest
 import android.animation.ValueAnimator
 import android.app.Activity
+import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
-import android.graphics.Color
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
@@ -469,7 +469,12 @@ fun Context.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): S
 
 @ColorInt
 fun @receiver:ColorInt Int.withAlpha(alpha: Float): Int {
-    return Color.argb((255 * alpha).toInt(), Color.red(this), Color.green(this), Color.blue(this))
+    return android.graphics.Color.argb(
+        (255 * alpha).toInt(),
+        android.graphics.Color.red(this),
+        android.graphics.Color.green(this),
+        android.graphics.Color.blue(this),
+    )
 }
 
 fun Context.getUriForFile(file: File): Uri =
