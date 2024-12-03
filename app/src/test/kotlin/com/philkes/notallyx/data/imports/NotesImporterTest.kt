@@ -128,6 +128,7 @@ class NotesImporterTest {
         return when (importSource) {
             ImportSource.GOOGLE_KEEP -> File(tempDir, "Takeout.zip")
             ImportSource.EVERNOTE -> File(tempDir, "Notebook.enex")
+            ImportSource.PLAIN_TEXT -> File(tempDir, "text.txt")
         }
     }
 

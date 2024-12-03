@@ -1,0 +1,4 @@
+Import from plain text files
+Export multiple notes to PDF, JSON, TXT, HTML
+Store Notes locally on external storage
+Add Notes in Labels View
