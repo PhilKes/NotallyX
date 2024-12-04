@@ -17,7 +17,7 @@
         android:layout_above="@id/AudioControlView"
         android:layout_below="@id/Toolbar"
         android:gravity="center"
-        android:textAppearance="?attr/textAppearanceBody2" />
+        android:textAppearance="?attr/textAppearanceBodyMedium" />
 
     <com.philkes.notallyx.presentation.view.note.audio.AudioControlView
         android:id="@+id/AudioControlView"
@@ -41,7 +41,7 @@
             android:layout_below="@id/Progress"
             android:layout_alignParentStart="true"
             android:layout_marginStart="8dp"
-            android:textAppearance="?attr/textAppearanceCaption" />
+            android:textAppearance="?attr/textAppearanceBodySmall" />
 
         <TextView
             android:id="@+id/Length"
@@ -50,7 +50,7 @@
             android:layout_below="@id/Progress"
             android:layout_alignParentEnd="true"
             android:layout_marginEnd="8dp"
-            android:textAppearance="?attr/textAppearanceCaption" />
+            android:textAppearance="?attr/textAppearanceBodySmall" />
 
     </com.philkes.notallyx.presentation.view.note.audio.AudioControlView>
 

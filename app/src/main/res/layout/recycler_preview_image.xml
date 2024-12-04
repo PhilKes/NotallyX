@@ -15,6 +15,6 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="@string/cant_load_image"
-        android:textAppearance="?attr/textAppearanceBody2" />
+        android:textAppearance="?attr/textAppearanceBodyMedium" />
 
 </FrameLayout>

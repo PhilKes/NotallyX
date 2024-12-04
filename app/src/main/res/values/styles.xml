@@ -1,6 +1,6 @@
 <resources>
 
-    <style name="Base.AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Base.AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorSecondary">?attr/colorPrimary</item>
         <item name="colorOnSecondary">?attr/colorOnPrimary</item>
 
@@ -8,32 +8,36 @@
 
         <item name="windowActionModeOverlay">true</item>
 
-        <item name="textAppearanceButton">@style/TextAppearance.Subtitle2</item>
-        <item name="textAppearanceSubtitle2">@style/TextAppearance.Subtitle2</item>
-        <!-- Menu Items, EditTexts, Dialog Titles -->
-        <item name="textAppearanceSubtitle1">@style/TextAppearance.Subtitle1</item>
-        <item name="textAppearanceHeadline6">@style/TextAppearance.Headline6</item>
-
         <!-- Submenu Title -->
         <item name="textAppearancePopupMenuHeader">@style/TextAppearance.Subtitle2.PopupMenu</item>
 
         <item name="toolbarStyle">@style/Toolbar</item>
         <item name="chipGroupStyle">@style/ChipGroup</item>
+        <item name="chipStyle">@style/IconChip</item>
+        <item name="checkboxStyle">@style/CheckBox</item>
+        <item name="navigationViewStyle">@style/NavigationView</item>
+        <item name="popupMenuBackground">?attr/colorSurface</item>
 
         <item name="materialAlertDialogTheme">@style/AlertDialog</item>
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+
+        <item name="colorSurface">@color/Default</item>
+        <item name="colorSurfaceVariant">@color/Default</item>
+        <item name="android:colorBackground">@color/Default</item>
+        <item name="android:statusBarColor">@color/Default</item>
+
     </style>
 
     <style name="AppTheme" parent="Base.AppTheme">
         <item name="colorPrimaryDark">@color/Black</item>
         <item name="colorPrimary">@color/Blue500</item>
-        <item name="alternateFabTint">@color/Blue500</item>
-        <item name="alternateFabBackground">@color/Blue50</item>
-    </style>
 
-    <style name="MainActivity" parent="AppTheme">
-        <item name="android:statusBarColor">@color/Transparent</item>
+        <item name="primaryFabTint">@color/Blue50</item>
+        <item name="primaryFabBackground">@color/Blue500</item>
+        <item name="secondaryFabTint">@color/Blue500</item>
+        <item name="secondaryFabBackground">@color/Blue50</item>
     </style>
-
 
     <style name="TextAppearance.Headline6.Toolbar">
         <item name="android:textSize">18sp</item>
@@ -55,19 +59,28 @@
         <item name="android:textColor">?attr/colorControlNormal</item>
     </style>
 
-
-    <style name="Toolbar" parent="Widget.MaterialComponents.Toolbar.Surface">
+    <style name="Toolbar" parent="Widget.Material3.Toolbar.Surface">
         <item name="android:elevation">4dp</item>
         <item name="titleTextAppearance">@style/TextAppearance.Headline6.Toolbar</item>
     </style>
 
+    <style name="CheckBox" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="buttonTint">?attr/colorPrimaryDark</item>
+        <item name="buttonCompat">@drawable/check_box_selector</item>
+    </style>
+
+    <style name="NavigationView" parent="Widget.Material3.NavigationView">
+        <item name="android:background">?attr/colorSurface</item>
+    </style>
 
     <style name="Preview" parent="Widget.AppCompat.TextView">
+        <item name="android:stateListAnimator">@null</item>
         <item name="android:paddingBottom">16dp</item>
         <item name="android:maxLines">1</item>
         <item name="android:ellipsize">end</item>
         <item name="android:textColor">?attr/colorControlNormal</item>
-        <item name="android:textAppearance">?attr/textAppearanceBody2</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyMedium</item>
+
     </style>
 
     <style name="Preview.ListItem">
@@ -82,38 +95,41 @@
     </style>
 
 
-    <style name="ChipGroup" parent="Widget.MaterialComponents.ChipGroup">
+    <style name="ChipGroup" parent="Widget.Material3.ChipGroup">
         <item name="chipSpacingVertical">8dp</item>
     </style>
 
 
-    <style name="Chip" parent="Widget.MaterialComponents.Chip.Choice">
+    <style name="TextChip" parent="Widget.MaterialComponents.Chip.Choice">
         <item name="android:stateListAnimator">@null</item>
-        <item name="android:textColor">@color/navigation_view_item</item>
         <item name="chipStrokeWidth">1dp</item>
         <item name="chipStrokeColor">@color/chip_stroke</item>
         <item name="chipBackgroundColor">@color/chip_background</item>
         <item name="ensureMinTouchTargetSize">false</item>
     </style>
 
+    <style name="IconChip" parent="Widget.Material3.Chip.Assist">
+        <item name="android:textColor">?attr/colorControlNormal</item>
+    </style>
 
-    <style name="AlertDialog.Title" parent="MaterialAlertDialog.MaterialComponents.Title.Text">
+
+    <style name="AlertDialog.Title" parent="MaterialAlertDialog.Material3.Title.Text">
         <item name="android:fontFamily">sans-serif-medium</item>
     </style>
 
 
-    <style name="AlertDialog" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+    <style name="AlertDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="materialAlertDialogTitleTextStyle">@style/AlertDialog.Title</item>
     </style>
 
-    <style name="Colorless" parent="ThemeOverlay.MaterialComponents">
+    <style name="Colorless" parent="ThemeOverlay.Material3">
         <item name="colorSecondary">?attr/colorOnSurface</item>
     </style>
 
 
     <style name="Preference" parent="TextView.Clickable">
         <item name="android:padding">16dp</item>
-        <item name="android:textAppearance">?attr/textAppearanceBody1</item>
+        <item name="android:textAppearance">?attr/textAppearanceBodyLarge</item>
     </style>
 
     <style name="PreferenceHeader" parent="Widget.AppCompat.TextView">
@@ -126,7 +142,7 @@
     </style>
 
 
-    <style name="RoundedRectangle" parent="ShapeAppearance.MaterialComponents.SmallComponent">
+    <style name="RoundedRectangle" parent="ShapeAppearance.Material3.SmallComponent">
         <item name="cornerSize">16dp</item>
     </style>
 
@@ -137,7 +153,7 @@
         <item name="android:textAppearance">@style/TextAppearance.MaterialComponents.Body2</item>
     </style>
 
-    <style name="PillButton" parent="Widget.MaterialComponents.Button.UnelevatedButton">
+    <style name="PillButton" parent="Widget.Material3.Button.UnelevatedButton">
         <item name="android:layout_width">112dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>

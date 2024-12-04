@@ -25,6 +25,6 @@
         android:layout_below="@id/Toolbar"
         android:gravity="center"
         android:text="@string/create_new"
-        android:textAppearance="?attr/textAppearanceBody2" />
+        android:textAppearance="?attr/textAppearanceBodyMedium" />
 
 </RelativeLayout>

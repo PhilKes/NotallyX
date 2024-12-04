@@ -42,8 +42,7 @@
 
         <activity
             android:name=".presentation.activity.main.MainActivity"
-            android:exported="true"
-            android:theme="@style/MainActivity">
+            android:exported="true">
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

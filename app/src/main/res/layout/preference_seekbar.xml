@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:paddingStart="12dp"
         android:paddingEnd="12dp"
-        android:textAppearance="?attr/textAppearanceBody1" />
+        android:textAppearance="?attr/textAppearanceBodyLarge" />
 
     <com.google.android.material.slider.Slider
         android:id="@+id/Slider"

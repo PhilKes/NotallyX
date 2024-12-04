@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <attr name="alternateFabTint" format="reference" />
-    <attr name="alternateFabBackground" format="reference" />
+    <attr name="primaryFabTint" format="reference" />
+    <attr name="primaryFabBackground" format="reference" />
+    <attr name="secondaryFabTint" format="reference" />
+    <attr name="secondaryFabBackground" format="reference" />
 </resources>

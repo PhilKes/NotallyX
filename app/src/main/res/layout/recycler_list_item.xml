@@ -64,7 +64,7 @@
             android:imeOptions="actionNext"
             android:inputType="textMultiLine"
             android:layout_marginEnd="48dp"
-            android:textAppearance="?attr/textAppearanceBody1" />
+            android:textAppearance="?attr/textAppearanceBodyLarge" />
     </RelativeLayout>
     </com.philkes.notallyx.presentation.view.misc.SwipeLayout>
 

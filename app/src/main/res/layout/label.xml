@@ -5,5 +5,5 @@
     android:includeFontPadding="false"
     android:paddingHorizontal="12dp"
     android:paddingVertical="6dp"
-    android:textAppearance="?attr/textAppearanceBody2"
+    android:textAppearance="?attr/textAppearanceBodyMedium"
     android:textColor="?attr/colorControlNormal" />

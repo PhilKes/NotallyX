@@ -13,7 +13,7 @@
     android:ellipsize="end"
     android:maxLines="1"
     android:padding="16dp"
-    android:textAppearance="?attr/textAppearanceBody1" />
+    android:textAppearance="?attr/textAppearanceBodyLarge" />
 
   <ImageButton
     android:id="@+id/VisibilityButton"
