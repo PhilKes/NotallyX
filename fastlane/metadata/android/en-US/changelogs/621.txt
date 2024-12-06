@@ -1,0 +1,5 @@
+* Migrate Theme to Material 3
+
+* Fix exporting multiple notes with same title
+
+* Allow to change note's color when editing

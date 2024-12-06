@@ -1,0 +1,5 @@
+* Theme auf Material 3 aktualisiert
+
+* Fix Exportieren mehrerer Notizen mit selbem Namen
+
+* Option die Farbe der Notiz beim Editieren zu ändern
