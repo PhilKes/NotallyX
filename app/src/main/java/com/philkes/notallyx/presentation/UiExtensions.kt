@@ -111,6 +111,10 @@ fun String.truncate(limit: Int): String {
     }
 }
 
+fun String.removeTrailingParentheses(): String {
+    return substringBeforeLast(" (")
+}
+
 /**
  * Adjusts or removes spans based on the selection range.
  *
