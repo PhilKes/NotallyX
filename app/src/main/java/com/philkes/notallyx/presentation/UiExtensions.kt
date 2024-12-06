@@ -49,11 +49,15 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
+import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.getUrl
+import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
+import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
+import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
@@ -445,6 +449,28 @@ fun Activity.copyToClipBoard(text: CharSequence) {
     ContextCompat.getSystemService(this, ClipboardManager::class.java)?.let {
         val clip = ClipData.newPlainText("label", text)
         it.setPrimaryClip(clip)
+    }
+}
+
+fun Activity.showColorSelectDialog(callback: (selectedColor: Color) -> Unit) {
+    val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.change_color).create()
+
+    val colorAdapter =
+        ColorAdapter(
+            object : ItemListener {
+                override fun onClick(position: Int) {
+                    dialog.dismiss()
+                    callback(Color.entries[position])
+                }
+
+                override fun onLongClick(position: Int) {}
+            }
+        )
+
+    DialogColorBinding.inflate(layoutInflater).apply {
+        RecyclerView.adapter = colorAdapter
+        dialog.setView(root)
+        dialog.show()
     }
 }
 

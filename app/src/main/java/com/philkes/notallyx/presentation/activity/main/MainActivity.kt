@@ -38,11 +38,9 @@ import com.google.android.material.transition.platform.MaterialFade
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityMainBinding
-import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
@@ -53,9 +51,8 @@ import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.nameWithoutExtension
+import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.view.Constants
-import com.philkes.notallyx.presentation.view.main.ColorAdapter
-import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
@@ -265,29 +262,6 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 Type.LIST -> Operations.getBody(baseNote.items)
             }
         Operations.shareNote(this, baseNote.title, body)
-    }
-
-    private fun changeColor() {
-        val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.change_color).create()
-
-        val colorAdapter =
-            ColorAdapter(
-                object : ItemListener {
-                    override fun onClick(position: Int) {
-                        dialog.dismiss()
-                        val color = Color.entries[position]
-                        model.colorBaseNote(color)
-                    }
-
-                    override fun onLongClick(position: Int) {}
-                }
-            )
-
-        DialogColorBinding.inflate(layoutInflater).apply {
-            RecyclerView.adapter = colorAdapter
-            dialog.setView(root)
-            dialog.show()
-        }
     }
 
     private fun deleteForever() {
@@ -615,7 +589,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM
         ): MenuItem {
             return add(R.string.change_color, R.drawable.change_color, showAsAction) {
-                changeColor()
+                showColorSelectDialog { selectedColor -> model.colorBaseNote(selectedColor) }
             }
         }
 
