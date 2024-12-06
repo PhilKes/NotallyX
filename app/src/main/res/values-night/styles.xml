@@ -3,8 +3,12 @@
 
     <style name="AppTheme" parent="Base.AppTheme">
         <item name="colorPrimary">@color/Blue100</item>
-        <item name="alternateFabTint">?attr/colorOnSecondary</item>
-        <item name="alternateFabBackground">@color/Indigo100</item>
+        <item name="colorPrimaryDark">@color/Blue50</item>
+
+        <item name="primaryFabTint">?attr/colorSurface</item>
+        <item name="primaryFabBackground">@color/Indigo100</item>
+        <item name="secondaryFabTint">?attr/colorSurface</item>
+        <item name="secondaryFabBackground">@color/Indigo100</item>
     </style>
 
 </resources>

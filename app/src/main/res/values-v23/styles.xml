@@ -3,9 +3,12 @@
 
     <style name="AppTheme" parent="Base.AppTheme">
         <item name="colorPrimary">@color/Blue500</item>
+        <item name="colorPrimaryDark">@color/Black</item>
 
-        <item name="alternateFabTint">@color/Blue500</item>
-        <item name="alternateFabBackground">@color/Blue50</item>
+        <item name="primaryFabTint">@color/Blue50</item>
+        <item name="primaryFabBackground">@color/Blue500</item>
+        <item name="secondaryFabTint">@color/Blue500</item>
+        <item name="secondaryFabBackground">@color/Blue50</item>
 
         <item name="android:windowLightStatusBar">true</item>
     </style>

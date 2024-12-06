@@ -192,7 +192,7 @@
           android:id="@+id/VersionText"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:textAppearance="?attr/textAppearanceCaption"
+          android:textAppearance="?attr/textAppearanceBodySmall"
           android:gravity="start"
           android:padding="16dp" />
 

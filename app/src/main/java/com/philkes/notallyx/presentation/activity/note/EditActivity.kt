@@ -591,6 +591,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         val color = Operations.extractColor(model.color, this)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.statusBarColor = color
+            window.navigationBarColor = color
         }
         binding.root.setBackgroundColor(color)
         binding.RecyclerView.setBackgroundColor(color)

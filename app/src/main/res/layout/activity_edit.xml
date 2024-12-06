@@ -50,7 +50,7 @@
                     android:clickable="false"
                     android:gravity="top"
                     android:stateListAnimator="@null"
-                    android:textAppearance="?attr/textAppearanceCaption"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
                     android:visibility="visible"
                     app:chipIcon="@drawable/add_images"
                     app:chipStartPadding="8dp"
@@ -85,7 +85,7 @@
                 android:paddingEnd="24dp"
                 android:paddingBottom="6dp"
                 android:text="@string/date"
-                android:textAppearance="?attr/textAppearanceBody2"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
                 android:textColor="?android:textColorHint" />
 
 
@@ -113,7 +113,7 @@
                 android:paddingStart="24dp"
                 android:paddingTop="16dp"
                 android:paddingEnd="24dp"
-                android:textAppearance="?attr/textAppearanceBody1" />
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/RecyclerView"

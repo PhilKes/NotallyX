@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/ProgressBar"
         android:paddingTop="16dp"
-        android:textAppearance="?attr/textAppearanceBody2"
+        android:textAppearance="?attr/textAppearanceBodyMedium"
         android:textColor="?attr/colorControlNormal" />
 
 </RelativeLayout>

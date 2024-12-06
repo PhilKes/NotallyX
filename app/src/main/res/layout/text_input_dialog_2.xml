@@ -18,7 +18,7 @@
       android:id="@+id/InputTextLayout1"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense">
+      style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
         <EditText
           android:id="@+id/InputText1"
@@ -37,7 +37,7 @@
       android:id="@+id/InputTextLayout2"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+      style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
       android:layout_marginTop="16dp">
 
         <EditText

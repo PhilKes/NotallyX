@@ -14,4 +14,4 @@
     app:chipIcon="@drawable/text_file"
     app:chipMinHeight="40dp"
     android:text="@string/cant_load_file"
-    android:textAppearance="?attr/textAppearanceBody2" />
+    android:textAppearance="?attr/textAppearanceBodyMedium" />
