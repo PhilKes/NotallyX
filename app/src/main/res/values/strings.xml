@@ -28,6 +28,8 @@
     <string name="uncheck_all_items">Uncheck all items</string>
     <string name="redo">Redo</string>
     <string name="undo">Undo</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
 
     <!-- Pinning -->
     <string name="pin">Pin</string>

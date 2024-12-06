@@ -62,7 +62,12 @@ class ListItemVH(
         }
     }
 
-    fun bind(item: ListItem, position: Int, autoSort: ListItemSort) {
+    fun bind(
+        item: ListItem,
+        position: Int,
+        highlights: List<ListItemAdapter.ListItemHighlight>?,
+        autoSort: ListItemSort,
+    ) {
         updateEditText(item, position)
 
         updateCheckBox(item, position)
@@ -79,6 +84,12 @@ class ListItemVH(
                 }
             contentDescription = "Drag$position"
         }
+
+        highlights?.let {
+            it.forEach { highlight ->
+                binding.EditText.highlight(highlight.startIdx, highlight.endIdx, highlight.selected)
+            }
+        } ?: binding.EditText.clearHighlights()
     }
 
     fun focusEditText(

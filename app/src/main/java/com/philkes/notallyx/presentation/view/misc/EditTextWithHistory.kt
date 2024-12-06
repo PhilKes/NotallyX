@@ -22,7 +22,7 @@ import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
  * *
  */
 class EditTextWithHistory(context: Context, attrs: AttributeSet) :
-    AppCompatEditText(context, attrs) {
+    HighlightableEditText(context, attrs) {
 
     var isActionModeOn = false
     private var changeHistory: ChangeHistory? = null
@@ -42,6 +42,7 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
             createTextWatcherWithHistory(
                 changeHistory,
                 { text, start, count ->
+                    clearHighlights()
                     val changedText = text.substring(start, start + count)
                     if (changedText.isWebUrl() || changedText.isNoteUrl()) {
                         super.getText()
@@ -96,11 +97,6 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
         return Pair(textBefore, super.getText()!!.clone())
     }
 
-    fun getSpanRange(span: CharacterStyle): Pair<Int, Int> {
-        val text = super.getText()!!
-        return Pair(text.getSpanStart(span), text.getSpanEnd(span))
-    }
-
     fun getSpanText(span: CharacterStyle): String {
         val (spanStart, spanEnd) = getSpanRange(span)
         return super.getText()!!.substring(spanStart, spanEnd)
@@ -122,13 +118,18 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
      *
      * @param removeText if this is `true` the text of the [span] is removed from `text`.
      */
-    fun removeSpan(span: CharacterStyle, removeText: Boolean = false) {
+    fun removeSpan(span: CharacterStyle, removeText: Boolean = false, pushChange: Boolean = true) {
         val (start, end) = getSpanRange(span)
-        changeTextWithHistory { text ->
+        val callback: (text: Editable) -> Unit = { text ->
             text.removeSelectionFromSpan(start, end)
             if (removeText) {
                 text.delete(start, end)
             }
+        }
+        if (pushChange) {
+            changeTextWithHistory(callback)
+        } else {
+            changeText(callback)
         }
     }
 
@@ -167,9 +168,18 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
         }
     }
 
-    fun applySpan(span: CharacterStyle, start: Int = selectionStart, end: Int = selectionEnd) {
-        changeTextWithHistory { text ->
-            text.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+    fun applySpan(
+        span: CharacterStyle,
+        start: Int = selectionStart,
+        end: Int = selectionEnd,
+        pushChange: Boolean = true,
+    ) {
+        if (pushChange) {
+            changeTextWithHistory { text ->
+                text.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
+            }
+        } else {
+            changeText { text -> text.setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE) }
         }
     }
 
