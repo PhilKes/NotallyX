@@ -349,22 +349,22 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                         application,
                         baseNote,
                         DocumentFile.fromFile(application.getExportedPath()),
-                        "Untitled.${mimeType.fileExtension}",
-                        object : PostPDFGenerator.OnResult {
+                        onResult =
+                            object : PostPDFGenerator.OnResult {
 
-                            override fun onSuccess(file: DocumentFile) {
-                                showFileOptionsDialog(file, ExportMimeType.PDF.mimeType)
-                            }
+                                override fun onSuccess(file: DocumentFile) {
+                                    showFileOptionsDialog(file, ExportMimeType.PDF.mimeType)
+                                }
 
-                            override fun onFailure(message: CharSequence?) {
-                                Toast.makeText(
-                                        this@MainActivity,
-                                        R.string.something_went_wrong,
-                                        Toast.LENGTH_SHORT,
-                                    )
-                                    .show()
-                            }
-                        },
+                                override fun onFailure(message: CharSequence?) {
+                                    Toast.makeText(
+                                            this@MainActivity,
+                                            R.string.something_went_wrong,
+                                            Toast.LENGTH_SHORT,
+                                        )
+                                        .show()
+                                }
+                            },
                     )
                 }
                 ExportMimeType.TXT,
@@ -376,7 +376,6 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                                 baseNote,
                                 mimeType,
                                 DocumentFile.fromFile(application.getExportedPath()),
-                                "Untitled.${mimeType.fileExtension}",
                             )
                             ?.let { showFileOptionsDialog(it, mimeType.mimeType) }
                     }

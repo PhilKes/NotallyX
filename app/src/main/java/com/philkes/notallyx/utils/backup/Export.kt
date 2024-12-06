@@ -17,6 +17,7 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.toHtml
 import com.philkes.notallyx.data.model.toJson
 import com.philkes.notallyx.data.model.toTxt
+import com.philkes.notallyx.presentation.removeTrailingParentheses
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
@@ -223,15 +224,29 @@ object Export {
         app: Application,
         note: BaseNote,
         folder: DocumentFile,
-        fileName: String = "${note.title}.${ExportMimeType.PDF.fileExtension}",
+        fileName: String = note.title,
         onResult: PostPDFGenerator.OnResult? = null,
         progress: MutableLiveData<Progress>? = null,
         counter: AtomicInteger? = null,
         total: Int? = null,
+        duplicateFileCount: Int = 1,
     ) {
-        folder.findFile(fileName)?.delete()
+        val filePath = "$fileName.${ExportMimeType.PDF.fileExtension}"
+        if (folder.findFile(filePath)?.exists() == true) {
+            return exportPdfFile(
+                app,
+                note,
+                folder,
+                "${fileName.removeTrailingParentheses()} ($duplicateFileCount)",
+                onResult,
+                progress,
+                counter,
+                total,
+                duplicateFileCount + 1,
+            )
+        }
         folder.createFile(ExportMimeType.PDF.mimeType, fileName)?.let {
-            val file = DocumentFile.fromFile(File(app.getExportedPath(), fileName))
+            val file = DocumentFile.fromFile(File(app.getExportedPath(), filePath))
             val html = note.toHtml(NotallyXPreferences.getInstance(app).showDateCreated())
             PostPDFGenerator.create(
                 file,
@@ -261,13 +276,26 @@ object Export {
         note: BaseNote,
         exportType: ExportMimeType,
         folder: DocumentFile,
-        fileName: String = "${note.title}.${exportType.fileExtension}",
+        fileName: String = note.title,
         progress: MutableLiveData<Progress>? = null,
         counter: AtomicInteger? = null,
         total: Int? = null,
+        duplicateFileCount: Int = 1,
     ): DocumentFile? {
+        if (folder.findFile("$fileName.${exportType.fileExtension}")?.exists() == true) {
+            return exportPlainTextFile(
+                app,
+                note,
+                exportType,
+                folder,
+                "${fileName.removeTrailingParentheses()} ($duplicateFileCount)",
+                progress,
+                counter,
+                total,
+                duplicateFileCount + 1,
+            )
+        }
         return withContext(Dispatchers.IO) {
-            folder.findFile(fileName)?.delete()
             val file =
                 folder.createFile(exportType.mimeType, fileName)?.let {
                     app.contentResolver.openOutputStream(it.uri)?.use { stream ->
