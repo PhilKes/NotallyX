@@ -223,15 +223,16 @@ object Export {
         app: Application,
         note: BaseNote,
         folder: DocumentFile,
-        fileName: String = "${note.title}.${ExportMimeType.PDF.fileExtension}",
+        fileName: String = note.title,
         onResult: PostPDFGenerator.OnResult? = null,
         progress: MutableLiveData<Progress>? = null,
         counter: AtomicInteger? = null,
         total: Int? = null,
     ) {
-        folder.findFile(fileName)?.delete()
+        val filePath = "$fileName.${ExportMimeType.PDF.fileExtension}"
+        folder.findFile(filePath)?.delete()
         folder.createFile(ExportMimeType.PDF.mimeType, fileName)?.let {
-            val file = DocumentFile.fromFile(File(app.getExportedPath(), fileName))
+            val file = DocumentFile.fromFile(File(app.getExportedPath(), filePath))
             val html = note.toHtml(NotallyXPreferences.getInstance(app).showDateCreated())
             PostPDFGenerator.create(
                 file,
@@ -261,13 +262,13 @@ object Export {
         note: BaseNote,
         exportType: ExportMimeType,
         folder: DocumentFile,
-        fileName: String = "${note.title}.${exportType.fileExtension}",
+        fileName: String = note.title,
         progress: MutableLiveData<Progress>? = null,
         counter: AtomicInteger? = null,
         total: Int? = null,
     ): DocumentFile? {
         return withContext(Dispatchers.IO) {
-            folder.findFile(fileName)?.delete()
+            folder.findFile("$fileName.${exportType.fileExtension}")?.delete()
             val file =
                 folder.createFile(exportType.mimeType, fileName)?.let {
                     app.contentResolver.openOutputStream(it.uri)?.use { stream ->
