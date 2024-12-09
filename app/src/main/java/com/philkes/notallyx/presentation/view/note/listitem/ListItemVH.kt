@@ -107,7 +107,11 @@ class ListItemVH(
             isEnabled = !item.checked
             addTextChangedListener(editTextWatcher)
             setOnKeyListener { _, keyCode, event ->
-                if (event.action == KeyEvent.ACTION_UP && keyCode == KeyEvent.KEYCODE_DEL) {
+                if (
+                    event.action == KeyEvent.ACTION_DOWN &&
+                        keyCode == KeyEvent.KEYCODE_DEL &&
+                        item.body.isEmpty()
+                ) {
                     // TODO: when there are multiple checked items above it does not jump to the
                     // last
                     // unchecked item but always re-adds a new item
