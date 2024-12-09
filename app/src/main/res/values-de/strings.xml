@@ -4,6 +4,7 @@
     <!-- Fragment Titles -->
     <string name="notes">Notizen</string>
     <string name="labels">Labels</string>
+    <string name="more">%d mehr</string>
     <string name="deleted">Papierkorb</string>
     <string name="archived">Archiv</string>
     <string name="settings">Einstellungen</string>
@@ -41,6 +42,7 @@
     <string name="clear">Löschen</string>
      <string name="continue_">Weiter</string>
     <string name="open_link">Link öffnen</string>
+    <string name="display_text">Anzeigetext</string>
     <string name="make_list">Liste erstellen</string>
     <string name="take_note">Notiz erstellen</string>
     <string name="add_label">Label hinzufügen</string>
@@ -72,6 +74,7 @@
     <string name="drag_handle">Ziehgriff</string>
     <string name="bold">Fett</string>
     <string name="link">Link erstellen</string>
+    <string name="remove_link">Link entfernen</string>
     <string name="italic">Kursiv</string>
     <string name="strikethrough">Durchstreichen</string>
     <string name="clear_formatting">Normal</string>
@@ -85,6 +88,7 @@
     <string name="select_labels">Label auswählen</string>
     
     <!-- Messages -->
+    <string name="label_visibility">Zeige/Verberge das Label in der Navigation</string>
     <string name="cant_open_link">Link konnte nicht geöffnet werden</string>
     <string name="edit_link">Link ändern</string>
     <string name="something_went_wrong">Etwas ist schief gelaufen. Bitte erneut versuchen.</string>
@@ -118,9 +122,11 @@
     <string name="max_lines_to_display">Maximal angezeigte Zeilen</string>
      <string name="max_lines_to_display_title">Maximal angezeigte Zeilen im Titel</string>
 
+    <string name="max_labels_to_display">Max. Anzahl an angezeigten Lables in der Navigation</string>
     <string name="security">Sicherheit</string>
 
     <string name="biometric_lock">App per Biometrie/PIN sperren</string>
+    <string name="locked">Gesperrt</string>
     <string name="enabled">Aktiviert</string>
     <string name="disabled">Deaktiviert</string>
 
@@ -141,11 +147,14 @@
     <string name="google_keep_help">Um deine Notizen aus Google Notizen zu importieren musst du deine Google Takeout ZIP Datei herunterladen\n\nFalls du das Takeout ZIP schon hast, klicke auf Import und wähle es aus.</string>
     <string name="exporting_backup">Backup Exportieren</string>
     <string name="importing_backup">Backup Importieren</string>
+    <string name="plain_text_files_help">Um deine Text-Notizen zu importieren, klicke Import und wähle den Ordner mit den Textdateien aus.\n\nJede Datei wird als einzelne Notiz importiert, der Dateiname wird zum Notiz-Titel. Sollte der Textinhalt mit einer List-Syntax beginnen (z.B. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’), wird die Datei als List-Notiz importiert.</string>
+    <string name="imported_notes">Notizen importiert</string>
     <string name="calculating">Berechne…</string>
     <string name="clear_data_message">Alle Notizen, Bilder, Dateien und Sprachnotizen werden permanent gelöscht</string>
 
     <string name="google_keep">Google Notizen</string>
 
+    <string name="plain_text_files">Text Dateien</string>
     <string name="export_backup">Backup erstellen</string>
     <string name="import_backup">Backup importieren</string>
     <string name="clear_data">Alle Daten löschen</string>
@@ -153,11 +162,13 @@
     <string name="import_other">Notizen von anderer App importieren</string>
 
     <string name="monthly">Monatlich</string>
+    <string name="disable_external_data">Verschiebe die Daten zurück in den internen Speicher</string>
     <string name="about">Über</string>
     <string name="libraries">Bibliotheken</string>
     <string name="choose_other_app">Wähle von welcher App importiert werden soll</string>
     <string name="rate">App bewerten</string>
     <string name="send_feedback">Feedback senden</string>
+    <string name="create_github_issue">Github Issue erstellen</string>
     <string name="report_bug">Fehler/Bug melden</string>
     <string name="make_feature_request">Feature/Verbesserung vorschlagen</string>
 
@@ -233,6 +244,15 @@
     <string name="biometrics_no_support">Dein Geräte verfügt über keine biometrischen Features</string>
     <string name="biometrics_not_setup">Biometrie/PIN wurde für dein Gerät noch nicht eingerichtet</string>
     <string name="invalid_google_keep">"Invalide Google Takeout ZIP Datei bereitgestellt "</string>
+    <string name="invalid_evernote">Ungültige Evernote ENEX Datei ausgewählt</string>
     <string name="help">Hilfe</string>
+    <string name="open_note">Notiz öffnen</string>
+    <string name="link_note">Notiz verlinken</string>
+    <string name="change_note">Notiz ändern</string>
+    <string name="evernote_help">Um deine Notizen von Evernote zu importierten, exportiere dein Evernote Notebook als ENEX. Klicke Hilfe für mehr Infos.\n\nFalls du schon ein ENEX Datei hast, klicke Import und wähle es aus.</string>
+    <string name="extracted_files">Dateien extrahiert</string>
+    <string name="imported_files">Dateien importiert</string>
+    <string name="data_on_external">Daten in ext. Speicher auslagern</string>
+    <string name="external_data_message">Wird dies aktiviert, wird die app-interne Datenbank in den app-externen Speicher ausgelagert (Android/media/com.philkes.notallyx). In Kombination mit Datei-Synchronisations Apps kann dies genutzt werden um NotallyX Daten zwischen mehrere Geräte zu synchronisieren.</string>
 
 </resources>
