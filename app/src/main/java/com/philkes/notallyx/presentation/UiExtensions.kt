@@ -225,25 +225,36 @@ fun Int.dp(context: Context): Int =
  * @param positionGetter Function to determine the current position of the EditText in the list
  *   (e.g. the current adapterPosition when using RecyclerViewer.Adapter)
  * @param updateModel Function to update the model. Is called on any text changes and on undo/redo.
+ * @param onTextChanged optional text change handler. Returns whether or not the original change
+ *   should be ignored or not.
  */
-fun EditText.createListTextWatcherWithHistory(listManager: ListManager, positionGetter: () -> Int) =
+fun EditText.createListTextWatcherWithHistory(
+    listManager: ListManager,
+    positionGetter: () -> Int,
+    onTextChanged: ((text: CharSequence, start: Int, count: Int) -> Boolean)? = null,
+) =
     object : TextWatcher {
         private lateinit var stateBefore: EditTextState
+        private var ignoreOriginalChange: Boolean = false
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             stateBefore = EditTextState(getText()!!.clone(), selectionStart)
         }
 
-        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            ignoreOriginalChange = onTextChanged?.invoke(s!!, start, count) ?: false
+        }
 
         override fun afterTextChanged(s: Editable?) {
-            listManager.changeText(
-                this@createListTextWatcherWithHistory,
-                this,
-                positionGetter.invoke(),
-                EditTextState(getText()!!.clone(), selectionStart),
-                before = stateBefore,
-            )
+            if (!ignoreOriginalChange) {
+                listManager.changeText(
+                    this@createListTextWatcherWithHistory,
+                    this,
+                    positionGetter.invoke(),
+                    EditTextState(getText()!!.clone(), selectionStart),
+                    before = stateBefore,
+                )
+            }
         }
     }
 
