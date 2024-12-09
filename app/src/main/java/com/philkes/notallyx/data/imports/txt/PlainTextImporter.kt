@@ -72,26 +72,4 @@ class PlainTextImporter : ExternalImporter {
 
         return Pair(notes, null)
     }
-
-    fun String.extractListItems(regex: Regex): List<ListItem> {
-        return regex
-            .findAll(this)
-            .mapIndexed { idx, matchResult ->
-                val isChild = matchResult.groupValues[1] != ""
-                val isChecked = matchResult.groupValues[2] != ""
-                val itemText = matchResult.groupValues[3]
-                ListItem(itemText.trimStart(), isChecked, isChild, idx, mutableListOf())
-            }
-            .toList()
-    }
-
-    fun String.findListSyntaxRegex(): Regex? {
-        if (startsWith("[ ]") || startsWith("[✓]")) {
-            return "\n?(\\s*)\\[ ?(✓?)\\](.*)".toRegex()
-        }
-        if (startsWith("- [ ]") || startsWith("- [x]", ignoreCase = true)) {
-            return "\n?(\\s*)- \\[ ?([xX]?)\\](.*)".toRegex()
-        }
-        return null
-    }
 }

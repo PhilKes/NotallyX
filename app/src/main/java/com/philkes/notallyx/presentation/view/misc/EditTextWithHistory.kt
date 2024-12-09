@@ -3,7 +3,6 @@ package com.philkes.notallyx.presentation.view.misc
 import android.content.Context
 import android.text.Editable
 import android.text.Spanned
-import android.text.TextWatcher
 import android.text.style.CharacterStyle
 import android.text.style.URLSpan
 import android.util.AttributeSet
@@ -22,12 +21,11 @@ import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
  * *
  */
 class EditTextWithHistory(context: Context, attrs: AttributeSet) :
-    AppCompatEditText(context, attrs) {
+    EditTextWithWatcher(context, attrs) {
 
     var isActionModeOn = false
     private var changeHistory: ChangeHistory? = null
     private var updateModel: ((text: Editable) -> Unit)? = null
-    private var textWatcher: TextWatcher? = null
 
     /**
      * If this is called every future text or span change is pushed to [changeHistory].
@@ -63,37 +61,6 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
         if (!isActionModeOn) {
             super.onWindowFocusChanged(hasWindowFocus)
         }
-    }
-
-    @Deprecated(
-        "You should not access text Editable directly, use other member functions to edit/read text properties.",
-        replaceWith = ReplaceWith("changeText/applyWithoutTextWatcher/..."),
-    )
-    override fun getText(): Editable? {
-        return super.getText()
-    }
-
-    fun getTextClone(): Editable {
-        return super.getText()!!.clone()
-    }
-
-    override fun setText(text: CharSequence?, type: BufferType?) {
-        applyWithoutTextWatcher { super.setText(text, type) }
-    }
-
-    fun setText(text: Editable) {
-        super.setText(text, BufferType.EDITABLE)
-    }
-
-    fun applyWithoutTextWatcher(
-        callback: EditTextWithHistory.() -> Unit
-    ): Pair<Editable, Editable> {
-        val textBefore = super.getText()!!.clone()
-        val editTextWatcher = textWatcher
-        editTextWatcher?.let { removeTextChangedListener(it) }
-        callback()
-        editTextWatcher?.let { addTextChangedListener(it) }
-        return Pair(textBefore, super.getText()!!.clone())
     }
 
     fun getSpanRange(span: CharacterStyle): Pair<Int, Int> {
@@ -191,15 +158,5 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
                 updateModel?.invoke(text.clone())
             }
         )
-    }
-
-    /**
-     * Can be used to change `text` without triggering the [TextWatcher], which would push a
-     * [EditTextWithHistoryChange] to [changeHistory].
-     *
-     * @return Clones of `text` before the changes and `text` after. *
-     */
-    fun changeText(callback: (text: Editable) -> Unit): Pair<Editable, Editable> {
-        return applyWithoutTextWatcher { callback(super.getText()!!) }
     }
 }

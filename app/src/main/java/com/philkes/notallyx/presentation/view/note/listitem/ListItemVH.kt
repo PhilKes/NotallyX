@@ -1,6 +1,5 @@
 package com.philkes.notallyx.presentation.view.note.listitem
 
-import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -10,10 +9,13 @@ import android.widget.TextView.INVISIBLE
 import android.widget.TextView.VISIBLE
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import com.philkes.notallyx.data.imports.txt.extractListItems
+import com.philkes.notallyx.data.imports.txt.findListSyntaxRegex
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
 import com.philkes.notallyx.presentation.setOnNextAction
+import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
 import com.philkes.notallyx.presentation.view.misc.SwipeLayout.SwipeActionsListener
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
@@ -25,7 +27,6 @@ class ListItemVH(
     textSize: TextSize,
 ) : RecyclerView.ViewHolder(binding.root) {
 
-    private var editTextWatcher: TextWatcher
     private var dragHandleInitialY: Float = 0f
 
     init {
@@ -38,9 +39,17 @@ class ListItemVH(
                 listManager.add(position)
             }
 
-            editTextWatcher =
-                createListTextWatcherWithHistory(listManager, this@ListItemVH::getAdapterPosition)
-            addTextChangedListener(editTextWatcher)
+            textWatcher =
+                createListTextWatcherWithHistory(
+                    listManager,
+                    this@ListItemVH::getAdapterPosition,
+                ) { text, start, count ->
+                    if (count > 1) {
+                        checkListPasted(text, start, count, this)
+                    } else {
+                        false
+                    }
+                }
 
             setOnFocusChangeListener { _, hasFocus ->
                 binding.Delete.visibility = if (hasFocus) VISIBLE else INVISIBLE
@@ -102,10 +111,8 @@ class ListItemVH(
 
     private fun updateEditText(item: ListItem, position: Int) {
         binding.EditText.apply {
-            removeTextChangedListener(editTextWatcher)
             setText(item.body)
             isEnabled = !item.checked
-            addTextChangedListener(editTextWatcher)
             setOnKeyListener { _, keyCode, event ->
                 if (
                     event.action == KeyEvent.ACTION_DOWN &&
@@ -165,5 +172,31 @@ class ListItemVH(
                 setOnActionsListener(swipeActionListener)
             }
         }
+    }
+
+    private fun checkListPasted(
+        text: CharSequence,
+        start: Int,
+        count: Int,
+        editText: EditTextAutoClearFocus,
+    ): Boolean {
+        val changedText = text.substring(start, start + count)
+        val containsLines = changedText.isNotBlank() && changedText.contains("\n")
+        if (containsLines) {
+            changedText
+                .findListSyntaxRegex(checkContains = true, plainNewLineAllowed = true)
+                ?.let { listSyntaxRegex ->
+                    val items = changedText.extractListItems(listSyntaxRegex)
+                    if (text.trim().length > count) {
+                        editText.setText(text.substring(0, start) + text.substring(start + count))
+                    } else {
+                        listManager.delete(adapterPosition, pushChange = false)
+                    }
+                    items.forEachIndexed { idx, it ->
+                        listManager.add(adapterPosition + idx + 1, it, pushChange = true)
+                    }
+                }
+        }
+        return containsLines
     }
 }
