@@ -44,6 +44,7 @@ class ListManager(
     private val changeHistory: ChangeHistory,
     private val preferences: NotallyXPreferences,
     private val inputMethodManager: InputMethodManager?,
+    private val endSearch: (() -> Unit)?,
 ) {
 
     private var nextItemId: Int = 0
@@ -55,6 +56,7 @@ class ListManager(
         item: ListItem = defaultNewItem(position),
         pushChange: Boolean = true,
     ) {
+        endSearch?.invoke()
         (item + item.children).forEach { setIdIfUnset(it) }
         val itemBeforeInsert = item.clone() as ListItem
 
@@ -93,6 +95,7 @@ class ListManager(
         pushChange: Boolean = true,
         allowFocusChange: Boolean = true,
     ): ListItem? {
+        endSearch?.invoke()
         if (position < 0 || position > items.lastIndex) {
             return null
         }
@@ -137,6 +140,7 @@ class ListManager(
         updateChildren: Boolean = true,
         isDrag: Boolean = false,
     ): Int? {
+        endSearch?.invoke()
         val itemTo = items[positionTo]
         val itemFrom = items[positionFrom]
         val itemBeforeMove = itemFrom.clone() as ListItem
