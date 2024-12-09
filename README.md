@@ -35,13 +35,13 @@
 * Use **Home Screen Widget** to access important notes fast
 * **Lock your notes via Biometric/PIN**
 * Configurable **auto-backups**
+* Create quick audio notes
 * Display the notes either in a **List or Grid**
 * Quickly share notes by text
 * Extensive preferences to adjust views to your liking
 * Actions to quickly remove checked tasks
 * Adaptive android app icon
 * Support for Lollipop devices and up
-
 
 ---
 

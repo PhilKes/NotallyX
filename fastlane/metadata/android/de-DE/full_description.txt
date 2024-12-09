@@ -2,21 +2,22 @@ NotallyX ist eine minimalistische Notiz-App mit einfachen Design und nützlichen
 
 <b>Organisation</b>
 
-Erstelle Notizen mit Unterstützung für alle Fettdruck, Kursivschrift, Monospace, etc.
-Erstelle Listen und ordnen sie mit Unteraufgaben.
-Ergänze deine Notizen mit beliebigen Dateien sowie Vorschauen für Bilder
-Sortiere Notizen nach Titel, Datum der letzten Änderung oder Erstellungsdatum.
-Ordne die Notizen entweder in einer Listen- oder Gitteransicht an.
-Farbmarkierung, anheften und beschrifte deine Notizen für eine schnelle Organisation.
-Füge anklickbare Links zu Notizen hinzu, mit Unterstützung für Telefonnummern, E-Mail-Adressen und URLs.
-Buttons um erledigte Aufgaben schnell und einfach zu entfernen.
-Die Möglichkeit Änderungen rückgängig zu machen.
-Umfangreiche Einstellungen, um Ansichten nach deinen Wünschen anzupassen.
-Teile Notizen schnell per Text.
-Sperre deine Notizen per Biometrie/PIN Lock.
-Konfigurierbare automatische Backups.
-Adaptives Android App-Icon.
-Unterstützung für Geräte ab Android Lollipop.
+• Erstelle Notizen mit Unterstützung für alle Fettdruck, Kursivschrift, Monospace, etc.
+• Erstelle Listen und ordnen sie mit Unteraufgaben
+• Ergänze deine Notizen mit beliebigen Dateien sowie Vorschauen für Bilder
+• Sortiere Notizen nach Titel, Datum der letzten Änderung oder Erstellungsdatum
+• Ordne die Notizen entweder in einer Listen- oder Gitteransicht an
+• Farbmarkierung, anheften und beschrifte deine Notizen für eine schnelle Organisation
+• Füge anklickbare Links zu Notizen hinzu, mit Unterstützung für Telefonnummern, E-Mail-Adressen und URLs
+• Buttons um erledigte Aufgaben schnell und einfach zu entfernen
+• Die Möglichkeit Änderungen rückgängig zu machen
+• Umfangreiche Einstellungen, um Ansichten nach deinen Wünschen anzupassen
+• Teile Notizen schnell per Text
+• Sperre deine Notizen per Biometrie/PIN Lock
+• Konfigurierbare automatische Backups
+• Erstelle Audio-Notizen
+• Adaptives Android App-Icon
+• Unterstützung für Geräte ab Android Lollipop
 
 <b>Komfort</b>
 
@@ -39,6 +40,10 @@ Wird verwendet, um eine Benachrichtigung anzuzeigen, falls das Löschen von Bild
 • Verhindern, dass das Telefon in den Ruhemodus wechselt, beim Start ausführen
 
 Wird von der automatischen Backup-Funktion verwendet, um sicherzustellen, dass Backups weiterhin erstellt werden, auch wenn dein Telefon neu gestartet wird.
+
+• Audios aufnehmen
+
+Wird verwendet wenn Audio-Notizen aufgenommen werden sollen
 
 <b>Hinweis</b>
 
