@@ -231,7 +231,7 @@
     <string name="report_bug">Report an issue/bug</string>
     <string name="make_feature_request">Make a feature request</string>
 
-    <string name="source_code" translatable="false">Source Code</string>
+    <string name="source_code">Source Code</string>
 
     <!-- Widget -->
     <string name="single_note_or_list">Single note or list</string>
