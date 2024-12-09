@@ -1,0 +1,3 @@
+* Einfaches Einfügen von Text-Listen in eine Listen-Notiz
+
+* Fehlende deutsche Übersetzungen ergänzt

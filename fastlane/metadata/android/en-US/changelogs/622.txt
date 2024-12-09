@@ -1,0 +1,5 @@
+* Easily paste list text into a list note
+
+* Fix chinese keyboard backspace deleting list item when empty
+
+* Updated chinese translations
