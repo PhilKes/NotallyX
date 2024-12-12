@@ -44,7 +44,7 @@
             app:srcCompat="@drawable/drag_handle"
             app:tint="?attr/colorControlNormal" />
 
-        <CheckBox
+        <com.google.android.material.checkbox.MaterialCheckBox
             android:id="@+id/CheckBox"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

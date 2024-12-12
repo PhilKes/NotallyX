@@ -1,24 +1,29 @@
 package com.philkes.notallyx.presentation.activity.note
 
 import android.app.Activity
-import android.content.ClipboardManager
 import android.content.Intent
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.text.Spanned
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
+import android.text.style.UnderlineSpan
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.updateLayoutParams
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
@@ -26,29 +31,35 @@ import com.philkes.notallyx.data.model.createNoteUrl
 import com.philkes.notallyx.data.model.getNoteIdFromUrl
 import com.philkes.notallyx.data.model.getNoteTypeFromUrl
 import com.philkes.notallyx.data.model.isNoteUrl
-import com.philkes.notallyx.data.model.isWebUrl
-import com.philkes.notallyx.databinding.TextInputDialog2Binding
+import com.philkes.notallyx.databinding.BottomTextFormattingMenuBinding
+import com.philkes.notallyx.databinding.ReyclerToggleBinding
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXCLUDE_NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TITLE
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TYPE
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.addIconButton
+import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.setOnNextAction
-import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.view.Constants
+import com.philkes.notallyx.presentation.view.note.TextFormattingAdapter
+import com.philkes.notallyx.presentation.view.note.action.AddNoteActions
+import com.philkes.notallyx.presentation.view.note.action.AddNoteBottomSheet
 import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.copyToClipBoard
 import com.philkes.notallyx.utils.findAllOccurrences
-import com.philkes.notallyx.utils.getLatestText
 
 private const val UNNAMED_NOTE_PLACEHOLDER = "Unnamed Note"
 
-class EditNoteActivity : EditActivity(Type.NOTE) {
+class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     private lateinit var selectedSpan: URLSpan
     private lateinit var pickNoteNewActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var pickNoteUpdateActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var textFormatMenu: View
+
+    private var textFormattingAdapter: TextFormattingAdapter? = null
 
     private var searchResultIndices: List<Pair<Int, Int>>? = null
     private var search = ""
@@ -80,7 +91,10 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     }
                     val noteTitle = data.getStringExtra(PICKED_NOTE_TITLE)!!
                     val noteType = Type.valueOf(data.getStringExtra(PICKED_NOTE_TYPE)!!)
-                    binding.EnterBody.addSpan(noteTitle, URLSpan(noteId.createNoteUrl(noteType)))
+                    binding.EnterBody.addSpans(
+                        noteTitle,
+                        listOf(UnderlineSpan(), URLSpan(noteId.createNoteUrl(noteType))),
+                    )
                 }
             }
         pickNoteUpdateActivityResultLauncher =
@@ -159,24 +173,38 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     // ActionMode implementation
                     try {
                         menu?.apply {
-                            add(R.string.bold, 0) {
+                            add(R.string.link, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
+                                binding.EnterBody.showAddLinkDialog(this@EditNoteActivity, mode)
+                            }
+                            add(R.string.bold, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
                                 binding.EnterBody.applySpan(StyleSpan(Typeface.BOLD))
                                 mode?.finish()
                             }
-                            add(R.string.link, 0) { showAddLinkDialog(mode) }
-                            add(R.string.italic, 0) {
+                            add(R.string.italic, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
                                 binding.EnterBody.applySpan(StyleSpan(Typeface.ITALIC))
                                 mode?.finish()
                             }
-                            add(R.string.monospace, 0) {
+                            add(
+                                R.string.monospace,
+                                0,
+                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                            ) {
                                 binding.EnterBody.applySpan(TypefaceSpan("monospace"))
                                 mode?.finish()
                             }
-                            add(R.string.strikethrough, 0) {
+                            add(
+                                R.string.strikethrough,
+                                0,
+                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                            ) {
                                 binding.EnterBody.applySpan(StrikethroughSpan())
                                 mode?.finish()
                             }
-                            add(R.string.clear_formatting, 0) {
+                            add(
+                                R.string.clear_formatting,
+                                0,
+                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                            ) {
                                 binding.EnterBody.clearFormatting()
                                 mode?.finish()
                             }
@@ -185,37 +213,6 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         exception.printStackTrace()
                     }
                     return true
-                }
-
-                private fun showAddLinkDialog(mode: ActionMode?) {
-                    val urlFromClipboard: String =
-                        ContextCompat.getSystemService(baseContext, ClipboardManager::class.java)
-                            ?.getLatestText()
-                            ?.let { if (it.isWebUrl()) it.toString() else "" } ?: ""
-                    val displayTextBefore = binding.EnterBody.getSelectionText() ?: ""
-                    this@EditNoteActivity.showEditLinkDialog(urlFromClipboard, displayTextBefore) {
-                        urlAfter,
-                        displayTextAfter ->
-                        if (displayTextAfter == displayTextBefore) {
-                            binding.EnterBody.applySpan(URLSpan(urlAfter))
-                        } else {
-                            binding.EnterBody.changeTextWithHistory { text ->
-                                val start = binding.EnterBody.selectionStart
-                                text.replace(
-                                    start,
-                                    binding.EnterBody.selectionEnd,
-                                    displayTextAfter,
-                                )
-                                text.setSpan(
-                                    URLSpan(urlAfter),
-                                    start,
-                                    start + displayTextAfter.length,
-                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                                )
-                            }
-                        }
-                        mode?.finish()
-                    }
                 }
 
                 override fun onDestroyActionMode(mode: ActionMode?) {
@@ -244,7 +241,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         try {
                             menu?.apply {
                                 add(R.string.link_note, 0, order = Menu.CATEGORY_CONTAINER + 1) {
-                                    startPickNote(pickNoteNewActivityResultLauncher)
+                                    linkNote(pickNoteNewActivityResultLauncher)
                                     mode?.finish()
                                 }
                             }
@@ -259,6 +256,20 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     }
                 }
         }
+        binding.EnterBody.setOnSelectionChange { selStart, selEnd ->
+            if (selEnd - selStart > 0) {
+                if (!textFormatMenu.isEnabled) {
+                    initBottomTextFormattingMenu()
+                }
+                textFormatMenu.isEnabled = true
+                textFormattingAdapter?.updateTextFormattingToggles(selStart, selEnd)
+            } else {
+                if (textFormatMenu.isEnabled) {
+                    initBottomMenu()
+                }
+                textFormatMenu.isEnabled = false
+            }
+        }
         binding.ContentLayout.setOnClickListener {
             binding.EnterBody.apply {
                 requestFocus()
@@ -268,9 +279,63 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
         }
     }
 
-    private fun EditNoteActivity.startPickNote(
-        activityResultLauncher: ActivityResultLauncher<Intent>
-    ) {
+    override fun initBottomMenu() {
+        super.initBottomMenu()
+        binding.BottomAppBarCenter.visibility = VISIBLE
+        binding.BottomAppBarLeft.apply {
+            removeAllViews()
+            addIconButton(R.string.add_item, R.drawable.add, marginStart = 0) {
+                AddNoteBottomSheet(this@EditNoteActivity)
+                    .show(supportFragmentManager, AddNoteBottomSheet.TAG)
+            }
+            updateLayoutParams<ConstraintLayout.LayoutParams> { endToStart = -1 }
+            textFormatMenu =
+                addIconButton(R.string.edit, R.drawable.text_format) {
+                        initBottomTextFormattingMenu()
+                    }
+                    .apply { isEnabled = binding.EnterBody.isActionModeOn }
+        }
+    }
+
+    private fun initBottomTextFormattingMenu() {
+        binding.BottomAppBarCenter.visibility = GONE
+        binding.BottomAppBarRight.apply {
+            removeAllViews()
+            addView(
+                ReyclerToggleBinding.inflate(layoutInflater, this, false).root.apply {
+                    setIconResource(R.drawable.close)
+                    contentDescription = context.getString(R.string.cancel)
+                    setOnClickListener { initBottomMenu() }
+
+                    updateLayoutParams<LinearLayout.LayoutParams> {
+                        marginEnd = 0
+                        marginStart = 10.dp(context)
+                    }
+                }
+            )
+        }
+        binding.BottomAppBarLeft.apply {
+            removeAllViews()
+            updateLayoutParams<ConstraintLayout.LayoutParams> {
+                endToStart = R.id.BottomAppBarRight
+            }
+            requestLayout()
+            val layout = BottomTextFormattingMenuBinding.inflate(layoutInflater, this, false)
+            layout.RecyclerView.apply {
+                textFormattingAdapter =
+                    TextFormattingAdapter(this@EditNoteActivity, binding.EnterBody)
+                adapter = textFormattingAdapter
+                layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
+            }
+            addView(layout.root)
+        }
+    }
+
+    override fun linkNote() {
+        linkNote(pickNoteNewActivityResultLauncher)
+    }
+
+    fun linkNote(activityResultLauncher: ActivityResultLauncher<Intent>) {
         val intent =
             Intent(this, PickNoteActivity::class.java).apply { putExtra(EXCLUDE_NOTE_ID, model.id) }
         activityResultLauncher.launch(intent)
@@ -309,7 +374,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         1 ->
                             if (span.url.isNoteUrl()) {
                                 selectedSpan = span
-                                startPickNote(pickNoteUpdateActivityResultLauncher)
+                                linkNote(pickNoteUpdateActivityResultLauncher)
                             } else {
                                 copyToClipBoard(span.url)
                                 Toast.makeText(this, R.string.copied_link, Toast.LENGTH_LONG).show()
@@ -320,7 +385,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                                 if (it.isNoteUrl()) {
                                     span.navigateToNote()
                                 } else {
-                                    span.showEditDialog()
+                                    binding.EnterBody.showEditDialog(span)
                                 }
                             }
                         }
@@ -354,51 +419,9 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
         }
     }
 
-    private fun URLSpan.showEditDialog() {
-        val displayTextBefore = binding.EnterBody.getSpanText(this)
-        showEditLinkDialog(url, displayTextBefore) { urlAfter, displayTextAfter ->
-            if (urlAfter != null) {
-                binding.EnterBody.updateSpan(
-                    this,
-                    URLSpan(urlAfter),
-                    if (displayTextAfter == displayTextBefore) null else displayTextAfter,
-                )
-            } else {
-                binding.EnterBody.removeSpan(this)
-            }
-        }
-    }
-
     private fun goToActivity(activity: Class<out Activity>, noteId: Long) {
         val intent = Intent(this, activity)
         intent.putExtra(Constants.SelectedBaseNote, noteId)
         startActivity(intent)
-    }
-
-    private fun showEditLinkDialog(
-        urlBefore: String,
-        displayTextBefore: String,
-        onSuccess: (urlAfter: String?, displayTextAfter: String) -> Unit,
-    ) {
-        val layout = TextInputDialog2Binding.inflate(layoutInflater)
-        layout.InputText1.apply { setText(displayTextBefore) }
-        layout.InputTextLayout1.setHint(R.string.display_text)
-        layout.InputText2.apply { setText(urlBefore) }
-
-        layout.InputTextLayout2.setHint(R.string.link)
-        MaterialAlertDialogBuilder(this)
-            .setView(layout.root)
-            .setTitle(R.string.edit_link)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val displayTextAfter = layout.InputText1.text.toString()
-                val urlAfter = layout.InputText2.text.toString()
-                onSuccess.invoke(urlAfter, displayTextAfter)
-            }
-            .setNegativeButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
-            .setNeutralButton(R.string.clear) { dialog, _ ->
-                dialog.cancel()
-                onSuccess.invoke(null, displayTextBefore)
-            }
-            .showAndFocus(layout.InputText2)
     }
 }

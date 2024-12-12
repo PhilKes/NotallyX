@@ -10,6 +10,16 @@ import com.philkes.notallyx.presentation.clone
 open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
     AppCompatEditText(context, attrs) {
     var textWatcher: TextWatcher? = null
+    private var onSelectionChange: ((selStart: Int, selEnd: Int) -> Unit)? = null
+
+    override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+        super.onSelectionChanged(selStart, selEnd)
+        onSelectionChange?.invoke(selStart, selEnd)
+    }
+
+    fun setOnSelectionChange(callback: (selStart: Int, selEnd: Int) -> Unit) {
+        this.onSelectionChange = callback
+    }
 
     override fun setText(text: CharSequence?, type: BufferType?) {
         applyWithoutTextWatcher { super.setText(text, type) }

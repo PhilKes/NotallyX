@@ -38,6 +38,7 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.getUriForFile
@@ -47,6 +48,11 @@ import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
+import com.philkes.notallyx.presentation.view.note.action.Action
+import com.philkes.notallyx.presentation.view.note.action.AddActions
+import com.philkes.notallyx.presentation.view.note.action.AddBottomSheet
+import com.philkes.notallyx.presentation.view.note.action.MoreActions
+import com.philkes.notallyx.presentation.view.note.action.MoreNoteBottomSheet
 import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
@@ -62,13 +68,16 @@ import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEditBinding>() {
+abstract class EditActivity(private val type: Type) :
+    LockedActivity<ActivityEditBinding>(), AddActions, MoreActions {
     private lateinit var recordAudioActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var addImagesActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var viewImagesActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var selectLabelsActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var playAudioActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var attachFilesActivityResultLauncher: ActivityResultLauncher<Intent>
+
+    private lateinit var pinMenuItem: MenuItem
 
     private lateinit var searchPosPrev: MenuItem
     private lateinit var searchPosNext: MenuItem
@@ -77,6 +86,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
     internal val model: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
+
+    protected val undos: MutableList<View> = mutableListOf()
+    protected val redos: MutableList<View> = mutableListOf()
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -121,7 +133,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 intent.getStringExtra(Constants.SelectedLabel)?.let { model.setLabels(listOf(it)) }
             }
 
-            setupToolbar()
+            setupToolbars()
             setupListeners()
             setStateFromModel()
 
@@ -226,51 +238,34 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     grantResults.isNotEmpty() &&
                         grantResults[0] == PackageManager.PERMISSION_GRANTED
                 ) {
-                    recordAudio()
+                    startRecordAudioActivity()
                 } else handleRejection()
             }
         }
     }
 
-    protected open fun initActionManager(undo: MenuItem, redo: MenuItem) {
-        changeHistory = ChangeHistory {
-            undo.isEnabled = changeHistory.canUndo()
-            redo.isEnabled = changeHistory.canRedo()
-        }
-        undo.isEnabled = changeHistory.canUndo()
-        redo.isEnabled = changeHistory.canRedo()
+    protected open fun initChangeHistory() {
+        changeHistory =
+            ChangeHistory().apply {
+                canUndo.observe(this@EditActivity) { canUndo ->
+                    undos.forEach { it.isEnabled = canUndo }
+                }
+                canRedo.observe(this@EditActivity) { canRedo ->
+                    redos.forEach { it.isEnabled = canRedo }
+                }
+            }
     }
 
-    protected open fun setupToolbar() {
+    protected open fun setupToolbars() {
         binding.Toolbar.setNavigationOnClickListener { finish() }
-
         binding.Toolbar.menu.apply {
             clear()
             add(R.string.search, R.drawable.search, MenuItem.SHOW_AS_ACTION_ALWAYS) {
                 startSearch()
             }
-            val undo =
-                add(R.string.undo, R.drawable.undo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                    changeHistory.undo()
-                }
-            val redo =
-                add(R.string.redo, R.drawable.redo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                    changeHistory.redo()
-                }
-
-            initActionManager(undo, redo)
-
-            val pin = add(R.string.pin, R.drawable.pin) { item -> pin(item) }
-            bindPinned(pin)
-
-            add(R.string.share, R.drawable.share) { share() }
-            add(R.string.labels, R.drawable.label) { label() }
-            add(R.string.add_images, R.drawable.add_images) { selectImages() }
-            add(R.string.attach_file, R.drawable.text_file) { selectFiles() }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                add(R.string.record_audio, R.drawable.record_audio) { checkAudioPermission() }
-            }
+            pinMenuItem =
+                add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { pin() }
+            bindPinned()
 
             when (model.folder) {
                 Folder.NOTES -> {
@@ -288,13 +283,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     add(R.string.unarchive, R.drawable.unarchive) { restore() }
                 }
             }
-
-            add(R.string.change_color, R.drawable.change_color) {
-                showColorSelectDialog { selectedColor ->
-                    model.color = selectedColor
-                    setColor()
-                }
-            }
+            add(R.string.share, R.drawable.share) { share() }
         }
 
         searchResultsAmount.mergeSkipFirst(searchResultPos).observe(this) { (amount, pos) ->
@@ -315,6 +304,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 }
             }
         }
+
+        initChangeHistory()
+        initBottomMenu()
     }
 
     protected fun setSearchResultsAmount(amount: Int) {
@@ -386,9 +378,69 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             visibility = GONE
             text = ""
         }
-        setupToolbar()
+        setupToolbars()
         binding.Toolbar.navigationIcon = navigationIconBeforeSearch
     }
+
+    protected open fun initBottomMenu() {
+        binding.BottomAppBarLeft.apply {
+            removeAllViews()
+            addIconButton(R.string.add_item, R.drawable.add, marginStart = 0) {
+                AddBottomSheet(this@EditActivity).show(supportFragmentManager, AddBottomSheet.TAG)
+            }
+        }
+        binding.BottomAppBarCenter.apply {
+            removeAllViews()
+            undos.add(
+                addIconButton(R.string.undo, R.drawable.undo, marginStart = 2) {
+                        changeHistory.undo()
+                    }
+                    .apply { isEnabled = changeHistory.canUndo.value }
+            )
+            redos.add(
+                addIconButton(R.string.redo, R.drawable.redo, marginStart = 2) {
+                        changeHistory.redo()
+                    }
+                    .apply { isEnabled = changeHistory.canRedo.value }
+            )
+        }
+        binding.BottomAppBarRight.apply {
+            removeAllViews()
+            addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
+                val additionalActions = listOf(createPinAction()) + createFolderActions()
+                MoreNoteBottomSheet(this@EditActivity, additionalActions)
+                    .show(supportFragmentManager, MoreNoteBottomSheet.TAG)
+            }
+        }
+    }
+
+    protected fun createPinAction() =
+        if (model.pinned) {
+            Action(R.string.unpin, R.drawable.unpin) { pin() }
+        } else {
+            Action(R.string.pin, R.drawable.pin) { pin() }
+        }
+
+    protected fun createFolderActions() =
+        when (model.folder) {
+            Folder.NOTES ->
+                listOf(
+                    Action(R.string.delete, R.drawable.delete, callback = ::delete),
+                    Action(R.string.archive, R.drawable.archive, callback = ::archive),
+                )
+
+            Folder.DELETED ->
+                listOf(
+                    Action(R.string.restore, R.drawable.restore, callback = ::restore),
+                    Action(R.string.delete_forever, R.drawable.delete, callback = ::deleteForever),
+                )
+
+            Folder.ARCHIVED ->
+                listOf(
+                    Action(R.string.delete, R.drawable.delete, callback = ::delete),
+                    Action(R.string.unarchive, R.drawable.unarchive, callback = ::restore),
+                )
+        }
 
     abstract fun configureUI()
 
@@ -428,7 +480,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
     }
 
     @RequiresApi(24)
-    private fun checkAudioPermission() {
+    override fun recordAudio() {
         val permission = Manifest.permission.RECORD_AUDIO
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(permission)) {
@@ -440,10 +492,10 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     }
                     .show()
             } else requestPermissions(arrayOf(permission), REQUEST_AUDIO_PERMISSION)
-        } else recordAudio()
+        } else startRecordAudioActivity()
     }
 
-    private fun recordAudio() {
+    private fun startRecordAudioActivity() {
         if (model.audioRoot != null) {
             val intent = Intent(this, RecordAudioActivity::class.java)
             recordAudioActivityResultLauncher.launch(intent)
@@ -462,7 +514,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             .show()
     }
 
-    private fun selectImages() {
+    override fun addImages() {
         if (model.imageRoot != null) {
             val intent =
                 Intent(Intent.ACTION_GET_CONTENT).apply {
@@ -475,7 +527,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         } else Toast.makeText(this, R.string.insert_an_sd_card_images, Toast.LENGTH_LONG).show()
     }
 
-    private fun selectFiles() {
+    override fun attachFiles() {
         if (model.filesRoot != null) {
             val intent =
                 Intent(Intent.ACTION_GET_CONTENT).apply {
@@ -488,19 +540,26 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         } else Toast.makeText(this, R.string.insert_an_sd_card_files, Toast.LENGTH_LONG).show()
     }
 
-    private fun share() {
+    override fun changeColor() {
+        showColorSelectDialog { selectedColor ->
+            model.color = selectedColor
+            setColor()
+        }
+    }
+
+    override fun changeLabels() {
+        val intent = Intent(this, SelectLabelsActivity::class.java)
+        intent.putStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS, model.labels)
+        selectLabelsActivityResultLauncher.launch(intent)
+    }
+
+    fun share() {
         val body =
             when (type) {
                 Type.NOTE -> model.body
                 Type.LIST -> Operations.getBody(model.items.toMutableList())
             }
         Operations.shareNote(this, model.title, body)
-    }
-
-    private fun label() {
-        val intent = Intent(this, SelectLabelsActivity::class.java)
-        intent.putStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS, model.labels)
-        selectLabelsActivityResultLauncher.launch(intent)
     }
 
     private fun delete() {
@@ -540,9 +599,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             .show()
     }
 
-    private fun pin(item: MenuItem) {
+    fun pin() {
         model.pinned = !model.pinned
-        bindPinned(item)
+        bindPinned()
     }
 
     private fun setupImages() {
@@ -708,11 +767,11 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         binding = ActivityEditBinding.inflate(layoutInflater)
         when (type) {
             Type.NOTE -> {
-                binding.AddItem.visibility = View.GONE
-                binding.RecyclerView.visibility = View.GONE
+                binding.AddItem.visibility = GONE
+                binding.RecyclerView.visibility = GONE
             }
             Type.LIST -> {
-                binding.EnterBody.visibility = View.GONE
+                binding.EnterBody.visibility = GONE
             }
         }
 
@@ -735,7 +794,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         binding.root.isSaveFromParentEnabled = false
     }
 
-    private fun bindPinned(item: MenuItem) {
+    private fun bindPinned() {
         val icon: Int
         val title: Int
         if (model.pinned) {
@@ -745,8 +804,10 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             icon = R.drawable.pin
             title = R.string.pin
         }
-        item.setTitle(title)
-        item.setIcon(icon)
+        pinMenuItem.apply {
+            setTitle(title)
+            setIcon(icon)
+        }
     }
 
     companion object {

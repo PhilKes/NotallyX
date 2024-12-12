@@ -6,7 +6,7 @@ import android.text.style.BackgroundColorSpan
 import android.text.style.CharacterStyle
 import android.util.AttributeSet
 import androidx.appcompat.widget.AppCompatEditText
-import com.philkes.notallyx.presentation.removeSelectionFromSpan
+import com.philkes.notallyx.presentation.removeSelectionFromSpans
 import com.philkes.notallyx.presentation.withAlpha
 
 /**
@@ -28,7 +28,7 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
      */
     protected fun removeSpan(span: CharacterStyle, removeText: Boolean = false) {
         val (start, end) = getSpanRange(span)
-        text?.removeSelectionFromSpan(start, end)
+        text?.removeSelectionFromSpans(start, end)
         if (removeText) {
             text?.delete(start, end)
         }
