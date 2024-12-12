@@ -1,10 +1,10 @@
 package com.philkes.notallyx.utils.changehistory
 
 import android.text.Editable
-import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
+import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 
 class EditTextWithHistoryChange(
-    private val editText: EditTextWithHistory,
+    private val editText: StylableEditTextWithHistory,
     before: EditTextState,
     after: EditTextState,
     private val updateModel: (newValue: Editable) -> Unit,

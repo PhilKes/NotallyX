@@ -1,15 +1,15 @@
 package com.philkes.notallyx.presentation.activity.note
 
-import android.os.Build
 import android.os.Bundle
-import android.view.MenuItem
 import android.view.View.GONE
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.setOnNextAction
+import com.philkes.notallyx.presentation.view.note.action.MoreListActions
+import com.philkes.notallyx.presentation.view.note.action.MoreListBottomSheet
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
@@ -19,10 +19,9 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
-import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.findAllOccurrences
 
-class EditListActivity : EditActivity(Type.LIST) {
+class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     private lateinit var adapter: ListItemAdapter
     private lateinit var items: ListItemSortedList
@@ -39,35 +38,26 @@ class EditListActivity : EditActivity(Type.LIST) {
         super.onSaveInstanceState(outState)
     }
 
-    override fun setupToolbar() {
-        super.setupToolbar()
-        binding.Toolbar.menu.apply {
-            add(
-                R.string.delete_checked_items,
-                R.drawable.delete_all,
-                MenuItem.SHOW_AS_ACTION_IF_ROOM,
-                groupId = 1,
-            ) {
-                listManager.deleteCheckedItems()
-            }
-            add(
-                R.string.check_all_items,
-                R.drawable.checkbox_fill,
-                MenuItem.SHOW_AS_ACTION_IF_ROOM,
-                groupId = 1,
-            ) {
-                listManager.changeCheckedForAll(true)
-            }
-            add(
-                R.string.uncheck_all_items,
-                R.drawable.checkbox,
-                MenuItem.SHOW_AS_ACTION_IF_ROOM,
-                groupId = 1,
-            ) {
-                listManager.changeCheckedForAll(false)
-            }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                setGroupDividerEnabled(true)
+    override fun deleteChecked() {
+        listManager.deleteCheckedItems()
+    }
+
+    override fun checkAll() {
+        listManager.changeCheckedForAll(true)
+    }
+
+    override fun uncheckAll() {
+        listManager.changeCheckedForAll(false)
+    }
+
+    override fun initBottomMenu() {
+        super.initBottomMenu()
+        binding.BottomAppBarRight.apply {
+            removeAllViews()
+            addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
+                val additionalActions = listOf(createPinAction()) + createFolderActions()
+                MoreListBottomSheet(this@EditListActivity, additionalActions)
+                    .show(supportFragmentManager, MoreListBottomSheet.TAG)
             }
         }
     }
@@ -96,13 +86,6 @@ class EditListActivity : EditActivity(Type.LIST) {
                     ?.itemView
                     ?.let { binding.ScrollView.scrollTo(0, binding.RecyclerView.top + it.top) }
             }
-        }
-    }
-
-    override fun initActionManager(undo: MenuItem, redo: MenuItem) {
-        changeHistory = ChangeHistory {
-            undo.isEnabled = changeHistory.canUndo()
-            redo.isEnabled = changeHistory.canRedo()
         }
     }
 

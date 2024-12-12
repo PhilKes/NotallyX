@@ -1,5 +1,6 @@
 package com.philkes.notallyx.changehistory
 
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.philkes.notallyx.test.mockAndroidLog
 import com.philkes.notallyx.utils.changehistory.Change
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
@@ -8,30 +9,29 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
 
 class ChangeHistoryTest {
     private lateinit var changeHistory: ChangeHistory
-    private lateinit var onStackChanged: (Int) -> Unit
+
+    @get:Rule val rule = InstantTaskExecutorRule()
 
     @Before
     fun setUp() {
         mockAndroidLog()
-        onStackChanged = mock() // Mock the onStackChanged callback
-        changeHistory = ChangeHistory(onStackChanged) // Inject the mock into the class
+        changeHistory = ChangeHistory()
     }
 
     @Test
     fun `test push adds change to stack and updates stackPointer`() {
-        val change = mock<Change>() // Mock a Change object
+        val change = mock<Change>()
 
         changeHistory.push(change)
 
-        // Verify stackPointer is updated (since there's one item, it should be 0)
-        verify(onStackChanged).invoke(0)
+        assertTrue(changeHistory.canUndo.value)
     }
 
     @Test
@@ -42,8 +42,8 @@ class ChangeHistoryTest {
         changeHistory.undo()
 
         verify(change).undo()
-
-        verify(onStackChanged).invoke(-1)
+        assertFalse(changeHistory.canUndo.value)
+        assertTrue(changeHistory.canRedo.value)
     }
 
     @Test
@@ -55,26 +55,26 @@ class ChangeHistoryTest {
         changeHistory.redo()
 
         verify(change).redo()
-        // Called once during push and once during redo
-        verify(onStackChanged, times(2)).invoke(0)
+        assertTrue(changeHistory.canUndo.value)
+        assertFalse(changeHistory.canRedo.value)
     }
 
     @Test
     fun `test canUndo and canRedo logic`() {
         val change = mock<Change>()
 
-        assertFalse(changeHistory.canUndo())
-        assertFalse(changeHistory.canRedo())
+        assertFalse(changeHistory.canUndo.value)
+        assertFalse(changeHistory.canRedo.value)
 
         changeHistory.push(change)
 
-        assertTrue(changeHistory.canUndo())
-        assertFalse(changeHistory.canRedo())
+        assertTrue(changeHistory.canUndo.value)
+        assertFalse(changeHistory.canRedo.value)
 
         changeHistory.undo()
 
-        assertFalse(changeHistory.canUndo())
-        assertTrue(changeHistory.canRedo())
+        assertFalse(changeHistory.canUndo.value)
+        assertTrue(changeHistory.canRedo.value)
     }
 
     @Test
