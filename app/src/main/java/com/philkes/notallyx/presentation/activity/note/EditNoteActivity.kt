@@ -15,6 +15,7 @@ import android.text.style.URLSpan
 import android.view.ActionMode
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -33,6 +34,7 @@ import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companio
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TITLE
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TYPE
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.addMenuItem
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showKeyboard
@@ -49,6 +51,7 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
     private lateinit var selectedSpan: URLSpan
     private lateinit var pickNoteNewActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var pickNoteUpdateActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var textFormatMenu: View
 
     private var searchResultIndices: List<Pair<Int, Int>>? = null
     private var search = ""
@@ -159,24 +162,38 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     // ActionMode implementation
                     try {
                         menu?.apply {
-                            add(R.string.bold, 0) {
+                            add(R.string.link, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
+                                showAddLinkDialog(mode)
+                            }
+                            add(R.string.bold, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
                                 binding.EnterBody.applySpan(StyleSpan(Typeface.BOLD))
                                 mode?.finish()
                             }
-                            add(R.string.link, 0) { showAddLinkDialog(mode) }
-                            add(R.string.italic, 0) {
+                            add(R.string.italic, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
                                 binding.EnterBody.applySpan(StyleSpan(Typeface.ITALIC))
                                 mode?.finish()
                             }
-                            add(R.string.monospace, 0) {
+                            add(
+                                R.string.monospace,
+                                0,
+                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                            ) {
                                 binding.EnterBody.applySpan(TypefaceSpan("monospace"))
                                 mode?.finish()
                             }
-                            add(R.string.strikethrough, 0) {
+                            add(
+                                R.string.strikethrough,
+                                0,
+                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                            ) {
                                 binding.EnterBody.applySpan(StrikethroughSpan())
                                 mode?.finish()
                             }
-                            add(R.string.clear_formatting, 0) {
+                            add(
+                                R.string.clear_formatting,
+                                0,
+                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                            ) {
                                 binding.EnterBody.clearFormatting()
                                 mode?.finish()
                             }
@@ -185,37 +202,6 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                         exception.printStackTrace()
                     }
                     return true
-                }
-
-                private fun showAddLinkDialog(mode: ActionMode?) {
-                    val urlFromClipboard: String =
-                        ContextCompat.getSystemService(baseContext, ClipboardManager::class.java)
-                            ?.getLatestText()
-                            ?.let { if (it.isWebUrl()) it.toString() else "" } ?: ""
-                    val displayTextBefore = binding.EnterBody.getSelectionText() ?: ""
-                    this@EditNoteActivity.showEditLinkDialog(urlFromClipboard, displayTextBefore) {
-                        urlAfter,
-                        displayTextAfter ->
-                        if (displayTextAfter == displayTextBefore) {
-                            binding.EnterBody.applySpan(URLSpan(urlAfter))
-                        } else {
-                            binding.EnterBody.changeTextWithHistory { text ->
-                                val start = binding.EnterBody.selectionStart
-                                text.replace(
-                                    start,
-                                    binding.EnterBody.selectionEnd,
-                                    displayTextAfter,
-                                )
-                                text.setSpan(
-                                    URLSpan(urlAfter),
-                                    start,
-                                    start + displayTextAfter.length,
-                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                                )
-                            }
-                        }
-                        mode?.finish()
-                    }
                 }
 
                 override fun onDestroyActionMode(mode: ActionMode?) {
@@ -259,12 +245,131 @@ class EditNoteActivity : EditActivity(Type.NOTE) {
                     }
                 }
         }
+        binding.EnterBody.setOnSelectionChange { selStart, selEnd ->
+            if (selEnd - selStart > 0) {
+                if (!textFormatMenu.isEnabled) {
+                    initBottomTextFormattingMenu()
+                }
+                textFormatMenu.isEnabled = true
+            } else {
+                if (textFormatMenu.isEnabled) {
+                    initBottomMenu()
+                }
+                textFormatMenu.isEnabled = false
+            }
+        }
         binding.ContentLayout.setOnClickListener {
             binding.EnterBody.apply {
                 requestFocus()
                 setSelection(length())
                 showKeyboard(this)
             }
+        }
+    }
+
+    override fun initBottomMenu() {
+        super.initBottomMenu()
+        binding.BottomAppBarLeft.apply {
+            textFormatMenu =
+                addMenuItem(
+                        R.string.edit,
+                        R.drawable.text_format,
+                        showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                    ) {
+                        initBottomTextFormattingMenu()
+                    }
+                    .apply { isEnabled = binding.EnterBody.isActionModeOn }
+        }
+    }
+
+    private fun initBottomTextFormattingMenu() {
+        binding.BottomAppBarLeft.removeAllViews()
+        binding.BottomAppBarRight.removeAllViews()
+        binding.BottomAppBarCenter.apply {
+            removeAllViews()
+            val groupId = 69
+            addMenuItem(
+                R.string.link,
+                R.drawable.link,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                groupId = groupId,
+            ) {
+                showAddLinkDialog()
+            }
+            addMenuItem(
+                R.string.bold,
+                R.drawable.format_bold,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                groupId = groupId,
+            ) {
+                binding.EnterBody.applySpan(StyleSpan(Typeface.BOLD))
+            }
+            addMenuItem(
+                R.string.italic,
+                R.drawable.format_italic,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                groupId = groupId,
+            ) {
+                binding.EnterBody.applySpan(StyleSpan(Typeface.ITALIC))
+            }
+            addMenuItem(
+                R.string.strikethrough,
+                R.drawable.format_strikethrough,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                groupId = groupId,
+            ) {
+                binding.EnterBody.applySpan(StrikethroughSpan())
+            }
+            addMenuItem(
+                R.string.monospace,
+                R.drawable.code,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                groupId = groupId,
+            ) {
+                binding.EnterBody.applySpan(TypefaceSpan("monospace"))
+            }
+            addMenuItem(
+                R.string.clear_formatting,
+                R.drawable.format_clear,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                groupId = groupId,
+            ) {
+                binding.EnterBody.clearFormatting()
+            }
+            addMenuItem(
+                R.string.cancel,
+                R.drawable.close,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+            ) {
+                initBottomMenu()
+            }
+        }
+    }
+
+    private fun showAddLinkDialog(mode: ActionMode? = null) {
+        val urlFromClipboard: String =
+            ContextCompat.getSystemService(baseContext, ClipboardManager::class.java)
+                ?.getLatestText()
+                ?.let { if (it.isWebUrl()) it.toString() else "" } ?: ""
+        val displayTextBefore = binding.EnterBody.getSelectionText() ?: ""
+        this@EditNoteActivity.showEditLinkDialog(urlFromClipboard, displayTextBefore) {
+            urlAfter,
+            displayTextAfter ->
+            if (displayTextAfter == displayTextBefore) {
+                binding.EnterBody.applySpan(URLSpan(urlAfter))
+            } else {
+                binding.EnterBody.changeTextWithHistory { text ->
+                    val start = binding.EnterBody.selectionStart
+                    text.replace(start, binding.EnterBody.selectionEnd, displayTextAfter)
+                    text.setSpan(
+                        URLSpan(urlAfter),
+                        start,
+                        start + displayTextAfter.length,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                    )
+                }
+            }
+            mode?.finish()
         }
     }
 

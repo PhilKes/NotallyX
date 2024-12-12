@@ -12,11 +12,13 @@ import android.os.Bundle
 import android.provider.Settings
 import android.text.Editable
 import android.util.TypedValue
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.VISIBLE
+import android.widget.LinearLayout.HORIZONTAL
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +40,7 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.addMenuItem
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.getUriForFile
@@ -77,6 +80,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
     internal val model: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
+
+    protected val undos: MutableList<View> = mutableListOf()
+    protected val redos: MutableList<View> = mutableListOf()
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -121,7 +127,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 intent.getStringExtra(Constants.SelectedLabel)?.let { model.setLabels(listOf(it)) }
             }
 
-            setupToolbar()
+            setupToolbars()
             setupListeners()
             setStateFromModel()
 
@@ -232,39 +238,39 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
         }
     }
 
-    protected open fun initActionManager(undo: MenuItem, redo: MenuItem) {
-        changeHistory = ChangeHistory {
-            undo.isEnabled = changeHistory.canUndo()
-            redo.isEnabled = changeHistory.canRedo()
-        }
-        undo.isEnabled = changeHistory.canUndo()
-        redo.isEnabled = changeHistory.canRedo()
+    protected open fun initChangeHistory() {
+        changeHistory =
+            ChangeHistory().apply {
+                canUndo.observe(this@EditActivity) { canUndo ->
+                    undos.forEach { it.isEnabled = canUndo }
+                }
+                canRedo.observe(this@EditActivity) { canRedo ->
+                    redos.forEach { it.isEnabled = canRedo }
+                }
+            }
     }
 
-    protected open fun setupToolbar() {
+    protected open fun setupToolbars() {
         binding.Toolbar.setNavigationOnClickListener { finish() }
-
         binding.Toolbar.menu.apply {
-            clear()
+            clear() // TODO: needed?
             add(R.string.search, R.drawable.search, MenuItem.SHOW_AS_ACTION_ALWAYS) {
                 startSearch()
             }
-            val undo =
-                add(R.string.undo, R.drawable.undo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                    changeHistory.undo()
+            val pin =
+                add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { item ->
+                    pin(item)
                 }
-            val redo =
-                add(R.string.redo, R.drawable.redo, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                    changeHistory.redo()
-                }
-
-            initActionManager(undo, redo)
-
-            val pin = add(R.string.pin, R.drawable.pin) { item -> pin(item) }
             bindPinned(pin)
+            add(R.string.labels, R.drawable.label, MenuItem.SHOW_AS_ACTION_ALWAYS) { label() }
 
-            add(R.string.share, R.drawable.share) { share() }
-            add(R.string.labels, R.drawable.label) { label() }
+            // TODO:
+            //            undos.add(add(R.string.undo, R.drawable.undo) {
+            //                changeHistory.undo()
+            //            })
+            //            redos.add(add(R.string.redo, R.drawable.redo) {
+            //                changeHistory.redo()
+            //            })
             add(R.string.add_images, R.drawable.add_images) { selectImages() }
             add(R.string.attach_file, R.drawable.text_file) { selectFiles() }
 
@@ -274,7 +280,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
 
             when (model.folder) {
                 Folder.NOTES -> {
-                    add(R.string.delete, R.drawable.delete) { delete() }
+                    add(R.string.delete, R.drawable.delete, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                        delete()
+                    }
                     add(R.string.archive, R.drawable.archive) { archive() }
                 }
 
@@ -288,7 +296,7 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                     add(R.string.unarchive, R.drawable.unarchive) { restore() }
                 }
             }
-
+            add(R.string.share, R.drawable.share) { share() }
             add(R.string.change_color, R.drawable.change_color) {
                 showColorSelectDialog { selectedColor ->
                     model.color = selectedColor
@@ -315,6 +323,9 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
                 }
             }
         }
+
+        initBottomMenu()
+        initChangeHistory()
     }
 
     protected fun setSearchResultsAmount(amount: Int) {
@@ -386,8 +397,83 @@ abstract class EditActivity(private val type: Type) : LockedActivity<ActivityEdi
             visibility = GONE
             text = ""
         }
-        setupToolbar()
+        setupToolbars()
         binding.Toolbar.navigationIcon = navigationIconBeforeSearch
+    }
+
+    protected open fun initBottomMenu() {
+        binding.BottomAppBarLeft.apply {
+            removeAllViews()
+            addMenuItem(
+                R.string.add_item,
+                R.drawable.add,
+                order = Menu.NONE,
+                marginStart = 0,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+            ) {
+                AddBottomSheet(::selectImages, ::selectFiles) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                            checkAudioPermission()
+                        }
+                    }
+                    .show(supportFragmentManager, AddBottomSheet.TAG)
+            }
+
+            //            when (model.folder) {
+            //                Folder.NOTES -> {
+            //                    add(R.string.delete, R.drawable.delete) { delete() }
+            //                    add(R.string.archive, R.drawable.archive) { archive() }
+            //                }
+            //
+            //                Folder.DELETED -> {
+            //                    add(R.string.restore, R.drawable.restore) { restore() }
+            //                    add(R.string.delete_forever, R.drawable.delete) { deleteForever()
+            // }
+            //                }
+            //
+            //                Folder.ARCHIVED -> {
+            //                    add(R.string.delete, R.drawable.delete) { delete() }
+            //                    add(R.string.unarchive, R.drawable.unarchive) { restore() }
+            //                }
+            //            }
+            //            add(R.string.share, R.drawable.share) { share() }
+            //            add(R.string.change_color, R.drawable.change_color) {
+            //                showColorSelectDialog { selectedColor ->
+            //                    model.color = selectedColor
+            //                    setColor()
+            //                }
+            //            }
+        }
+        binding.BottomAppBarCenter.apply {
+            removeAllViews()
+            undos.add(
+                this.addMenuItem(
+                    R.string.undo,
+                    R.drawable.undo,
+                    gravity = null,
+                    weight = null,
+                    marginStart = 2,
+                    order = Menu.CATEGORY_CONTAINER + 1,
+                    showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                ) {
+                    changeHistory.undo()
+                }
+            )
+            redos.add(
+                this.addMenuItem(
+                    R.string.redo,
+                    R.drawable.redo,
+                    gravity = null,
+                    weight = null,
+                    marginStart = 2,
+                    order = Menu.CATEGORY_CONTAINER + 2,
+                    showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+                ) {
+                    changeHistory.undo()
+                }
+            )
+        }
+        binding.BottomAppBarRight.apply { removeAllViews() }
     }
 
     abstract fun configureUI()

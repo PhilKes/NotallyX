@@ -39,8 +39,8 @@ class EditListActivity : EditActivity(Type.LIST) {
         super.onSaveInstanceState(outState)
     }
 
-    override fun setupToolbar() {
-        super.setupToolbar()
+    override fun setupToolbars() {
+        super.setupToolbars()
         binding.Toolbar.menu.apply {
             add(
                 R.string.delete_checked_items,
@@ -96,13 +96,6 @@ class EditListActivity : EditActivity(Type.LIST) {
                     ?.itemView
                     ?.let { binding.ScrollView.scrollTo(0, binding.RecyclerView.top + it.top) }
             }
-        }
-    }
-
-    override fun initActionManager(undo: MenuItem, redo: MenuItem) {
-        changeHistory = ChangeHistory {
-            undo.isEnabled = changeHistory.canUndo()
-            redo.isEnabled = changeHistory.canRedo()
         }
     }
 
