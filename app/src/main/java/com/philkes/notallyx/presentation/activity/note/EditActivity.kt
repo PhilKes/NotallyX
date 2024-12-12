@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -42,6 +41,7 @@ import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.getUriForFile
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.showKeyboard
@@ -259,7 +259,7 @@ abstract class EditActivity(private val type: Type) :
     protected open fun setupToolbars() {
         binding.Toolbar.setNavigationOnClickListener { finish() }
         binding.Toolbar.menu.apply {
-            clear()
+            clear() // TODO: needed?
             add(R.string.search, R.drawable.search, MenuItem.SHOW_AS_ACTION_ALWAYS) {
                 startSearch()
             }
@@ -269,7 +269,9 @@ abstract class EditActivity(private val type: Type) :
 
             when (model.folder) {
                 Folder.NOTES -> {
-                    add(R.string.delete, R.drawable.delete) { delete() }
+                    add(R.string.delete, R.drawable.delete, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                        delete()
+                    }
                     add(R.string.archive, R.drawable.archive) { archive() }
                 }
 
@@ -371,7 +373,7 @@ abstract class EditActivity(private val type: Type) :
 
     protected fun endSearch() {
         binding.EnterSearchKeyword.apply {
-            visibility = GONE
+            //            visibility = GONE
             setText("")
         }
         binding.SearchResults.apply {
@@ -385,7 +387,7 @@ abstract class EditActivity(private val type: Type) :
     protected open fun initBottomMenu() {
         binding.BottomAppBarLeft.apply {
             removeAllViews()
-            addIconButton(R.string.add_item, R.drawable.add, marginStart = 0) {
+            addIconButton(R.string.adding_files, R.drawable.add, marginStart = 0) {
                 AddBottomSheet(this@EditActivity).show(supportFragmentManager, AddBottomSheet.TAG)
             }
         }
@@ -751,16 +753,12 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
-    private fun setColor() {
+    open protected fun setColor() {
         val color = Operations.extractColor(model.color, this)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.statusBarColor = color
-            window.navigationBarColor = color
+        binding.ScrollView.apply {
+            setBackgroundColor(color)
+            setControlsContrastColorForAllViews(color)
         }
-        binding.root.setBackgroundColor(color)
-        binding.RecyclerView.setBackgroundColor(color)
-        binding.RecyclerView.adapter?.notifyDataSetChanged()
-        binding.Toolbar.backgroundTintList = ColorStateList.valueOf(color)
     }
 
     private fun initialiseBinding() {

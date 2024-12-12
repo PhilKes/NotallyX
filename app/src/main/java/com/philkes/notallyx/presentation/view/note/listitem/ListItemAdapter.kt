@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.view.note.listitem
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
@@ -10,6 +11,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
 class ListItemAdapter(
+    @ColorInt var backgroundColor: Int,
     private val textSize: TextSize,
     elevation: Float,
     private val preferences: NotallyXPreferences,
@@ -30,7 +32,13 @@ class ListItemAdapter(
 
     override fun onBindViewHolder(holder: ListItemVH, position: Int) {
         val item = list[position]
-        holder.bind(item, position, highlights.get(position), preferences.listItemSorting.value)
+        holder.bind(
+            backgroundColor,
+            item,
+            position,
+            highlights.get(position),
+            preferences.listItemSorting.value,
+        )
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListItemVH {
@@ -38,6 +46,11 @@ class ListItemAdapter(
         val binding = RecyclerListItemBinding.inflate(inflater, parent, false)
         binding.root.background = parent.background
         return ListItemVH(binding, listManager, touchHelper, textSize)
+    }
+
+    internal fun setBackgroundColor(@ColorInt color: Int) {
+        backgroundColor = color
+        notifyDataSetChanged()
     }
 
     internal fun setList(list: ListItemSortedList) {

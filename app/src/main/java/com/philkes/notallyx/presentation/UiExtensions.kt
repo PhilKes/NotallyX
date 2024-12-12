@@ -4,6 +4,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.net.Uri
 import android.os.Build
@@ -18,6 +19,7 @@ import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
 import android.util.TypedValue
+import android.view.ContextThemeWrapper
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
@@ -27,6 +29,7 @@ import android.view.ViewGroup
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.LinearLayout
@@ -38,13 +41,17 @@ import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.checkbox.MaterialCheckBox
+import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.shape.MaterialShapeDrawable
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
@@ -207,7 +214,7 @@ fun ViewGroup.addIconButton(
     onClick: ((item: View) -> Unit)? = null,
 ): View {
     val view =
-        ImageButton(context).apply {
+        ImageButton(ContextThemeWrapper(context, R.style.AppTheme)).apply {
             setImageResource(drawable)
             contentDescription = context.getString(title)
             setBackgroundResource(R.color.Transparent)
@@ -503,4 +510,76 @@ fun Context.getColorFromAttr(@AttrRes attr: Int): Int {
     } else {
         throw IllegalArgumentException("Attribute not found in current theme")
     }
+}
+
+fun View.setControlsContrastColorForAllViews(@ColorInt backgroundColor: Int) {
+    val controlsColor = context.getContrastFontColor(backgroundColor)
+    setControlsColorForAllViews(controlsColor, backgroundColor)
+}
+
+fun View.setControlsColorForAllViews(@ColorInt controlsColor: Int, @ColorInt backgroundColor: Int) {
+    if (this is ViewGroup) {
+        for (i in 0 until childCount) {
+            val child = getChildAt(i)
+            child.setControlsColorForAllViews(
+                controlsColor,
+                backgroundColor,
+            ) // Recursive call for nested layouts
+        }
+    } else {
+        if (this is Chip) {
+            // Chip should not be re-colored
+            return
+        }
+        if (this is TextView) {
+            setCompoundDrawableTint(controlsColor)
+            setTextColor(controlsColor)
+            setLinkTextColor(controlsColor)
+            setHintTextColor(controlsColor.withAlpha(0.5f))
+        }
+        if (this is CompoundButton) {
+            buttonTintList = ColorStateList.valueOf(controlsColor)
+        }
+        if (this is ImageButton) {
+            imageTintList = ColorStateList.valueOf(controlsColor)
+        }
+        if (this is MaterialCheckBox) {
+            buttonIconTintList = ColorStateList.valueOf(backgroundColor)
+        }
+        backgroundTintList = ColorStateList.valueOf(controlsColor)
+    }
+}
+
+fun TextView.setCompoundDrawableTint(@ColorInt color: Int) {
+    compoundDrawablesRelative.forEach { drawable ->
+        drawable?.let { DrawableCompat.setTint(DrawableCompat.wrap(it), color) }
+    }
+
+    compoundDrawables.forEach { drawable ->
+        drawable?.let { DrawableCompat.setTint(DrawableCompat.wrap(it), color) }
+    }
+
+    (background as? MaterialShapeDrawable)?.setStrokeTint(color)
+
+    //    setCompoundDrawablesRelativeWithIntrinsicBounds(
+    //        compoundDrawablesRelative[0], // Start
+    //        compoundDrawablesRelative[1], // Top
+    //        compoundDrawablesRelative[2], // End
+    //        compoundDrawablesRelative[3], // Bottom
+    //    )
+}
+
+@ColorInt
+private fun Context.getContrastFontColor(@ColorInt backgroundColor: Int): Int {
+    // Extract RGB components
+    val red = android.graphics.Color.red(backgroundColor) / 255.0
+    val green = android.graphics.Color.green(backgroundColor) / 255.0
+    val blue = android.graphics.Color.blue(backgroundColor) / 255.0
+
+    // Calculate relative luminance
+    val luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
+
+    // Return white for dark backgrounds, black for light backgrounds
+    return if (luminance > 0.5) ContextCompat.getColor(this, R.color.TextDark)
+    else ContextCompat.getColor(this, R.color.TextLight)
 }

@@ -19,11 +19,12 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.findAllOccurrences
 
 class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
-    private lateinit var adapter: ListItemAdapter
+    private var adapter: ListItemAdapter? = null
     private lateinit var items: ListItemSortedList
 
     private lateinit var listManager: ListManager
@@ -64,12 +65,12 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     override fun highlightSearchResults(search: String): Int {
         var resultPos = 0
-        adapter.clearHighlights()
+        adapter?.clearHighlights()
         return items
             .mapIndexed { idx, item ->
                 val occurrences = item.body.findAllOccurrences(search)
                 occurrences.onEach { (startIdx, endIdx) ->
-                    adapter.highlightText(
+                    adapter?.highlightText(
                         ListItemAdapter.ListItemHighlight(idx, resultPos++, startIdx, endIdx, false)
                     )
                 }
@@ -79,7 +80,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
     }
 
     override fun selectSearchResult(resultPos: Int) {
-        val selectedItemPos = adapter.selectHighlight(resultPos)
+        val selectedItemPos = adapter!!.selectHighlight(resultPos)
         if (selectedItemPos != -1) {
             binding.RecyclerView.post {
                 binding.RecyclerView.findViewHolderForAdapterPosition(selectedItemPos)
@@ -118,6 +119,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
             }
         adapter =
             ListItemAdapter(
+                Operations.extractColor(model.color, this),
                 model.textSize,
                 elevation,
                 NotallyXPreferences.getInstance(application),
@@ -133,9 +135,14 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
             sortCallback.setList(items)
         }
         items.init(model.items)
-        adapter.setList(items)
+        adapter?.setList(items)
         binding.RecyclerView.adapter = adapter
-        listManager.adapter = adapter
+        listManager.adapter = adapter!!
         listManager.initList(items)
+    }
+
+    override fun setColor() {
+        super.setColor()
+        adapter?.setBackgroundColor(Operations.extractColor(model.color, this))
     }
 }

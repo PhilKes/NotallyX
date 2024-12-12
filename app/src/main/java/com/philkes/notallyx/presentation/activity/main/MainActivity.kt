@@ -10,6 +10,8 @@ import android.view.Menu.CATEGORY_CONTAINER
 import android.view.Menu.CATEGORY_SYSTEM
 import android.view.MenuItem
 import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -43,6 +45,7 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityMainBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
+import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_FOLDER
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
@@ -452,6 +455,18 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             fragmentIdToLoad = destination.id
             binding.NavigationView.setCheckedItem(destination.id)
+            if (destination.id != R.id.Search) {
+                binding.EnterSearchKeyword.apply {
+                    setText("")
+                    clearFocus()
+                }
+                when (destination.id) {
+                    R.id.Notes,
+                    R.id.Deleted,
+                    R.id.Archived -> binding.EnterSearchKeywordLayout.visibility = VISIBLE
+                    else -> binding.EnterSearchKeywordLayout.visibility = GONE
+                }
+            }
             handleDestinationChange(destination)
         }
     }
@@ -472,14 +487,14 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         val inputManager = ContextCompat.getSystemService(this, InputMethodManager::class.java)
         if (destination.id == R.id.Search) {
             binding.EnterSearchKeyword.apply {
-                setText("")
+                //                setText("")
                 visibility = View.VISIBLE
                 requestFocus()
                 inputManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
             }
         } else {
             binding.EnterSearchKeyword.apply {
-                visibility = View.GONE
+                //                visibility = View.GONE
                 inputManager?.hideSoftInputFromWindow(this.windowToken, 0)
             }
         }
@@ -502,7 +517,24 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private fun setupSearch() {
         binding.EnterSearchKeyword.apply {
             setText(model.keyword)
-            doAfterTextChanged { text -> model.keyword = requireNotNull(text).trim().toString() }
+            doAfterTextChanged { text ->
+                model.keyword = requireNotNull(text).trim().toString()
+                if (
+                    model.keyword.isNotEmpty() &&
+                        navController.currentDestination?.id != R.id.Search
+                ) {
+                    val bundle =
+                        Bundle().apply { putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value) }
+                    navController.navigate(R.id.Search, bundle)
+                }
+            }
+            setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus && navController.currentDestination?.id != R.id.Search) {
+                    val bundle =
+                        Bundle().apply { putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value) }
+                    navController.navigate(R.id.Search, bundle)
+                }
+            }
         }
     }
 

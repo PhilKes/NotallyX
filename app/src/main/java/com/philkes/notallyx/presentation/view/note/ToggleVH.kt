@@ -1,9 +1,9 @@
 package com.philkes.notallyx.presentation.view.note
 
 import androidx.recyclerview.widget.RecyclerView
-import com.philkes.notallyx.databinding.ReyclerToggleBinding
+import com.philkes.notallyx.databinding.RecyclerToggleBinding
 
-class ToggleVH(private val binding: ReyclerToggleBinding) : RecyclerView.ViewHolder(binding.root) {
+class ToggleVH(private val binding: RecyclerToggleBinding) : RecyclerView.ViewHolder(binding.root) {
 
     fun bind(toggle: Toggle) {
         binding.root.apply {

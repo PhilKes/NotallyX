@@ -4,4 +4,8 @@
     <attr name="primaryFabBackground" format="reference" />
     <attr name="secondaryFabTint" format="reference" />
     <attr name="secondaryFabBackground" format="reference" />
+    <attr name="colorPrimaryInverse" format="reference" />
+    <attr name="colorSurface" format="reference" />
+    <attr name="colorSurfaceInverse" format="reference" />
+    <attr name="textColor" format="reference" />
 </resources>

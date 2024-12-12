@@ -32,7 +32,7 @@ import com.philkes.notallyx.data.model.getNoteIdFromUrl
 import com.philkes.notallyx.data.model.getNoteTypeFromUrl
 import com.philkes.notallyx.data.model.isNoteUrl
 import com.philkes.notallyx.databinding.BottomTextFormattingMenuBinding
-import com.philkes.notallyx.databinding.ReyclerToggleBinding
+import com.philkes.notallyx.databinding.RecyclerToggleBinding
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXCLUDE_NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TITLE
@@ -302,7 +302,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addView(
-                ReyclerToggleBinding.inflate(layoutInflater, this, false).root.apply {
+                RecyclerToggleBinding.inflate(layoutInflater, this, false).root.apply {
                     setIconResource(R.drawable.close)
                     contentDescription = context.getString(R.string.cancel)
                     setOnClickListener { initBottomMenu() }

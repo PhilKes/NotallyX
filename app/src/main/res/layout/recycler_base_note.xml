@@ -6,15 +6,13 @@
     android:layout_marginStart="4dp"
     android:layout_marginEnd="4dp"
     android:layout_marginBottom="8dp"
+    app:checkedIconTint="?attr/colorPrimary"
     android:checkable="true"
-    app:cardElevation="0dp"
-    app:checkedIcon="@drawable/checked_circle"
-    app:strokeWidth="1dp">
+    app:cardElevation="0dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/Colorless">
+        android:layout_height="wrap_content">
 
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -33,7 +31,7 @@
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/ImageViewMore"
-                style="@style/Preview"
+                style="@style/FileChip"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:clickable="false"
@@ -57,6 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:gravity="center"
+          android:clickable="false"
             android:text="@string/cant_load_image"
             android:textAppearance="?attr/textAppearanceBodyMedium"
             app:layout_constraintDimensionRatio="4:3"
@@ -66,11 +65,11 @@
             android:id="@+id/Space"
             android:layout_width="match_parent"
             android:layout_height="14dp"
+          android:clickable="false"
             app:layout_constraintTop_toBottomOf="@id/Message" />
 
         <TextView
             android:id="@+id/Title"
-            style="@style/Preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-medium"
@@ -83,7 +82,6 @@
 
         <TextView
             android:id="@+id/Date"
-            style="@style/Preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingStart="16dp"
@@ -102,33 +100,26 @@
             >
             <com.google.android.material.chip.Chip
                 android:id="@+id/FileView"
-                style="@style/Preview"
+                style="@style/FileChip"
                 android:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="top"
-                android:clickable="false"
                 android:layout_marginStart="11dp"
-                app:chipStartPadding="4dp"
-                app:textStartPadding="2dp"
                 app:chipIcon="@drawable/text_file"
-                app:chipIconSize="10pt"
-                android:stateListAnimator="@null"
                 android:text="@string/cant_load_file"
-                android:textAppearance="?attr/textAppearanceBodySmall"
                 app:layout_constraintStart_toStartOf="parent"
                 />
 
             <com.google.android.material.chip.Chip
                 android:id="@+id/FileViewMore"
-                style="@style/Preview"
+                style="@style/FileChip"
                 android:visibility="visible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="top"
-                android:clickable="false"
-                android:stateListAnimator="@null"
                 android:layout_marginStart="6dp"
+                android:layout_marginEnd="6dp"
                 android:textAppearance="?attr/textAppearanceBodySmall"
                 app:chipStartPadding="8dp"
                 app:textStartPadding="2dp"
@@ -137,12 +128,12 @@
 
         <TextView
             android:id="@+id/Note"
-            style="@style/Preview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:lineSpacingMultiplier="1.1"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:paddingBottom="16dp"
             app:layout_constraintTop_toBottomOf="@id/FileViewLayout" />
 
         <LinearLayout
@@ -156,58 +147,58 @@
             app:layout_constraintTop_toBottomOf="@id/Note">
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/ItemsRemaining"
-                style="@style/Preview.ListItem"
+                style="@style/FileChip.ListItem"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:drawableStartCompat="@drawable/add_16" />
