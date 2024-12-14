@@ -1,6 +1,6 @@
 package com.philkes.notallyx.utils.changehistory
 
-import com.philkes.notallyx.presentation.truncate
+import com.philkes.notallyx.utils.truncate
 
 abstract class ListPositionValueChange<T>(
     internal val newValue: T,

@@ -20,6 +20,8 @@ class ListItemAdapter(
     private val callback = ListItemDragCallback(elevation, listManager)
     private val touchHelper = ItemTouchHelper(callback)
 
+    private val highlights = mutableMapOf<Int, MutableList<ListItemHighlight>>()
+
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         touchHelper.attachToRecyclerView(recyclerView)
     }
@@ -28,7 +30,7 @@ class ListItemAdapter(
 
     override fun onBindViewHolder(holder: ListItemVH, position: Int) {
         val item = list[position]
-        holder.bind(item, position, preferences.listItemSorting.value)
+        holder.bind(item, position, highlights.get(position), preferences.listItemSorting.value)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListItemVH {
@@ -41,4 +43,43 @@ class ListItemAdapter(
     internal fun setList(list: ListItemSortedList) {
         this.list = list
     }
+
+    internal fun clearHighlights() {
+        highlights.clear()
+        notifyDataSetChanged()
+    }
+
+    internal fun highlightText(highlight: ListItemHighlight) {
+        if (highlights.containsKey(highlight.itemPos)) {
+            highlights[highlight.itemPos]!!.add(highlight)
+        } else {
+            highlights[highlight.itemPos] = mutableListOf(highlight)
+        }
+        notifyItemChanged(highlight.itemPos)
+    }
+
+    internal fun selectHighlight(pos: Int): Int {
+        var selectedItemPos = -1
+        highlights.entries.forEach { (_, value) ->
+            value.forEach {
+                val isSelected = it.selected
+                it.selected = it.resultPos == pos
+                if (isSelected != it.selected) {
+                    notifyItemChanged(it.itemPos)
+                }
+                if (it.selected) {
+                    selectedItemPos = it.itemPos
+                }
+            }
+        }
+        return selectedItemPos
+    }
+
+    data class ListItemHighlight(
+        val itemPos: Int,
+        val resultPos: Int,
+        val startIdx: Int,
+        val endIdx: Int,
+        var selected: Boolean,
+    )
 }

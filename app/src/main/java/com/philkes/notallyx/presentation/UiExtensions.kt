@@ -1,20 +1,14 @@
 package com.philkes.notallyx.presentation
 
 import android.Manifest
+import android.animation.ValueAnimator
 import android.app.Activity
-import android.app.KeyguardManager
-import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.ContentResolver
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Typeface
-import android.hardware.biometrics.BiometricManager
-import android.hardware.biometrics.BiometricManager.Authenticators.BIOMETRIC_STRONG
-import android.hardware.biometrics.BiometricManager.Authenticators.DEVICE_CREDENTIAL
 import android.net.Uri
 import android.os.Build
-import android.provider.OpenableColumns
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
@@ -32,12 +26,14 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -181,6 +177,19 @@ fun EditText.setOnNextAction(onNext: () -> Unit) {
     }
 }
 
+fun EditText.animateScroll(targetY: Int, targetX: Int = 0) {
+    val currentY = scrollY
+    ValueAnimator.ofInt(currentY, targetY).apply {
+        duration = 180
+        interpolator = AccelerateDecelerateInterpolator()
+        addUpdateListener { animator ->
+            val animatedValue = animator.animatedValue as Int
+            scrollTo(targetX, animatedValue)
+        }
+        start()
+    }
+}
+
 fun Menu.add(
     title: Int,
     drawable: Int,
@@ -310,47 +319,6 @@ fun RadioGroup.checkedTag(): Any {
     return this.findViewById<RadioButton?>(this.checkedRadioButtonId).tag
 }
 
-fun Context.canAuthenticateWithBiometrics(): Int {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val keyguardManager = ContextCompat.getSystemService(this, KeyguardManager::class.java)
-            val packageManager: PackageManager = this.packageManager
-            if (!packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
-                return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
-            }
-            if (keyguardManager?.isKeyguardSecure == false) {
-                return BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
-            }
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            val biometricManager: BiometricManager =
-                this.getSystemService(BiometricManager::class.java)
-            return biometricManager.canAuthenticate()
-        } else {
-            val biometricManager: BiometricManager =
-                this.getSystemService(BiometricManager::class.java)
-            return biometricManager.canAuthenticate(BIOMETRIC_STRONG or DEVICE_CREDENTIAL)
-        }
-    }
-    return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
-}
-
-fun Context.getFileName(uri: Uri): String? =
-    when (uri.scheme) {
-        ContentResolver.SCHEME_CONTENT -> getContentFileName(uri)
-        else -> uri.path?.let(::File)?.name
-    }
-
-fun Context.getContentFileName(uri: Uri): String? =
-    runCatching {
-            contentResolver.query(uri, null, null, null, null)?.use { cursor ->
-                cursor.moveToFirst()
-                return@use cursor
-                    .getColumnIndexOrThrow(OpenableColumns.DISPLAY_NAME)
-                    .let(cursor::getString)
-            }
-        }
-        .getOrNull()
-
 fun Activity.showKeyboard(view: View) {
     ContextCompat.getSystemService(this, InputMethodManager::class.java)
         ?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
@@ -460,13 +428,6 @@ private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
     }
 }
 
-fun Activity.copyToClipBoard(text: CharSequence) {
-    ContextCompat.getSystemService(this, ClipboardManager::class.java)?.let {
-        val clip = ClipData.newPlainText("label", text)
-        it.setPrimaryClip(clip)
-    }
-}
-
 fun Activity.showColorSelectDialog(callback: (selectedColor: Color) -> Unit) {
     val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.change_color).create()
 
@@ -504,6 +465,16 @@ fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
 
 fun Context.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {
     return resources.getQuantityString(id, quantity, quantity, *formatArgs)
+}
+
+@ColorInt
+fun @receiver:ColorInt Int.withAlpha(alpha: Float): Int {
+    return android.graphics.Color.argb(
+        (255 * alpha).toInt(),
+        android.graphics.Color.red(this),
+        android.graphics.Color.green(this),
+        android.graphics.Color.blue(this),
+    )
 }
 
 fun Context.getUriForFile(file: File): Uri =
