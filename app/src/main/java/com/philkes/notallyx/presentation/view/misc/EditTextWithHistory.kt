@@ -26,6 +26,7 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
     var isActionModeOn = false
     private var changeHistory: ChangeHistory? = null
     private var updateModel: ((text: Editable) -> Unit)? = null
+    private var onSelectionChange: ((selStart: Int, selEnd: Int) -> Unit)? = null
 
     /**
      * If this is called every future text or span change is pushed to [changeHistory].
@@ -56,6 +57,10 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
                 updateModel(text.clone())
             }
         this.textWatcher?.let { addTextChangedListener(it) }
+    }
+
+    fun setOnSelectionChange(callback: (selStart: Int, selEnd: Int) -> Unit) {
+        this.onSelectionChange = callback
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
@@ -168,5 +173,10 @@ class EditTextWithHistory(context: Context, attrs: AttributeSet) :
                 updateModel?.invoke(text.clone())
             }
         )
+    }
+
+    override fun onSelectionChanged(selStart: Int, selEnd: Int) {
+        super.onSelectionChanged(selStart, selEnd)
+        onSelectionChange?.invoke(selStart, selEnd)
     }
 }

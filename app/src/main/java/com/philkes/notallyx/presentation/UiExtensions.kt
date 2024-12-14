@@ -3,7 +3,6 @@ package com.philkes.notallyx.presentation
 import android.Manifest
 import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Typeface
@@ -20,6 +19,7 @@ import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.Menu
@@ -30,6 +30,8 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
@@ -199,12 +201,59 @@ fun Menu.add(
     onClick: (item: MenuItem) -> Unit,
 ): MenuItem {
     val menuItem =
-        add(groupId, Menu.NONE, order, title).setIcon(drawable).setOnMenuItemClickListener { item ->
-            onClick(item)
-            return@setOnMenuItemClickListener false
-        }
+        add(groupId, Math.random().toInt(), order, title)
+            .setIcon(drawable)
+            .setOnMenuItemClickListener { item ->
+                onClick(item)
+                item.isChecked = true
+                return@setOnMenuItemClickListener false
+            }
     menuItem.setShowAsAction(showAsAction)
     return menuItem
+}
+
+fun LinearLayout.addMenuItem(
+    title: Int,
+    drawable: Int,
+    gravity: Int? = Gravity.START,
+    weight: Float? = 1f,
+    marginStart: Int = 10,
+    showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM,
+    groupId: Int = Menu.NONE,
+    order: Int = Menu.NONE,
+    onClick: ((item: View) -> Unit)? = null,
+): View {
+    val view = createBottomMenuItem(context, title, drawable, gravity, weight, marginStart, onClick)
+    addView(view)
+    return view
+}
+
+fun createBottomMenuItem(
+    context: Context,
+    title: Int,
+    drawable: Int,
+    gravity: Int? = Gravity.START,
+    weight: Float? = 1f,
+    marginStart: Int = 10,
+    onClick: ((item: View) -> Unit)? = null,
+): View {
+    return ImageButton(context).apply {
+        setImageResource(drawable)
+        isClickable = true
+        contentDescription = context.getString(title)
+        setBackgroundResource(R.color.Transparent)
+        setOnClickListener(onClick)
+        layoutParams =
+            LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                )
+                .apply {
+                    //            weight?.let {  this.weight = it} // Spread equally
+                    //            gravity?.let {  this.gravity = it}
+                    setMargins(marginStart.dp(context), paddingTop, 0, paddingBottom)
+                }
+    }
 }
 
 fun TextView.displayFormattedTimestamp(
@@ -448,10 +497,6 @@ fun Activity.showColorSelectDialog(callback: (selectedColor: Color) -> Unit) {
         dialog.setView(root)
         dialog.show()
     }
-}
-
-fun ClipboardManager.getLatestText(): CharSequence? {
-    return primaryClip?.let { if (it.itemCount > 0) it.getItemAt(0)!!.text else null }
 }
 
 fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
