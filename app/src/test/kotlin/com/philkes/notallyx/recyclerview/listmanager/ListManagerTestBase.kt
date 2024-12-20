@@ -1,6 +1,7 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
 import android.view.inputmethod.InputMethodManager
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
@@ -23,6 +24,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Rule
 import org.mockito.Mockito.anyInt
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -41,13 +43,15 @@ open class ListManagerTestBase {
 
     lateinit var listManager: ListManager
 
+    @get:Rule val rule = InstantTaskExecutorRule()
+
     @Before
     fun setUp() {
         mockAndroidLog()
         recyclerView = mock(RecyclerView::class.java)
         adapter = mock(RecyclerView.Adapter::class.java)
         inputMethodManager = mock(InputMethodManager::class.java)
-        changeHistory = ChangeHistory() {}
+        changeHistory = ChangeHistory()
         listItemVH = mock(ListItemVH::class.java)
         preferences = mock(NotallyXPreferences::class.java)
         listManager = ListManager(recyclerView, changeHistory, preferences, inputMethodManager) {}

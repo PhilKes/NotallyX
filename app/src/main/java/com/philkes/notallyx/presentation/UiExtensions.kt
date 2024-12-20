@@ -1,9 +1,7 @@
 package com.philkes.notallyx.presentation
 
 import android.Manifest
-import android.animation.ValueAnimator
 import android.app.Activity
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Typeface
@@ -25,18 +23,23 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
+import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.view.marginBottom
+import androidx.core.view.marginTop
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -52,9 +55,9 @@ import com.philkes.notallyx.data.model.getUrl
 import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
-import com.philkes.notallyx.presentation.view.misc.EditTextWithHistory
 import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.Progress
+import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
@@ -117,10 +120,12 @@ fun String.removeTrailingParentheses(): String {
  * @param selectionStart the start index of the selection
  * @param selectionEnd the end index of the selection
  */
-fun Editable.removeSelectionFromSpan(selectionStart: Int, selectionEnd: Int) {
-    // Get all spans of type CharacterStyle (can be extended to other types)
-    val spans = getSpans(selectionStart, selectionEnd, CharacterStyle::class.java)
-
+fun Editable.removeSelectionFromSpans(
+    selectionStart: Int,
+    selectionEnd: Int,
+    spans: Collection<CharacterStyle> =
+        getSpans(selectionStart, selectionEnd, CharacterStyle::class.java).toList(),
+) {
     for (span in spans) {
         val spanStart = getSpanStart(span)
         val spanEnd = getSpanEnd(span)
@@ -177,19 +182,6 @@ fun EditText.setOnNextAction(onNext: () -> Unit) {
     }
 }
 
-fun EditText.animateScroll(targetY: Int, targetX: Int = 0) {
-    val currentY = scrollY
-    ValueAnimator.ofInt(currentY, targetY).apply {
-        duration = 180
-        interpolator = AccelerateDecelerateInterpolator()
-        addUpdateListener { animator ->
-            val animatedValue = animator.animatedValue as Int
-            scrollTo(targetX, animatedValue)
-        }
-        start()
-    }
-}
-
 fun Menu.add(
     title: Int,
     drawable: Int,
@@ -201,10 +193,34 @@ fun Menu.add(
     val menuItem =
         add(groupId, Menu.NONE, order, title).setIcon(drawable).setOnMenuItemClickListener { item ->
             onClick(item)
+            item.isChecked = true
             return@setOnMenuItemClickListener false
         }
     menuItem.setShowAsAction(showAsAction)
     return menuItem
+}
+
+fun ViewGroup.addIconButton(
+    title: Int,
+    drawable: Int,
+    marginStart: Int = 10,
+    onClick: ((item: View) -> Unit)? = null,
+): View {
+    val view =
+        ImageButton(context).apply {
+            setImageResource(drawable)
+            contentDescription = context.getString(title)
+            setBackgroundResource(R.color.Transparent)
+            setOnClickListener(onClick)
+            layoutParams =
+                LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                    )
+                    .apply { setMargins(marginStart.dp(context), marginTop, 0, marginBottom) }
+        }
+    addView(view)
+    return view
 }
 
 fun TextView.displayFormattedTimestamp(
@@ -267,7 +283,7 @@ fun EditText.createListTextWatcherWithHistory(
         }
     }
 
-fun EditTextWithHistory.createTextWatcherWithHistory(
+fun StylableEditTextWithHistory.createTextWatcherWithHistory(
     changeHistory: ChangeHistory,
     onTextChanged: ((text: CharSequence, start: Int, count: Int) -> Unit)? = null,
     updateModel: (text: Editable) -> Unit,
@@ -450,10 +466,6 @@ fun Activity.showColorSelectDialog(callback: (selectedColor: Color) -> Unit) {
     }
 }
 
-fun ClipboardManager.getLatestText(): CharSequence? {
-    return primaryClip?.let { if (it.itemCount > 0) it.getItemAt(0)!!.text else null }
-}
-
 fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
     val dialog = show()
     view.requestFocus()
@@ -482,3 +494,13 @@ fun Context.getUriForFile(file: File): Uri =
 
 val DocumentFile.nameWithoutExtension: String?
     get() = name?.substringBeforeLast(".")
+
+fun Context.getColorFromAttr(@AttrRes attr: Int): Int {
+    val typedValue = TypedValue()
+    val resolved = theme.resolveAttribute(attr, typedValue, true)
+    if (resolved) {
+        return typedValue.data // Returns the color as an Int
+    } else {
+        throw IllegalArgumentException("Attribute not found in current theme")
+    }
+}
