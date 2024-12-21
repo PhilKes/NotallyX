@@ -17,6 +17,7 @@
         <item name="checkboxStyle">@style/CheckBox</item>
         <item name="navigationViewStyle">@style/NavigationView</item>
         <item name="popupMenuBackground">?attr/colorSurface</item>
+        <item name="bottomSheetDialogTheme">@style/ThemeOverlay.App.BottomSheetDialog</item>
 
         <item name="materialAlertDialogTheme">@style/AlertDialog</item>
         <item name="elevationOverlayEnabled">false</item>
@@ -164,6 +165,23 @@
         <item name="android:paddingBottom">14dp</item>
         <item name="android:includeFontPadding">false</item>
         <item name="shapeAppearanceOverlay">@style/ShapeAppearanceOverlay.MaterialComponents.Chip</item>
+    </style>
+
+    <style name="BottomSheetText" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:padding">8dp</item>
+        <item name="android:drawablePadding">16dp</item>
+        <item name="android:clickable">true</item>
+        <item name="android:layout_marginTop">5dp</item>
+        <item name="android:layout_marginBottom">5dp</item>
+    </style>
+
+    <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/ModalBottomSheet</item>
+    </style>
+
+    <style name="ModalBottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.Corner.None</item>
+        <item name="behavior_draggable">false</item>
     </style>
 
 </resources>

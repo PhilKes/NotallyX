@@ -119,7 +119,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
 
         assertNull(deletedItem)
         items.assertSize(6)
-        assertFalse(changeHistory.canUndo())
+        assertFalse(changeHistory.canUndo.value)
     }
 
     @Test
@@ -151,7 +151,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         val deletedItem = listManager.delete(10)
 
         assertNull(deletedItem)
-        assertFalse(changeHistory.canUndo())
+        assertFalse(changeHistory.canUndo.value)
     }
 
     // endregion

@@ -22,11 +22,11 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         listManager.move(1, 5)
         val bodiesAfterMove = items.map { it.body }.toTypedArray()
 
-        while (changeHistory.canUndo()) {
+        while (changeHistory.canUndo.value) {
             changeHistory.undo()
         }
         items.assertOrder("A", "B", "C", "D", "E", "F")
-        while (changeHistory.canRedo()) {
+        while (changeHistory.canRedo.value) {
             changeHistory.redo()
         }
         items.assertOrder(*bodiesAfterMove)
@@ -43,11 +43,11 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         listManager.changeChecked(2, true)
         val checkedValues = items.map { it.checked }.toBooleanArray()
 
-        while (changeHistory.canUndo()) {
+        while (changeHistory.canUndo.value) {
             changeHistory.undo()
         }
         items.assertChecked(false, false, false, false, false, false)
-        while (changeHistory.canRedo()) {
+        while (changeHistory.canRedo.value) {
             changeHistory.redo()
         }
         items.assertChecked(*checkedValues)
@@ -65,12 +65,12 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         val bodiesAfterMove = items.map { it.body }.toTypedArray()
         val checkedValues = items.map { it.checked }.toBooleanArray()
 
-        while (changeHistory.canUndo()) {
+        while (changeHistory.canUndo.value) {
             changeHistory.undo()
         }
         items.assertChecked(false, false, false, false, false, false)
         items.assertOrder("A", "B", "C", "D", "E", "F")
-        while (changeHistory.canRedo()) {
+        while (changeHistory.canRedo.value) {
             changeHistory.redo()
         }
         items.assertChecked(*checkedValues)
@@ -106,11 +106,11 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         listManager.changeIsChild(4, true)
         // Afterwards: B has children C,D,E
 
-        while (changeHistory.canUndo()) {
+        while (changeHistory.canUndo.value) {
             changeHistory.undo()
         }
         listOf("A", "B", "C", "D", "E", "F").forEach { it.assertChildren() }
-        while (changeHistory.canRedo()) {
+        while (changeHistory.canRedo.value) {
             changeHistory.redo()
         }
         "A".assertChildren()
@@ -129,12 +129,12 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         listManager.addWithChildren(items.lastIndex, "Parent6", "Child3", "Child4")
         val bodiesAfterAdd = items.map { it.body }.toTypedArray()
 
-        while (changeHistory.canUndo()) {
+        while (changeHistory.canUndo.value) {
             changeHistory.undo()
         }
         items.assertOrder("A", "B", "C", "D", "E", "F")
         listOf("A", "B", "C", "D", "E", "F").forEach { it.assertChildren() }
-        while (changeHistory.canRedo()) {
+        while (changeHistory.canRedo.value) {
             changeHistory.redo()
         }
         items.assertOrder(*bodiesAfterAdd)
@@ -160,13 +160,13 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         listManager.delete(0, true)
         items.assertSize(0)
 
-        while (changeHistory.canUndo()) {
+        while (changeHistory.canUndo.value) {
             changeHistory.undo()
         }
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "A".assertChildren("B")
         "C".assertChildren("D", "E")
-        while (changeHistory.canRedo()) {
+        while (changeHistory.canRedo.value) {
             changeHistory.redo()
         }
         items.assertSize(0)
@@ -253,14 +253,14 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         "Parent6".assertChildren("Child4")
         "Parent".assertChildren()
 
-        while (changeHistory.canUndo()) {
+        while (changeHistory.canUndo.value) {
             changeHistory.undo()
         }
         items.assertOrder("A", "B", "C", "D", "E", "F")
         listOf("A", "B", "C", "D", "E", "F").forEach { it.assertChildren() }
         items.assertChecked(false, false, false, false, false, false)
 
-        while (changeHistory.canRedo()) {
+        while (changeHistory.canRedo.value) {
             changeHistory.redo()
         }
         items.assertOrder(*bodiesAfterAdd)
