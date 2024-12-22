@@ -97,6 +97,16 @@
             android:exported="false">
         </activity>
 
+        <activity
+          android:name=".utils.ErrorActivity"
+          android:exported="true"
+          android:label="@string/unknown_error"
+          android:process=":error_activity">
+            <intent-filter>
+            <action android:name="cat.ereza.customactivityoncrash.ERROR" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".presentation.widget.WidgetProvider"
             android:exported="false"

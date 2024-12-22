@@ -1,16 +1,20 @@
 package com.philkes.notallyx.utils
 
 import android.app.Application
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.content.res.ColorStateList
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.RelativeCornerSize
@@ -46,7 +50,7 @@ object Operations {
         return null
     }
 
-    fun log(app: Application, throwable: Throwable) {
+    fun log(app: Application, throwable: Throwable? = null, stackTrace: String? = null) {
         Log.e(TAG, "Exception occurred", throwable)
         val file = getLog(app)
         val output = FileOutputStream(file, !file.exists() || !file.isLargerThan(2048))
@@ -56,7 +60,8 @@ object Operations {
         val time = formatter.format(System.currentTimeMillis())
 
         writer.println("[Start]")
-        throwable.printStackTrace(writer)
+        throwable?.printStackTrace(writer)
+        stackTrace?.let { writer.println(it) }
         writer.println("Version code : " + BuildConfig.VERSION_CODE)
         writer.println("Version name : " + BuildConfig.VERSION_NAME)
         writer.println("Model : " + Build.MODEL)
@@ -133,6 +138,34 @@ object Operations {
         val folder = File(app.filesDir, "logs")
         folder.mkdir()
         return File(folder, "Log.v1.txt")
+    }
+
+    fun Fragment.reportBug(stackTrace: String?) {
+        requireContext().catchNoBrowserInstalled {
+            startActivity(createReportBugIntent(stackTrace))
+        }
+    }
+
+    fun Context.reportBug(stackTrace: String?) {
+        catchNoBrowserInstalled { startActivity(createReportBugIntent(stackTrace)) }
+    }
+
+    fun Context.catchNoBrowserInstalled(callback: () -> Unit) {
+        try {
+            callback()
+        } catch (exception: ActivityNotFoundException) {
+            Toast.makeText(this, R.string.install_a_browser, Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun createReportBugIntent(stackTrace: String?): Intent {
+        return Intent(
+            Intent.ACTION_VIEW,
+            Uri.parse(
+                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let {  "&logs=$stackTrace"} ?: ""}"
+                    .take(2000)
+            ),
+        )
     }
 
     private fun getOutlinedDrawable(context: Context): MaterialShapeDrawable {

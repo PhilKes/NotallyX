@@ -56,6 +56,8 @@ import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 import com.philkes.notallyx.presentation.viewmodel.preference.StringPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.TextProvider
 import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.Operations.catchNoBrowserInstalled
+import com.philkes.notallyx.utils.Operations.reportBug
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
@@ -351,38 +353,28 @@ class SettingsFragment : Fragment() {
     }
 
     private fun createIssue() {
-        MaterialAlertDialogBuilder(requireContext())
         val options =
             arrayOf(getString(R.string.report_bug), getString(R.string.make_feature_request))
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.create_github_issue)
             .setItems(options) { _, which ->
-                val intent =
-                    when (which) {
-                        0 -> {
-                            val app = requireContext().applicationContext as Application
-                            val logs = Operations.getLastExceptionLog(app)
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(
-                                    "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${logs?.let { "&logs=$it" } ?: ""}"
-                                        .take(2000)
-                                ),
+                when (which) {
+                    0 -> {
+                        val app = requireContext().applicationContext as Application
+                        val logs = Operations.getLastExceptionLog(app)
+                        reportBug(logs)
+                    }
+                    else ->
+                        requireContext().catchNoBrowserInstalled {
+                            startActivity(
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(
+                                        "https://github.com/PhilKes/NotallyX/issues/new?labels=enhancement&template=feature_request.md"
+                                    ),
+                                )
                             )
                         }
-                        else ->
-                            Intent(
-                                Intent.ACTION_VIEW,
-                                Uri.parse(
-                                    "https://github.com/PhilKes/NotallyX/issues/new?labels=enhancement&template=feature_request.md"
-                                ),
-                            )
-                    }
-                try {
-                    startActivity(intent)
-                } catch (exception: ActivityNotFoundException) {
-                    Toast.makeText(requireContext(), R.string.install_a_browser, Toast.LENGTH_LONG)
-                        .show()
                 }
             }
             .setNegativeButton(R.string.cancel, null)
