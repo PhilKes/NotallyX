@@ -48,13 +48,18 @@
 ### Translations
 All translations are crowd sourced. To contribute, follow these [guidelines](https://m2.material.io/design/communication/writing.html) and open a pull request.
 
+### Bug Reports / Feature-Requests
+If you find any bugs or want to propose a new Feature/Enhancement, feel free to [create a new Issue](https://github.com/PhilKes/NotallyX/issues/new/choose)
+
+When using the app and an unknown error occurs, causing the app to crash you will see a dialog (see showcase video in https://github.com/PhilKes/NotallyX/pull/171) from which you can immediately create a bug report on Github with the crash details pre-filled.
 
 ### Contributing
-If you find any bugs or want to propose a new Feature/Enhancement, feel free to [create a new Issue](https://github.com/PhilKes/NotallyX/issues/new)
 
-If you would like to contribute code yourself, just grab any open issue (that has no other developer assigned yet) and start working.
-The project is a default Android project written in Kotlin.
-Before submitting your proposed changes as a Pull-Request, make sure all tests are still working, and run `./gradlew ktfmtFormat` for common formatting.
+If you would like to contribute code yourself, just grab any open issue (that has no other developer assigned yet), leave a comment that you want to work on it and start developing by forking this repo.
+
+The project is a default Android project written in Kotlin, I highly recommend using Android Studio for development. Also be sure to test your changes with an Android device/emulator that uses the same Android SDK Version as defined in the `build.gradle` `targetSdk`.
+
+Before submitting your proposed changes as a Pull-Request, make sure all tests are still working (`./gradlew test`), and run `./gradlew ktfmtFormat` for common formatting (also executed automatically as pre-commit hook).
 
 ### Attribution
 The original Notally project was developed by [OmGodse](https://github.com/OmGodse) under the [GPL 3.0 License](https://github.com/OmGodse/Notally/blob/master/LICENSE.md).
