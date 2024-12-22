@@ -50,8 +50,6 @@ import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.copyToClipBoard
 import com.philkes.notallyx.utils.findAllOccurrences
 
-private const val UNNAMED_NOTE_PLACEHOLDER = "Unnamed Note"
-
 class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     private lateinit var selectedSpan: URLSpan
@@ -84,35 +82,32 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         pickNoteNewActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    val data = result.data
-                    val noteId = data?.getLongExtra(PICKED_NOTE_ID, -1L)!!
-                    if (noteId == -1L) {
-                        return@registerForActivityResult
-                    }
-                    val noteTitle = data.getStringExtra(PICKED_NOTE_TITLE)!!
-                    val noteType = Type.valueOf(data.getStringExtra(PICKED_NOTE_TYPE)!!)
-                    binding.EnterBody.addSpans(
-                        noteTitle,
-                        listOf(UnderlineSpan(), URLSpan(noteId.createNoteUrl(noteType))),
-                    )
+                    try {
+                        val (title, url, emptyTitle) = result.data.getPickedNoteData()
+                        if (emptyTitle) {
+                            binding.EnterBody.showAddLinkDialog(
+                                this,
+                                presetDisplayText = title,
+                                presetUrl = url,
+                                isNewUnnamedLink = true,
+                            )
+                        } else {
+                            binding.EnterBody.addSpans(title, listOf(UnderlineSpan(), URLSpan(url)))
+                        }
+                    } catch (_: IllegalArgumentException) {}
                 }
             }
         pickNoteUpdateActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    val data = result.data
-                    val noteId = data?.getLongExtra(PICKED_NOTE_ID, -1L)!!
-                    if (noteId == -1L) {
-                        return@registerForActivityResult
-                    }
-                    // TODO: If the linked note title changes the link display text does not change
-                    val noteTitle =
-                        data.getStringExtra(PICKED_NOTE_TITLE)!!.ifEmpty {
-                            UNNAMED_NOTE_PLACEHOLDER
+                    try {
+                        val (title, url, emptyTitle) = result.data.getPickedNoteData()
+                        val newSpan = URLSpan(url)
+                        binding.EnterBody.updateSpan(selectedSpan, newSpan, title)
+                        if (emptyTitle) {
+                            binding.EnterBody.showEditDialog(newSpan, isNewUnnamedLink = true)
                         }
-                    val noteType = Type.valueOf(data.getStringExtra(PICKED_NOTE_TYPE)!!)
-                    val noteUrl = noteId.createNoteUrl(noteType)
-                    binding.EnterBody.updateSpan(selectedSpan, URLSpan(noteUrl), noteTitle)
+                    } catch (_: IllegalArgumentException) {}
                 }
             }
     }
@@ -174,7 +169,10 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                     try {
                         menu?.apply {
                             add(R.string.link, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
-                                binding.EnterBody.showAddLinkDialog(this@EditNoteActivity, mode)
+                                binding.EnterBody.showAddLinkDialog(
+                                    this@EditNoteActivity,
+                                    mode = mode,
+                                )
                             }
                             add(R.string.bold, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
                                 binding.EnterBody.applySpan(StyleSpan(Typeface.BOLD))
@@ -348,6 +346,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                     arrayOf(
                         getString(R.string.remove_link),
                         getString(R.string.change_note),
+                        getString(R.string.edit),
                         getString(R.string.open_note),
                     )
                 } else {
@@ -369,7 +368,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                 .setItems(items) { _, which ->
                     when (which) {
                         0 -> {
-                            binding.EnterBody.removeSpan(span, true)
+                            binding.EnterBody.removeSpanWithHistory(span, true)
                         }
                         1 ->
                             if (span.url.isNoteUrl()) {
@@ -381,17 +380,17 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                             }
 
                         2 -> {
+                            binding.EnterBody.showEditDialog(span)
+                        }
+
+                        3 -> {
                             span.url?.let {
                                 if (it.isNoteUrl()) {
                                     span.navigateToNote()
                                 } else {
-                                    binding.EnterBody.showEditDialog(span)
+                                    openLink(span.url)
                                 }
                             }
-                        }
-
-                        3 -> {
-                            openLink(span.url)
                         }
                     }
                 }
@@ -423,5 +422,21 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         val intent = Intent(this, activity)
         intent.putExtra(Constants.SelectedBaseNote, noteId)
         startActivity(intent)
+    }
+
+    private fun Intent?.getPickedNoteData(): Triple<String, String, Boolean> {
+        val noteId = this?.getLongExtra(PICKED_NOTE_ID, -1L)!!
+        if (noteId == -1L) {
+            throw IllegalArgumentException("Invalid note picked!")
+        }
+        var emptyTitle = false
+        val noteTitle =
+            this.getStringExtra(PICKED_NOTE_TITLE)!!.ifEmpty {
+                emptyTitle = true
+                this@EditNoteActivity.getString(R.string.note)
+            }
+        val noteType = Type.valueOf(this.getStringExtra(PICKED_NOTE_TYPE)!!)
+        val noteUrl = noteId.createNoteUrl(noteType)
+        return Triple(noteTitle, noteUrl, emptyTitle)
     }
 }

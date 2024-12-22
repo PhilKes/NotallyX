@@ -473,13 +473,17 @@ fun Activity.showColorSelectDialog(callback: (selectedColor: Color) -> Unit) {
     }
 }
 
-fun MaterialAlertDialogBuilder.showAndFocus(view: View): AlertDialog {
-    val dialog = show()
-    view.requestFocus()
-    if (view is EditText) {
-        dialog.window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE)
+fun MaterialAlertDialogBuilder.showAndFocus(view: View, selectAll: Boolean = false): AlertDialog {
+    return create().apply {
+        view.requestFocus()
+        if (view is EditText) {
+            if (selectAll) {
+                view.selectAll()
+            }
+            window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE)
+        }
+        show()
     }
-    return dialog
 }
 
 fun Context.getQuantityString(id: Int, quantity: Int, vararg formatArgs: Any): String {

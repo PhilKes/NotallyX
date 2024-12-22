@@ -138,7 +138,11 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
      *
      * @param removeText if this is `true` the text of the [span] is removed from `text`.
      */
-    fun removeSpan(span: CharacterStyle, removeText: Boolean = false, pushChange: Boolean = true) {
+    fun removeSpanWithHistory(
+        span: CharacterStyle,
+        removeText: Boolean = false,
+        pushChange: Boolean = true,
+    ) {
         val (start, end) = getSpanRange(span)
         val callback: (text: Editable) -> Unit = { text ->
             text.removeSelectionFromSpans(start, end)
@@ -169,9 +173,18 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
         spanText: String,
         spans: Collection<CharacterStyle>,
         position: Int = selectionStart,
+        pushChange: Boolean = true,
     ) {
-        val actualPosition = if (position < 0 || !hasFocus()) (text?.lastIndex) ?: 0 else position
-        changeTextWithHistory { text ->
+        val actualPosition =
+            if (position < 0 || !hasFocus()) {
+                text?.lastIndex?.let {
+                    if (it > -1) {
+                        it
+                    } else 0
+                } ?: 0
+            } else position
+
+        val callback: (text: Editable) -> Unit = { text ->
             text.insert(actualPosition, spanText)
             spans.forEach { span ->
                 text.setSpan(
@@ -181,6 +194,11 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
                     Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
                 )
             }
+        }
+        if (pushChange) {
+            changeTextWithHistory(callback)
+        } else {
+            changeText(callback)
         }
     }
 
@@ -242,9 +260,13 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
         )
     }
 
-    internal fun showEditDialog(urlSpan: URLSpan, onClose: (() -> Unit)? = null) {
+    internal fun showEditDialog(
+        urlSpan: URLSpan,
+        isNewUnnamedLink: Boolean = false,
+        onClose: (() -> Unit)? = null,
+    ) {
         val displayTextBefore = getSpanText(urlSpan)
-        showLinkDialog(context, urlSpan.url, displayTextBefore, onClose) {
+        showLinkDialog(context, urlSpan.url, displayTextBefore, isNewUnnamedLink, onClose) {
             urlAfter,
             displayTextAfter ->
             if (urlAfter != null) {
@@ -254,25 +276,41 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
                     if (displayTextAfter == displayTextBefore) null else displayTextAfter,
                 )
             } else {
-                removeSpan(urlSpan)
+                removeSpanWithHistory(
+                    urlSpan,
+                    removeText = isNewUnnamedLink,
+                    pushChange = !isNewUnnamedLink,
+                )
             }
         }
     }
 
     internal fun showAddLinkDialog(
         context: Context,
+        isNewUnnamedLink: Boolean = false,
         mode: ActionMode? = null,
+        presetUrl: String? = null,
+        presetDisplayText: String? = null,
         onClose: (() -> Unit)? = null,
     ) {
-        val urlFromClipboard: String =
-            ContextCompat.getSystemService(this.context, ClipboardManager::class.java)
-                ?.getLatestText()
-                ?.let { if (it.isWebUrl()) it.toString() else "" } ?: ""
-        val displayTextBefore = getSelectionText() ?: ""
-        showLinkDialog(context, urlFromClipboard, displayTextBefore, onClose = onClose) {
-            urlAfter,
-            displayTextAfter ->
-            if (displayTextAfter == displayTextBefore) {
+        val displayedUrl: String =
+            presetUrl
+                ?: ContextCompat.getSystemService(this.context, ClipboardManager::class.java)
+                    ?.getLatestText()
+                    ?.let { if (it.isWebUrl()) it.toString() else "" }
+                ?: ""
+        val displayTextBefore = presetDisplayText ?: getSelectionText() ?: ""
+        showLinkDialog(
+            context,
+            displayedUrl,
+            displayTextBefore,
+            isNewUnnamedLink,
+            onClose = onClose,
+        ) { urlAfter, displayTextAfter ->
+            if (urlAfter == null) {
+                return@showLinkDialog
+            }
+            if (!isNewUnnamedLink && displayTextAfter == displayTextBefore) {
                 this.applySpan(URLSpan(urlAfter))
             } else {
                 this.changeTextWithHistory { text ->
@@ -294,15 +332,21 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
         context: Context,
         urlBefore: String,
         displayTextBefore: String,
+        isNewUnnamedLink: Boolean,
         onClose: (() -> Unit)? = null,
         onSuccess: (urlAfter: String?, displayTextAfter: String) -> Unit,
     ) {
+        val isNoteUrl = urlBefore.isNoteUrl()
         val layout =
             TextInputDialog2Binding.inflate(LayoutInflater.from(context)).apply {
                 InputText1.setText(displayTextBefore)
                 InputTextLayout1.setHint(R.string.display_text)
                 InputText2.setText(urlBefore)
-                InputTextLayout2.setHint(R.string.link)
+                if (isNoteUrl) {
+                    InputTextLayout2.visibility = GONE
+                } else {
+                    InputTextLayout2.setHint(R.string.link)
+                }
             }
 
         MaterialAlertDialogBuilder(context)
@@ -323,6 +367,6 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
                 onSuccess.invoke(null, displayTextBefore)
                 onClose?.invoke()
             }
-            .showAndFocus(layout.InputText2)
+            .showAndFocus(if (isNoteUrl) layout.InputText1 else layout.InputText2, isNewUnnamedLink)
     }
 }
