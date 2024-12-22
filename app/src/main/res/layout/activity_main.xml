@@ -20,17 +20,24 @@
             app:navigationContentDescription="ToolbarNavigation"
             app:contentInsetEnd="16dp">
 
-            <EditText
-                android:id="@+id/EnterSearchKeyword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@null"
-                android:hint="@string/search"
-                android:inputType="textFilter"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
-                android:textAppearance="?attr/textAppearanceBodyLarge"
-                android:visibility="gone" />
+            <com.google.android.material.textfield.TextInputLayout
+              android:id="@+id/EnterSearchKeywordLayout"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              style="@style/RoundedTextInput"
+              >
+                <com.google.android.material.textfield.TextInputEditText
+                  android:id="@+id/EnterSearchKeyword"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:background="@null"
+                  app:boxStrokeWidth="0dp"
+                  android:hint="@string/search"
+                  android:inputType="textFilter"
+                  android:paddingTop="10dp"
+                  android:paddingBottom="10dp"
+                  android:textAppearance="?attr/textAppearanceBodyLarge" />
+            </com.google.android.material.textfield.TextInputLayout>
 
         </com.google.android.material.appbar.MaterialToolbar>
 
@@ -60,12 +67,8 @@
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/make_list"
             android:tooltipText="@string/make_list"
-            app:elevation="2dp"
-            app:pressedTranslationZ="4dp"
-            app:srcCompat="@drawable/checkbox"
-            app:shapeAppearance="@style/PillButton"
-            app:backgroundTint="?attr/secondaryFabBackground"
-            app:tint="?attr/secondaryFabTint" />
+            style="@style/FloatingActionButtonPrimary"
+            app:srcCompat="@drawable/checkbox" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/TakeNote"
@@ -77,9 +80,7 @@
             android:layout_marginBottom="16dp"
             android:contentDescription="@string/take_note"
             android:tooltipText="@string/take_note"
-            app:shapeAppearanceOverlay="@style/RoundedRectangle"
-            android:backgroundTint="?attr/primaryFabBackground"
-            app:tint="?attr/primaryFabTint"
+            style="@style/FloatingActionButtonPrimary"
             app:srcCompat="@drawable/edit" />
 
     </RelativeLayout>

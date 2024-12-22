@@ -53,7 +53,6 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
-            android:theme="@style/Colorless"
             android:visibility="gone">
 
             <LinearLayout
@@ -80,7 +79,6 @@
 
                     <com.google.android.material.chip.Chip
                         android:id="@+id/ImagePreviewPosition"
-                        style="@style/Preview"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:clickable="false"
@@ -176,8 +174,7 @@
                     android:text="@string/add_item"
                     android:textAppearance="?attr/textAppearanceSubtitle2"
                     android:textColor="?android:textColorHint"
-                    app:drawableStartCompat="@drawable/add"
-                    app:drawableTint="?android:textColorHint" />
+                    app:drawableStartCompat="@drawable/add" />
 
                 <TextView
                     android:id="@+id/AudioHeader"
@@ -215,8 +212,9 @@
       android:id="@+id/BottomAppBarLayout"
       android:layout_width="match_parent"
       android:layout_height="50dp"
-      style="@style/Widget.Material3.BottomAppBar"
       android:layout_gravity="bottom"
+      android:backgroundTint="?attr/colorSurface"
+      app:elevation="0dp"
       >
         <androidx.constraintlayout.widget.ConstraintLayout
           android:id="@+id/BottomAppBar"
@@ -228,7 +226,7 @@
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintBottom_toBottomOf="parent"
               android:layout_width="0dp"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:orientation="horizontal"
               >
             </LinearLayout>
@@ -239,7 +237,7 @@
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintBottom_toBottomOf="parent"
               android:layout_width="wrap_content"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:orientation="horizontal"
               android:gravity="center_horizontal"
               >
@@ -250,7 +248,7 @@
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintBottom_toBottomOf="parent"
               android:layout_width="wrap_content"
-              android:layout_height="match_parent"
+              android:layout_height="wrap_content"
               android:orientation="horizontal"
               >
             </LinearLayout>

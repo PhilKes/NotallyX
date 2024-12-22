@@ -118,7 +118,7 @@ class BaseNoteAdapter(
 
     private fun handleCheck(holder: RecyclerView.ViewHolder, position: Int) {
         val baseNote = list[position] as BaseNote
-        (holder as BaseNoteVH).updateCheck(selectedIds.contains(baseNote.id))
+        (holder as BaseNoteVH).updateCheck(selectedIds.contains(baseNote.id), baseNote.color)
     }
 
     private fun <T> SortedList<T>.toList(): List<T> {

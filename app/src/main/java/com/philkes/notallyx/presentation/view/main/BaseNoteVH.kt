@@ -27,7 +27,9 @@ import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.dp
+import com.philkes.notallyx.presentation.getColorFromAttr
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
@@ -71,12 +73,28 @@ class BaseNoteVH(
         }
     }
 
-    fun updateCheck(checked: Boolean) {
+    fun updateCheck(checked: Boolean, color: Color) {
+        if (binding.root.isChecked != checked) {
+            if (checked) {
+                binding.root.apply {
+                    strokeColor = context.getColorFromAttr(androidx.appcompat.R.attr.colorPrimary)
+                    strokeWidth = 3.dp(context)
+                }
+            } else {
+                binding.root.apply {
+                    strokeColor =
+                        if (color == Color.DEFAULT)
+                            ContextCompat.getColor(context, R.color.chip_stroke)
+                        else 0
+                    strokeWidth = 1.dp(context)
+                }
+            }
+        }
         binding.root.isChecked = checked
     }
 
     fun bind(baseNote: BaseNote, imageRoot: File?, checked: Boolean, sortBy: NotesSortBy) {
-        updateCheck(checked)
+        updateCheck(checked, baseNote.color)
 
         when (baseNote.type) {
             Type.NOTE -> bindNote(baseNote.body, baseNote.spans)
@@ -91,7 +109,6 @@ class BaseNoteVH(
             }
         binding.Date.displayFormattedTimestamp(date, dateFormat, datePrefixResId)
 
-        setColor(baseNote.color)
         setImages(baseNote.images, imageRoot)
         setFiles(baseNote.files)
 
@@ -108,6 +125,7 @@ class BaseNoteVH(
                 visibility = View.VISIBLE
             }
         }
+        setColor(baseNote.color)
     }
 
     private fun bindNote(body: String, spans: List<SpanRepresentation>) {
@@ -161,10 +179,12 @@ class BaseNoteVH(
                 val stroke = ContextCompat.getColorStateList(context, R.color.chip_stroke)
                 setStrokeColor(stroke)
                 setCardBackgroundColor(0)
+                setControlsContrastColorForAllViews(context.getColorFromAttr(R.attr.colorSurface))
             } else {
                 strokeColor = 0
                 val colorInt = Operations.extractColor(color, context)
                 setCardBackgroundColor(colorInt)
+                setControlsContrastColorForAllViews(colorInt)
             }
         }
     }

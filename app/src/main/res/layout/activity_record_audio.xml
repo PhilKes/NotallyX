@@ -35,8 +35,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/Stop"
-                style="@style/PillButton"
                 android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/stop"
                 android:textColor="@color/stop_text"
@@ -52,8 +52,8 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/Main"
-                style="@style/PillButton"
                 android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
                 android:layout_gravity="center"
                 android:text="@string/start" />
 

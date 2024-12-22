@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
-import com.philkes.notallyx.databinding.ReyclerToggleBinding
+import com.philkes.notallyx.databinding.RecyclerToggleBinding
 
 open class ToggleAdapter(protected val toggles: MutableList<Toggle>) :
     RecyclerView.Adapter<ToggleVH>() {
@@ -19,7 +19,7 @@ open class ToggleAdapter(protected val toggles: MutableList<Toggle>) :
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToggleVH {
         val inflater = LayoutInflater.from(parent.context)
-        val binding = ReyclerToggleBinding.inflate(inflater, parent, false)
+        val binding = RecyclerToggleBinding.inflate(inflater, parent, false)
         return ToggleVH(binding)
     }
 }

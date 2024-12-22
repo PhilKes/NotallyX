@@ -1,5 +1,6 @@
 package com.philkes.notallyx.presentation.view.note.action
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.BottomSheetActionBinding
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getColorFromAttr
@@ -39,7 +41,9 @@ open class ActionBottomSheet(private val actions: Collection<Action>) :
                     View(context).apply {
                         layoutParams =
                             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
-                                .apply { setMargins(8.dp(context), 0, 8.dp(context), 0) }
+                                .apply {
+                                    setMargins(8.dp(context), 0, 8.dp(context), 8.dp(context))
+                                }
                         setBackgroundColor(
                             context.getColorFromAttr(
                                 com.google.android.material.R.attr.colorOnSurfaceVariant
@@ -66,6 +70,10 @@ open class ActionBottomSheet(private val actions: Collection<Action>) :
         }
 
         return view
+    }
+
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        return BottomSheetDialog(requireContext(), R.style.ThemeOverlay_App_BottomSheetDialog)
     }
 
     private fun BottomSheetDialogFragment.hide() {

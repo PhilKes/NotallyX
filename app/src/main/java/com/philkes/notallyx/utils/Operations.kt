@@ -9,6 +9,7 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -20,6 +21,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.LabelBinding
+import com.philkes.notallyx.presentation.getColorFromAttr
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
 import java.io.FileOutputStream
@@ -68,10 +70,11 @@ object Operations {
         writer.close()
     }
 
+    @ColorInt
     fun extractColor(color: Color, context: Context): Int {
         val id =
             when (color) {
-                Color.DEFAULT -> R.color.Default
+                Color.DEFAULT -> return context.getColorFromAttr(R.attr.colorSurface)
                 Color.CORAL -> R.color.Coral
                 Color.ORANGE -> R.color.Orange
                 Color.SAND -> R.color.Sand

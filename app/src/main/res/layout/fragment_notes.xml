@@ -39,21 +39,21 @@
 
         <com.google.android.material.chip.Chip
             android:id="@+id/Notes"
-            style="@style/TextChip"
+            style="@style/FilterChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/notes" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/Deleted"
-            style="@style/TextChip"
+            style="@style/FilterChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/deleted" />
 
         <com.google.android.material.chip.Chip
             android:id="@+id/Archived"
-            style="@style/TextChip"
+            style="@style/FilterChip"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/archived" />

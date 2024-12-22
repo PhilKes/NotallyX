@@ -22,3 +22,14 @@ data class BaseNote(
     val files: List<FileAttachment>,
     val audios: List<Audio>,
 ) : Item
+
+fun BaseNote.deepCopy(): BaseNote {
+    return copy(
+        labels = labels.map { toString() }.toMutableList(),
+        spans = spans.map { it.copy() }.toMutableList(),
+        items = items.map { it.copy() }.toMutableList(),
+        images = images.map { it.copy() }.toMutableList(),
+        files = files.map { it.copy() }.toMutableList(),
+        audios = audios.map { it.copy() }.toMutableList(),
+    )
+}

@@ -20,7 +20,7 @@
         android:focusable="true"
         android:gravity="center"
         android:text="@string/select_note"
-        android:textAppearance="@style/TextAppearance.Subtitle2"
+        android:textAppearance="?attr/textAppearanceSubtitle2"
         android:textColor="?android:textColorPrimary" />
 
 </FrameLayout>

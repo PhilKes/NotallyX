@@ -28,6 +28,7 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.deepCopy
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
@@ -210,7 +211,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             val baseNote = cachedNote ?: withContext(Dispatchers.IO) { baseNoteDao.get(id) }
 
             if (baseNote != null) {
-                originalNote = baseNote
+                originalNote = baseNote.deepCopy()
 
                 this.id = id
                 folder = baseNote.folder

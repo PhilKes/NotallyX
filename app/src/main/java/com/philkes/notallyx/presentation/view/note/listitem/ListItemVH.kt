@@ -7,6 +7,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.TextView.INVISIBLE
 import android.widget.TextView.VISIBLE
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.imports.txt.extractListItems
@@ -14,6 +15,7 @@ import com.philkes.notallyx.data.imports.txt.findListSyntaxRegex
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
 import com.philkes.notallyx.presentation.view.misc.SwipeLayout.SwipeActionsListener
@@ -72,6 +74,7 @@ class ListItemVH(
     }
 
     fun bind(
+        @ColorInt backgroundColor: Int,
         item: ListItem,
         position: Int,
         highlights: List<ListItemAdapter.ListItemHighlight>?,
@@ -99,6 +102,8 @@ class ListItemVH(
                 binding.EditText.highlight(highlight.startIdx, highlight.endIdx, highlight.selected)
             }
         } ?: binding.EditText.clearHighlights()
+
+        binding.root.setControlsContrastColorForAllViews(backgroundColor)
     }
 
     fun focusEditText(
