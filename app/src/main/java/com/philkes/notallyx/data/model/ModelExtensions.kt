@@ -13,6 +13,17 @@ fun CharSequence?.isWebUrl(): Boolean {
     return this?.let { Patterns.WEB_URL.matcher(this).matches() } ?: false
 }
 
+fun CharSequence?.findWebUrls(): Collection<Pair<Int, Int>> {
+    return this?.let {
+        val matcher = Patterns.WEB_URL.matcher(this)
+        val matches = mutableListOf<Pair<Int, Int>>()
+        while (matcher.find()) {
+            matches.add(Pair(matcher.start(), matcher.end()))
+        }
+        matches
+    } ?: listOf()
+}
+
 private const val NOTE_URL_PREFIX = "note://"
 private val NOTE_URL_POSTFIX_NOTE = "/${Type.NOTE.name}"
 private val NOTE_URL_POSTFIX_LIST = "/${Type.LIST.name}"

@@ -17,6 +17,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.model.findWebUrls
 import com.philkes.notallyx.data.model.isNoteUrl
 import com.philkes.notallyx.data.model.isWebUrl
 import com.philkes.notallyx.databinding.TextInputDialog2Binding
@@ -54,15 +55,17 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
                 changeHistory,
                 { text, start, count ->
                     clearHighlights()
-                    val changedText = text.substring(start, start + count)
-                    if (changedText.isWebUrl() || changedText.isNoteUrl()) {
-                        super.getText()
-                            ?.setSpan(
-                                URLSpan(changedText),
-                                start,
-                                start + count,
-                                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                            )
+                    if (count > 1) {
+                        val changedText = text.substring(start, start + count)
+                        changedText.findWebUrls().forEach { (urlStart, urlEnd) ->
+                            super.getText()
+                                ?.setSpan(
+                                    URLSpan(changedText.substring(urlStart, urlEnd)),
+                                    start + urlStart,
+                                    start + urlEnd,
+                                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                                )
+                        }
                     }
                 },
             ) { text: Editable ->
