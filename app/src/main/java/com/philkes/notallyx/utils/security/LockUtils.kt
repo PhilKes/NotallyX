@@ -77,22 +77,19 @@ private fun showBiometricOrPinPrompt(
                     descriptionResId?.let {
                         setDescription(context.getString(descriptionResId))
                     }
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        setAllowedAuthenticators(
-                            BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                        )
-                    } else {
-                        // Add negative button text for Android 9 and 10
-                        setNegativeButton(
-                            context.getString(R.string.cancel),
-                            context.mainExecutor
-                        ) { _, _ ->
-                            onFailure.invoke()
-                        }
+                    setAllowedAuthenticators(
+                        BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                                BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                    )
+                    setNegativeButton(
+                        context.getString(R.string.cancel),
+                        context.mainExecutor
+                    ) { _, _ ->
+                        onFailure.invoke()
                     }
                 }
                 .build()
+
             val cipher =
                 if (isForDecrypt) {
                     getInitializedCipherForDecryption(iv = cipherIv!!)
@@ -176,7 +173,7 @@ private fun showBiometricOrPinPrompt(
                 ContextCompat.getSystemService(context, FingerprintManager::class.java)
             if (
                 fingerprintManager?.isHardwareDetected == true &&
-                    fingerprintManager.hasEnrolledFingerprints()
+                fingerprintManager.hasEnrolledFingerprints()
             ) {
                 val cipher =
                     if (isForDecrypt) {
