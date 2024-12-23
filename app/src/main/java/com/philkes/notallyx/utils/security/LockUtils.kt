@@ -81,15 +81,8 @@ private fun showBiometricOrPinPrompt(
                         BiometricManager.Authenticators.BIOMETRIC_STRONG or
                                 BiometricManager.Authenticators.DEVICE_CREDENTIAL
                     )
-                    setNegativeButton(
-                        context.getString(R.string.cancel),
-                        context.mainExecutor
-                    ) { _, _ ->
-                        onFailure.invoke()
-                    }
                 }
                 .build()
-
             val cipher =
                 if (isForDecrypt) {
                     getInitializedCipherForDecryption(iv = cipherIv!!)
