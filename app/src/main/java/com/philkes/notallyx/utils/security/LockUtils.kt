@@ -69,7 +69,62 @@ private fun showBiometricOrPinPrompt(
     onFailure: () -> Unit,
 ) {
     when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
+            // Android 11+ with BiometricPrompt and Authenticators
+            val prompt = BiometricPrompt.Builder(context)
+                .apply {
+                    setTitle(context.getString(titleResId))
+                    descriptionResId?.let {
+                        setDescription(context.getString(descriptionResId))
+                    }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        setAllowedAuthenticators(
+                            BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                        )
+                    } else {
+                        // Add negative button text for Android 9 and 10
+                        setNegativeButton(
+                            context.getString(R.string.cancel),
+                            context.mainExecutor
+                        ) { _, _ ->
+                            onFailure.invoke()
+                        }
+                    }
+                }
+                .build()
+            val cipher =
+                if (isForDecrypt) {
+                    getInitializedCipherForDecryption(iv = cipherIv!!)
+                } else {
+                    getInitializedCipherForEncryption()
+                }
+            prompt.authenticate(
+                BiometricPrompt.CryptoObject(cipher),
+                getCancellationSignal(context),
+                context.mainExecutor,
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(
+                        result: BiometricPrompt.AuthenticationResult?
+                    ) {
+                        super.onAuthenticationSucceeded(result)
+                        onSuccess.invoke(result!!.cryptoObject!!.cipher)
+                    }
+
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        onFailure.invoke()
+                    }
+
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
+                        super.onAuthenticationError(errorCode, errString)
+                        onFailure.invoke()
+                    }
+                },
+            )
+        }
+        Build.VERSION.SDK_INT == Build.VERSION_CODES.Q -> {
+            // Android 10: Use BiometricPrompt without Authenticators
             val prompt =
                 BiometricPrompt.Builder(context)
                     .apply {
@@ -77,11 +132,11 @@ private fun showBiometricOrPinPrompt(
                         descriptionResId?.let {
                             setDescription(context.getString(descriptionResId))
                         }
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                            setAllowedAuthenticators(
-                                BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                            )
+                        setNegativeButton(
+                            context.getString(R.string.cancel),
+                            context.mainExecutor
+                        ) { _, _ ->
+                            onFailure.invoke()
                         }
                     }
                     .build()
@@ -115,6 +170,7 @@ private fun showBiometricOrPinPrompt(
                 },
             )
         }
+
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
             val fingerprintManager =
                 ContextCompat.getSystemService(context, FingerprintManager::class.java)
