@@ -96,11 +96,19 @@
     <string name="small">Petite</string>
     <string name="medium">Moyenne</string>
     <string name="large">Grande</string>
+	
+    <string name="notes_sorted_by">Notes triées par</string>
+    <string name="creation_date">Date de création</string>
+    <string name="modified_date">Date de modification,</string>
+    <string name="ascending">Croissant</string>
+    <string name="descending">Décroissant</string>
+    <string name="sort_direction">Ordre de tri</string>
 
     <string name="content_density">Densité d\'affichage</string>
     <string name="max_items_to_display">Nombre maximum d\'éléments à afficher dans une liste</string>
     <string name="max_lines_to_display">Nombre maximum de lignes à afficher dans une note</string>
     <string name="max_lines_to_display_title">Nombre maximum de lignes à afficher pour un titre</string>
+    <string name="max_labels_to_display">Nombre maximum d\'étiquettes à afficher dans le panneau de navigation</string>
 
     <!-- Auto backup -->
     <string name="backup">Sauvegarde</string>
