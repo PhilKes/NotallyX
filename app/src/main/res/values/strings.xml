@@ -30,6 +30,7 @@
     <string name="undo">Undo</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
+    <string name="select_all">Select All</string>
 
     <!-- Pinning -->
     <string name="pin">Pin</string>

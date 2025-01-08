@@ -22,6 +22,7 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.FragmentNotesBinding
+import com.philkes.notallyx.presentation.activity.main.MainActivity
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FOLDER_FROM
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FOLDER_TO
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.NOTE_ID
@@ -181,6 +182,12 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         binding?.RecyclerView?.apply {
             adapter = notesAdapter
             setHasFixedSize(true)
+        }
+        model.actionMode.addListener = { notesAdapter?.notifyDataSetChanged() }
+        if (activity is MainActivity) {
+            (activity as MainActivity).getCurrentFragmentNotes = {
+                notesAdapter?.currentList?.filterIsInstance<BaseNote>()
+            }
         }
     }
 
