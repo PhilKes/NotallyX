@@ -121,7 +121,7 @@
     <string name="copied_link">Link copiato negli appunti</string>
     <string name="edit_link">Modifica link</string>
     <string name="something_went_wrong">Qualcosa è andato storto. Per favore riprova.</string>
-    <string name="install_an_email">Installa un'app per email per mandare un feedback</string>
+    <string name="install_an_email">Installa un’app per email per mandare un feedback</string>
     <string name="install_a_browser">Installa un browser per aprire questo link</string>
     <string name="cant_find_note">Impossibile trovare la nota. Potrebbe essere stata eliminata</string>
 
@@ -166,7 +166,7 @@
 
     <string name="security">Sicurezza</string>
 
-    <string name="biometric_lock">Usa l'accesso biometrico del dispositivo o il PIN per bloccare l'app</string>
+    <string name="biometric_lock">Usa l’accesso biometrico del dispositivo o il PIN per bloccare l’app</string>
     <string name="locked">Bloccato</string>
     <string name="enabled">Attivato</string>
     <string name="disabled">Disattivato</string>
@@ -260,7 +260,7 @@
     <!-- Files -->
     <string name="adding_files">Aggiunta file in corso</string>
     <string name="deleting_files">Eliminazione file in corso</string>
-    <string name="delete_file">Eliminare il file \'%s\'?</string>
+    <string name="delete_file">Eliminare il file \’%s\’?</string>
     <string name="error_while_renaming_file">Errore durante la rinomina del file</string>
     <string name="cant_load_file">Impossibile caricare il file. Potrebbe essere stato spostato o cancellato</string>
 
