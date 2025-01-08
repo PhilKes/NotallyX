@@ -22,6 +22,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
@@ -782,7 +783,16 @@ class SettingsFragment : Fragment() {
             valueTo = max.toFloat()
             valueFrom = min.toFloat()
             this@apply.value = value.toFloat()
-            addOnChangeListener { _, value, _ -> onChange(value.toInt()) }
+            clearOnSliderTouchListeners()
+            addOnSliderTouchListener(
+                object : Slider.OnSliderTouchListener {
+                    override fun onStartTrackingTouch(slider: Slider) {}
+
+                    override fun onStopTrackingTouch(slider: Slider) {
+                        onChange(slider.value.toInt())
+                    }
+                }
+            )
             contentDescription = getString(titleResId)
         }
     }
