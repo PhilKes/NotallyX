@@ -8,6 +8,8 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
+import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.DataSource
@@ -42,7 +44,7 @@ class BaseNoteVH(
     private val dateFormat: DateFormat,
     private val textSize: TextSize,
     private val maxItems: Int,
-    maxLines: Int,
+    private val maxContentLines: Int,
     maxTitle: Int,
     listener: ItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
@@ -62,7 +64,7 @@ class BaseNoteVH(
             }
 
             Title.maxLines = maxTitle
-            Note.maxLines = maxLines
+            Note.maxLines = maxContentLines
 
             root.setOnClickListener { listener.onClick(adapterPosition) }
 
@@ -97,7 +99,7 @@ class BaseNoteVH(
         updateCheck(checked, baseNote.color)
 
         when (baseNote.type) {
-            Type.NOTE -> bindNote(baseNote.body, baseNote.spans)
+            Type.NOTE -> bindNote(baseNote.body, baseNote.spans, baseNote.title.isEmpty())
             Type.LIST -> bindList(baseNote.items)
         }
         val (date, datePrefixResId) =
@@ -115,25 +117,39 @@ class BaseNoteVH(
         binding.Title.apply {
             text = baseNote.title
             isVisible = baseNote.title.isNotEmpty()
+            updatePadding(
+                bottom = if (baseNote.hasNoContents() || maxContentLines < 1) 0 else 8.dp(context)
+            )
         }
 
-        Operations.bindLabels(binding.LabelGroup, baseNote.labels, textSize)
+        Operations.bindLabels(
+            binding.LabelGroup,
+            baseNote.labels,
+            textSize,
+            binding.Note.isVisible || binding.Title.isVisible,
+        )
 
-        if (isEmpty(baseNote)) {
+        if (baseNote.isEmpty()) {
             binding.Title.apply {
-                setText(getEmptyMessage(baseNote))
-                visibility = View.VISIBLE
+                setText(baseNote.getEmptyMessage())
+                isVisible = true
             }
         }
         setColor(baseNote.color)
     }
 
-    private fun bindNote(body: String, spans: List<SpanRepresentation>) {
+    private fun bindNote(body: String, spans: List<SpanRepresentation>, isTitleEmpty: Boolean) {
         binding.LinearLayout.visibility = View.GONE
 
         binding.Note.apply {
             text = body.applySpans(spans)
-            isVisible = body.isNotEmpty()
+            if (maxContentLines < 1) {
+                isVisible = isTitleEmpty
+                maxLines = if (isTitleEmpty) 1 else maxContentLines
+            } else {
+                val emptyBody = body.isNotEmpty()
+                isVisible = emptyBody
+            }
         }
     }
 
@@ -154,16 +170,16 @@ class BaseNoteVH(
                                 handleChecked(this, item.checked)
                                 visibility = View.VISIBLE
                                 if (item.isChild) {
-                                    val layoutParams = layoutParams as LinearLayout.LayoutParams
-                                    layoutParams.marginStart = 20.dp(context)
-                                    setLayoutParams(layoutParams)
+                                    updateLayoutParams<LinearLayout.LayoutParams> {
+                                        marginStart = 20.dp(context)
+                                    }
                                 }
                             }
                         } else view.visibility = View.GONE
                     }
                 }
 
-                if (items.size > maxItems) {
+                if (maxItems > 0 && items.size > maxItems) {
                     ItemsRemaining.apply {
                         visibility = View.VISIBLE
                         text = (items.size - maxItems).toString()
@@ -265,21 +281,15 @@ class BaseNoteVH(
         }
     }
 
-    private fun isEmpty(baseNote: BaseNote): Boolean {
-        return with(baseNote) {
-            when (type) {
-                Type.NOTE -> title.isBlank() && body.isBlank() && images.isEmpty()
-                Type.LIST -> title.isBlank() && items.isEmpty() && images.isEmpty()
-            }
-        }
-    }
+    private fun BaseNote.isEmpty() = title.isBlank() && hasNoContents() && images.isEmpty()
 
-    private fun getEmptyMessage(baseNote: BaseNote): Int {
-        return when (baseNote.type) {
+    private fun BaseNote.hasNoContents() = body.isEmpty() && items.isEmpty()
+
+    private fun BaseNote.getEmptyMessage() =
+        when (type) {
             Type.NOTE -> R.string.empty_note
             Type.LIST -> R.string.empty_list
         }
-    }
 
     private fun handleChecked(textView: TextView, checked: Boolean) {
         if (checked) {
