@@ -74,6 +74,7 @@ import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
 import java.io.File
 import java.util.Date
+import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.ocpsoft.prettytime.PrettyTime
 
 /**
@@ -626,3 +627,11 @@ fun Context.showToast(message: CharSequence) =
     ContextCompat.getMainExecutor(this).execute {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
+
+fun ViewGroup.addFastScroll(context: Context) {
+    FastScrollerBuilder(this)
+        .useMd2Style()
+        .setTrackDrawable(ContextCompat.getDrawable(context, R.drawable.scroll_track)!!)
+        .setPadding(0, 0, 2.dp(context), 0)
+        .build()
+}

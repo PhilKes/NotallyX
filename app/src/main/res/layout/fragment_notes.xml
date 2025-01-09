@@ -21,8 +21,7 @@
         android:paddingStart="4dp"
         android:paddingTop="8dp"
         android:paddingEnd="4dp"
-        android:scrollbarStyle="outsideOverlay"
-        android:scrollbars="vertical" />
+      />
 
     <com.google.android.material.chip.ChipGroup
         android:id="@+id/ChipGroup"

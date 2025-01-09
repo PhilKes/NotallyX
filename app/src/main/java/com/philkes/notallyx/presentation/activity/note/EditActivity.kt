@@ -36,6 +36,7 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.addFastScroll
 import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.getQuantityString
@@ -138,7 +139,10 @@ abstract class EditActivity(private val type: Type) :
             setStateFromModel()
 
             configureUI()
-            binding.ScrollView.visibility = View.VISIBLE
+            binding.ScrollView.apply {
+                visibility = View.VISIBLE
+                addFastScroll(this@EditActivity)
+            }
         }
 
         setupActivityResultLaunchers()
