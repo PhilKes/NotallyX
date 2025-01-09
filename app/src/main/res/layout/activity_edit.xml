@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_marginBottom="50dp">
+        android:layout_marginBottom="45dp">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/Toolbar"
@@ -213,7 +213,7 @@
     <com.google.android.material.bottomappbar.BottomAppBar
       android:id="@+id/BottomAppBarLayout"
       android:layout_width="match_parent"
-      android:layout_height="50dp"
+      android:layout_height="45dp"
       android:layout_gravity="bottom"
       android:backgroundTint="?attr/colorSurface"
       app:elevation="0dp"
@@ -221,14 +221,14 @@
         <androidx.constraintlayout.widget.ConstraintLayout
           android:id="@+id/BottomAppBar"
           android:layout_width="match_parent"
-          android:layout_height="wrap_content">
+          android:layout_height="match_parent">
             <LinearLayout
               android:id="@+id/BottomAppBarLeft"
               app:layout_constraintStart_toStartOf="parent"
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintBottom_toBottomOf="parent"
               android:layout_width="0dp"
-              android:layout_height="wrap_content"
+              android:layout_height="match_parent"
               android:orientation="horizontal"
               >
             </LinearLayout>
@@ -239,7 +239,7 @@
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintBottom_toBottomOf="parent"
               android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+              android:layout_height="match_parent"
               android:orientation="horizontal"
               android:gravity="center_horizontal"
               >
@@ -250,7 +250,7 @@
               app:layout_constraintTop_toTopOf="parent"
               app:layout_constraintBottom_toBottomOf="parent"
               android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
+              android:layout_height="match_parent"
               android:orientation="horizontal"
               >
             </LinearLayout>
