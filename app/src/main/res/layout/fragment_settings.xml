@@ -66,6 +66,10 @@
             android:id="@+id/MaxLines"
             layout="@layout/preference_seekbar" />
 
+        <include
+          android:id="@+id/LabelsHiddenInOverview"
+          layout="@layout/preference" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

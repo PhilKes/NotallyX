@@ -164,6 +164,8 @@
     <string name="max_lines_to_display">Max lines to display in note</string>
     <string name="max_lines_to_display_title">Max lines to display in title</string>
     <string name="max_labels_to_display">Max labels to display in Navigation</string>
+    <string name="labels_hidden_in_overview_title">Hide Labels in Overview</string>
+    <string name="labels_hidden_in_overview">By enabling this, the notes’ labels will be hidden in the overview</string>
 
 
     <string name="security">Security</string>

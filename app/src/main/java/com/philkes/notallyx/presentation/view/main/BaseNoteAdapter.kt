@@ -17,17 +17,13 @@ import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
-import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
 
 class BaseNoteAdapter(
     private val selectedIds: Set<Long>,
     private val dateFormat: DateFormat,
     private var notesSort: NotesSort,
-    private val textSize: TextSize,
-    private val maxItems: Int,
-    private val maxLines: Int,
-    private val maxTitle: Int,
+    private val preferences: BaseNoteVHPreferences,
     private val imageRoot: File?,
     private val listener: ItemListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -77,7 +73,7 @@ class BaseNoteAdapter(
             }
             else -> {
                 val binding = RecyclerBaseNoteBinding.inflate(inflater, parent, false)
-                BaseNoteVH(binding, dateFormat, textSize, maxItems, maxLines, maxTitle, listener)
+                BaseNoteVH(binding, dateFormat, preferences, listener)
             }
         }
     }

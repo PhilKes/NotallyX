@@ -123,6 +123,7 @@
      <string name="max_lines_to_display_title">Maximal angezeigte Zeilen im Titel</string>
 
     <string name="max_labels_to_display">Max. Anzahl an angezeigten Lables in der Navigation</string>
+    <string name="labels_hidden_in_overview">Ist dies aktiviert, werden die Labels der Notizen in der Übersicht ausgeblendet</string>
     <string name="security">Sicherheit</string>
 
     <string name="biometric_lock">App per Biometrie/PIN sperren</string>
@@ -265,5 +266,6 @@
     <string name="export_settings_success">Einstellungen erfolgreich exportiert</string>
     <string name="export_settings_failure">Import der Einstellungen fehlgeschlagen, wurde die richtige Datei ausgewählt?</string>
     <string name="reset_settings">Einstellungen zurücksetzen</string>
+    <string name="labels_hidden_in_overview_title">Verberge Labels in Übersicht</string>
 
 </resources>

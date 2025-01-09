@@ -33,6 +33,7 @@ import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
+import com.philkes.notallyx.presentation.view.main.BaseNoteVHPreferences
 import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesView
@@ -162,10 +163,13 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                     model.actionMode.selectedIds,
                     dateFormat.value,
                     notesSorting.value,
-                    textSize.value,
-                    maxItems.value,
-                    maxLines.value,
-                    maxTitle.value,
+                    BaseNoteVHPreferences(
+                        textSize.value,
+                        maxItems.value,
+                        maxLines.value,
+                        maxTitle.value,
+                        labelsHiddenInOverview.value,
+                    ),
                     model.imageRoot,
                     this@NotallyFragment,
                 )

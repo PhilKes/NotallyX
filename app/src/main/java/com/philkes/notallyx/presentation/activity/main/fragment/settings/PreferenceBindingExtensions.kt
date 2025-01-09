@@ -179,9 +179,8 @@ fun PreferenceBinding.setup(
     value: Boolean,
     context: Context,
     layoutInflater: LayoutInflater,
-    model: BaseNoteModel,
     messageResId: Int? = null,
-    onSave: ((newValue: Boolean) -> Unit)?,
+    onSave: (newValue: Boolean) -> Unit,
 ) {
     Title.setText(preference.titleResId!!)
 
@@ -205,13 +204,13 @@ fun PreferenceBinding.setup(
             EnabledButton.setOnClickListener {
                 dialog.cancel()
                 if (!value) {
-                    onSave?.invoke(true) ?: model.savePreference(preference, true)
+                    onSave.invoke(true)
                 }
             }
             DisabledButton.setOnClickListener {
                 dialog.cancel()
                 if (value) {
-                    onSave?.invoke(false) ?: model.savePreference(preference, false)
+                    onSave.invoke(false)
                 }
             }
         }

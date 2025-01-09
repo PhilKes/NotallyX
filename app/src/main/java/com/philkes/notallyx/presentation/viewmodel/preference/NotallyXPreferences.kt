@@ -30,7 +30,6 @@ class NotallyXPreferences private constructor(private val app: Application) {
         )
     }
 
-    // Main thread (unfortunately)
     val theme = createEnumPreference(preferences, "theme", Theme.FOLLOW_SYSTEM, R.string.theme)
     val textSize =
         createEnumPreference(preferences, "textSize", TextSize.MEDIUM, R.string.text_size)
@@ -76,6 +75,13 @@ class NotallyXPreferences private constructor(private val app: Application) {
         )
     val labelsHiddenInNavigation =
         StringSetPreference("labelsHiddenInNavigation", preferences, setOf())
+    val labelsHiddenInOverview =
+        BooleanPreference(
+            "labelsHiddenInOverview",
+            preferences,
+            false,
+            R.string.labels_hidden_in_overview_title,
+        )
     val maxLabels =
         IntPreference(
             "maxLabelsInNavigation",
