@@ -43,9 +43,9 @@ class BaseNoteVH(
     private val binding: RecyclerBaseNoteBinding,
     private val dateFormat: DateFormat,
     private val textSize: TextSize,
-    private val maxItems: Int,
-    private val maxContentLines: Int,
-    maxTitle: Int,
+    private val maxDisplayedItems: Int,
+    private val maxDisplayedLines: Int,
+    maxDisplayedTitleLines: Int,
     listener: ItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -63,8 +63,8 @@ class BaseNoteVH(
                 view.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
             }
 
-            Title.maxLines = maxTitle
-            Note.maxLines = maxContentLines
+            Title.maxLines = maxDisplayedTitleLines
+            Note.maxLines = maxDisplayedLines
 
             root.setOnClickListener { listener.onClick(adapterPosition) }
 
@@ -118,8 +118,13 @@ class BaseNoteVH(
             text = baseNote.title
             isVisible = baseNote.title.isNotEmpty()
             updatePadding(
-                bottom = if (baseNote.hasNoContents() || maxContentLines < 1) 0 else 8.dp(context)
+                bottom =
+                    if (baseNote.hasNoContents() || shouldOnlyDisplayTitle(baseNote)) 0
+                    else 8.dp(context)
             )
+            if (baseNote.type == Type.LIST && maxDisplayedItems < 1) {
+                setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_small, 0, 0, 0)
+            }
         }
 
         Operations.bindLabels(
@@ -143,12 +148,11 @@ class BaseNoteVH(
 
         binding.Note.apply {
             text = body.applySpans(spans)
-            if (maxContentLines < 1) {
+            if (maxDisplayedLines < 1) {
                 isVisible = isTitleEmpty
-                maxLines = if (isTitleEmpty) 1 else maxContentLines
+                maxLines = if (isTitleEmpty) 1 else maxDisplayedLines
             } else {
-                val emptyBody = body.isNotEmpty()
-                isVisible = emptyBody
+                isVisible = body.isNotEmpty()
             }
         }
     }
@@ -160,7 +164,7 @@ class BaseNoteVH(
                 LinearLayout.visibility = View.GONE
             } else {
                 LinearLayout.visibility = View.VISIBLE
-                val filteredList = items.take(maxItems)
+                val filteredList = items.take(maxDisplayedItems)
                 LinearLayout.children.forEachIndexed { index, view ->
                     if (view.id != R.id.ItemsRemaining) {
                         if (index < filteredList.size) {
@@ -179,10 +183,10 @@ class BaseNoteVH(
                     }
                 }
 
-                if (maxItems > 0 && items.size > maxItems) {
+                if (maxDisplayedItems > 0 && items.size > maxDisplayedItems) {
                     ItemsRemaining.apply {
                         visibility = View.VISIBLE
-                        text = (items.size - maxItems).toString()
+                        text = (items.size - maxDisplayedItems).toString()
                     }
                 } else ItemsRemaining.visibility = View.GONE
             }
@@ -280,6 +284,12 @@ class BaseNoteVH(
             }
         }
     }
+
+    private fun shouldOnlyDisplayTitle(baseNote: BaseNote) =
+        when (baseNote.type) {
+            Type.NOTE -> maxDisplayedLines < 1
+            Type.LIST -> maxDisplayedItems < 1
+        }
 
     private fun BaseNote.isEmpty() = title.isBlank() && hasNoContents() && images.isEmpty()
 

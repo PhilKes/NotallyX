@@ -42,11 +42,11 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
     }
 
     private val uncheckedDrawable: Drawable? =
-        ContextCompat.getDrawable(context, R.drawable.check_box_unchecked)
+        ContextCompat.getDrawable(context, R.drawable.checkbox_unchecked)
     private val checkedDrawable: Drawable? =
-        ContextCompat.getDrawable(context, R.drawable.check_box_checked)
+        ContextCompat.getDrawable(context, R.drawable.checkbox_checked)
     private val partiallyCheckedDrawable: Drawable? =
-        ContextCompat.getDrawable(context, R.drawable.check_box_partial)
+        ContextCompat.getDrawable(context, R.drawable.checkbox_partial)
 
     init {
         compoundDrawablePadding = 4.dp(context)

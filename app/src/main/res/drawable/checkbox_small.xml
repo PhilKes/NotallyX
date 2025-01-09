@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<scale xmlns:android="http://schemas.android.com/apk/res/android"
+  android:drawable="@drawable/checkbox"
+  android:scaleGravity="center_vertical|start"
+  android:level="7000"
+  android:scaleHeight="80%"
+  android:scaleWidth="80%" />
