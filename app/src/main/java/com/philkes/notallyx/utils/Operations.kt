@@ -14,6 +14,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import com.google.android.material.chip.ChipGroup
 import com.google.android.material.shape.MaterialShapeDrawable
@@ -25,6 +26,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.LabelBinding
+import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getColorFromAttr
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
@@ -97,12 +99,14 @@ object Operations {
 
     fun shareNote(context: Context, title: String, body: CharSequence) {
         val text = body.toString()
-        val intent = Intent(Intent.ACTION_SEND)
-        intent.type = "text/plain"
-        intent.putExtra(extraCharSequence, body)
-        intent.putExtra(Intent.EXTRA_TEXT, text)
-        intent.putExtra(Intent.EXTRA_TITLE, title)
-        intent.putExtra(Intent.EXTRA_SUBJECT, title)
+        val intent =
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(extraCharSequence, body)
+                putExtra(Intent.EXTRA_TEXT, text)
+                putExtra(Intent.EXTRA_TITLE, title)
+                putExtra(Intent.EXTRA_SUBJECT, title)
+            }
         val chooser = Intent.createChooser(intent, null)
         context.startActivity(chooser)
     }
@@ -115,21 +119,28 @@ object Operations {
         }
     }
 
-    fun bindLabels(group: ChipGroup, labels: List<String>, textSize: TextSize) {
+    fun bindLabels(
+        group: ChipGroup,
+        labels: List<String>,
+        textSize: TextSize,
+        paddingTop: Boolean,
+    ) {
         if (labels.isEmpty()) {
             group.visibility = View.GONE
         } else {
-            group.visibility = View.VISIBLE
-            group.removeAllViews()
-
+            group.apply {
+                visibility = View.VISIBLE
+                removeAllViews()
+                updatePadding(top = if (paddingTop) 8.dp(context) else 0)
+            }
             val inflater = LayoutInflater.from(group.context)
             val labelSize = textSize.displayBodySize
-
             for (label in labels) {
-                val view = LabelBinding.inflate(inflater, group, true).root
-                view.background = getOutlinedDrawable(group.context)
-                view.setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
-                view.text = label
+                LabelBinding.inflate(inflater, group, true).root.apply {
+                    background = getOutlinedDrawable(group.context)
+                    setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
+                    text = label
+                }
             }
         }
     }
@@ -175,12 +186,11 @@ object Operations {
                 .setAllCornerSizes(RelativeCornerSize(0.5f))
                 .build()
 
-        val drawable = MaterialShapeDrawable(model)
-        drawable.fillColor = ColorStateList.valueOf(0)
-        drawable.strokeWidth = context.resources.displayMetrics.density
-        drawable.strokeColor = ContextCompat.getColorStateList(context, R.color.chip_stroke)
-
-        return drawable
+        return MaterialShapeDrawable(model).apply {
+            fillColor = ColorStateList.valueOf(0)
+            strokeWidth = context.resources.displayMetrics.density
+            strokeColor = ContextCompat.getColorStateList(context, R.color.chip_stroke)
+        }
     }
 
     private fun File.isLargerThan(kilobytes: Long): Boolean {

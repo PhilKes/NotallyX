@@ -25,7 +25,7 @@ data class BaseNote(
 
 fun BaseNote.deepCopy(): BaseNote {
     return copy(
-        labels = labels.map { toString() }.toMutableList(),
+        labels = labels.toMutableList(),
         spans = spans.map { it.copy() }.toMutableList(),
         items = items.map { it.copy() }.toMutableList(),
         images = images.map { it.copy() }.toMutableList(),

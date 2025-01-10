@@ -189,7 +189,12 @@ abstract class EditActivity(private val type: Type) :
                         result.data?.getStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS)
                     if (list != null && list != model.labels) {
                         model.setLabels(list)
-                        Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
+                        Operations.bindLabels(
+                            binding.LabelGroup,
+                            model.labels,
+                            model.textSize,
+                            paddingTop = true,
+                        )
                     }
                 }
             }
@@ -461,7 +466,7 @@ abstract class EditActivity(private val type: Type) :
             }
         binding.Date.displayFormattedTimestamp(date, preferences.dateFormat.value, datePrefixResId)
         binding.EnterTitle.setText(model.title)
-        Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize)
+        Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize, paddingTop = true)
 
         setColor()
     }

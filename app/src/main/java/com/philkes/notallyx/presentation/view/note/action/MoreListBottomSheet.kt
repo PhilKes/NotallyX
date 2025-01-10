@@ -21,10 +21,10 @@ class MoreListBottomSheet(
                     ) {
                         callbacks.deleteChecked()
                     },
-                    Action(R.string.check_all_items, R.drawable.check_box_checked) {
+                    Action(R.string.check_all_items, R.drawable.checkbox_checked) {
                         callbacks.checkAll()
                     },
-                    Action(R.string.uncheck_all_items, R.drawable.check_box_unchecked) {
+                    Action(R.string.uncheck_all_items, R.drawable.checkbox_unchecked) {
                         callbacks.uncheckAll()
                     },
                 )

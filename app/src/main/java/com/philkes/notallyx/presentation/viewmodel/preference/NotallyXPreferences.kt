@@ -45,7 +45,7 @@ class NotallyXPreferences private constructor(app: Application) {
             "maxItemsToDisplayInList.v1",
             preferences,
             4,
-            1,
+            0,
             10,
             R.string.max_items_to_display,
         )
@@ -54,7 +54,7 @@ class NotallyXPreferences private constructor(app: Application) {
             "maxLinesToDisplayInNote.v1",
             preferences,
             8,
-            1,
+            0,
             10,
             R.string.max_lines_to_display,
         )
