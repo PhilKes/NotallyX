@@ -4,7 +4,6 @@ import android.app.Application
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
 import android.net.Uri
-import android.widget.Toast
 import androidx.core.database.getLongOrNull
 import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.R
@@ -19,6 +18,7 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.utils.IO.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.IO.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.IO.SUBFOLDER_IMAGES
@@ -156,16 +156,16 @@ object Import {
                 }
             databaseFolder.clearDirectory()
             val message = app.getQuantityString(R.plurals.imported_notes, importedNotes)
-            Toast.makeText(app, message, Toast.LENGTH_LONG).show()
+            app.showToast(message)
         } catch (e: ZipException) {
             if (e.type == ZipException.Type.WRONG_PASSWORD) {
-                Toast.makeText(app, R.string.wrong_password, Toast.LENGTH_LONG).show()
+                app.showToast(R.string.wrong_password)
             } else {
-                Toast.makeText(app, R.string.invalid_backup, Toast.LENGTH_LONG).show()
+                app.showToast(R.string.invalid_backup)
                 Operations.log(app, e)
             }
         } catch (e: Exception) {
-            Toast.makeText(app, R.string.invalid_backup, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.invalid_backup)
             Operations.log(app, e)
         } finally {
             importingBackup?.value = ImportProgress(inProgress = false)

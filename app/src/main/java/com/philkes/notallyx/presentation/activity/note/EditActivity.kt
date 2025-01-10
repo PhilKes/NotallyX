@@ -16,7 +16,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.VISIBLE
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -45,6 +44,7 @@ import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.showKeyboard
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
@@ -506,7 +506,7 @@ abstract class EditActivity(private val type: Type) :
         if (model.audioRoot != null) {
             val intent = Intent(this, RecordAudioActivity::class.java)
             recordAudioActivityResultLauncher.launch(intent)
-        } else Toast.makeText(this, R.string.insert_an_sd_card_audio, Toast.LENGTH_LONG).show()
+        } else showToast(R.string.insert_an_sd_card_audio)
     }
 
     private fun handleRejection() {
@@ -531,7 +531,7 @@ abstract class EditActivity(private val type: Type) :
                     addCategory(Intent.CATEGORY_OPENABLE)
                 }
             addImagesActivityResultLauncher.launch(intent)
-        } else Toast.makeText(this, R.string.insert_an_sd_card_images, Toast.LENGTH_LONG).show()
+        } else showToast(R.string.insert_an_sd_card_images)
     }
 
     override fun attachFiles() {
@@ -544,7 +544,7 @@ abstract class EditActivity(private val type: Type) :
                     addCategory(Intent.CATEGORY_OPENABLE)
                 }
             attachFilesActivityResultLauncher.launch(intent)
-        } else Toast.makeText(this, R.string.insert_an_sd_card_files, Toast.LENGTH_LONG).show()
+        } else showToast(R.string.insert_an_sd_card_files)
     }
 
     override fun changeColor() {

@@ -18,7 +18,6 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.LinearLayout
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -42,6 +41,7 @@ import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.showKeyboard
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.TextFormattingAdapter
 import com.philkes.notallyx.presentation.view.note.action.AddNoteActions
@@ -376,7 +376,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                                 linkNote(pickNoteUpdateActivityResultLauncher)
                             } else {
                                 copyToClipBoard(span.url)
-                                Toast.makeText(this, R.string.copied_link, Toast.LENGTH_LONG).show()
+                                showToast(R.string.copied_link)
                             }
 
                         2 -> {
@@ -405,7 +405,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         try {
             startActivity(intent)
         } catch (exception: Exception) {
-            Toast.makeText(this, R.string.cant_open_link, Toast.LENGTH_LONG).show()
+            showToast(R.string.cant_open_link)
         }
     }
 

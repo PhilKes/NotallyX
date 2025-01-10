@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Typeface
@@ -36,6 +37,7 @@ import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
@@ -587,3 +589,40 @@ private fun Context.getContrastFontColor(@ColorInt backgroundColor: Int): Int {
     return if (luminance > 0.5) ContextCompat.getColor(this, R.color.TextDark)
     else ContextCompat.getColor(this, R.color.TextLight)
 }
+
+fun MaterialAlertDialogBuilder.addCancelButton(): MaterialAlertDialogBuilder {
+    setNegativeButton(R.string.cancel, null)
+    return this
+}
+
+fun Fragment.showDialog(
+    messageResId: Int,
+    positiveButtonTextResId: Int,
+    onPositiveButtonClickListener: DialogInterface.OnClickListener,
+) =
+    requireContext()
+        .showDialog(messageResId, positiveButtonTextResId, onPositiveButtonClickListener)
+
+fun Context.showDialog(
+    messageResId: Int,
+    positiveButtonTextResId: Int,
+    onPositiveButtonClickListener: DialogInterface.OnClickListener,
+) {
+    MaterialAlertDialogBuilder(this)
+        .setMessage(messageResId)
+        .setPositiveButton(positiveButtonTextResId, onPositiveButtonClickListener)
+        .addCancelButton()
+        .show()
+}
+
+fun Fragment.showToast(messageResId: Int) = requireContext().showToast(messageResId)
+
+fun Context.showToast(messageResId: Int) =
+    ContextCompat.getMainExecutor(this).execute {
+        Toast.makeText(this, messageResId, Toast.LENGTH_LONG).show()
+    }
+
+fun Context.showToast(message: CharSequence) =
+    ContextCompat.getMainExecutor(this).execute {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }

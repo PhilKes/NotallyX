@@ -61,7 +61,7 @@
 
     <fragment
         android:id="@+id/Settings"
-        android:name="com.philkes.notallyx.presentation.activity.main.fragment.SettingsFragment"
+        android:name="com.philkes.notallyx.presentation.activity.main.fragment.settings.SettingsFragment"
         android:label="@string/settings" />
 
     <fragment

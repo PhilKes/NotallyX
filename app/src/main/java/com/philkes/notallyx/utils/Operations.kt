@@ -11,7 +11,6 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import android.widget.Toast
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import androidx.core.view.updatePadding
@@ -28,6 +27,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.LabelBinding
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getColorFromAttr
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
 import java.io.FileOutputStream
@@ -165,7 +165,7 @@ object Operations {
         try {
             callback()
         } catch (exception: ActivityNotFoundException) {
-            Toast.makeText(this, R.string.install_a_browser, Toast.LENGTH_LONG).show()
+            showToast(R.string.install_a_browser)
         }
     }
 

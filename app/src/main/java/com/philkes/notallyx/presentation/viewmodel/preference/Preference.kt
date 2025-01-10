@@ -83,6 +83,11 @@ abstract class BasePreference<T>(
 
         mediator.observeForever(observer)
     }
+
+    fun refresh() {
+        cachedValue = null
+        getData().postValue(value)
+    }
 }
 
 fun <T> BasePreference<T>.observeForeverSkipFirst(observer: Observer<T>) {
@@ -103,7 +108,7 @@ interface StaticTextProvider : TextProvider {
 
 class EnumPreference<T>(
     sharedPreferences: SharedPreferences,
-    private val key: String,
+    val key: String,
     defaultValue: T,
     private val enumClass: Class<T>,
     titleResId: Int? = null,
@@ -152,7 +157,7 @@ inline fun <reified T> createEnumPreference(
 }
 
 class IntPreference(
-    private val key: String,
+    val key: String,
     sharedPreferences: SharedPreferences,
     defaultValue: Int,
     val min: Int,
@@ -202,7 +207,7 @@ class BooleanPreference(
 }
 
 class ByteArrayPreference(
-    private val key: String,
+    val key: String,
     sharedPreferences: SharedPreferences,
     defaultValue: ByteArray?,
     titleResId: Int? = null,
@@ -218,7 +223,7 @@ class ByteArrayPreference(
 }
 
 class EncryptedPassphrasePreference(
-    private val key: String,
+    val key: String,
     sharedPreferences: SharedPreferences,
     defaultValue: ByteArray,
     titleResId: Int? = null,
