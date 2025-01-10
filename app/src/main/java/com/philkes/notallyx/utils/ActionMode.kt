@@ -11,6 +11,7 @@ class ActionMode {
     val selectedNotes = HashMap<Long, BaseNote>()
     val selectedIds = selectedNotes.keys
     val closeListener = MutableLiveData<Event<Set<Long>>>()
+    var addListener: (() -> Unit)? = null
 
     private fun refresh() {
         count.value = selectedNotes.size
@@ -20,6 +21,12 @@ class ActionMode {
     fun add(id: Long, baseNote: BaseNote) {
         selectedNotes[id] = baseNote
         refresh()
+    }
+
+    fun add(baseNotes: Collection<BaseNote>) {
+        baseNotes.forEach { selectedNotes[it.id] = it }
+        refresh()
+        addListener?.invoke()
     }
 
     fun remove(id: Long) {

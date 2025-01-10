@@ -84,6 +84,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             }
         }
 
+    var getCurrentFragmentNotes: (() -> Collection<BaseNote>?)? = null
+
     override fun onSupportNavigateUp(): Boolean {
         return navController.navigateUp(configuration)
     }
@@ -560,6 +562,14 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         override fun onChanged(value: Folder) {
             menu.clear()
             model.actionMode.count.removeObservers(this@MainActivity)
+
+            menu.add(
+                R.string.select_all,
+                R.drawable.select_all,
+                showAsAction = MenuItem.SHOW_AS_ACTION_ALWAYS,
+            ) {
+                getCurrentFragmentNotes?.invoke()?.let { model.actionMode.add(it) }
+            }
             when (value) {
                 Folder.NOTES -> {
                     val pinned = menu.addPinned(MenuItem.SHOW_AS_ACTION_ALWAYS)
