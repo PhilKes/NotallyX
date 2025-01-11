@@ -28,6 +28,7 @@ import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FO
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.NOTE_ID
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
+import com.philkes.notallyx.presentation.addFastScroll
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.view.Constants
@@ -182,6 +183,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         binding?.RecyclerView?.apply {
             adapter = notesAdapter
             setHasFixedSize(true)
+            this.addFastScroll(this@NotallyFragment.requireContext())
         }
         model.actionMode.addListener = { notesAdapter?.notifyDataSetChanged() }
         if (activity is MainActivity) {

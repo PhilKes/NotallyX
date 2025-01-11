@@ -48,12 +48,14 @@
 
     </com.google.android.material.appbar.MaterialToolbar>
 
-        <androidx.core.widget.NestedScrollView
+        <me.zhanghai.android.fastscroll.FastScrollNestedScrollView
             android:id="@+id/ScrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fillViewport="true"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:clipToPadding="false"
+          >
 
             <LinearLayout
                 android:id="@+id/ContentLayout"
@@ -204,7 +206,7 @@
 
             </LinearLayout>
 
-        </androidx.core.widget.NestedScrollView>
+        </me.zhanghai.android.fastscroll.FastScrollNestedScrollView>
 
     </LinearLayout>
 

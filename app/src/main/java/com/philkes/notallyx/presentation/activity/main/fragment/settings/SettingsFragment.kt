@@ -468,6 +468,7 @@ class SettingsFragment : Fragment() {
                         "Material Components for Android",
                         "SQLCipher",
                         "Zip4J",
+                        "AndroidFastScroll",
                     )
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.libraries)
@@ -488,9 +489,9 @@ class SettingsFragment : Fragment() {
                                 openLink(
                                     "https://github.com/material-components/material-components-android"
                                 )
-
                             6 -> openLink("https://github.com/sqlcipher/sqlcipher")
                             7 -> openLink("https://github.com/srikanth-lingala/zip4j")
+                            8 -> openLink("https://github.com/zhanghai/AndroidFastScroll")
                         }
                     }
                     .addCancelButton()
