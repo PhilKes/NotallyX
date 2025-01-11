@@ -128,9 +128,14 @@ class BaseNoteVH(
                     if (baseNote.hasNoContents() || shouldOnlyDisplayTitle(baseNote)) 0
                     else 8.dp(context)
             )
-            if (baseNote.type == Type.LIST && preferences.maxItems < 1) {
-                setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_small, 0, 0, 0)
-            }
+            setCompoundDrawablesWithIntrinsicBounds(
+                if (baseNote.type == Type.LIST && preferences.maxItems < 1)
+                    R.drawable.checkbox_small
+                else 0,
+                0,
+                0,
+                0,
+            )
         }
 
         if (preferences.hideLabels) {
