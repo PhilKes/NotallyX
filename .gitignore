@@ -9,5 +9,6 @@
 .cxx
 */.attach_pid*
 fastlane/*
+!fastlane/join-testers.png
 !fastlane/metadata
 Gemfile*
