@@ -66,7 +66,7 @@
     <string name="biometrics_setup_success">Le verrouillage biométrique/code PIN a été activé</string>
     <string name="biometrics_disable_success">Le verrouillage biométrique/code PIN a été désactivé</string>
     <string name="biometrics_failure">Échec de l\'authentification biométrique/code PIN</string>
-    <string name="backup_encryption_description">En activant cette option, tous les futurs fichiers ZIP de sauvegarde seront encryptés et protégés par un mot de passe</string>
+    <string name="backup_password_hint">En activant cette option, tous les futurs fichiers ZIP de sauvegarde seront encryptés et protégés par un mot de passe</string>
     <string name="import_backup_password_hint">Si votre sauvegarde n\'est pas protégée par mot de passe, cliquez seulement sur "Importer une sauvegarde", sinon entrez le mot de passe correspondant.</string>
 
     <!-- Snackbars -->
