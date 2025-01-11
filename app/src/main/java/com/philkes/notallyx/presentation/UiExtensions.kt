@@ -33,6 +33,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.RadioButton
 import android.widget.RadioGroup
@@ -46,6 +47,7 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
+import androidx.core.view.setPadding
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
@@ -222,12 +224,15 @@ fun ViewGroup.addIconButton(
             contentDescription = context.getString(title)
             setBackgroundResource(R.color.Transparent)
             setOnClickListener(onClick)
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            adjustViewBounds = true
             layoutParams =
                 LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
-                        LinearLayout.LayoutParams.WRAP_CONTENT,
+                        LinearLayout.LayoutParams.MATCH_PARENT,
                     )
                     .apply { setMargins(marginStart.dp(context), marginTop, 0, marginBottom) }
+            setPadding(8.dp(context))
         }
     addView(view)
     return view

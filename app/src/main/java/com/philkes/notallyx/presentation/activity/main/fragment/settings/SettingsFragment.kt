@@ -233,6 +233,17 @@ class SettingsFragment : Fragment() {
             MaxLines.setup(maxLines, requireContext()) { newValue ->
                 model.savePreference(maxLines, newValue)
             }
+            labelsHiddenInOverview.observe(viewLifecycleOwner) { value ->
+                binding.LabelsHiddenInOverview.setup(
+                    labelsHiddenInOverview,
+                    value,
+                    requireContext(),
+                    layoutInflater,
+                    R.string.labels_hidden_in_overview,
+                ) { enabled ->
+                    model.savePreference(labelsHiddenInOverview, enabled)
+                }
+            }
         }
     }
 
@@ -274,7 +285,6 @@ class SettingsFragment : Fragment() {
                 value,
                 requireContext(),
                 layoutInflater,
-                model,
                 R.string.external_data_message,
             ) { enabled ->
                 if (enabled) {

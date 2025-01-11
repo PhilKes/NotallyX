@@ -2,7 +2,8 @@ package com.philkes.notallyx.presentation.view.main
 
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
-import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
@@ -39,19 +40,24 @@ import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import com.philkes.notallyx.utils.Operations
 import java.io.File
 
+data class BaseNoteVHPreferences(
+    val textSize: TextSize,
+    val maxItems: Int,
+    val maxLines: Int,
+    val maxTitleLines: Int,
+    val hideLabels: Boolean,
+)
+
 class BaseNoteVH(
     private val binding: RecyclerBaseNoteBinding,
     private val dateFormat: DateFormat,
-    private val textSize: TextSize,
-    private val maxDisplayedItems: Int,
-    private val maxDisplayedLines: Int,
-    maxDisplayedTitleLines: Int,
+    private val preferences: BaseNoteVHPreferences,
     listener: ItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     init {
-        val title = textSize.displayTitleSize
-        val body = textSize.displayBodySize
+        val title = preferences.textSize.displayTitleSize
+        val body = preferences.textSize.displayBodySize
 
         binding.apply {
             Title.setTextSize(TypedValue.COMPLEX_UNIT_SP, title)
@@ -63,8 +69,8 @@ class BaseNoteVH(
                 view.setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
             }
 
-            Title.maxLines = maxDisplayedTitleLines
-            Note.maxLines = maxDisplayedLines
+            Title.maxLines = preferences.maxTitleLines
+            Note.maxLines = preferences.maxLines
 
             root.setOnClickListener { listener.onClick(adapterPosition) }
 
@@ -122,17 +128,21 @@ class BaseNoteVH(
                     if (baseNote.hasNoContents() || shouldOnlyDisplayTitle(baseNote)) 0
                     else 8.dp(context)
             )
-            if (baseNote.type == Type.LIST && maxDisplayedItems < 1) {
+            if (baseNote.type == Type.LIST && preferences.maxItems < 1) {
                 setCompoundDrawablesWithIntrinsicBounds(R.drawable.checkbox_small, 0, 0, 0)
             }
         }
 
-        Operations.bindLabels(
-            binding.LabelGroup,
-            baseNote.labels,
-            textSize,
-            binding.Note.isVisible || binding.Title.isVisible,
-        )
+        if (preferences.hideLabels) {
+            binding.LabelGroup.visibility = GONE
+        } else {
+            Operations.bindLabels(
+                binding.LabelGroup,
+                baseNote.labels,
+                preferences.textSize,
+                binding.Note.isVisible || binding.Title.isVisible,
+            )
+        }
 
         if (baseNote.isEmpty()) {
             binding.Title.apply {
@@ -144,13 +154,13 @@ class BaseNoteVH(
     }
 
     private fun bindNote(body: String, spans: List<SpanRepresentation>, isTitleEmpty: Boolean) {
-        binding.LinearLayout.visibility = View.GONE
+        binding.LinearLayout.visibility = GONE
 
         binding.Note.apply {
             text = body.applySpans(spans)
-            if (maxDisplayedLines < 1) {
+            if (preferences.maxLines < 1) {
                 isVisible = isTitleEmpty
-                maxLines = if (isTitleEmpty) 1 else maxDisplayedLines
+                maxLines = if (isTitleEmpty) 1 else preferences.maxLines
             } else {
                 isVisible = body.isNotEmpty()
             }
@@ -159,12 +169,12 @@ class BaseNoteVH(
 
     private fun bindList(items: List<ListItem>) {
         binding.apply {
-            Note.visibility = View.GONE
+            Note.visibility = GONE
             if (items.isEmpty()) {
-                LinearLayout.visibility = View.GONE
+                LinearLayout.visibility = GONE
             } else {
-                LinearLayout.visibility = View.VISIBLE
-                val filteredList = items.take(maxDisplayedItems)
+                LinearLayout.visibility = VISIBLE
+                val filteredList = items.take(preferences.maxItems)
                 LinearLayout.children.forEachIndexed { index, view ->
                     if (view.id != R.id.ItemsRemaining) {
                         if (index < filteredList.size) {
@@ -172,23 +182,23 @@ class BaseNoteVH(
                             (view as TextView).apply {
                                 text = item.body
                                 handleChecked(this, item.checked)
-                                visibility = View.VISIBLE
+                                visibility = VISIBLE
                                 if (item.isChild) {
                                     updateLayoutParams<LinearLayout.LayoutParams> {
                                         marginStart = 20.dp(context)
                                     }
                                 }
                             }
-                        } else view.visibility = View.GONE
+                        } else view.visibility = GONE
                     }
                 }
 
-                if (maxDisplayedItems > 0 && items.size > maxDisplayedItems) {
+                if (preferences.maxItems > 0 && items.size > preferences.maxItems) {
                     ItemsRemaining.apply {
-                        visibility = View.VISIBLE
-                        text = (items.size - maxDisplayedItems).toString()
+                        visibility = VISIBLE
+                        text = (items.size - preferences.maxItems).toString()
                     }
-                } else ItemsRemaining.visibility = View.GONE
+                } else ItemsRemaining.visibility = GONE
             }
         }
     }
@@ -213,8 +223,8 @@ class BaseNoteVH(
 
         binding.apply {
             if (images.isNotEmpty()) {
-                ImageView.visibility = View.VISIBLE
-                Message.visibility = View.GONE
+                ImageView.visibility = VISIBLE
+                Message.visibility = GONE
 
                 val image = images[0]
                 val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
@@ -233,7 +243,7 @@ class BaseNoteVH(
                                 target: Target<Drawable>?,
                                 isFirstResource: Boolean,
                             ): Boolean {
-                                Message.visibility = View.VISIBLE
+                                Message.visibility = VISIBLE
                                 return false
                             }
 
@@ -252,15 +262,15 @@ class BaseNoteVH(
                 if (images.size > 1) {
                     ImageViewMore.apply {
                         text = images.size.toString()
-                        visibility = View.VISIBLE
+                        visibility = VISIBLE
                     }
                 } else {
-                    ImageViewMore.visibility = View.GONE
+                    ImageViewMore.visibility = GONE
                 }
             } else {
-                ImageView.visibility = View.GONE
-                Message.visibility = View.GONE
-                ImageViewMore.visibility = View.GONE
+                ImageView.visibility = GONE
+                Message.visibility = GONE
+                ImageViewMore.visibility = GONE
                 Glide.with(ImageView).clear(ImageView)
             }
         }
@@ -269,26 +279,26 @@ class BaseNoteVH(
     private fun setFiles(files: List<FileAttachment>) {
         binding.apply {
             if (files.isNotEmpty()) {
-                FileViewLayout.visibility = View.VISIBLE
+                FileViewLayout.visibility = VISIBLE
                 FileView.text = files[0].originalName
                 if (files.size > 1) {
                     FileViewMore.apply {
                         text = getQuantityString(R.plurals.more_files, files.size - 1)
-                        visibility = View.VISIBLE
+                        visibility = VISIBLE
                     }
                 } else {
-                    FileViewMore.visibility = View.GONE
+                    FileViewMore.visibility = GONE
                 }
             } else {
-                FileViewLayout.visibility = View.GONE
+                FileViewLayout.visibility = GONE
             }
         }
     }
 
     private fun shouldOnlyDisplayTitle(baseNote: BaseNote) =
         when (baseNote.type) {
-            Type.NOTE -> maxDisplayedLines < 1
-            Type.LIST -> maxDisplayedItems < 1
+            Type.NOTE -> preferences.maxLines < 1
+            Type.LIST -> preferences.maxItems < 1
         }
 
     private fun BaseNote.isEmpty() = title.isBlank() && hasNoContents() && images.isEmpty()
