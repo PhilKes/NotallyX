@@ -3,7 +3,6 @@ package com.philkes.notallyx.presentation.activity.note
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
@@ -15,6 +14,7 @@ import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.showAndFocus
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.main.SelectableLabelAdapter
 import com.philkes.notallyx.presentation.viewmodel.LabelModel
 
@@ -67,7 +67,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
                     model.insertLabel(label) { success ->
                         if (success) {
                             dialog.dismiss()
-                        } else Toast.makeText(this, R.string.label_exists, Toast.LENGTH_LONG).show()
+                        } else showToast(R.string.label_exists)
                     }
                 }
             }

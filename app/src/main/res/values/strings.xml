@@ -205,6 +205,9 @@
     <string name="imported_notes">Notes imported</string>
     <string name="calculating">Calculating…</string>
     <string name="clear_data_message">All Notes, Images, Files, Audios will be permanently deleted</string>
+    <string name="import_settings_message">In order to import settings, please choose a valid NotallyX settings JSON file</string>
+    <string name="export_settings_message">All Settings will be exported to a JSON file, which can be used to re-import stored settings.\n\nBe aware, that this does not include encrypted settings like the auto-backup password or the biometric encryption key</string>
+    <string name="reset_settings_message">All Settings will be reset to their default value</string>
 
     <string name="google_keep">Google Keep</string>
     <string name="evernote">Evernote</string>
@@ -215,6 +218,14 @@
     <string name="clear_data">Clear Data</string>
     <string name="cleared_data">All Data has been cleared</string>
     <string name="import_other">Import Notes from other App</string>
+    <string name="import_settings">Import Settings</string>
+    <string name="import_settings_success">Successfully imported settings</string>
+    <string name="import_settings_failure">Failed to import settings, did you choose the correct file?</string>
+    <string name="export_settings">Export Settings</string>
+    <string name="export_settings_success">Successfully exported settings</string>
+    <string name="export_settings_failure">Failed to export settings, did you choose an invalid path?</string>
+    <string name="reset_settings">Reset Settings</string>
+    <string name="reset_settings_success">Successfully reset all settings</string>
 
     <string name="auto_backup_period">Auto backup period</string>
     <string name="daily">Daily</string>

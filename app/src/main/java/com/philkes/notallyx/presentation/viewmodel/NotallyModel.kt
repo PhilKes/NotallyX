@@ -11,7 +11,6 @@ import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
-import android.widget.Toast
 import androidx.core.text.getSpans
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
@@ -30,6 +29,7 @@ import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.deepCopy
 import com.philkes.notallyx.presentation.applySpans
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -234,7 +234,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 audios.value = baseNote.audios
             } else {
                 originalNote = createBaseNote()
-                Toast.makeText(app, R.string.cant_find_note, Toast.LENGTH_LONG).show()
+                app.showToast(R.string.cant_find_note)
             }
         } else originalNote = createBaseNote()
     }

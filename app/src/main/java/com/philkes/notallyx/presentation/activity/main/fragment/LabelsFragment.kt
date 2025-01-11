@@ -21,6 +21,7 @@ import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.showAndFocus
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.label.LabelAdapter
 import com.philkes.notallyx.presentation.view.main.label.LabelData
@@ -129,8 +130,9 @@ class LabelsFragment : Fragment(), LabelListener {
                     model.insertLabel(label) { success: Boolean ->
                         if (success) {
                             dialog.dismiss()
-                        } else
-                            Toast.makeText(context, R.string.label_exists, Toast.LENGTH_LONG).show()
+                        } else {
+                            showToast(R.string.label_exists)
+                        }
                     }
                 }
             }

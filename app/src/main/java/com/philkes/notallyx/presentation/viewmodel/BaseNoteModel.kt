@@ -33,6 +33,7 @@ import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.SearchResult
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
@@ -232,14 +233,14 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun exportBackup(uri: Uri) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) { Export.exportAsZip(uri, app, exportProgress) }
-            Toast.makeText(app, R.string.saved_to_device, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.saved_to_device)
         }
     }
 
     fun importZipBackup(uri: Uri, password: String) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             Operations.log(app, throwable)
-            Toast.makeText(app, R.string.invalid_backup, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.invalid_backup)
         }
 
         val backupDir = app.getBackupDir()
@@ -251,7 +252,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun importXmlBackup(uri: Uri) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             Operations.log(app, throwable)
-            Toast.makeText(app, R.string.invalid_backup, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.invalid_backup)
         }
 
         viewModelScope.launch(exceptionHandler) {
@@ -263,7 +264,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     baseNotes.size
                 }
             val message = app.getQuantityString(R.plurals.imported_notes, importedNotes)
-            Toast.makeText(app, message, Toast.LENGTH_LONG).show()
+            app.showToast(message)
         }
     }
 
@@ -287,7 +288,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     NotesImporter(app, database).import(uri, importSource, importProgress)
                 }
             val message = app.getQuantityString(R.plurals.imported_notes, importedNotes)
-            Toast.makeText(app, message, Toast.LENGTH_LONG).show()
+            app.showToast(message)
         }
     }
 
@@ -298,7 +299,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     app.contentResolver.openInputStream(selectedExportFile!!.uri)?.copyTo(output)
                 }
             }
-            Toast.makeText(app, R.string.saved_to_device, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.saved_to_device)
         }
     }
 
@@ -307,7 +308,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             Operations.log(app, throwable)
             actionMode.close(true)
             exportProgress.postValue(Progress(inProgress = false))
-            Toast.makeText(app, R.string.something_went_wrong, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.something_went_wrong)
         }
         viewModelScope.launch(exceptionHandler) {
             val notes = actionMode.selectedNotes.values
@@ -343,7 +344,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
             actionMode.close(true)
             exportProgress.postValue(Progress(inProgress = false))
-            Toast.makeText(app, R.string.saved_to_device, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.saved_to_device)
         }
     }
 
@@ -383,7 +384,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         viewModelScope.launch {
             deleteBaseNotes(withContext(Dispatchers.IO) { baseNoteDao.getAllIds().toLongArray() })
             withContext(Dispatchers.IO) { labelDao.deleteAll() }
-            Toast.makeText(app, R.string.cleared_data, Toast.LENGTH_LONG).show()
+            app.showToast(R.string.cleared_data)
         }
     }
 

@@ -110,13 +110,6 @@
             android:layout_height="wrap_content"
             android:text="@string/export_backup" />
 
-        <TextView
-          android:id="@+id/ClearData"
-          style="@style/Preference"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="@string/clear_data" />
-
 
         <include
           android:id="@+id/ExternalDataFolder"
@@ -140,6 +133,45 @@
         <include
           android:id="@+id/BackupPassword"
           layout="@layout/preference" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="?android:attr/listDivider" />
+
+        <TextView
+          style="@style/PreferenceHeader"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/settings" />
+
+        <TextView
+          android:id="@+id/ImportSettings"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/import_settings" />
+
+        <TextView
+          android:id="@+id/ExportSettings"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/export_settings" />
+
+        <TextView
+          android:id="@+id/ResetSettings"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/reset_settings" />
+
+        <TextView
+          android:id="@+id/ClearData"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/clear_data" />
 
         <View
             android:layout_width="match_parent"
@@ -179,14 +211,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/libraries" />
-
-        <TextView
-            android:id="@+id/Rate"
-            style="@style/Preference"
-            android:visibility="gone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/rate" />
 
         <TextView
           android:id="@+id/VersionText"

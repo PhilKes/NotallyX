@@ -152,6 +152,7 @@
     <string name="calculating">Berechne…</string>
     <string name="clear_data_message">Alle Notizen, Bilder, Dateien und Sprachnotizen werden permanent gelöscht</string>
 
+    <string name="reset_settings_message">Alle Einstellungen werden auf ihre Default-Werte zurückgesetzt</string>
     <string name="google_keep">Google Notizen</string>
 
     <string name="plain_text_files">Text Dateien</string>
@@ -217,6 +218,7 @@
     <string name="modified_date">Zuletzt geändert am</string>
     <string name="ascending">Aufsteigend</string>
     <string name="descending">Absteigend</string>
+    <string name="reset_settings_success">Einstellungen erfolgreich zurückgesetzt</string>
     <string name="auto_backup_period">Intervall für autom. Backups</string>
     <string name="daily">Täglich</string>
     <string name="weekly">Wöchentlich</string>
@@ -254,5 +256,14 @@
     <string name="imported_files">Dateien importiert</string>
     <string name="data_on_external">Daten in ext. Speicher auslagern</string>
     <string name="external_data_message">Wird dies aktiviert, wird die app-interne Datenbank in den app-externen Speicher ausgelagert (Android/media/com.philkes.notallyx). In Kombination mit Datei-Synchronisations Apps kann dies genutzt werden um NotallyX Daten zwischen mehrere Geräte zu synchronisieren.</string>
+    <string name="import_settings_message">"Um Einstellungen zu importieren, wähle eine valide NotallyX JSON Datei aus "</string>
+    <string name="export_settings_message">Alle Einstellungen werden als JSON Datei exportiert, die dann zum Re-Import genutzt werden kann.\n\nBeachte das hier bei verschlüsselte Einstellungen wie das Auto-Backup Passwort oder die biometrische Verschlüssung nicht exportiert wird</string>
+    <string name="import_settings">Einstellungen Importieren</string>
+    <string name="import_settings_success">Einstellungen erfolgreich importiert</string>
+    <string name="import_settings_failure">Import der Einstellungen fehlgeschlagen, wurde die richtige Datei ausgewählt?</string>
+    <string name="export_settings">Einstellungen exportieren</string>
+    <string name="export_settings_success">Einstellungen erfolgreich exportiert</string>
+    <string name="export_settings_failure">Import der Einstellungen fehlgeschlagen, wurde die richtige Datei ausgewählt?</string>
+    <string name="reset_settings">Einstellungen zurücksetzen</string>
 
 </resources>
