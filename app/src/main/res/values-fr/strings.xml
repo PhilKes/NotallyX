@@ -156,8 +156,8 @@
     <string name="max_lines_to_display">Nombre maximum de lignes à afficher pour une note</string>
     <string name="max_lines_to_display_title">Nombre maximum de lignes à afficher pour un titre</string>
     <string name="max_labels_to_display">Nombre maximum d\'étiquettes à afficher dans le panneau de navigation</string>
-	<string name="labels_hidden_in_overview_title">Masquer les étiquettes dans la vue d'ensemble</string>
-    <string name="labels_hidden_in_overview">En activant cette option, les étiquettes des notes seront masquées dans la vue d'ensemble</string>
+	  <string name="labels_hidden_in_overview_title">Masquer les étiquettes dans la vue d\'ensemble</string>
+    <string name="labels_hidden_in_overview">En activant cette option, les étiquettes des notes seront masquées dans la vue d\'ensemble</string>
 
 	<string name="security">Sécurité</string>
 
@@ -202,7 +202,7 @@
     <string name="calculating">Calcul…</string>
     <string name="clear_data_message">Toutes les notes, images, fichiers et audios seront supprimés définitivement</string>
      <string name="import_settings_message">Pour importer les paramètres, veuillez sélectionner un fichier JSON de paramètres NotallyX valide</string>
-    <string name="export_settings_message">Tous les paramètres seront exportés dans un fichier JSON, qui pourra être utilisé pour réimporter les paramètres enregistrés.\n\nVeuillez noter que cela n'inclut pas les paramètres chiffrés, tels que le mot de passe de sauvegarde automatique ou la clé de chiffrement biométrique.</string>
+    <string name="export_settings_message">Tous les paramètres seront exportés dans un fichier JSON, qui pourra être utilisé pour réimporter les paramètres enregistrés.\n\nVeuillez noter que cela n\'inclut pas les paramètres chiffrés, tels que le mot de passe de sauvegarde automatique ou la clé de chiffrement biométrique.</string>
     <string name="reset_settings_message">Tous les paramètres seront réinitialisés à leur valeur par défaut</string>
    
     <string name="google_keep">Google Keep</string>
@@ -220,10 +220,10 @@
     <string name="disable_external_data">Replacer les données dans le stockage interne</string>
 	<string name="import_settings">Importer les paramètres</string>
 	<string name="import_settings_success">Paramètres importés avec succès</string>
-	<string name="import_settings_failure">Échec de l'importation des paramètres, avez-vous choisi le bon fichier ?</string>
+	<string name="import_settings_failure">Échec de l\'importation des paramètres, avez-vous choisi le bon fichier ?</string>
 	<string name="export_settings">Exporter les paramètres</string>
 	<string name="export_settings_success">Paramètres exportés avec succès</string>
-	<string name="export_settings_failure">Échec de l'exportation des paramètres, avez-vous choisi un chemin invalide ?</string>
+	<string name="export_settings_failure">Échec de l\'exportation des paramètres, avez-vous choisi un chemin invalide ?</string>
 	<string name="reset_settings">Réinitialiser les paramètres</string>
 	<string name="reset_settings_success">Tous les paramètres ont été réinitialisés avec succès</string>
 
