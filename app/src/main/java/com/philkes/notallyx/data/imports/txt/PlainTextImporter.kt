@@ -31,6 +31,9 @@ class PlainTextImporter : ExternalImporter {
                 }
 
                 file.isFile -> {
+                    if (file.type?.isTextMimeType() == false) {
+                        return
+                    }
                     val fileNameWithoutExtension = file.name?.substringBeforeLast(".") ?: ""
                     var content =
                         app.contentResolver.openInputStream(file.uri)?.use { inputStream ->
@@ -73,4 +76,17 @@ class PlainTextImporter : ExternalImporter {
         file?.let { readTxtFiles(it) }
         return Pair(notes, null)
     }
+
+    private fun String.isTextMimeType(): Boolean {
+        return startsWith("text/") || this in APPLICATION_TEXT_MIME_TYPES
+    }
 }
+
+val APPLICATION_TEXT_MIME_TYPES =
+    arrayOf(
+        "application/json",
+        "application/xml",
+        "application/javascript",
+        "application/xhtml+xml",
+        "application/yaml",
+    )

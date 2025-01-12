@@ -23,6 +23,7 @@ import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.FOLDER_OR_FILE_MIMETYPE
 import com.philkes.notallyx.data.imports.ImportSource
+import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.addCancelButton
@@ -332,8 +333,13 @@ class SettingsFragment : Fragment() {
                                             1 ->
                                                 importOtherActivityResultLauncher.launch(
                                                     Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
-                                                        type = "*/*"
+                                                        type = "text/*"
                                                         addCategory(Intent.CATEGORY_OPENABLE)
+                                                        putExtra(
+                                                            Intent.EXTRA_MIME_TYPES,
+                                                            arrayOf("text/*") +
+                                                                APPLICATION_TEXT_MIME_TYPES,
+                                                        )
                                                     }
                                                 )
                                         }
