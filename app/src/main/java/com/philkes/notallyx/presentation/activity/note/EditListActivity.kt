@@ -56,8 +56,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
-                val additionalActions = listOf(createPinAction()) + createFolderActions()
-                MoreListBottomSheet(this@EditListActivity, additionalActions)
+                MoreListBottomSheet(this@EditListActivity, createFolderActions())
                     .show(supportFragmentManager, MoreListBottomSheet.TAG)
             }
         }
