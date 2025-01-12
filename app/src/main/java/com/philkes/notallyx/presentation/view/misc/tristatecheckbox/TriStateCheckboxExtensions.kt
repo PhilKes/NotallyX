@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.view.misc.tristatecheckbox
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View.OnClickListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -35,18 +36,20 @@ private class TriStateListAdapter(
 ) : RecyclerView.Adapter<TriStateListAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val binding = ChoiceItemTriStateBinding.inflate(LayoutInflater.from(context))
-        binding.CheckBox.setOnClickListener(null)
-        return ViewHolder(binding)
+        return ViewHolder(ChoiceItemTriStateBinding.inflate(LayoutInflater.from(context)))
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         holder.bind(item, checkedStates[position])
-        holder.binding.Layout.setOnClickListener {
+        val onClickListener = OnClickListener {
             holder.binding.CheckBox.toggleState()
-            onItemClick(position, holder.binding.CheckBox.state)
-            notifyItemChanged(position)
+            onItemClick(holder.bindingAdapterPosition, holder.binding.CheckBox.state)
+            notifyItemChanged(holder.bindingAdapterPosition)
+        }
+        holder.binding.apply {
+            Layout.setOnClickListener(onClickListener)
+            CheckBox.setOnClickListener(onClickListener)
         }
     }
 
