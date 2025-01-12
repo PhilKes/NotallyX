@@ -148,7 +148,7 @@
     <string name="google_keep_help">Um deine Notizen aus Google Notizen zu importieren musst du deine Google Takeout ZIP Datei herunterladen\n\nFalls du das Takeout ZIP schon hast, klicke auf Import und wähle es aus.</string>
     <string name="exporting_backup">Backup Exportieren</string>
     <string name="importing_backup">Backup Importieren</string>
-    <string name="plain_text_files_help">Um deine Text-Notizen zu importieren, klicke Import und wähle den Ordner mit den Textdateien aus.\n\nJede Datei wird als einzelne Notiz importiert, der Dateiname wird zum Notiz-Titel. Sollte der Textinhalt mit einer List-Syntax beginnen (z.B. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’), wird die Datei als List-Notiz importiert.</string>
+    <string name="plain_text_files_help">Um deine Text-Notizen (einzele Datei oder Ordner) zu importieren, klicke Import.\n\nJede Datei wird als einzelne Notiz importiert, der Dateiname wird zum Notiz-Titel. Sollte der Textinhalt mit einer List-Syntax beginnen (z.B. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’), wird die Datei als List-Notiz importiert.</string>
     <string name="imported_notes">Notizen importiert</string>
     <string name="calculating">Berechne…</string>
     <string name="clear_data_message">Alle Notizen, Bilder, Dateien und Sprachnotizen werden permanent gelöscht</string>
@@ -157,6 +157,8 @@
     <string name="google_keep">Google Notizen</string>
 
     <string name="plain_text_files">Text Dateien</string>
+    <string name="single_file">Einzelne Datei</string>
+    <string name="folder">Ordner</string>
     <string name="export_backup">Backup erstellen</string>
     <string name="import_backup">Backup importieren</string>
     <string name="clear_data">Alle Daten löschen</string>
