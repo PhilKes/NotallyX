@@ -66,7 +66,7 @@
     <string name="biometrics_setup_success">Le verrouillage biométrique/code PIN a été activé</string>
     <string name="biometrics_disable_success">Le verrouillage biométrique/code PIN a été désactivé</string>
     <string name="biometrics_failure">Échec de l\'authentification biométrique/code PIN</string>
-    <string name="backup_password_hint">En activant cette option, tous les futurs fichiers ZIP de sauvegarde seront encryptés et protégés par un mot de passe</string>
+    <string name="backup_password_hint">En activant cette option, tous les futurs fichiers ZIP de sauvegarde seront chiffrés et protégés par un mot de passe</string>
     <string name="import_backup_password_hint">Si votre sauvegarde n\'est pas protégée par mot de passe, cliquez seulement sur "Importer une sauvegarde", sinon entrez le mot de passe correspondant.</string>
 
     <!-- Snackbars -->
@@ -145,18 +145,20 @@
     <string name="large">Grande</string>
 	
     <string name="notes_sorted_by">Notes triées par</string>
-    <string name="creation_date">Date de création</string>
-    <string name="modified_date">Date de modification</string>
+    <string name="creation_date">Crée</string>
+    <string name="modified_date">Modifié</string>
     <string name="ascending">Croissant</string>
     <string name="descending">Décroissant</string>
     <string name="sort_direction">Ordre de tri</string>
 
     <string name="content_density">Densité d\'affichage</string>
-    <string name="max_items_to_display">Nombre maximum d\'éléments à afficher dans une liste</string>
-    <string name="max_lines_to_display">Nombre maximum de lignes à afficher dans une note</string>
+    <string name="max_items_to_display">Nombre maximum d\'éléments à afficher pour une liste</string>
+    <string name="max_lines_to_display">Nombre maximum de lignes à afficher pour une note</string>
     <string name="max_lines_to_display_title">Nombre maximum de lignes à afficher pour un titre</string>
     <string name="max_labels_to_display">Nombre maximum d\'étiquettes à afficher dans le panneau de navigation</string>
-	
+	<string name="labels_hidden_in_overview_title">Masquer les étiquettes dans la vue d'ensemble</string>
+    <string name="labels_hidden_in_overview">En activant cette option, les étiquettes des notes seront masquées dans la vue d'ensemble</string>
+
 	<string name="security">Sécurité</string>
 
     <string name="biometric_lock">Verrouiller l\'application avec la biométrie ou le code PIN de l\'appareil</string>
@@ -199,7 +201,10 @@
     <string name="imported_notes">Notes importées</string>
     <string name="calculating">Calcul…</string>
     <string name="clear_data_message">Toutes les notes, images, fichiers et audios seront supprimés définitivement</string>
-    
+     <string name="import_settings_message">Pour importer les paramètres, veuillez sélectionner un fichier JSON de paramètres NotallyX valide</string>
+    <string name="export_settings_message">Tous les paramètres seront exportés dans un fichier JSON, qui pourra être utilisé pour réimporter les paramètres enregistrés.\n\nVeuillez noter que cela n'inclut pas les paramètres chiffrés, tels que le mot de passe de sauvegarde automatique ou la clé de chiffrement biométrique.</string>
+    <string name="reset_settings_message">Tous les paramètres seront réinitialisés à leur valeur par défaut</string>
+   
     <string name="google_keep">Google Keep</string>
     <string name="evernote">Evernote</string>
     <string name="plain_text_files">Fichiers texte bruts</string>
@@ -213,8 +218,14 @@
     <string name="data_on_external">Stocker les données sur le stockage externe</string>
     <string name="external_data_message">En activant cette option, la base de données interne de l\'application sera déplacée vers le stockage externe de l\'application (Android/media/com.philkes.notallyx).\nEn combinaison avec des applications de synchronisation de fichiers, cela peut être utilisé pour synchroniser les données de NotallyX entre plusieurs appareils.</string>
     <string name="disable_external_data">Replacer les données dans le stockage interne</string>
-    
-	
+	<string name="import_settings">Importer les paramètres</string>
+	<string name="import_settings_success">Paramètres importés avec succès</string>
+	<string name="import_settings_failure">Échec de l'importation des paramètres, avez-vous choisi le bon fichier ?</string>
+	<string name="export_settings">Exporter les paramètres</string>
+	<string name="export_settings_success">Paramètres exportés avec succès</string>
+	<string name="export_settings_failure">Échec de l'exportation des paramètres, avez-vous choisi un chemin invalide ?</string>
+	<string name="reset_settings">Réinitialiser les paramètres</string>
+	<string name="reset_settings_success">Tous les paramètres ont été réinitialisés avec succès</string>
 
     <string name="about">À propos</string>
     <string name="libraries">Bibliothèques</string>
@@ -281,7 +292,7 @@
 
     <!-- Lock -->
     <string name="enable_lock_title">Activer le verrouillage biométrique/code PIN</string>
-    <string name="enable_lock_description">La base de donnée sera aussi encryptée</string>
+    <string name="enable_lock_description">La base de donnée sera aussi chiffrée</string>
     <string name="disable_lock_title">Désactiver le verrouillage biométrique/code PIN</string>
     <string name="disable_lock_description">La base de donnée sera aussi décryptée</string>
     <string name="unlock">Déverrouiller par biométrie/code PIN</string>
