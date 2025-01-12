@@ -1,56 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:paddingTop="8dp"
-  android:paddingStart="24dp"
-  android:paddingEnd="24dp"
-  android:orientation="vertical">
-
-    <TextView
-      android:id="@+id/Message"
+  android:layout_height="wrap_content">
+    <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
-      android:visibility="gone" />
+      android:paddingTop="8dp"
+      android:paddingStart="24dp"
+      android:paddingEnd="24dp"
+      android:orientation="vertical">
 
-    <com.google.android.material.textfield.TextInputLayout
-      android:id="@+id/InputTextLayout1"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
-
-        <EditText
-          android:id="@+id/InputText1"
+        <TextView
+          android:id="@+id/Message"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="12dp"
-          android:paddingBottom="8dp"
-          android:maxLines="1"
-          android:layout_gravity="center_horizontal"
-          android:singleLine="true"
-          android:scrollHorizontally="true"
-          android:textSize="16sp"/>
-    </com.google.android.material.textfield.TextInputLayout>
+          android:textAppearance="@style/TextAppearance.MaterialComponents.Caption"
+          android:visibility="gone" />
 
-    <com.google.android.material.textfield.TextInputLayout
-      android:id="@+id/InputTextLayout2"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
-      android:layout_marginTop="16dp">
-
-        <EditText
-          android:id="@+id/InputText2"
+        <com.google.android.material.textfield.TextInputLayout
+          android:id="@+id/InputTextLayout1"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="12dp"
-          android:paddingBottom="8dp"
-          android:maxLines="1"
-          android:layout_gravity="center_horizontal"
-          android:singleLine="true"
-          android:scrollHorizontally="true"
-          android:textSize="16sp"/>
-    </com.google.android.material.textfield.TextInputLayout>
+          style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense">
 
-</LinearLayout>
+            <EditText
+              android:id="@+id/InputText1"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="12dp"
+              android:paddingBottom="8dp"
+              android:minLines="1"
+              android:maxLines="1"
+              android:layout_gravity="center_horizontal"
+              android:singleLine="true"
+              android:scrollHorizontally="true"
+              android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+          android:id="@+id/InputTextLayout2"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense"
+          android:layout_marginTop="16dp">
+
+            <EditText
+              android:id="@+id/InputText2"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:layout_marginTop="12dp"
+              android:paddingBottom="8dp"
+              android:minLines="1"
+              android:maxLines="1"
+              android:layout_gravity="center_horizontal"
+              android:singleLine="true"
+              android:scrollHorizontally="true"
+              android:textSize="16sp"/>
+        </com.google.android.material.textfield.TextInputLayout>
+
+    </LinearLayout>
+</ScrollView>
