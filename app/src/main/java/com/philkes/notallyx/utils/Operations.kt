@@ -100,16 +100,15 @@ object Operations {
     fun shareNote(context: Context, title: String, body: CharSequence) {
         val text = body.toString()
         val intent =
-            Intent(Intent.ACTION_SEND)
-                .apply {
-                    type = "text/plain"
-                    putExtra(extraCharSequence, body)
-                    putExtra(Intent.EXTRA_TEXT, text)
-                    putExtra(Intent.EXTRA_TITLE, title)
-                    putExtra(Intent.EXTRA_SUBJECT, title)
-                }
-                .wrapWithChooser(context)
-        context.startActivity(intent)
+            Intent(Intent.ACTION_SEND).apply {
+                type = "text/plain"
+                putExtra(extraCharSequence, body)
+                putExtra(Intent.EXTRA_TEXT, text)
+                putExtra(Intent.EXTRA_TITLE, title)
+                putExtra(Intent.EXTRA_SUBJECT, title)
+            }
+        val chooser = Intent.createChooser(intent, null)
+        context.startActivity(chooser)
     }
 
     fun getBody(list: List<ListItem>) = buildString {
@@ -154,7 +153,7 @@ object Operations {
 
     fun Fragment.reportBug(stackTrace: String?) {
         requireContext().catchNoBrowserInstalled {
-            startActivity(requireContext().createReportBugIntent(stackTrace))
+            startActivity(createReportBugIntent(stackTrace))
         }
     }
 
@@ -170,15 +169,14 @@ object Operations {
         }
     }
 
-    private fun Context.createReportBugIntent(stackTrace: String?): Intent {
+    private fun createReportBugIntent(stackTrace: String?): Intent {
         return Intent(
-                Intent.ACTION_VIEW,
-                Uri.parse(
-                    "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let {  "&logs=$stackTrace"} ?: ""}"
-                        .take(2000)
-                ),
-            )
-            .wrapWithChooser(this)
+            Intent.ACTION_VIEW,
+            Uri.parse(
+                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let {  "&logs=$stackTrace"} ?: ""}"
+                    .take(2000)
+            ),
+        )
     }
 
     private fun getOutlinedDrawable(context: Context): MaterialShapeDrawable {

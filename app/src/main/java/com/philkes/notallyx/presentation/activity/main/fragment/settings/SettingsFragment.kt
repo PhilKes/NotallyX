@@ -45,7 +45,6 @@ import com.philkes.notallyx.utils.Operations.reportBug
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
-import com.philkes.notallyx.utils.wrapWithChooser
 
 class SettingsFragment : Fragment() {
 
@@ -257,28 +256,21 @@ class SettingsFragment : Fragment() {
         binding.apply {
             ImportBackup.setOnClickListener {
                 val intent =
-                    Intent(Intent.ACTION_OPEN_DOCUMENT)
-                        .apply {
-                            type = "*/*"
-                            putExtra(
-                                Intent.EXTRA_MIME_TYPES,
-                                arrayOf("application/zip", "text/xml"),
-                            )
-                            addCategory(Intent.CATEGORY_OPENABLE)
-                        }
-                        .wrapWithChooser(requireContext())
+                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                        type = "*/*"
+                        putExtra(Intent.EXTRA_MIME_TYPES, arrayOf("application/zip", "text/xml"))
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
                 importBackupActivityResultLauncher.launch(intent)
             }
             ImportOther.setOnClickListener { importFromOtherApp() }
             ExportBackup.setOnClickListener {
                 val intent =
-                    Intent(Intent.ACTION_CREATE_DOCUMENT)
-                        .apply {
-                            type = "application/zip"
-                            addCategory(Intent.CATEGORY_OPENABLE)
-                            putExtra(Intent.EXTRA_TITLE, "NotallyX Backup")
-                        }
-                        .wrapWithChooser(requireContext())
+                    Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                        type = "application/zip"
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                        putExtra(Intent.EXTRA_TITLE, "NotallyX Backup")
+                    }
                 exportBackupActivityResultLauncher.launch(intent)
             }
         }
@@ -334,25 +326,21 @@ class SettingsFragment : Fragment() {
                                         when (which) {
                                             0 ->
                                                 importOtherActivityResultLauncher.launch(
-                                                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                                                        .apply {
-                                                            addCategory(Intent.CATEGORY_DEFAULT)
-                                                        }
-                                                        .wrapWithChooser(requireContext())
+                                                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                                                        addCategory(Intent.CATEGORY_DEFAULT)
+                                                    }
                                                 )
                                             1 ->
                                                 importOtherActivityResultLauncher.launch(
-                                                    Intent(Intent.ACTION_OPEN_DOCUMENT)
-                                                        .apply {
-                                                            type = "text/*"
-                                                            addCategory(Intent.CATEGORY_OPENABLE)
-                                                            putExtra(
-                                                                Intent.EXTRA_MIME_TYPES,
-                                                                arrayOf("text/*") +
-                                                                    APPLICATION_TEXT_MIME_TYPES,
-                                                            )
-                                                        }
-                                                        .wrapWithChooser(requireContext())
+                                                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                                        type = "text/*"
+                                                        addCategory(Intent.CATEGORY_OPENABLE)
+                                                        putExtra(
+                                                            Intent.EXTRA_MIME_TYPES,
+                                                            arrayOf("text/*") +
+                                                                APPLICATION_TEXT_MIME_TYPES,
+                                                        )
+                                                    }
                                                 )
                                         }
                                     }
@@ -360,16 +348,14 @@ class SettingsFragment : Fragment() {
                                     .show()
                             else ->
                                 importOtherActivityResultLauncher.launch(
-                                    Intent(Intent.ACTION_OPEN_DOCUMENT)
-                                        .apply {
-                                            type = "application/*"
-                                            putExtra(
-                                                Intent.EXTRA_MIME_TYPES,
-                                                arrayOf(selectedImportSource.mimeType),
-                                            )
-                                            addCategory(Intent.CATEGORY_OPENABLE)
-                                        }
-                                        .wrapWithChooser(requireContext())
+                                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                        type = "application/*"
+                                        putExtra(
+                                            Intent.EXTRA_MIME_TYPES,
+                                            arrayOf(selectedImportSource.mimeType),
+                                        )
+                                        addCategory(Intent.CATEGORY_OPENABLE)
+                                    }
                                 )
                         }
                     }
@@ -377,9 +363,7 @@ class SettingsFragment : Fragment() {
                         selectedImportSource.documentationUrl?.let<String, Unit> { docUrl ->
                             it.setNegativeButton(R.string.help) { _, _ ->
                                 val intent =
-                                    Intent(Intent.ACTION_VIEW)
-                                        .apply { data = Uri.parse(docUrl) }
-                                        .wrapWithChooser(requireContext())
+                                    Intent(Intent.ACTION_VIEW).apply { data = Uri.parse(docUrl) }
                                 startActivity(intent)
                             }
                         }
@@ -421,26 +405,22 @@ class SettingsFragment : Fragment() {
             ImportSettings.setOnClickListener {
                 showDialog(R.string.import_settings_message, R.string.import_action) { _, _ ->
                     val intent =
-                        Intent(Intent.ACTION_OPEN_DOCUMENT)
-                            .apply {
-                                type = "application/json"
-                                addCategory(Intent.CATEGORY_OPENABLE)
-                                putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
-                            }
-                            .wrapWithChooser(requireContext())
+                        Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                            type = "application/json"
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                            putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
+                        }
                     importSettingsActivityResultLauncher.launch(intent)
                 }
             }
             ExportSettings.setOnClickListener {
                 showDialog(R.string.export_settings_message, R.string.export) { _, _ ->
                     val intent =
-                        Intent(Intent.ACTION_CREATE_DOCUMENT)
-                            .apply {
-                                type = "application/json"
-                                addCategory(Intent.CATEGORY_OPENABLE)
-                                putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
-                            }
-                            .wrapWithChooser(requireContext())
+                        Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                            type = "application/json"
+                            addCategory(Intent.CATEGORY_OPENABLE)
+                            putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
+                        }
                     exportSettingsActivityResultLauncher.launch(intent)
                 }
             }
@@ -465,19 +445,17 @@ class SettingsFragment : Fragment() {
         binding.apply {
             SendFeedback.setOnClickListener {
                 val intent =
-                    Intent(Intent.ACTION_SEND)
-                        .apply {
-                            selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
-                            putExtra(Intent.EXTRA_EMAIL, arrayOf("notallyx@yahoo.com"))
-                            putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
-                            val app = requireContext().applicationContext as Application
-                            val log = Operations.getLog(app)
-                            if (log.exists()) {
-                                val uri = app.getUriForFile(log)
-                                putExtra(Intent.EXTRA_STREAM, uri)
-                            }
+                    Intent(Intent.ACTION_SEND).apply {
+                        selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
+                        putExtra(Intent.EXTRA_EMAIL, arrayOf("notallyx@yahoo.com"))
+                        putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
+                        val app = requireContext().applicationContext as Application
+                        val log = Operations.getLog(app)
+                        if (log.exists()) {
+                            val uri = app.getUriForFile(log)
+                            putExtra(Intent.EXTRA_STREAM, uri)
                         }
-                        .wrapWithChooser(requireContext())
+                    }
                 try {
                     startActivity(intent)
                 } catch (exception: ActivityNotFoundException) {
@@ -504,12 +482,11 @@ class SettingsFragment : Fragment() {
                                 requireContext().catchNoBrowserInstalled {
                                     startActivity(
                                         Intent(
-                                                Intent.ACTION_VIEW,
-                                                Uri.parse(
-                                                    "https://github.com/PhilKes/NotallyX/issues/new?labels=enhancement&template=feature_request.md"
-                                                ),
-                                            )
-                                            .wrapWithChooser(requireContext())
+                                            Intent.ACTION_VIEW,
+                                            Uri.parse(
+                                                "https://github.com/PhilKes/NotallyX/issues/new?labels=enhancement&template=feature_request.md"
+                                            ),
+                                        )
                                     )
                                 }
                         }
@@ -602,7 +579,7 @@ class SettingsFragment : Fragment() {
 
     private fun displayChooseBackupFolderDialog() {
         showDialog(R.string.notes_will_be, R.string.choose_folder) { _, _ ->
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).wrapWithChooser(requireContext())
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
             chooseBackupFolderActivityResultLauncher.launch(intent)
         }
     }
@@ -665,7 +642,11 @@ class SettingsFragment : Fragment() {
 
     private fun openLink(link: String) {
         val uri = Uri.parse(link)
-        val intent = Intent(Intent.ACTION_VIEW, uri).wrapWithChooser(requireContext())
-        startActivity(intent)
+        val intent = Intent(Intent.ACTION_VIEW, uri)
+        try {
+            startActivity(intent)
+        } catch (exception: ActivityNotFoundException) {
+            showToast(R.string.install_a_browser)
+        }
     }
 }

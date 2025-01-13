@@ -66,7 +66,6 @@ import com.philkes.notallyx.utils.IO.getExportedPath
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.backup.Export.exportPdfFile
 import com.philkes.notallyx.utils.backup.Export.exportPlainTextFile
-import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import kotlinx.coroutines.launch
 
@@ -389,9 +388,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         } else {
             lifecycleScope.launch {
                 val intent =
-                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                        .apply { addCategory(Intent.CATEGORY_DEFAULT) }
-                        .wrapWithChooser(this@MainActivity)
+                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                        addCategory(Intent.CATEGORY_DEFAULT)
+                    }
                 model.selectedExportMimeType = mimeType
                 exportNotesActivityResultLauncher.launch(intent)
             }
@@ -407,24 +406,22 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     private fun viewFile(uri: Uri, mimeType: String) {
         val intent =
-            Intent(Intent.ACTION_VIEW)
-                .apply {
-                    setDataAndType(uri, mimeType)
-                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                }
-                .wrapWithChooser(this@MainActivity)
-        startActivity(intent)
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, mimeType)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+
+        val chooser = Intent.createChooser(intent, getString(R.string.view_note))
+        startActivity(chooser)
     }
 
     private fun saveFileToDevice(file: DocumentFile, mimeType: String) {
         val intent =
-            Intent(Intent.ACTION_CREATE_DOCUMENT)
-                .apply {
-                    type = mimeType
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension!!)
-                }
-                .wrapWithChooser(this@MainActivity)
+            Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                type = mimeType
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension!!)
+            }
         model.selectedExportFile = file
         exportFileActivityResultLauncher.launch(intent)
     }

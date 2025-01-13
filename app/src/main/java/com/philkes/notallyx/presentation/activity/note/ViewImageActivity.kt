@@ -24,7 +24,6 @@ import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
 import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
-import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -158,19 +157,18 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
             val uri = getUriForFile(file)
 
             val intent =
-                Intent(Intent.ACTION_SEND)
-                    .apply {
-                        type = image.mimeType
-                        putExtra(Intent.EXTRA_STREAM, uri)
+                Intent(Intent.ACTION_SEND).apply {
+                    type = image.mimeType
+                    putExtra(Intent.EXTRA_STREAM, uri)
 
-                        // Necessary for sharesheet to show a preview of the image
-                        // Check ->
-                        // https://commonsware.com/blog/2021/01/07/action_send-share-sheet-clipdata.html
-                        clipData = ClipData.newRawUri(null, uri)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-                    .wrapWithChooser(this@ViewImageActivity)
-            startActivity(intent)
+                    // Necessary for sharesheet to show a preview of the image
+                    // Check ->
+                    // https://commonsware.com/blog/2021/01/07/action_send-share-sheet-clipdata.html
+                    clipData = ClipData.newRawUri(null, uri)
+                    addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                }
+            val chooser = Intent.createChooser(intent, null)
+            startActivity(chooser)
         }
     }
 
@@ -179,13 +177,11 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
         if (file != null && file.exists()) {
             val intent =
-                Intent(Intent.ACTION_CREATE_DOCUMENT)
-                    .apply {
-                        type = image.mimeType
-                        addCategory(Intent.CATEGORY_OPENABLE)
-                        putExtra(Intent.EXTRA_TITLE, "NotallyX Image")
-                    }
-                    .wrapWithChooser(this)
+                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                    type = image.mimeType
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_TITLE, "NotallyX Image")
+                }
             currentImage = image
             exportFileActivityResultLauncher.launch(intent)
         }

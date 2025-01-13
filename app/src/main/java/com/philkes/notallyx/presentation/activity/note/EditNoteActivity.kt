@@ -49,7 +49,6 @@ import com.philkes.notallyx.presentation.view.note.action.AddNoteBottomSheet
 import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.copyToClipBoard
 import com.philkes.notallyx.utils.findAllOccurrences
-import com.philkes.notallyx.utils.wrapWithChooser
 
 class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
@@ -402,7 +401,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     private fun openLink(url: String) {
         val uri = Uri.parse(url)
-        val intent = Intent(Intent.ACTION_VIEW, uri).wrapWithChooser(this)
+        val intent = Intent(Intent.ACTION_VIEW, uri)
         try {
             startActivity(intent)
         } catch (exception: Exception) {
