@@ -21,6 +21,7 @@ import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.audio.AudioPlayService
 import com.philkes.notallyx.utils.audio.LocalBinder
+import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -113,15 +114,14 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         val file = if (audioRoot != null) File(audioRoot, audio.name) else null
         if (file != null && file.exists()) {
             val uri = getUriForFile(file)
-
             val intent =
-                Intent(Intent.ACTION_SEND).apply {
-                    type = "audio/mp4"
-                    putExtra(Intent.EXTRA_STREAM, uri)
-                }
-
-            val chooser = Intent.createChooser(intent, null)
-            startActivity(chooser)
+                Intent(Intent.ACTION_SEND)
+                    .apply {
+                        type = "audio/mp4"
+                        putExtra(Intent.EXTRA_STREAM, uri)
+                    }
+                    .wrapWithChooser(this@PlayAudioActivity)
+            startActivity(intent)
         }
     }
 
@@ -143,10 +143,12 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         val file = if (audioRoot != null) File(audioRoot, audio.name) else null
         if (file != null && file.exists()) {
             val intent =
-                Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
-                    type = "audio/mp4"
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                }
+                Intent(Intent.ACTION_CREATE_DOCUMENT)
+                    .apply {
+                        type = "audio/mp4"
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
+                    .wrapWithChooser(this)
 
             val formatter = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT)
             val title = formatter.format(audio.timestamp)

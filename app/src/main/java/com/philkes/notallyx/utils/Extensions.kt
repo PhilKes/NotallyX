@@ -6,6 +6,7 @@ import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.ContentResolver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.hardware.biometrics.BiometricManager
 import android.net.Uri
@@ -139,3 +140,6 @@ fun String.findAllOccurrences(
         .map { match -> match.range.first to match.range.last + 1 }
         .toList()
 }
+
+fun Intent.wrapWithChooser(context: Context, titleResId: Int? = null): Intent =
+    Intent.createChooser(this, titleResId?.let { context.getText(it) })

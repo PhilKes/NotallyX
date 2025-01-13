@@ -1,7 +1,6 @@
 package com.philkes.notallyx.presentation.activity.note
 
 import android.Manifest
-import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.drawable.Drawable
@@ -65,6 +64,7 @@ import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.mergeSkipFirst
 import com.philkes.notallyx.utils.observeSkipFirst
+import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -520,12 +520,14 @@ abstract class EditActivity(private val type: Type) :
     override fun addImages() {
         if (model.imageRoot != null) {
             val intent =
-                Intent(Intent.ACTION_GET_CONTENT).apply {
-                    type = "image/*"
-                    putExtra(Intent.EXTRA_LOCAL_ONLY, true)
-                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                }
+                Intent(Intent.ACTION_GET_CONTENT)
+                    .apply {
+                        type = "image/*"
+                        putExtra(Intent.EXTRA_LOCAL_ONLY, true)
+                        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
+                    .wrapWithChooser(this)
             addImagesActivityResultLauncher.launch(intent)
         } else showToast(R.string.insert_an_sd_card_images)
     }
@@ -533,12 +535,14 @@ abstract class EditActivity(private val type: Type) :
     override fun attachFiles() {
         if (model.filesRoot != null) {
             val intent =
-                Intent(Intent.ACTION_GET_CONTENT).apply {
-                    type = "*/*"
-                    putExtra(Intent.EXTRA_LOCAL_ONLY, true)
-                    putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                }
+                Intent(Intent.ACTION_GET_CONTENT)
+                    .apply {
+                        type = "*/*"
+                        putExtra(Intent.EXTRA_LOCAL_ONLY, true)
+                        putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
+                        addCategory(Intent.CATEGORY_OPENABLE)
+                    }
+                    .wrapWithChooser(this)
             attachFilesActivityResultLauncher.launch(intent)
         } else showToast(R.string.insert_an_sd_card_files)
     }
@@ -666,17 +670,15 @@ abstract class EditActivity(private val type: Type) :
                     return@PreviewFileAdapter
                 }
                 val intent =
-                    Intent(Intent.ACTION_VIEW).apply {
-                        val file = File(model.filesRoot, fileAttachment.localName)
-                        val uri = this@EditActivity.getUriForFile(file)
-                        setDataAndType(uri, fileAttachment.mimeType)
-                        addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                    }
-                try {
-                    startActivity(intent)
-                } catch (e: ActivityNotFoundException) {
-                    startActivity(Intent.createChooser(intent, null))
-                }
+                    Intent(Intent.ACTION_VIEW)
+                        .apply {
+                            val file = File(model.filesRoot, fileAttachment.localName)
+                            val uri = this@EditActivity.getUriForFile(file)
+                            setDataAndType(uri, fileAttachment.mimeType)
+                            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                        }
+                        .wrapWithChooser(this@EditActivity)
+                startActivity(intent)
             }) { fileAttachment ->
                 MaterialAlertDialogBuilder(this)
                     .setMessage(getString(R.string.delete_file, fileAttachment.originalName))
