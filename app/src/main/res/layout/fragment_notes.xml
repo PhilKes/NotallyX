@@ -21,6 +21,11 @@
         android:paddingStart="4dp"
         android:paddingTop="8dp"
         android:paddingEnd="4dp"
+        app:fastScrollEnabled="true"
+        app:fastScrollHorizontalTrackDrawable="@drawable/scroll_track"
+        app:fastScrollVerticalTrackDrawable="@drawable/scroll_track"
+        app:fastScrollHorizontalThumbDrawable="@drawable/scroll_thumb"
+        app:fastScrollVerticalThumbDrawable="@drawable/scroll_thumb"
       />
 
     <com.google.android.material.chip.ChipGroup
