@@ -234,7 +234,6 @@ class NotallyXPreferences private constructor(private val app: Application) {
                 listItemSorting,
                 labelsHiddenInNavigation,
                 autoBackup,
-                dataOnExternalStorage,
                 dateFormat,
                 maxItems,
                 maxTitle,
