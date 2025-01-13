@@ -281,20 +281,20 @@ abstract class EditActivity(private val type: Type) :
                     add(R.string.delete, R.drawable.delete, MenuItem.SHOW_AS_ACTION_ALWAYS) {
                         delete()
                     }
-                    add(R.string.archive, R.drawable.archive) { archive() }
                 }
 
                 Folder.DELETED -> {
-                    add(R.string.restore, R.drawable.restore) { restore() }
-                    add(R.string.delete_forever, R.drawable.delete) { deleteForever() }
+                    add(R.string.restore, R.drawable.restore, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                        restore()
+                    }
                 }
 
                 Folder.ARCHIVED -> {
-                    add(R.string.delete, R.drawable.delete) { delete() }
-                    add(R.string.unarchive, R.drawable.unarchive) { restore() }
+                    add(R.string.unarchive, R.drawable.unarchive, MenuItem.SHOW_AS_ACTION_ALWAYS) {
+                        restore()
+                    }
                 }
             }
-            add(R.string.share, R.drawable.share) { share() }
         }
 
         searchResultsAmount.mergeSkipFirst(searchResultPos).observe(this) { (amount, pos) ->
@@ -418,32 +418,24 @@ abstract class EditActivity(private val type: Type) :
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
-                val additionalActions = listOf(createPinAction()) + createFolderActions()
-                MoreNoteBottomSheet(this@EditActivity, additionalActions)
+                MoreNoteBottomSheet(this@EditActivity, createFolderActions())
                     .show(supportFragmentManager, MoreNoteBottomSheet.TAG)
             }
         }
     }
 
-    protected fun createPinAction() =
-        if (model.pinned) {
-            Action(R.string.unpin, R.drawable.unpin) { pin() }
-        } else {
-            Action(R.string.pin, R.drawable.pin) { pin() }
-        }
-
     protected fun createFolderActions() =
         when (model.folder) {
             Folder.NOTES ->
                 listOf(
-                    Action(R.string.delete, R.drawable.delete, callback = ::delete),
                     Action(R.string.archive, R.drawable.archive, callback = ::archive),
+                    Action(R.string.delete, R.drawable.delete, callback = ::delete),
                 )
 
             Folder.DELETED ->
                 listOf(
-                    Action(R.string.restore, R.drawable.restore, callback = ::restore),
                     Action(R.string.delete_forever, R.drawable.delete, callback = ::deleteForever),
+                    Action(R.string.restore, R.drawable.restore, callback = ::restore),
                 )
 
             Folder.ARCHIVED ->
@@ -564,7 +556,7 @@ abstract class EditActivity(private val type: Type) :
         selectLabelsActivityResultLauncher.launch(intent)
     }
 
-    fun share() {
+    override fun share() {
         val body =
             when (type) {
                 Type.NOTE -> model.body

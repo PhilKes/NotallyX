@@ -13,6 +13,7 @@ class MoreNoteBottomSheet(
 
         internal fun createActions(callbacks: MoreActions, additionalActions: Collection<Action>) =
             listOf(
+                Action(R.string.share, R.drawable.share) { callbacks.share() },
                 Action(R.string.change_color, R.drawable.change_color) { callbacks.changeColor() },
                 Action(R.string.labels, R.drawable.label) { callbacks.changeLabels() },
             ) + additionalActions
@@ -20,6 +21,8 @@ class MoreNoteBottomSheet(
 }
 
 interface MoreActions {
+    fun share()
+
     fun changeColor()
 
     fun changeLabels()
