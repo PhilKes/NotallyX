@@ -189,7 +189,7 @@
     <string name="google_keep_help">Pour importer vos notes depuis Google Keep, vous devez télécharger votre fichier ZIP Google Takeout. Cliquez sur "Aide" pour plus d
 	information.\n\nSi vous possédez déjà un fichier ZIP Google Takeout, cliquez sur "Importer" et choisissez le fichier ZIP.</string>
     <string name="evernote_help">Pour importer vos notes depuis Evernote, vous devez exporter votre carnet de notes Evernote au format ENEX. Cliquez sur "Aide" pour plus d\'information.\n\nSi vous possédez déjà un fichier ENEX, cliquez sur "Importer" et sélectionnez-le.</string>
-    <string name="plain_text_files_help">Pour importer vos notes à partir de fichiers texte bruts, cliquez sur "Importer" et choisissez le dossier contenant les fichiers texte. Chaque fichier est importé comme une note séparée, le nom du fichier devient le titre de la note. Si le contenu du texte commence par une syntaxe de liste (par exemple, Markdown ‘- [x]’, syntaxe NotallyX ‘[✓]’, ou ‘*’, ‘-’), il sera converti en une note sous forme de liste.</string>
+    <string name="plain_text_files_help">Pour importer vos notes à partir de fichiers (un seul fichier ou dossier) texte bruts, cliquez sur "Importer". Chaque fichier est importé comme une note séparée, le nom du fichier devient le titre de la note. Si le contenu du texte commence par une syntaxe de liste (par exemple, Markdown ‘- [x]’, syntaxe NotallyX ‘[✓]’, ou ‘*’, ‘-’), il sera converti en une note sous forme de liste.</string>
     <plurals name="imported_notes">
         <item quantity="one">%s note importée</item>
         <item quantity="other">%s notes importées</item>

@@ -146,11 +146,11 @@ enum class ImportSource(
     ),
     PLAIN_TEXT(
         R.string.plain_text_files,
-        FOLDER_MIMETYPE,
+        FOLDER_OR_FILE_MIMETYPE,
         R.string.plain_text_files_help,
         null,
         R.drawable.text_file,
     ),
 }
 
-const val FOLDER_MIMETYPE = "FOLDER"
+const val FOLDER_OR_FILE_MIMETYPE = "FOLDER_OR_FILE"

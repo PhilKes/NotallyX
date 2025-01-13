@@ -24,52 +24,69 @@ class PlainTextImporter : ExternalImporter {
         progress: MutableLiveData<ImportProgress>?,
     ): Pair<List<BaseNote>, File?> {
         val notes = mutableListOf<BaseNote>()
-        fun readTxtFiles(folder: DocumentFile) {
-            folder.listFiles().forEach { file ->
-                when {
-                    file.isDirectory -> {
-                        readTxtFiles(file)
-                    }
+        fun readTxtFiles(file: DocumentFile) {
+            when {
+                file.isDirectory -> {
+                    file.listFiles().forEach { readTxtFiles(it) }
+                }
 
-                    file.isFile -> {
-                        val fileNameWithoutExtension = file.name?.substringBeforeLast(".") ?: ""
-                        var content =
-                            app.contentResolver.openInputStream(file.uri)?.use { inputStream ->
-                                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                                    reader.readText()
-                                }
-                            } ?: ""
-                        val listItems = mutableListOf<ListItem>()
-                        content.findListSyntaxRegex()?.let { listSyntaxRegex ->
-                            listItems.addAll(content.extractListItems(listSyntaxRegex))
-                            content = ""
-                        }
-                        val timestamp = System.currentTimeMillis()
-                        notes.add(
-                            BaseNote(
-                                id = 0L, // Auto-generated
-                                type = if (listItems.isEmpty()) Type.NOTE else Type.LIST,
-                                folder = Folder.NOTES,
-                                color = Color.DEFAULT,
-                                title = fileNameWithoutExtension,
-                                pinned = false,
-                                timestamp = timestamp,
-                                modifiedTimestamp = timestamp,
-                                labels = listOf(),
-                                body = content,
-                                spans = listOf(),
-                                items = listItems,
-                                images = listOf(),
-                                files = listOf(),
-                                audios = listOf(),
-                            )
-                        )
+                file.isFile -> {
+                    if (file.type?.isTextMimeType() == false) {
+                        return
                     }
+                    val fileNameWithoutExtension = file.name?.substringBeforeLast(".") ?: ""
+                    var content =
+                        app.contentResolver.openInputStream(file.uri)?.use { inputStream ->
+                            BufferedReader(InputStreamReader(inputStream)).use { reader ->
+                                reader.readText()
+                            }
+                        } ?: ""
+                    val listItems = mutableListOf<ListItem>()
+                    content.findListSyntaxRegex()?.let { listSyntaxRegex ->
+                        listItems.addAll(content.extractListItems(listSyntaxRegex))
+                        content = ""
+                    }
+                    val timestamp = System.currentTimeMillis()
+                    notes.add(
+                        BaseNote(
+                            id = 0L, // Auto-generated
+                            type = if (listItems.isEmpty()) Type.NOTE else Type.LIST,
+                            folder = Folder.NOTES,
+                            color = Color.DEFAULT,
+                            title = fileNameWithoutExtension,
+                            pinned = false,
+                            timestamp = timestamp,
+                            modifiedTimestamp = timestamp,
+                            labels = listOf(),
+                            body = content,
+                            spans = listOf(),
+                            items = listItems,
+                            images = listOf(),
+                            files = listOf(),
+                            audios = listOf(),
+                        )
+                    )
                 }
             }
         }
-        DocumentFile.fromTreeUri(app, source)?.let { readTxtFiles(it) }
-
+        val file =
+            if (source.pathSegments.firstOrNull() == "tree") {
+                DocumentFile.fromTreeUri(app, source)
+            } else DocumentFile.fromSingleUri(app, source)
+        file?.let { readTxtFiles(it) }
         return Pair(notes, null)
     }
+
+    private fun String.isTextMimeType(): Boolean {
+        return startsWith("text/") || this in APPLICATION_TEXT_MIME_TYPES
+    }
 }
+
+val APPLICATION_TEXT_MIME_TYPES =
+    arrayOf(
+        "application/json",
+        "application/xml",
+        "application/javascript",
+        "application/xhtml+xml",
+        "application/yaml",
+    )

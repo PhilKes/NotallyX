@@ -21,8 +21,9 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.imports.FOLDER_MIMETYPE
+import com.philkes.notallyx.data.imports.FOLDER_OR_FILE_MIMETYPE
 import com.philkes.notallyx.data.imports.ImportSource
+import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.addCancelButton
@@ -312,14 +313,41 @@ class SettingsFragment : Fragment() {
                     .setMessage(selectedImportSource.helpTextResId)
                     .setPositiveButton(R.string.import_action) { dialog, _ ->
                         dialog.cancel()
-                        val intent =
-                            when (selectedImportSource.mimeType) {
-                                FOLDER_MIMETYPE ->
-                                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
-                                        addCategory(Intent.CATEGORY_DEFAULT)
+                        when (selectedImportSource.mimeType) {
+                            FOLDER_OR_FILE_MIMETYPE ->
+                                MaterialAlertDialogBuilder(requireContext())
+                                    .setTitle(R.string.plain_text_files)
+                                    .setItems(
+                                        arrayOf(
+                                            getString(R.string.folder),
+                                            getString(R.string.single_file),
+                                        )
+                                    ) { _, which ->
+                                        when (which) {
+                                            0 ->
+                                                importOtherActivityResultLauncher.launch(
+                                                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+                                                        addCategory(Intent.CATEGORY_DEFAULT)
+                                                    }
+                                                )
+                                            1 ->
+                                                importOtherActivityResultLauncher.launch(
+                                                    Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+                                                        type = "text/*"
+                                                        addCategory(Intent.CATEGORY_OPENABLE)
+                                                        putExtra(
+                                                            Intent.EXTRA_MIME_TYPES,
+                                                            arrayOf("text/*") +
+                                                                APPLICATION_TEXT_MIME_TYPES,
+                                                        )
+                                                    }
+                                                )
+                                        }
                                     }
-
-                                else ->
+                                    .addCancelButton()
+                                    .show()
+                            else ->
+                                importOtherActivityResultLauncher.launch(
                                     Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
                                         type = "application/*"
                                         putExtra(
@@ -328,8 +356,8 @@ class SettingsFragment : Fragment() {
                                         )
                                         addCategory(Intent.CATEGORY_OPENABLE)
                                     }
-                            }
-                        importOtherActivityResultLauncher.launch(intent)
+                                )
+                        }
                     }
                     .also {
                         selectedImportSource.documentationUrl?.let<String, Unit> { docUrl ->
