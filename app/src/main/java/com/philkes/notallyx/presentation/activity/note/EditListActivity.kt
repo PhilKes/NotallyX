@@ -30,12 +30,12 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
     private lateinit var listManager: ListManager
 
     override fun finish() {
-        model.setItems(items.toMutableList())
+        notallyModel.setItems(items.toMutableList())
         super.finish()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        model.setItems(items.toMutableList())
+        notallyModel.setItems(items.toMutableList())
         super.onSaveInstanceState(outState)
     }
 
@@ -92,7 +92,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { listManager.moveFocusToNext(-1) }
 
-        if (model.isNewNote || model.items.isEmpty()) {
+        if (notallyModel.isNewNote || notallyModel.items.isEmpty()) {
             listManager.add(pushChange = false)
         }
     }
@@ -118,8 +118,8 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
             }
         adapter =
             ListItemAdapter(
-                Operations.extractColor(model.color, this),
-                model.textSize,
+                Operations.extractColor(notallyModel.color, this),
+                notallyModel.textSize,
                 elevation,
                 NotallyXPreferences.getInstance(application),
                 listManager,
@@ -133,7 +133,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)
         }
-        items.init(model.items)
+        items.init(notallyModel.items)
         adapter?.setList(items)
         binding.RecyclerView.adapter = adapter
         listManager.adapter = adapter!!
@@ -142,6 +142,6 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     override fun setColor() {
         super.setColor()
-        adapter?.setBackgroundColor(Operations.extractColor(model.color, this))
+        adapter?.setBackgroundColor(Operations.extractColor(notallyModel.color, this))
     }
 }

@@ -6,6 +6,8 @@ import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.annotation.RequiresApi
 import com.philkes.notallyx.data.NotallyDatabase.Companion.DatabaseName
+import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import java.io.File
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -98,7 +100,7 @@ fun getInitializedCipherForDecryption(
 }
 
 @RequiresApi(Build.VERSION_CODES.M)
-private fun getCipher(): Cipher {
+fun getCipher(): Cipher {
     return Cipher.getInstance(
         KeyProperties.KEY_ALGORITHM_AES +
             "/" +
@@ -106,4 +108,15 @@ private fun getCipher(): Cipher {
             "/" +
             KeyProperties.ENCRYPTION_PADDING_PKCS7
     )
+}
+
+@RequiresApi(Build.VERSION_CODES.M)
+fun Context.disableBiometricLock(model: BaseNoteModel, cipher: Cipher? = null) {
+    val encryptedPassphrase = model.preferences.databaseEncryptionKey.value
+    val passphrase =
+        cipher?.doFinal(encryptedPassphrase)
+            ?: model.preferences.fallbackDatabaseEncryptionKey.value!!
+    model.closeDatabase()
+    decryptDatabase(this, passphrase)
+    model.savePreference(model.preferences.biometricLock, BiometricLock.DISABLED)
 }

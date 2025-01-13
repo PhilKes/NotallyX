@@ -23,7 +23,7 @@ fun Activity.showBiometricOrPinPrompt(
     titleResId: Int,
     descriptionResId: Int? = null,
     onSuccess: (cipher: Cipher) -> Unit,
-    onFailure: () -> Unit,
+    onFailure: (errorCode: Int?) -> Unit,
 ) {
     showBiometricOrPinPrompt(
         isForDecrypt,
@@ -44,7 +44,7 @@ fun Fragment.showBiometricOrPinPrompt(
     descriptionResId: Int,
     cipherIv: ByteArray? = null,
     onSuccess: (cipher: Cipher) -> Unit,
-    onFailure: () -> Unit,
+    onFailure: (errorCode: Int?) -> Unit,
 ) {
     showBiometricOrPinPrompt(
         isForDecrypt,
@@ -66,23 +66,24 @@ private fun showBiometricOrPinPrompt(
     descriptionResId: Int? = null,
     cipherIv: ByteArray? = null,
     onSuccess: (cipher: Cipher) -> Unit,
-    onFailure: () -> Unit,
+    onFailure: (errorCode: Int?) -> Unit,
 ) {
     when {
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
             // Android 11+ with BiometricPrompt and Authenticators
-            val prompt = BiometricPrompt.Builder(context)
-                .apply {
-                    setTitle(context.getString(titleResId))
-                    descriptionResId?.let {
-                        setDescription(context.getString(descriptionResId))
-                    }
-                    setAllowedAuthenticators(
-                        BiometricManager.Authenticators.BIOMETRIC_STRONG or
+            val prompt =
+                BiometricPrompt.Builder(context)
+                    .apply {
+                        setTitle(context.getString(titleResId))
+                        descriptionResId?.let {
+                            setDescription(context.getString(descriptionResId))
+                        }
+                        setAllowedAuthenticators(
+                            BiometricManager.Authenticators.BIOMETRIC_STRONG or
                                 BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                    )
-                }
-                .build()
+                        )
+                    }
+                    .build()
             val cipher =
                 if (isForDecrypt) {
                     getInitializedCipherForDecryption(iv = cipherIv!!)
@@ -103,12 +104,12 @@ private fun showBiometricOrPinPrompt(
 
                     override fun onAuthenticationFailed() {
                         super.onAuthenticationFailed()
-                        onFailure.invoke()
+                        onFailure.invoke(null)
                     }
 
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
                         super.onAuthenticationError(errorCode, errString)
-                        onFailure.invoke()
+                        onFailure.invoke(errorCode)
                     }
                 },
             )
@@ -124,9 +125,9 @@ private fun showBiometricOrPinPrompt(
                         }
                         setNegativeButton(
                             context.getString(R.string.cancel),
-                            context.mainExecutor
+                            context.mainExecutor,
                         ) { _, _ ->
-                            onFailure.invoke()
+                            onFailure.invoke(null)
                         }
                     }
                     .build()
@@ -150,12 +151,12 @@ private fun showBiometricOrPinPrompt(
 
                     override fun onAuthenticationFailed() {
                         super.onAuthenticationFailed()
-                        onFailure.invoke()
+                        onFailure.invoke(null)
                     }
 
                     override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
                         super.onAuthenticationError(errorCode, errString)
-                        onFailure.invoke()
+                        onFailure.invoke(errorCode)
                     }
                 },
             )
@@ -166,7 +167,7 @@ private fun showBiometricOrPinPrompt(
                 ContextCompat.getSystemService(context, FingerprintManager::class.java)
             if (
                 fingerprintManager?.isHardwareDetected == true &&
-                fingerprintManager.hasEnrolledFingerprints()
+                    fingerprintManager.hasEnrolledFingerprints()
             ) {
                 val cipher =
                     if (isForDecrypt) {
@@ -188,7 +189,7 @@ private fun showBiometricOrPinPrompt(
 
                         override fun onAuthenticationFailed() {
                             super.onAuthenticationFailed()
-                            onFailure.invoke()
+                            onFailure.invoke(null)
                         }
 
                         override fun onAuthenticationError(
@@ -196,7 +197,7 @@ private fun showBiometricOrPinPrompt(
                             errString: CharSequence?,
                         ) {
                             super.onAuthenticationError(errorCode, errString)
-                            onFailure.invoke()
+                            onFailure.invoke(errorCode)
                         }
                     },
                     null,
@@ -225,7 +226,7 @@ private fun promptPinAuthentication(
     context: Context,
     activityResultLauncher: ActivityResultLauncher<Intent>,
     titleResId: Int,
-    onFailure: () -> Unit,
+    onFailure: (errorCode: Int?) -> Unit,
 ) {
     val keyguardManager = ContextCompat.getSystemService(context, KeyguardManager::class.java)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -239,10 +240,10 @@ private fun promptPinAuthentication(
             if (intent != null) {
                 activityResultLauncher.launch(intent)
             } else {
-                onFailure.invoke()
+                onFailure.invoke(null)
             }
         } else {
-            onFailure.invoke()
+            onFailure.invoke(null)
         }
     } else {
         // For API 21-22, use isKeyguardSecure
@@ -255,10 +256,10 @@ private fun promptPinAuthentication(
             if (intent != null) {
                 activityResultLauncher.launch(intent)
             } else {
-                onFailure.invoke()
+                onFailure.invoke(null)
             }
         } else {
-            onFailure.invoke()
+            onFailure.invoke(null)
         }
     }
 }
