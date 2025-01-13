@@ -208,6 +208,11 @@
     <string name="google_keep">Google Keep</string>
     <string name="evernote">Evernote</string>
     <string name="plain_text_files">Fichiers texte bruts</string>
+    <string name="single_file">Fichier unique</string>
+    <string name="folder">Dossier</string>
+	
+    
+	
     
     <string name="export_backup">Exporter la sauvegarde</string>
     <string name="import_backup">Importer une sauvegarde</string>
