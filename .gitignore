@@ -12,3 +12,4 @@ fastlane/*
 !fastlane/join-testers.png
 !fastlane/metadata
 Gemfile*
+*.sh

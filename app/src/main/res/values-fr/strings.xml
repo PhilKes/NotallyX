@@ -113,6 +113,7 @@
   <string name="external_data_message">En activant cette option, la base de données interne de l\'application sera déplacée vers le stockage externe de l\'application (Android/media/com.philkes.notallyx).\nEn combinaison avec des applications de synchronisation de fichiers, cela peut être utilisé pour synchroniser les données de NotallyX entre plusieurs appareils.</string>
   <string name="extracted_files">Fichiers extraits</string>
   <string name="filter">Filtrer</string>
+  <string name="folder">Dossier</string>
   <string name="follow_system">En fonction du système</string>
   <string name="google_keep">Google Keep</string>
   <string name="google_keep_help">Pour importer vos notes depuis Google Keep, vous devez télécharger votre fichier ZIP Google Takeout. Cliquez sur &quot;Aide&quot; pour plus d
@@ -136,6 +137,7 @@
   </plurals>
   <string name="importing_backup">Importation de la sauvegarde</string>
   <string name="insert_an_sd_card_audio">Insérer une carte SD pour enregistrer de l\'audio</string>
+  <string name="insert_an_sd_card_files">Insérez une carte SD pour ajouter des fichiers</string>
   <string name="insert_an_sd_card_images">Insérez une carte SD pour ajouter des images</string>
   <string name="install_a_browser">Installez un navigateur pour ouvrir ce lien</string>
   <string name="install_an_email">Installez une application de courriel pour envoyer des commentaires</string>
@@ -213,16 +215,19 @@
   <string name="saved_to_notally">Sauvegardé dans NotallyX</string>
   <string name="search">Rechercher</string>
   <string name="security">Sécurité</string>
+  <string name="select_all">Sélectionner tout</string>
   <string name="select_labels">Sélectionner des étiquettes</string>
   <string name="select_note">Sélectionnez une note</string>
   <string name="send_feedback">Envoyer des commentaires</string>
   <string name="settings">Paramètres</string>
   <string name="share">Partager</string>
+  <string name="single_file">Fichier unique</string>
   <string name="single_note_or_list">Note ou liste unique</string>
   <string name="small">Petite</string>
   <string name="something_went_wrong">Quelque chose a mal tourné. Veuillez réessayer.</string>
   <string name="something_went_wrong_audio">Une erreur est survenue. l\'enregistrement audio a peut-être été déplacé ou supprimé.\n\nErreur : (%1$d, %2$d)</string>
   <string name="sort_direction">Ordre de tri</string>
+  <string name="source_code">Code source</string>
   <string name="start">Enregistrer</string>
   <string name="stop">Arrêter</string>
   <string name="strikethrough">Barré</string>
