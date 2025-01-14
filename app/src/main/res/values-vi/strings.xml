@@ -1,147 +1,116 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" ?>
 <resources>
-    <!-- Fragment Titles -->
-    <string name="notes">Ghi chú</string>
-    <string name="labels">Nhãn</string>
-    <string name="deleted">Thùng rác</string>
-    <string name="archived">Lưu trữ</string>
-    <string name="settings">Cài đặt</string>
-
-    <!-- Menu Options -->
-    <string name="share">Chia sẻ</string>
-    <string name="filter">Lọc</string>
-    <string name="search">Tìm kiếm</string>
-    <string name="delete">Xóa</string>
-    <string name="restore">Khôi phục</string>
-    <string name="archive">Lưu trữ</string>
-    <string name="unarchive">Bỏ lưu trữ</string>
-    <string name="add_images">Thêm ảnh</string>
-    <string name="delete_all">Xóa toàn bộ</string>
-    <string name="change_color">Đổi màu</string>
-    <string name="delete_forever">Xóa vĩnh viễn</string>
-
-    <!-- Pinning -->
-    <string name="pin">Ghim</string>
-    <string name="unpin">Bỏ ghim</string>
-    <string name="pinned">Đã ghim</string>
-    <string name="others">Còn lại</string>
-
-    <!-- Chooser dialog hints -->
-    <string name="view_note">Xem ghi chú…</string>
-
-    <!-- Dialogs -->
-    <string name="save">Lưu</string>
-    <string name="edit">Sửa</string>
-    <string name="cancel">Hủy</string>
-    <string name="continue_">Tiếp tục</string>
-    <string name="open_link">Mở liên kết</string>
-    <string name="make_list">Liệt kê</string>
-    <string name="take_note">Ghi chú</string>
-    <string name="add_label">Thêm nhãn</string>
-    <string name="export">Xuất</string>
-    <string name="view_file">Xem tập tin</string>
-    <string name="save_to_device">Lưu vào thiết bị</string>
-    <string name="edit_label">Đổi nhãn</string>
-    <string name="label_exists">Danh sách nhãn sử dụng</string>
-    <string name="delete_label">Xóa nhãn?</string>
-    <string name="create_new">Chưa có nhãn nào. Thử tạo mới?</string>
-    <string name="delete_all_notes">Xóa toàn bộ ghi chú?</string>
-    <string name="delete_selected_notes">Xóa những ghi chú đã chọn?</string>
-    <string name="delete_note_forever">Xóa vĩnh viễn ghi chú?</string>
-    <string name="your_notes_associated">Những ghi chú có sử dụng nhãn này sẽ không bị xóa.</string>
-
-    <!-- Lists and Notes -->
-    <string name="note">Ghi chú</string>
-    <string name="item">Liệt kê</string>
-    <string name="date">Ngày</string>
-    <string name="title">Tựa đề</string>
-    <string name="add_item">Thêm nội dung</string>
-    <string name="drag_handle">Kéo thả</string>
-    <string name="bold">Đậm</string>
-    <string name="link">Liên kết</string>
-    <string name="italic">Nghiêng</string>
-    <string name="strikethrough">Gạch giữa</string>
-    <string name="clear_formatting">Xóa định dạng</string>
-    <string name="monospace">Monospace</string>
-
-    <!-- Miscellaneous -->
-    <string name="saved_to_device">Đã lưu vào thiết bị</string>
-    <string name="saved_to_notally">Đã lưu trong NotallyX</string>
-    <string name="empty_note">Nội dung ghi chú trống</string>
-    <string name="empty_list">Nội dung liệt kê trống</string>
-
-    <!-- Messages -->
-    <string name="cant_open_link">Không thể mở liên kết</string>
-    <string name="something_went_wrong">Có lỗi xảy ra. Vui lòng thử lại.</string>
-    <string name="install_an_email">Cài đặt một ứng dụng email để gửi phản hồi</string>
-    <string name="install_a_browser">Cài đặt một trình duyệt để mở link này</string>
-    <string name="cant_find_note">Không tìm thấy ghi chú. Có lẽ nó đã bị xóa</string>
-
-    <!-- Settings Page -->
-    <string name="appearance">Giao diện</string>
-
-    <string name="view">Kiểu xem</string>
-    <string name="list">Danh sách</string>
-    <string name="grid">Lưới</string>
-
-    <string name="theme">Chủ đề</string>
-    <string name="dark">Tối</string>
-    <string name="light">Sáng</string>
-    <string name="follow_system">Mặc định hệ thống</string>
-
-    <string name="date_format">Định dạng ngày tháng</string>
-    <string name="none">Không</string>
-
-    <string name="text_size">Cỡ chữ</string>
-    <string name="small">Nhỏ</string>
-    <string name="medium">Vừa</string>
-    <string name="large">Lớn</string>
-
-    <string name="content_density">Mật độ hiển thị nội dung</string>
-    <string name="max_items_to_display">Số lượng mục liệt kê tối đa</string>
-    <string name="max_lines_to_display">Số lượng dòng ghi chú tối đa</string>
-    <string name="max_lines_to_display_title">Số lượng dòng tựa đề tối đa</string>
-
-    <string name="backup">Sao lưu</string>
-    <string name="auto_backup">Sao lưu tự động</string>
-    <string name="tap_to_set_up">Thiết lập</string>
-    <string name="notes_will_be">Ghi chú sẽ được lưu vào bộ nhớ trong của điện thoại.\n\nTính năng sẽ không hoạt động nếu bạn bật tiết kiệm pin</string>
-    <string name="choose_folder">Chọn thư mục</string>
-    <string name="disable_auto_backup">Tắt sao lưu tự động</string>
-    <string name="choose_another_folder">Chọn thư mục khác</string>
-    <string name="cant_find_folder">Không tìm thấy thư mục. Có lẽ nó đã bị đổi tên hoặc xóa</string>
-    <string name="invalid_backup">Bản sao lưu không hợp lệ</string>
-    <string name="exporting_backup">Đã xuất bản sao lưu</string>
-    <string name="calculating">Đang xử lý…</string>
-
-    <string name="export_backup">Xuất dữ liệu</string>
-    <string name="import_backup">Nhập dữ liệu</string>
-
-    <string name="about">Giới thiệu</string>
-    <string name="libraries">Thư viện sử dụng</string>
-    <string name="rate">Đánh giá app</string>
-    <string name="send_feedback">Gửi phản hồi</string>
-
-    <!-- Widget -->
-    <string name="single_note_or_list">Ghi chú hoặc liệt kê</string>
-    <string name="select_note">Chọn ghi chú</string>
-
-    <!-- Images -->
-    <string name="adding_images">Đang thêm ảnh</string>
-    <string name="deleting_images">Đang xóa ảnh</string>
-    <string name="invalid_image">Ảnh không hợp lệ</string>
-    <string name="error_while_renaming_image">Xảy ra lỗi khi đổi tên ảnh</string>
-    <string name="image_format_not_supported">Định dạng không hỗ trợ</string>
-    <string name="delete_image_forever">Xóa vĩnh viễn ảnh?</string>
-    <string name="cant_load_image">Không thể tải ảnh. Có lẽ nó đã bị đổi tên hoặc xóa</string>
-    <string name="unknown_name">Không rõ tên</string>
-    <string name="unknown_error">Không rõ lỗi</string>
-    <string name="insert_an_sd_card_images">Gắn thẻ SD trước</string>
-    <string name="please_grant_notally_notification">Xin cho phép NotallyX quyền gửi thông báo. Nó sẽ cho phép hiển thị tiến trình nếu các thao tác xóa hình ảnh hoặc nhập bản sao lưu mất nhiều thời gian</string>
-
-    <plurals name="cant_add_images">
-        <item quantity="one">Không thể thêm %d ảnh</item>
-        <item quantity="other">Không thể thêm %d ảnh</item>
-    </plurals>
-
+  <string name="about">Giới thiệu</string>
+  <string name="add_images">Thêm ảnh</string>
+  <string name="add_item">Thêm nội dung</string>
+  <string name="add_label">Thêm nhãn</string>
+  <string name="adding_images">Đang thêm ảnh</string>
+  <string name="appearance">Giao diện</string>
+  <string name="archive">Lưu trữ</string>
+  <string name="archived">Lưu trữ</string>
+  <string name="auto_backup">Sao lưu tự động</string>
+  <string name="backup">Sao lưu</string>
+  <string name="bold">Đậm</string>
+  <string name="calculating">Đang xử lý…</string>
+  <string name="cancel">Hủy</string>
+  <plurals name="cant_add_images">
+    <item quantity="one">Không thể thêm %d ảnh</item>
+    <item quantity="other">Không thể thêm %d ảnh</item>
+  </plurals>
+  <string name="cant_find_folder">Không tìm thấy thư mục. Có lẽ nó đã bị đổi tên hoặc xóa</string>
+  <string name="cant_find_note">Không tìm thấy ghi chú. Có lẽ nó đã bị xóa</string>
+  <string name="cant_load_image">Không thể tải ảnh. Có lẽ nó đã bị đổi tên hoặc xóa</string>
+  <string name="cant_open_link">Không thể mở liên kết</string>
+  <string name="change_color">Đổi màu</string>
+  <string name="choose_another_folder">Chọn thư mục khác</string>
+  <string name="choose_folder">Chọn thư mục</string>
+  <string name="clear_formatting">Xóa định dạng</string>
+  <string name="content_density">Mật độ hiển thị nội dung</string>
+  <string name="continue_">Tiếp tục</string>
+  <string name="create_new">Chưa có nhãn nào. Thử tạo mới?</string>
+  <string name="dark">Tối</string>
+  <string name="date">Ngày</string>
+  <string name="date_format">Định dạng ngày tháng</string>
+  <string name="delete">Xóa</string>
+  <string name="delete_all">Xóa toàn bộ</string>
+  <string name="delete_all_notes">Xóa toàn bộ ghi chú?</string>
+  <string name="delete_forever">Xóa vĩnh viễn</string>
+  <string name="delete_image_forever">Xóa vĩnh viễn ảnh?</string>
+  <string name="delete_label">Xóa nhãn?</string>
+  <string name="delete_note_forever">Xóa vĩnh viễn ghi chú?</string>
+  <string name="delete_selected_notes">Xóa những ghi chú đã chọn?</string>
+  <string name="deleted">Thùng rác</string>
+  <string name="deleting_images">Đang xóa ảnh</string>
+  <string name="disable_auto_backup">Tắt sao lưu tự động</string>
+  <string name="drag_handle">Kéo thả</string>
+  <string name="edit">Sửa</string>
+  <string name="edit_label">Đổi nhãn</string>
+  <string name="empty_list">Nội dung liệt kê trống</string>
+  <string name="empty_note">Nội dung ghi chú trống</string>
+  <string name="error_while_renaming_image">Xảy ra lỗi khi đổi tên ảnh</string>
+  <string name="export">Xuất</string>
+  <string name="export_backup">Xuất dữ liệu</string>
+  <string name="exporting_backup">Đã xuất bản sao lưu</string>
+  <string name="filter">Lọc</string>
+  <string name="follow_system">Mặc định hệ thống</string>
+  <string name="grid">Lưới</string>
+  <string name="image_format_not_supported">Định dạng không hỗ trợ</string>
+  <string name="import_backup">Nhập dữ liệu</string>
+  <string name="insert_an_sd_card_images">Gắn thẻ SD trước</string>
+  <string name="install_a_browser">Cài đặt một trình duyệt để mở link này</string>
+  <string name="install_an_email">Cài đặt một ứng dụng email để gửi phản hồi</string>
+  <string name="invalid_backup">Bản sao lưu không hợp lệ</string>
+  <string name="invalid_image">Ảnh không hợp lệ</string>
+  <string name="italic">Nghiêng</string>
+  <string name="item">Liệt kê</string>
+  <string name="label_exists">Danh sách nhãn sử dụng</string>
+  <string name="labels">Nhãn</string>
+  <string name="large">Lớn</string>
+  <string name="libraries">Thư viện sử dụng</string>
+  <string name="light">Sáng</string>
+  <string name="link">Liên kết</string>
+  <string name="list">Danh sách</string>
+  <string name="make_list">Liệt kê</string>
+  <string name="max_items_to_display">Số lượng mục liệt kê tối đa</string>
+  <string name="max_lines_to_display">Số lượng dòng ghi chú tối đa</string>
+  <string name="max_lines_to_display_title">Số lượng dòng tựa đề tối đa</string>
+  <string name="medium">Vừa</string>
+  <string name="monospace">Monospace</string>
+  <string name="none">Không</string>
+  <string name="note">Ghi chú</string>
+  <string name="notes">Ghi chú</string>
+  <string name="notes_will_be">Ghi chú sẽ được lưu vào bộ nhớ trong của điện thoại.\n\nTính năng sẽ không hoạt động nếu bạn bật tiết kiệm pin</string>
+  <string name="open_link">Mở liên kết</string>
+  <string name="others">Còn lại</string>
+  <string name="pin">Ghim</string>
+  <string name="pinned">Đã ghim</string>
+  <string name="please_grant_notally_notification">Xin cho phép NotallyX quyền gửi thông báo. Nó sẽ cho phép hiển thị tiến trình nếu các thao tác xóa hình ảnh hoặc nhập bản sao lưu mất nhiều thời gian</string>
+  <string name="rate">Đánh giá app</string>
+  <string name="restore">Khôi phục</string>
+  <string name="save">Lưu</string>
+  <string name="save_to_device">Lưu vào thiết bị</string>
+  <string name="saved_to_device">Đã lưu vào thiết bị</string>
+  <string name="saved_to_notally">Đã lưu trong NotallyX</string>
+  <string name="search">Tìm kiếm</string>
+  <string name="select_note">Chọn ghi chú</string>
+  <string name="send_feedback">Gửi phản hồi</string>
+  <string name="settings">Cài đặt</string>
+  <string name="share">Chia sẻ</string>
+  <string name="single_note_or_list">Ghi chú hoặc liệt kê</string>
+  <string name="small">Nhỏ</string>
+  <string name="something_went_wrong">Có lỗi xảy ra. Vui lòng thử lại.</string>
+  <string name="strikethrough">Gạch giữa</string>
+  <string name="take_note">Ghi chú</string>
+  <string name="tap_to_set_up">Thiết lập</string>
+  <string name="text_size">Cỡ chữ</string>
+  <string name="theme">Chủ đề</string>
+  <string name="title">Tựa đề</string>
+  <string name="unarchive">Bỏ lưu trữ</string>
+  <string name="unknown_error">Không rõ lỗi</string>
+  <string name="unknown_name">Không rõ tên</string>
+  <string name="unpin">Bỏ ghim</string>
+  <string name="view">Kiểu xem</string>
+  <string name="view_file">Xem tập tin</string>
+  <string name="view_note">Xem ghi chú…</string>
+  <string name="your_notes_associated">Những ghi chú có sử dụng nhãn này sẽ không bị xóa.</string>
 </resources>

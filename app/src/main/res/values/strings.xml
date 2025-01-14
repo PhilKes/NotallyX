@@ -1,322 +1,269 @@
+<?xml version="1.0" ?>
 <resources>
-    <string name="app_name" translatable="false">NotallyX</string>
-
-    <!-- Fragment Titles -->
-    <string name="notes">Notes</string>
-    <string name="labels">Labels</string>
-    <string name="more">%d more</string>
-    <string name="deleted">Deleted</string>
-    <string name="archived">Archived</string>
-    <string name="settings">Settings</string>
-
-    <!-- Menu Options -->
-    <string name="share">Share</string>
-    <string name="filter">Filter</string>
-    <string name="search">Search</string>
-    <string name="delete">Delete</string>
-    <string name="restore">Restore</string>
-    <string name="archive">Archive</string>
-    <string name="unarchive">Unarchive</string>
-    <string name="add_images">Add images</string>
-    <string name="attach_file">Attach file</string>
-    <string name="delete_all">Delete all</string>
-    <string name="record_audio">Record audio</string>
-    <string name="change_color">Change color</string>
-    <string name="delete_forever">Delete forever</string>
-    <string name="delete_checked_items">Delete checked items</string>
-    <string name="check_all_items">Check all items</string>
-    <string name="uncheck_all_items">Uncheck all items</string>
-    <string name="redo">Redo</string>
-    <string name="undo">Undo</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
-    <string name="select_all">Select All</string>
-
-    <!-- Pinning -->
-    <string name="pin">Pin</string>
-    <string name="unpin">Unpin</string>
-    <string name="pinned">Pinned</string>
-    <string name="others">Others</string>
-
-    <!-- Chooser dialog hints -->
-    <string name="view_note">View note</string>
-
-    <!-- Dialogs -->
-    <string name="save">Save</string>
-    <string name="edit">Edit</string>
-    <string name="copy">Copy</string>
-    <string name="cancel">Cancel</string>
-    <string name="clear">Clear</string>
-    <string name="continue_">Continue</string>
-    <string name="open_link">Open link</string>
-    <string name="open_note">Open Note</string>
-    <string name="display_text">Text to display</string>
-    <string name="make_list">Make list</string>
-    <string name="take_note">Take note</string>
-    <string name="add_label">Add label</string>
-    <string name="export">Export</string>
-    <string name="view_file">View file</string>
-    <string name="save_to_device">Save to device</string>
-    <string name="edit_label">Edit label</string>
-    <string name="label_exists">Label exists</string>
-    <string name="delete_label">Delete label?</string>
-    <string name="create_new">No labels yet. Create one?</string>
-    <string name="delete_all_notes">Delete all notes?</string>
-    <string name="delete_selected_notes">Delete selected notes?</string>
-    <string name="delete_note_forever">Delete note forever?</string>
-    <string name="your_notes_associated">Your notes attached to this label will not be deleted</string>
-    <string name="biometrics_setup_success">Biometric/PIN lock has been enabled</string>
-    <string name="biometrics_disable_success">Biometric/PIN lock has been disabled</string>
-    <string name="biometrics_failure">Failed to authenticate vai Biometric/PIN</string>
-    <string name="backup_password_hint">By setting this, all future backup ZIPs will be encrypted and password-protected</string>
-    <string name="import_backup_password_hint">If your backup is not password-protected simply press Import, otherwise enter the correct password.</string>
-
-    <!-- Snackbars -->
-    <plurals name="deleted_selected_notes">
-        <item quantity="one">Deleted %d note</item>
-        <item quantity="other">Deleted %d notes</item>
-    </plurals>
-    <plurals name="archived_selected_notes">
-        <item quantity="one">Archived %d note</item>
-        <item quantity="other">Archived %d notes</item>
-    </plurals>
-    <plurals name="unarchived_selected_notes">
-        <item quantity="one">Unarchived %d note</item>
-        <item quantity="other">Unarchived %d notes</item>
-    </plurals>
-    <plurals name="restored_selected_notes">
-        <item quantity="one">Restored %d note</item>
-        <item quantity="other">Restored %d notes</item>
-    </plurals>
-
-
-    <!-- Lists and Notes -->
-    <string name="note">Note</string>
-    <string name="item">Item</string>
-    <string name="date">Date</string>
-    <string name="title">Title</string>
-    <string name="add_item">Add Item</string>
-    <string name="audio_recordings">Audio Recordings</string>
-    <string name="drag_handle">Drag Handle</string>
-    <string name="bold">Bold</string>
-    <string name="link">Link</string>
-    <string name="link_note">Link Note</string>
-    <string name="change_note">Change Note</string>
-    <string name="remove_link">Remove Link</string>
-    <string name="italic">Italic</string>
-    <string name="strikethrough">Strikethrough</string>
-    <string name="clear_formatting">Clear formatting</string>
-    <string name="monospace">Monospace</string>
-
-    <!-- Miscellaneous -->
-    <string name="saved_to_device">Saved to device</string>
-    <string name="saved_to_notally">Saved to NotallyX</string>
-    <string name="empty_note">Empty note</string>
-    <string name="empty_list">Empty list</string>
-    <string name="select_labels">Select labels</string>
-    <string name="label_visibility">Hide/Show the label in the navigation panel</string>
-
-    <!-- Messages -->
-    <string name="cant_open_link">Can’t open link</string>
-    <string name="invalid_link">Copy a valid link into your clipboard</string>
-    <string name="updated_link">Updated Link</string>
-    <string name="copied_link">Copied Link to Clipboard</string>
-    <string name="edit_link">Edit Link</string>
-    <string name="something_went_wrong">Something went wrong. Please try again.</string>
-    <string name="install_an_email">Install an email app to send feedback</string>
-    <string name="install_a_browser">Install a browser to open this link</string>
-    <string name="cant_find_note">Can’t find note. It may have been deleted</string>
-
-    <!-- Settings Page -->
-    <string name="appearance">Appearance</string>
-
-    <string name="view">View</string>
-    <string name="list">List</string>
-    <string name="grid">Grid</string>
-
-    <string name="theme">Theme</string>
-    <string name="dark">Dark</string>
-    <string name="light">Light</string>
-    <string name="follow_system">Follow system</string>
-
-    <string name="date_format">Date format</string>
-    <string name="none">None</string>
-
-    <string name="text_size">Text size</string>
-    <string name="small">Small</string>
-    <string name="medium">Medium</string>
-    <string name="large">Large</string>
-
-    <string name="checked_list_item_sorting">List auto sort</string>
-    <string name="no_auto_sort">Dont autosort</string>
-    <string name="auto_sort_by_checked">Autosort by checked items</string>
-
-    <string name="notes_sorted_by">Notes sorted by</string>
-    <string name="creation_date">Created</string>
-    <string name="modified_date">Modified</string>
-    <string name="ascending">Ascending</string>
-    <string name="descending">Descending</string>
-    <string name="sort_direction">Sort Direction</string>
-
-
-    <string name="content_density">Content density</string>
-    <string name="max_items_to_display">Max items to display in list</string>
-    <string name="max_lines_to_display">Max lines to display in note</string>
-    <string name="max_lines_to_display_title">Max lines to display in title</string>
-    <string name="max_labels_to_display">Max labels to display in Navigation</string>
-    <string name="labels_hidden_in_overview_title">Hide Labels in Overview</string>
-    <string name="labels_hidden_in_overview">By enabling this, the notes’ labels will be hidden in the overview</string>
-
-
-    <string name="security">Security</string>
-
-    <string name="biometric_lock">Lock app with device biometric or PIN</string>
-    <string name="locked">Locked</string>
-    <string name="enabled">Enabled</string>
-    <string name="disabled">Disabled</string>
-
-    <!-- Backup -->
-    <string name="backup">Backup</string>
-    <string name="auto_backup">Auto backup</string>
-    <string name="backup_password">Backup Password</string>
-    <string name="wrong_password">Wrong password provided</string>
-    <string name="max_backups">Amount of backups to keep</string>
-    <string name="backup_period_days">Auto backup period in days</string>
-    <string name="tap_to_set_up">Tap to set up</string>
-    <string name="notes_will_be">Notes will be backed up to your phone’s internal storage everyday.\n\nThis may not work if you have power saving mode enabled</string>
-    <string name="choose_folder">Choose folder</string>
-    <string name="import_action">Import</string>
-    <string name="disable_auto_backup">Disable auto backup</string>
-    <string name="choose_another_folder">Choose another folder</string>
-    <string name="cant_find_folder">Can’t find folder. It may have been moved or deleted</string>
-    <string name="invalid_backup">Invalid backup</string>
-    <string name="invalid_google_keep">Invalid Google Takeout ZIP File provided</string>
-    <string name="invalid_evernote">Invalid Evernote ENEX File provided</string>
-    <string name="help">Help</string>
-    <string name="google_keep_help">In order to import your Notes from Google Keep you must download your Google Takeout ZIP file. Click Help to get more information.\n\nIf you already have a Takeout ZIP file, click Import and choose the ZIP file.</string>
-    <string name="evernote_help">In order to import your Notes from Evernote you must export your Evernote Notebook as ENEX. Click Help to get more information.\n\nIf you already have a ENEX file, click Import and choose it.</string>
-    <string name="plain_text_files_help">In order to import your Notes from plain text files (single file or folder), click Import. Every file is imported as a separate note, the file’s name becomes the note’s title. If the text contents start with list syntax (e.g. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’) it will be converted to a List note.</string>
-    <plurals name="imported_notes">
-        <item quantity="one">Imported %s Note</item>
-        <item quantity="other">Imported %s Notes</item>
-    </plurals>
-    <string name="exporting_backup">Exporting backup</string>
-    <string name="importing_backup">Importing backup</string>
-    <string name="extracted_files">Files extracted</string>
-    <string name="imported_files">Files imported</string>
-    <string name="imported_notes">Notes imported</string>
-    <string name="calculating">Calculating…</string>
-    <string name="clear_data_message">All Notes, Images, Files, Audios will be permanently deleted</string>
-    <string name="import_settings_message">In order to import settings, please choose a valid NotallyX settings JSON file</string>
-    <string name="export_settings_message">All Settings will be exported to a JSON file, which can be used to re-import stored settings.\n\nBe aware, that this does not include encrypted settings like the auto-backup password or the biometric encryption key</string>
-    <string name="reset_settings_message">All Settings will be reset to their default value</string>
-
-    <string name="google_keep">Google Keep</string>
-    <string name="evernote">Evernote</string>
-    <string name="plain_text_files">Plain Text Files</string>
-    <string name="single_file">Single File</string>
-    <string name="folder">Folder</string>
-
-    <string name="export_backup">Export backup</string>
-    <string name="import_backup">Import backup</string>
-    <string name="clear_data">Clear Data</string>
-    <string name="cleared_data">All Data has been cleared</string>
-    <string name="import_other">Import Notes from other App</string>
-    <string name="import_settings">Import Settings</string>
-    <string name="import_settings_success">Successfully imported settings</string>
-    <string name="import_settings_failure">Failed to import settings, did you choose the correct file?</string>
-    <string name="export_settings">Export Settings</string>
-    <string name="export_settings_success">Successfully exported settings</string>
-    <string name="export_settings_failure">Failed to export settings, did you choose an invalid path?</string>
-    <string name="reset_settings">Reset Settings</string>
-    <string name="reset_settings_success">Successfully reset all settings</string>
-
-    <string name="auto_backup_period">Auto backup period</string>
-    <string name="daily">Daily</string>
-    <string name="weekly">Weekly</string>
-    <string name="monthly">Monthly</string>
-
-    <string name="data_on_external">Store Data on External Storage</string>
-    <string name="external_data_message">By enabling this, the app’s internal database will be moved into the app’s external storage (Android/media/com.philkes.notallyx).\nIn combination with file synchronization apps this can be used to synchronize NotallyX data between multiple devices.</string>
-    <string name="disable_external_data">Move data back to internal storage</string>
-
-    <string name="about">About</string>
-    <string name="libraries">Libraries</string>
-    <string name="choose_other_app">Choose which app to import from</string>
-    <string name="rate">Rate this app</string>
-    <string name="send_feedback">Send Feedback</string>
-    <string name="create_github_issue">Create Github Issue</string>
-    <string name="report_bug">Report an issue/bug</string>
-    <string name="make_feature_request">Make a feature request</string>
-
-    <string name="source_code">Source Code</string>
-
-    <!-- Widget -->
-    <string name="single_note_or_list">Single note or list</string>
-    <string name="select_note">Select note</string>
-
-    <!-- Images -->
-    <string name="count" translatable="false">%1$d / %2$d</string>
-    <string name="adding_images">Adding images</string>
-    <string name="deleting_images">Deleting images</string>
-    <string name="invalid_image">Invalid image</string>
-    <string name="error_while_renaming_image">Error while renaming image</string>
-    <string name="image_format_not_supported">Image format not supported</string>
-    <string name="delete_image_forever">Delete image forever?</string>
-    <string name="cant_load_image">Can’t load image. It may have been moved or deleted</string>
-    <string name="unknown_name">Unknown name</string>
-    <string name="unknown_error">Unknown error</string>
-    <string name="insert_an_sd_card_images">Insert an SD card to add images</string>
-    <string name="insert_an_sd_card_files">Insert an SD card to add files</string>
-    <string name="please_grant_notally_notification">Please grant NotallyX the permission to send notifications. This is used to display the progress if operations like deleting images or importing backups take time</string>
-
-    <plurals name="cant_add_images">
-        <item quantity="one">Can’t add %d image</item>
-        <item quantity="other">Can’t add %d images</item>
-    </plurals>
-
-    <!-- Files -->
-    <string name="adding_files">Adding files</string>
-    <string name="deleting_files">Deleting files</string>
-    <string name="delete_file">Delete file \'%s\'?</string>
-    <string name="error_while_renaming_file">Error while renaming file</string>
-    <string name="cant_load_file">Can’t load file. It may have been moved or deleted</string>
-
-    <plurals name="cant_add_files">
-        <item quantity="one">Can’t add %d file</item>
-        <item quantity="other">Can’t add %d files</item>
-    </plurals>
-
-    <plurals name="more_files">
-        <item quantity="one">…%d more file</item>
-        <item quantity="other">…%d more files</item>
-    </plurals>
-
-    <!-- Audio -->
-    <string name="play">Play</string>
-    <string name="stop">Stop</string>
-    <string name="start">Start</string>
-    <string name="pause">Pause</string>
-    <string name="resume">Resume</string>
-    <string name="paused">Paused</string>
-    <string name="recording">Recording…</string>
-    <string name="ready_to_record">Ready to record</string>
-    <string name="discard">Discard</string>
-    <string name="save_recording">Save recording?</string>
-    <string name="delete_audio_recording_forever">Delete audio recording forever?</string>
-    <string name="tap_for_more_options">Tap for more options</string>
-    <string name="to_record_audio">To record audio, allow NotallyX access to your microphone. Tap Settings > Permissions and turn Microphone on</string>
-    <string name="please_grant_notally_audio">Please grant NotallyX the permission to record audio. Recordings never leave your device</string>
-    <string name="insert_an_sd_card_audio">Insert an SD card to record audio</string>
-    <string name="something_went_wrong_audio">Something went wrong. The audio recording may have been moved or deleted.\n\nError : (%1$d, %2$d)</string>
-
-    <!-- Lock -->
-    <string name="enable_lock_title">Enable lock via Biometric/PIN</string>
-    <string name="enable_lock_description">This will also encrypt the database</string>
-    <string name="disable_lock_title">Disable lock via Biometric/PIN</string>
-    <string name="disable_lock_description">This will also decrypt the database</string>
-    <string name="unlock">Unlock via Biometric/PIN</string>
-    <string name="biometrics_no_support">No biometric features available on this device</string>
-    <string name="biometrics_not_setup">Biometrics/PIN are not setup for your device yet</string>
-
+  <string name="about">About</string>
+  <string name="add_images">Add images</string>
+  <string name="add_item">Add Item</string>
+  <string name="add_label">Add label</string>
+  <string name="adding_files">Adding files</string>
+  <string name="adding_images">Adding images</string>
+  <string name="app_name" translatable="false">NotallyX</string>
+  <string name="appearance">Appearance</string>
+  <string name="archive">Archive</string>
+  <string name="archived">Archived</string>
+  <plurals name="archived_selected_notes">
+    <item quantity="one">Archived %d note</item>
+    <item quantity="other">Archived %d notes</item>
+  </plurals>
+  <string name="ascending">Ascending</string>
+  <string name="attach_file">Attach file</string>
+  <string name="audio_recordings">Audio Recordings</string>
+  <string name="auto_backup">Auto backup</string>
+  <string name="auto_backup_period">Auto backup period</string>
+  <string name="auto_sort_by_checked">Autosort by checked items</string>
+  <string name="backup">Backup</string>
+  <string name="backup_password">Backup Password</string>
+  <string name="backup_password_hint">By setting this, all future backup ZIPs will be encrypted and password-protected</string>
+  <string name="backup_period_days">Auto backup period in days</string>
+  <string name="biometric_lock">Lock app with device biometric or PIN</string>
+  <string name="biometrics_disable_success">Biometric/PIN lock has been disabled</string>
+  <string name="biometrics_failure">Failed to authenticate via Biometric/PIN</string>
+  <string name="biometrics_no_support">No biometric features available on this device</string>
+  <string name="biometrics_not_setup">Biometrics/PIN are not setup for your device yet</string>
+  <string name="biometrics_setup_success">Biometric/PIN lock has been enabled</string>
+  <string name="bold">Bold</string>
+  <string name="calculating">Calculating…</string>
+  <string name="cancel">Cancel</string>
+  <plurals name="cant_add_files">
+    <item quantity="one">Can’t add %d file</item>
+    <item quantity="other">Can’t add %d files</item>
+  </plurals>
+  <plurals name="cant_add_images">
+    <item quantity="one">Can’t add %d image</item>
+    <item quantity="other">Can’t add %d images</item>
+  </plurals>
+  <string name="cant_find_folder">Can’t find folder. It may have been moved or deleted</string>
+  <string name="cant_find_note">Can’t find note. It may have been deleted</string>
+  <string name="cant_load_file">Can’t load file. It may have been moved or deleted</string>
+  <string name="cant_load_image">Can’t load image. It may have been moved or deleted</string>
+  <string name="cant_open_link">Can’t open link</string>
+  <string name="change_color">Change color</string>
+  <string name="change_note">Change Note</string>
+  <string name="check_all_items">Check all items</string>
+  <string name="checked_list_item_sorting">List auto sort</string>
+  <string name="choose_another_folder">Choose another folder</string>
+  <string name="choose_folder">Choose folder</string>
+  <string name="choose_other_app">Choose which app to import from</string>
+  <string name="clear">Clear</string>
+  <string name="clear_data">Clear Data</string>
+  <string name="clear_data_message">All Notes, Images, Files, Audios will be permanently deleted</string>
+  <string name="clear_formatting">Clear formatting</string>
+  <string name="cleared_data">All Data has been cleared</string>
+  <string name="content_density">Content density</string>
+  <string name="continue_">Continue</string>
+  <string name="copied_link">Copied Link to Clipboard</string>
+  <string name="copy">Copy</string>
+  <string name="count" translatable="false">%1$d / %2$d</string>
+  <string name="create_github_issue">Create Github Issue</string>
+  <string name="create_new">No labels yet. Create one?</string>
+  <string name="creation_date">Created</string>
+  <string name="daily">Daily</string>
+  <string name="dark">Dark</string>
+  <string name="data_on_external">Store Data on External Storage</string>
+  <string name="date">Date</string>
+  <string name="date_format">Date format</string>
+  <string name="delete">Delete</string>
+  <string name="delete_all">Delete all</string>
+  <string name="delete_all_notes">Delete all notes?</string>
+  <string name="delete_audio_recording_forever">Delete audio recording forever?</string>
+  <string name="delete_checked_items">Delete checked items</string>
+  <string name="delete_file">Delete file \'%s\'?</string>
+  <string name="delete_forever">Delete forever</string>
+  <string name="delete_image_forever">Delete image forever?</string>
+  <string name="delete_label">Delete label?</string>
+  <string name="delete_note_forever">Delete note forever?</string>
+  <string name="delete_selected_notes">Delete selected notes?</string>
+  <string name="deleted">Deleted</string>
+  <plurals name="deleted_selected_notes">
+    <item quantity="one">Deleted %d note</item>
+    <item quantity="other">Deleted %d notes</item>
+  </plurals>
+  <string name="deleting_files">Deleting files</string>
+  <string name="deleting_images">Deleting images</string>
+  <string name="descending">Descending</string>
+  <string name="disable_auto_backup">Disable auto backup</string>
+  <string name="disable_external_data">Move data back to internal storage</string>
+  <string name="disable_lock_description">This will also decrypt the database</string>
+  <string name="disable_lock_title">Disable lock via Biometric/PIN</string>
+  <string name="disabled">Disabled</string>
+  <string name="discard">Discard</string>
+  <string name="display_text">Text to display</string>
+  <string name="drag_handle">Drag Handle</string>
+  <string name="edit">Edit</string>
+  <string name="edit_label">Edit label</string>
+  <string name="edit_link">Edit Link</string>
+  <string name="empty_list">Empty list</string>
+  <string name="empty_note">Empty note</string>
+  <string name="enable_lock_description">This will also encrypt the database</string>
+  <string name="enable_lock_title">Enable lock via Biometric/PIN</string>
+  <string name="enabled">Enabled</string>
+  <string name="error_while_renaming_file">Error while renaming file</string>
+  <string name="error_while_renaming_image">Error while renaming image</string>
+  <string name="evernote">Evernote</string>
+  <string name="evernote_help">In order to import your Notes from Evernote you must export your Evernote Notebook as ENEX. Click Help to get more information.\n\nIf you already have a ENEX file, click Import and choose it.</string>
+  <string name="export">Export</string>
+  <string name="export_backup">Export backup</string>
+  <string name="export_settings">Export Settings</string>
+  <string name="export_settings_failure">Failed to export settings, did you choose an invalid path?</string>
+  <string name="export_settings_message">All Settings will be exported to a JSON file, which can be used to re-import stored settings.\n\nBe aware, that this does not include encrypted settings like the auto-backup password or the biometric encryption key</string>
+  <string name="export_settings_success">Successfully exported settings</string>
+  <string name="exporting_backup">Exporting backup</string>
+  <string name="external_data_message">By enabling this, the app’s internal database will be moved into the app’s external storage (Android/media/com.philkes.notallyx).\nIn combination with file synchronization apps this can be used to synchronize NotallyX data between multiple devices.</string>
+  <string name="extracted_files">Files extracted</string>
+  <string name="filter">Filter</string>
+  <string name="folder">Folder</string>
+  <string name="follow_system">Follow system</string>
+  <string name="google_keep">Google Keep</string>
+  <string name="google_keep_help">In order to import your Notes from Google Keep you must download your Google Takeout ZIP file. Click Help to get more information.\n\nIf you already have a Takeout ZIP file, click Import and choose the ZIP file.</string>
+  <string name="grid">Grid</string>
+  <string name="help">Help</string>
+  <string name="image_format_not_supported">Image format not supported</string>
+  <string name="import_action">Import</string>
+  <string name="import_backup">Import backup</string>
+  <string name="import_backup_password_hint">If your backup is not password-protected simply press Import, otherwise enter the correct password.</string>
+  <string name="import_other">Import Notes from other App</string>
+  <string name="import_settings">Import Settings</string>
+  <string name="import_settings_failure">Failed to import settings, did you choose the correct file?</string>
+  <string name="import_settings_message">In order to import settings, please choose a valid NotallyX settings JSON file</string>
+  <string name="import_settings_success">Successfully imported settings</string>
+  <string name="imported_files">Files imported</string>
+  <string name="imported_notes">Notes imported</string>
+  <plurals name="imported_notes">
+    <item quantity="one">Imported %s Note</item>
+    <item quantity="other">Imported %s Notes</item>
+  </plurals>
+  <string name="importing_backup">Importing backup</string>
+  <string name="insert_an_sd_card_audio">Insert an SD card to record audio</string>
+  <string name="insert_an_sd_card_files">Insert an SD card to add files</string>
+  <string name="insert_an_sd_card_images">Insert an SD card to add images</string>
+  <string name="install_a_browser">Install a browser to open this link</string>
+  <string name="install_an_email">Install an email app to send feedback</string>
+  <string name="invalid_backup">Invalid backup</string>
+  <string name="invalid_evernote">Invalid Evernote ENEX File provided</string>
+  <string name="invalid_google_keep">Invalid Google Takeout ZIP File provided</string>
+  <string name="invalid_image">Invalid image</string>
+  <string name="invalid_link">Copy a valid link into your clipboard</string>
+  <string name="italic">Italic</string>
+  <string name="item">Item</string>
+  <string name="label_exists">Label exists</string>
+  <string name="label_visibility">Hide/Show the label in the navigation panel</string>
+  <string name="labels">Labels</string>
+  <string name="labels_hidden_in_overview">By enabling this, the notes’ labels will be hidden in the overview</string>
+  <string name="labels_hidden_in_overview_title">Hide Labels in Overview</string>
+  <string name="large">Large</string>
+  <string name="libraries">Libraries</string>
+  <string name="light">Light</string>
+  <string name="link">Link</string>
+  <string name="link_note">Link Note</string>
+  <string name="list">List</string>
+  <string name="locked">Locked</string>
+  <string name="make_feature_request">Make a feature request</string>
+  <string name="make_list">Make list</string>
+  <string name="max_backups">Amount of backups to keep</string>
+  <string name="max_items_to_display">Max items to display in list</string>
+  <string name="max_labels_to_display">Max labels to display in Navigation</string>
+  <string name="max_lines_to_display">Max lines to display in note</string>
+  <string name="max_lines_to_display_title">Max lines to display in title</string>
+  <string name="medium">Medium</string>
+  <string name="modified_date">Modified</string>
+  <string name="monospace">Monospace</string>
+  <string name="monthly">Monthly</string>
+  <string name="more">%d more</string>
+  <plurals name="more_files">
+    <item quantity="one">…%d more file</item>
+    <item quantity="other">…%d more files</item>
+  </plurals>
+  <string name="next">Next</string>
+  <string name="no_auto_sort">Dont autosort</string>
+  <string name="none">None</string>
+  <string name="note">Note</string>
+  <string name="notes">Notes</string>
+  <string name="notes_sorted_by">Notes sorted by</string>
+  <string name="notes_will_be">Notes will be backed up to your phone’s internal storage everyday.\n\nThis may not work if you have power saving mode enabled</string>
+  <string name="open_link">Open link</string>
+  <string name="open_note">Open Note</string>
+  <string name="others">Others</string>
+  <string name="pause">Pause</string>
+  <string name="paused">Paused</string>
+  <string name="pin">Pin</string>
+  <string name="pinned">Pinned</string>
+  <string name="plain_text_files">Plain Text Files</string>
+  <string name="plain_text_files_help">In order to import your Notes from plain text files (single file or folder), click Import. Every file is imported as a separate note, the file’s name becomes the note’s title. If the text contents start with list syntax (e.g. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’) it will be converted to a List note.</string>
+  <string name="play">Play</string>
+  <string name="please_grant_notally_audio">Please grant NotallyX the permission to record audio. Recordings never leave your device</string>
+  <string name="please_grant_notally_notification">Please grant NotallyX the permission to send notifications. This is used to display the progress if operations like deleting images or importing backups take time</string>
+  <string name="previous">Previous</string>
+  <string name="rate">Rate this app</string>
+  <string name="ready_to_record">Ready to record</string>
+  <string name="record_audio">Record audio</string>
+  <string name="recording">Recording…</string>
+  <string name="redo">Redo</string>
+  <string name="remove_link">Remove Link</string>
+  <string name="report_bug">Report an issue/bug</string>
+  <string name="reset_settings">Reset Settings</string>
+  <string name="reset_settings_message">All Settings will be reset to their default value</string>
+  <string name="reset_settings_success">Successfully reset all settings</string>
+  <string name="restore">Restore</string>
+  <plurals name="restored_selected_notes">
+    <item quantity="one">Restored %d note</item>
+    <item quantity="other">Restored %d notes</item>
+  </plurals>
+  <string name="resume">Resume</string>
+  <string name="save">Save</string>
+  <string name="save_recording">Save recording?</string>
+  <string name="save_to_device">Save to device</string>
+  <string name="saved_to_device">Saved to device</string>
+  <string name="saved_to_notally">Saved to NotallyX</string>
+  <string name="search">Search</string>
+  <string name="security">Security</string>
+  <string name="select_all">Select All</string>
+  <string name="select_labels">Select labels</string>
+  <string name="select_note">Select note</string>
+  <string name="send_feedback">Send Feedback</string>
+  <string name="settings">Settings</string>
+  <string name="share">Share</string>
+  <string name="single_file">Single File</string>
+  <string name="single_note_or_list">Single note or list</string>
+  <string name="small">Small</string>
+  <string name="something_went_wrong">Something went wrong. Please try again.</string>
+  <string name="something_went_wrong_audio">Something went wrong. The audio recording may have been moved or deleted.\n\nError : (%1$d, %2$d)</string>
+  <string name="sort_direction">Sort Direction</string>
+  <string name="source_code">Source Code</string>
+  <string name="start">Start</string>
+  <string name="stop">Stop</string>
+  <string name="strikethrough">Strikethrough</string>
+  <string name="take_note">Take note</string>
+  <string name="tap_for_more_options">Tap for more options</string>
+  <string name="tap_to_set_up">Tap to set up</string>
+  <string name="text_size">Text size</string>
+  <string name="theme">Theme</string>
+  <string name="title">Title</string>
+  <string name="to_record_audio">To record audio, allow NotallyX access to your microphone. Tap Settings &gt; Permissions and turn Microphone on</string>
+  <string name="unarchive">Unarchive</string>
+  <plurals name="unarchived_selected_notes">
+    <item quantity="one">Unarchived %d note</item>
+    <item quantity="other">Unarchived %d notes</item>
+  </plurals>
+  <string name="uncheck_all_items">Uncheck all items</string>
+  <string name="undo">Undo</string>
+  <string name="unknown_error">Unknown error</string>
+  <string name="unknown_name">Unknown name</string>
+  <string name="unlock">Unlock via Biometric/PIN</string>
+  <string name="unpin">Unpin</string>
+  <string name="updated_link">Updated Link</string>
+  <string name="view">View</string>
+  <string name="view_file">View file</string>
+  <string name="view_note">View note</string>
+  <string name="weekly">Weekly</string>
+  <string name="wrong_password">Wrong password provided</string>
+  <string name="your_notes_associated">Your notes attached to this label will not be deleted</string>
 </resources>
