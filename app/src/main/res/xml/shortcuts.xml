@@ -2,7 +2,7 @@
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
 
     <shortcut
-        android:icon="@drawable/take_note"
+        android:icon="@drawable/edit"
         android:shortcutId="takeNote"
         android:shortcutShortLabel="@string/take_note">
 
@@ -14,7 +14,7 @@
     </shortcut>
 
     <shortcut
-        android:icon="@drawable/make_list"
+        android:icon="@drawable/checkbox"
         android:shortcutId="makeList"
         android:shortcutShortLabel="@string/make_list">
 
