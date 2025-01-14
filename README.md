@@ -46,34 +46,37 @@
 
 ---
 
-### Translations
-All translations are crowd sourced.
-To contribute:
-1. Download [translations.xlsx](./translations/translations.xlsx)
-2. Open in Excel and add missing translations
-    Notes:
-        - Missing translations are marked in red
-        - Non-Translatable strings are marked in gray, do not add translations for them
-3. Open a [Update Translations Issue](https://github.com/PhilKes/NotallyX/issues/new?template=translation.md)
-4. I will create a Pull-Request to add you updated translations
-
-#### Python Helper
-
-To generate an up-to-date Excel file:
-```shell
- python -m pip install -r ./translations/requirements.txt
- python ./translations/string_export.py ./app/src/main/res/ ./translations/translations.xlsx
-```
-
-To import `strings.xml` for all languages from Excel file:
-```shell
- python ./translations/string_export.py ./app/src/main/res/ ./translations/translations.xlsx
-```
-
 ### Bug Reports / Feature-Requests
 If you find any bugs or want to propose a new Feature/Enhancement, feel free to [create a new Issue](https://github.com/PhilKes/NotallyX/issues/new/choose)
 
 When using the app and an unknown error occurs, causing the app to crash you will see a dialog (see showcase video in https://github.com/PhilKes/NotallyX/pull/171) from which you can immediately create a bug report on Github with the crash details pre-filled.
+
+### Translations
+All translations are crowd sourced.
+To contribute:
+1. Download current [translations.xlsx](./translations/translations.xlsx)
+2. Open in Excel and add missing translations
+   Notes:
+   - Missing translations are marked in red
+   - Non-Translatable strings are hidden and marked in gray, do not add translations for them
+   - For plurals, some languages need/have more quantity strings than others, if a quantity string in the default language (english) is not needed the row is highlighted in yellow. If your language does not need that quantity string either, ignore them.
+3. Open a [Update Translations Issue](https://github.com/PhilKes/NotallyX/issues/new?template=translation.md)
+4. I will create a Pull-Request to add your updated translations
+
+#### Android Excel Converter]
+
+See [AndroidExcelConverter](https://github.com/PhilKes/AndroidExcelConverter)
+
+To generate an up-to-date Excel file:
+```shell
+python -m pip install -r ./translations/requirements.txt
+python ./translations/export.py ./app/src/main/res/ ./translations/translations.xlsx
+```
+
+To import `strings.xml` for all languages from Excel file:
+```shell
+python ./translations/import.py ./translations/translations.xlsx ./app/src/main/res/
+```
 
 ### Contributing
 

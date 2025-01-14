@@ -7,4 +7,4 @@ assignees: ''
 
 ---
 
-Drag'n'drop your updated translations.xlsx file here
+Drag'n'drop your updated translations.xlsx file here 🙂
