@@ -47,7 +47,28 @@
 ---
 
 ### Translations
-All translations are crowd sourced. To contribute, follow these [guidelines](https://m2.material.io/design/communication/writing.html) and open a pull request.
+All translations are crowd sourced.
+To contribute:
+1. Download [translations.xlsx](./translations/translations.xlsx)
+2. Open in Excel and add missing translations
+    Notes:
+        - Missing translations are marked in red
+        - Non-Translatable strings are marked in gray, do not add translations for them
+3. Open a [Update Translations Issue](https://github.com/PhilKes/NotallyX/issues/new?template=translation.md)
+4. I will create a Pull-Request to add you updated translations
+
+#### Python Helper
+
+To generate an up-to-date Excel file:
+```shell
+ python -m pip install -r ./translations/requirements.txt
+ python ./translations/string_export.py ./app/src/main/res/ ./translations/translations.xlsx
+```
+
+To import `strings.xml` for all languages from Excel file:
+```shell
+ python ./translations/string_export.py ./app/src/main/res/ ./translations/translations.xlsx
+```
 
 ### Bug Reports / Feature-Requests
 If you find any bugs or want to propose a new Feature/Enhancement, feel free to [create a new Issue](https://github.com/PhilKes/NotallyX/issues/new/choose)

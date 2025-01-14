@@ -1,88 +1,68 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" ?>
 <resources>
-    <!-- Fragment Titles -->
-    <string name="notes">Jegyzetek</string>
-    <string name="labels">Címkék</string>
-    <string name="deleted">Kuka</string>
-    <string name="archived">Archivált</string>
-    <string name="settings">Beállítások</string>
-
-    <!-- Menu Options -->
-    <string name="share">Megosztás</string>
-    <string name="search">Keresés</string>
-    <string name="delete">Törlés</string>
-    <string name="restore">Visszaállítás</string>
-    <string name="archive">Archiválás</string>
-    <string name="unarchive">Archiválás visszavonása</string>
-    <string name="delete_all">Törli mind?</string>
-    <string name="delete_forever">Végleges törlés</string>
-
-    <!-- Pinning -->
-    <string name="pin">Rögzítés</string>
-    <string name="unpin">Feloldás</string>
-    <string name="pinned">Kitűzve</string>
-
-    <!-- Chooser dialog hints -->
-    <string name="view_note">Megtekintés…</string>
-
-    <!-- Dialogs -->
-    <string name="save">Mentés</string>
-    <string name="edit">Szerkesztés</string>
-    <string name="cancel">Mégse</string>
-    <string name="make_list">Lista</string>
-    <string name="take_note">Feljegyzés</string>
-    <string name="add_label">Címke létrehozása</string>
-    <string name="export">Exportálás</string>
-    <string name="save_to_device">Mentés az eszközre</string>
-    <string name="edit_label">Címke szerkesztése</string>
-    <string name="label_exists">A címke már létezik</string>
-    <string name="delete_label">Törölni szeretnéd a címkét?</string>
-    <string name="create_new">Nincsenek címkék. Szeretnél készíteni egyet?</string>
-    <string name="delete_all_notes">Törli az összes jegyzetet?</string>
-    <string name="delete_note_forever">Véglegesen törölni szeretné a jegyzetet?</string>
-    <string name="your_notes_associated">A jegyzetek ezzel a címkével nem kerülnek törlésre</string>
-
-    <!-- Lists and Notes -->
-    <string name="note">Jegyzet</string>
-    <string name="item">Elem</string>
-    <string name="date">Dátum</string>
-    <string name="title">Cím</string>
-    <string name="add_item">Elem hozzáadása</string>
-    <string name="drag_handle">Megfogó nyél</string>
-    <string name="bold">Félkövér</string>
-    <string name="link">Hivatkozás</string>
-    <string name="italic">Dőlt</string>
-    <string name="strikethrough">Áthúzás</string>
-    <string name="clear_formatting">Formázás törlése</string>
-    <string name="monospace">Állandó szélességű</string>
-
-    <!-- Miscellaneous -->
-    <string name="saved_to_device">Elmentve az eszközre</string>
-    <string name="saved_to_notally">Elmentve a NotallyX -ban</string>
-    <string name="empty_note">Üres jegyzet</string>
-    <string name="empty_list">Üres lista</string>
-    <string name="cant_open_link">A hivatkozás nem nyitható meg</string>
-    <string name="something_went_wrong">Valami elromlott. Kérlek próbáld újra</string>
-
-    <!-- Settings Page -->
-    <string name="appearance">Megjelenés</string>
-
-    <string name="view">Nézet</string>
-    <string name="list">Lista</string>
-    <string name="grid">Rács</string>
-
-    <string name="theme">Téma</string>
-    <string name="dark">Sötét</string>
-    <string name="light">Világos</string>
-    <string name="follow_system">Rendszer követése</string>
-
-    <string name="content_density">Tartalom sűrűsége</string>
-    <string name="max_items_to_display">Elemek száma egy listában</string>
-    <string name="max_lines_to_display">Sorok száma egy jegyzetben</string>
-
-    <string name="backup">Biztonsági mentés</string>
-
-    <string name="about">Névjegy</string>
-    <string name="libraries">Könyvtárak</string>
-    <string name="rate">Értékeld ezt az alkalmazást</string>
+  <string name="about">Névjegy</string>
+  <string name="add_item">Elem hozzáadása</string>
+  <string name="add_label">Címke létrehozása</string>
+  <string name="appearance">Megjelenés</string>
+  <string name="archive">Archiválás</string>
+  <string name="archived">Archivált</string>
+  <string name="backup">Biztonsági mentés</string>
+  <string name="bold">Félkövér</string>
+  <string name="cancel">Mégse</string>
+  <string name="cant_open_link">A hivatkozás nem nyitható meg</string>
+  <string name="clear_formatting">Formázás törlése</string>
+  <string name="content_density">Tartalom sűrűsége</string>
+  <string name="create_new">Nincsenek címkék. Szeretnél készíteni egyet?</string>
+  <string name="dark">Sötét</string>
+  <string name="date">Dátum</string>
+  <string name="delete">Törlés</string>
+  <string name="delete_all">Törli mind?</string>
+  <string name="delete_all_notes">Törli az összes jegyzetet?</string>
+  <string name="delete_forever">Végleges törlés</string>
+  <string name="delete_label">Törölni szeretnéd a címkét?</string>
+  <string name="delete_note_forever">Véglegesen törölni szeretné a jegyzetet?</string>
+  <string name="deleted">Kuka</string>
+  <string name="drag_handle">Megfogó nyél</string>
+  <string name="edit">Szerkesztés</string>
+  <string name="edit_label">Címke szerkesztése</string>
+  <string name="empty_list">Üres lista</string>
+  <string name="empty_note">Üres jegyzet</string>
+  <string name="export">Exportálás</string>
+  <string name="follow_system">Rendszer követése</string>
+  <string name="grid">Rács</string>
+  <string name="italic">Dőlt</string>
+  <string name="item">Elem</string>
+  <string name="label_exists">A címke már létezik</string>
+  <string name="labels">Címkék</string>
+  <string name="libraries">Könyvtárak</string>
+  <string name="light">Világos</string>
+  <string name="link">Hivatkozás</string>
+  <string name="list">Lista</string>
+  <string name="make_list">Lista</string>
+  <string name="max_items_to_display">Elemek száma egy listában</string>
+  <string name="max_lines_to_display">Sorok száma egy jegyzetben</string>
+  <string name="monospace">Állandó szélességű</string>
+  <string name="note">Jegyzet</string>
+  <string name="notes">Jegyzetek</string>
+  <string name="pin">Rögzítés</string>
+  <string name="pinned">Kitűzve</string>
+  <string name="rate">Értékeld ezt az alkalmazást</string>
+  <string name="restore">Visszaállítás</string>
+  <string name="save">Mentés</string>
+  <string name="save_to_device">Mentés az eszközre</string>
+  <string name="saved_to_device">Elmentve az eszközre</string>
+  <string name="saved_to_notally">Elmentve a NotallyX -ban</string>
+  <string name="search">Keresés</string>
+  <string name="settings">Beállítások</string>
+  <string name="share">Megosztás</string>
+  <string name="something_went_wrong">Valami elromlott. Kérlek próbáld újra</string>
+  <string name="strikethrough">Áthúzás</string>
+  <string name="take_note">Feljegyzés</string>
+  <string name="theme">Téma</string>
+  <string name="title">Cím</string>
+  <string name="unarchive">Archiválás visszavonása</string>
+  <string name="unpin">Feloldás</string>
+  <string name="view">Nézet</string>
+  <string name="view_note">Megtekintés…</string>
+  <string name="your_notes_associated">A jegyzetek ezzel a címkével nem kerülnek törlésre</string>
 </resources>
