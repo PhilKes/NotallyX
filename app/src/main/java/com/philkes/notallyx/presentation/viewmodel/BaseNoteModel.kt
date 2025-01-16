@@ -1,6 +1,7 @@
 package com.philkes.notallyx.presentation.viewmodel
 
 import android.app.Application
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
@@ -187,7 +188,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             withContext(Dispatchers.IO) {
                 val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
                 database.checkpoint()
-                NotallyDatabase.getCurrentDatabaseFile(app)
+                NotallyDatabase.getInternalDatabaseFile(app)
                     .copyTo(NotallyDatabase.getExternalDatabaseFile(app), overwrite = true)
             }
             savePreference(preferences.dataOnExternalStorage, true)
@@ -199,7 +200,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             withContext(Dispatchers.IO) {
                 val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
                 database.checkpoint()
-                NotallyDatabase.getCurrentDatabaseFile(app)
+                NotallyDatabase.getExternalDatabaseFile(app)
                     .copyTo(NotallyDatabase.getInternalDatabaseFile(app), overwrite = true)
                 NotallyDatabase.getExternalDatabaseFiles(app).forEach {
                     if (it.exists()) {
@@ -462,6 +463,30 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     private fun executeAsync(function: suspend () -> Unit) {
         viewModelScope.launch(Dispatchers.IO) { function() }
+    }
+
+    fun resetPreferences() {
+        preferences.reset()
+        refreshDataOnExternalStorage()
+    }
+
+    fun importPreferences(context: Context, uri: Uri): Boolean {
+        val success = preferences.import(context, uri)
+        refreshDataOnExternalStorage()
+        return success
+    }
+
+    private fun refreshDataOnExternalStorage() {
+        val dataOnExternalStorageBefore = preferences.dataOnExternalStorage.value
+        val dataOnExternalStorageAfter = preferences.dataOnExternalStorage.getFreshValue()
+        if (dataOnExternalStorageBefore != dataOnExternalStorageAfter) {
+            if (dataOnExternalStorageAfter) {
+                enableExternalData()
+            } else {
+                disableExternalData()
+            }
+        }
+        preferences.dataOnExternalStorage.refresh()
     }
 
     companion object {

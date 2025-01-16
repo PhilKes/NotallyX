@@ -88,6 +88,8 @@ abstract class BasePreference<T>(
         cachedValue = null
         getData().postValue(value)
     }
+
+    fun getFreshValue() = getValue(sharedPreferences)
 }
 
 fun <T> BasePreference<T>.observeForeverSkipFirst(observer: Observer<T>) {
