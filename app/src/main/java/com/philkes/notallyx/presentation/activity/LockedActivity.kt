@@ -3,19 +3,27 @@ package com.philkes.notallyx.presentation.activity
 import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Intent
+import android.hardware.biometrics.BiometricPrompt.BIOMETRIC_ERROR_HW_NOT_PRESENT
+import android.hardware.biometrics.BiometricPrompt.BIOMETRIC_ERROR_NO_BIOMETRICS
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.viewbinding.ViewBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
+import com.philkes.notallyx.presentation.showToast
+import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.utils.security.disableBiometricLock
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 
 abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
@@ -26,6 +34,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
     protected lateinit var binding: T
     protected lateinit var preferences: NotallyXPreferences
+    protected val baseModel: BaseNoteModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,8 +77,41 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
             biometricAuthenticationActivityResultLauncher,
             R.string.unlock,
             onSuccess = { unlock() },
-        ) {
-            finish()
+        ) { errorCode ->
+            when (errorCode) {
+                BIOMETRIC_ERROR_NO_BIOMETRICS -> {
+                    MaterialAlertDialogBuilder(this)
+                        .setMessage(R.string.unlock_with_biometrics_not_setup)
+                        .setPositiveButton(R.string.disable) { _, _ ->
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                disableBiometricLock(baseModel)
+                            }
+                            show()
+                        }
+                        .setNegativeButton(R.string.tap_to_set_up) { _, _ ->
+                            val intent =
+                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                                    Intent(Settings.ACTION_BIOMETRIC_ENROLL)
+                                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                    Intent(Settings.ACTION_FINGERPRINT_ENROLL)
+                                } else {
+                                    Intent(Settings.ACTION_SECURITY_SETTINGS)
+                                }
+                            startActivity(intent)
+                        }
+                        .show()
+                }
+
+                BIOMETRIC_ERROR_HW_NOT_PRESENT -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                        disableBiometricLock(baseModel)
+                        showToast(R.string.biometrics_disable_success)
+                    }
+                    show()
+                }
+
+                else -> finish()
+            }
         }
     }
 

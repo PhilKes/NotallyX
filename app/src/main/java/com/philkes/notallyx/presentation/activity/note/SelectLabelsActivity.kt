@@ -64,7 +64,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
                 val value = binding.EditText.text.toString().trim()
                 if (value.isNotEmpty()) {
                     val label = Label(value)
-                    model.insertLabel(label) { success ->
+                    baseModel.insertLabel(label) { success ->
                         if (success) {
                             dialog.dismiss()
                         } else showToast(R.string.label_exists)
@@ -95,7 +95,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
             )
         }
 
-        model.labels.observe(this) { labels ->
+        baseModel.labels.observe(this) { labels ->
             labelAdapter.submitList(labels)
             if (labels.isEmpty()) {
                 binding.EmptyState.visibility = View.VISIBLE

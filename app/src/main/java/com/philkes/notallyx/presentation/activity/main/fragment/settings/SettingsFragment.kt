@@ -42,7 +42,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.Operations.catchNoBrowserInstalled
 import com.philkes.notallyx.utils.Operations.reportBug
-import com.philkes.notallyx.utils.security.decryptDatabase
+import com.philkes.notallyx.utils.security.disableBiometricLock
 import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 import com.philkes.notallyx.utils.wrapWithChooser
@@ -618,6 +618,10 @@ class SettingsFragment : Fragment() {
                     model.savePreference(model.preferences.iv, cipher.iv)
                     val passphrase = model.preferences.databaseEncryptionKey.init(cipher)
                     encryptDatabase(requireContext(), passphrase)
+                    model.savePreference(
+                        model.preferences.fallbackDatabaseEncryptionKey,
+                        passphrase,
+                    )
                     model.savePreference(model.preferences.biometricLock, BiometricLock.ENABLED)
                 }
                 val app = (activity?.application as NotallyXApplication)
@@ -638,11 +642,7 @@ class SettingsFragment : Fragment() {
             model.preferences.iv.value!!,
             onSuccess = { cipher ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    val encryptedPassphrase = model.preferences.databaseEncryptionKey.value
-                    val passphrase = cipher.doFinal(encryptedPassphrase)
-                    model.closeDatabase()
-                    decryptDatabase(requireContext(), passphrase)
-                    model.savePreference(model.preferences.biometricLock, BiometricLock.DISABLED)
+                    requireContext().disableBiometricLock(model, cipher)
                 }
                 showToast(R.string.biometrics_disable_success)
             },

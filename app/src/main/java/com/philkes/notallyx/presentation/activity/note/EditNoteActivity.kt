@@ -68,7 +68,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
         setupEditor()
 
-        if (model.isNewNote) {
+        if (notallyModel.isNewNote) {
             binding.EnterBody.requestFocus()
         }
     }
@@ -120,7 +120,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
             return 0
         }
         searchResultIndices =
-            model.body.toString().findAllOccurrences(search).onEach { (startIdx, endIdx) ->
+            notallyModel.body.toString().findAllOccurrences(search).onEach { (startIdx, endIdx) ->
                 binding.EnterBody.highlight(startIdx, endIdx, false)
             }
         return searchResultIndices!!.size
@@ -136,8 +136,8 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     override fun setupListeners() {
         super.setupListeners()
         binding.EnterBody.initHistory(changeHistory) { text ->
-            val textChanged = !model.body.toString().contentEquals(text)
-            model.body = text
+            val textChanged = !notallyModel.body.toString().contentEquals(text)
+            notallyModel.body = text
             if (textChanged && searchResultIndices?.isNotEmpty() == true) {
                 val amount = highlightSearchResults(search)
                 setSearchResultsAmount(amount)
@@ -151,7 +151,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     }
 
     private fun updateEditText() {
-        binding.EnterBody.text = model.body
+        binding.EnterBody.text = notallyModel.body
     }
 
     private fun setupEditor() {
@@ -336,7 +336,9 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     fun linkNote(activityResultLauncher: ActivityResultLauncher<Intent>) {
         val intent =
-            Intent(this, PickNoteActivity::class.java).apply { putExtra(EXCLUDE_NOTE_ID, model.id) }
+            Intent(this, PickNoteActivity::class.java).apply {
+                putExtra(EXCLUDE_NOTE_ID, notallyModel.id)
+            }
         activityResultLauncher.launch(intent)
     }
 

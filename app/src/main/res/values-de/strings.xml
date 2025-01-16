@@ -76,6 +76,7 @@
   <string name="deleting_files">Dateien löschen</string>
   <string name="deleting_images">Bilder löschen</string>
   <string name="descending">Absteigend</string>
+  <string name="disable">Deaktivieren</string>
   <string name="disable_auto_backup">Automatisches Backup deaktivieren</string>
   <string name="disable_external_data">Verschiebe die Daten zurück in den internen Speicher</string>
   <string name="disable_lock_description">Dies entschlüsselt außerdem die Datenbank</string>
@@ -222,6 +223,7 @@
   <string name="unknown_error">Unbekannter Fehler</string>
   <string name="unknown_name">Unbekannter Name</string>
   <string name="unlock">Entsperre mittels Biometrie/PIN</string>
+  <string name="unlock_with_biometrics_not_setup">Die biometrische Sperre ist aktiviert, allerdings ist für dein Gerät keine Biometrie/PIN mehr eingerichtet.\n\nUm die biometrische zu deaktivieren klicke Deaktivieren, ansonsten richte für dein Geräte Biometrie/PIN ein</string>
   <string name="unpin">Loslösen</string>
   <string name="updated_link">Link aktualisiert</string>
   <string name="view">Ansicht</string>

@@ -17,7 +17,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.widget.doAfterTextChanged
@@ -77,11 +76,10 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
 
-    private val model: BaseNoteModel by viewModels()
     private val actionModeCancelCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
-                model.actionMode.close(true)
+                baseModel.actionMode.close(true)
             }
         }
 
@@ -159,10 +157,10 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 .setCheckable(true)
                 .setIcon(R.drawable.settings)
         }
-        model.preferences.labelsHiddenInNavigation.observe(this) { hiddenLabels ->
-            hideLabelsInNavigation(hiddenLabels, model.preferences.maxLabels.value)
+        baseModel.preferences.labelsHiddenInNavigation.observe(this) { hiddenLabels ->
+            hideLabelsInNavigation(hiddenLabels, baseModel.preferences.maxLabels.value)
         }
-        model.preferences.maxLabels.observe(this) { maxLabels ->
+        baseModel.preferences.maxLabels.observe(this) { maxLabels ->
             binding.NavigationView.menu.setupLabelsMenuItems(labels, maxLabels)
         }
     }
@@ -201,7 +199,10 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             } else null
         configuration = AppBarConfiguration(binding.NavigationView.menu, binding.DrawerLayout)
         setupActionBarWithNavController(navController, configuration)
-        hideLabelsInNavigation(model.preferences.labelsHiddenInNavigation.value, maxLabelsToDisplay)
+        hideLabelsInNavigation(
+            baseModel.preferences.labelsHiddenInNavigation.value,
+            maxLabelsToDisplay,
+        )
     }
 
     private fun hideLabelsInNavigation(hiddenLabels: Set<String>, maxLabelsToDisplay: Int) {
@@ -218,7 +219,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     }
 
     private fun setupActionMode() {
-        binding.ActionMode.setNavigationOnClickListener { model.actionMode.close(true) }
+        binding.ActionMode.setNavigationOnClickListener { baseModel.actionMode.close(true) }
 
         val transition =
             MaterialFade().apply {
@@ -230,7 +231,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 excludeTarget(binding.NavigationView, true)
             }
 
-        model.actionMode.enabled.observe(this) { enabled ->
+        baseModel.actionMode.enabled.observe(this) { enabled ->
             TransitionManager.beginDelayedTransition(binding.RelativeLayout, transition)
             if (enabled) {
                 binding.Toolbar.visibility = View.GONE
@@ -245,23 +246,23 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
 
         val menu = binding.ActionMode.menu
-        model.folder.observe(this@MainActivity, ModelFolderObserver(menu, model))
+        baseModel.folder.observe(this@MainActivity, ModelFolderObserver(menu, baseModel))
     }
 
     private fun moveNotes(folderTo: Folder) {
-        val folderFrom = model.actionMode.getFirstNote().folder
-        val ids = model.moveBaseNotes(folderTo)
+        val folderFrom = baseModel.actionMode.getFirstNote().folder
+        val ids = baseModel.moveBaseNotes(folderTo)
         Snackbar.make(
                 findViewById(R.id.DrawerLayout),
                 getQuantityString(folderTo.movedToResId(), ids.size),
                 Snackbar.LENGTH_SHORT,
             )
-            .apply { setAction(R.string.undo) { model.moveBaseNotes(ids, folderFrom) } }
+            .apply { setAction(R.string.undo) { baseModel.moveBaseNotes(ids, folderFrom) } }
             .show()
     }
 
     private fun share() {
-        val baseNote = model.actionMode.getFirstNote()
+        val baseNote = baseModel.actionMode.getFirstNote()
         val body =
             when (baseNote.type) {
                 Type.NOTE -> baseNote.body.applySpans(baseNote.spans)
@@ -273,19 +274,19 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private fun deleteForever() {
         MaterialAlertDialogBuilder(this)
             .setMessage(R.string.delete_selected_notes)
-            .setPositiveButton(R.string.delete) { _, _ -> model.deleteSelectedBaseNotes() }
+            .setPositiveButton(R.string.delete) { _, _ -> baseModel.deleteSelectedBaseNotes() }
             .setNegativeButton(R.string.cancel, null)
             .show()
     }
 
     private fun label() {
-        val baseNotes = model.actionMode.selectedNotes.values
+        val baseNotes = baseModel.actionMode.selectedNotes.values
         lifecycleScope.launch {
-            val labels = model.getAllLabels()
+            val labels = baseModel.getAllLabels()
             if (labels.isNotEmpty()) {
                 displaySelectLabelsDialog(labels, baseNotes)
             } else {
-                model.actionMode.close(true)
+                baseModel.actionMode.close(true)
                 navigateWithAnimation(R.id.Labels)
             }
         }
@@ -340,15 +341,15 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                         noteLabels
                     }
                 baseNotes.zip(updatedBaseNotesLabels).forEach { (baseNote, updatedLabels) ->
-                    model.updateBaseNoteLabels(updatedLabels, baseNote.id)
+                    baseModel.updateBaseNoteLabels(updatedLabels, baseNote.id)
                 }
             }
             .show()
     }
 
     private fun exportSelectedNotes(mimeType: ExportMimeType) {
-        if (model.actionMode.count.value == 1) {
-            val baseNote = model.actionMode.getFirstNote()
+        if (baseModel.actionMode.count.value == 1) {
+            val baseNote = baseModel.actionMode.getFirstNote()
             when (mimeType) {
                 ExportMimeType.PDF -> {
                     exportPdfFile(
@@ -392,7 +393,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
                         .apply { addCategory(Intent.CATEGORY_DEFAULT) }
                         .wrapWithChooser(this@MainActivity)
-                model.selectedExportMimeType = mimeType
+                baseModel.selectedExportMimeType = mimeType
                 exportNotesActivityResultLauncher.launch(intent)
             }
         }
@@ -425,7 +426,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension!!)
                 }
                 .wrapWithChooser(this@MainActivity)
-        model.selectedExportFile = file
+        baseModel.selectedExportFile = file
         exportFileActivityResultLauncher.launch(intent)
     }
 
@@ -521,22 +522,26 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     private fun setupSearch() {
         binding.EnterSearchKeyword.apply {
-            setText(model.keyword)
+            setText(baseModel.keyword)
             doAfterTextChanged { text ->
-                model.keyword = requireNotNull(text).trim().toString()
+                baseModel.keyword = requireNotNull(text).trim().toString()
                 if (
-                    model.keyword.isNotEmpty() &&
+                    baseModel.keyword.isNotEmpty() &&
                         navController.currentDestination?.id != R.id.Search
                 ) {
                     val bundle =
-                        Bundle().apply { putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value) }
+                        Bundle().apply {
+                            putSerializable(EXTRA_INITIAL_FOLDER, baseModel.folder.value)
+                        }
                     navController.navigate(R.id.Search, bundle)
                 }
             }
             setOnFocusChangeListener { v, hasFocus ->
                 if (hasFocus && navController.currentDestination?.id != R.id.Search) {
                     val bundle =
-                        Bundle().apply { putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value) }
+                        Bundle().apply {
+                            putSerializable(EXTRA_INITIAL_FOLDER, baseModel.folder.value)
+                        }
                     navController.navigate(R.id.Search, bundle)
                 }
             }
@@ -547,13 +552,13 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         exportFileActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> model.exportSelectedFileToUri(uri) }
+                    result.data?.data?.let { uri -> baseModel.exportSelectedFileToUri(uri) }
                 }
             }
         exportNotesActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> model.exportSelectedNotesToFolder(uri) }
+                    result.data?.data?.let { uri -> baseModel.exportSelectedNotesToFolder(uri) }
                 }
             }
     }

@@ -85,7 +85,7 @@ abstract class EditActivity(private val type: Type) :
     private val searchResultPos = NotNullLiveData(-1)
     private val searchResultsAmount = NotNullLiveData(-1)
 
-    internal val model: NotallyModel by viewModels()
+    internal val notallyModel: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
 
     protected val undos: MutableList<View> = mutableListOf()
@@ -93,9 +93,9 @@ abstract class EditActivity(private val type: Type) :
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
-            if (model.isEmpty()) {
-                model.deleteBaseNote()
-            } else if (model.isModified()) {
+            if (notallyModel.isEmpty()) {
+                notallyModel.deleteBaseNote()
+            } else if (notallyModel.isModified()) {
                 saveNote()
             }
             super.finish()
@@ -104,21 +104,21 @@ abstract class EditActivity(private val type: Type) :
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putLong("id", model.id)
-        if (model.isModified()) {
+        outState.putLong("id", notallyModel.id)
+        if (notallyModel.isModified()) {
             lifecycleScope.launch { saveNote() }
         }
     }
 
     open suspend fun saveNote() {
-        model.modifiedTimestamp = System.currentTimeMillis()
-        model.saveNote()
-        WidgetProvider.sendBroadcast(application, longArrayOf(model.id))
+        notallyModel.modifiedTimestamp = System.currentTimeMillis()
+        notallyModel.saveNote()
+        WidgetProvider.sendBroadcast(application, longArrayOf(notallyModel.id))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        model.type = type
+        notallyModel.type = type
         initialiseBinding()
         setContentView(binding.root)
 
@@ -126,12 +126,14 @@ abstract class EditActivity(private val type: Type) :
             val persistedId = savedInstanceState?.getLong("id")
             val selectedId = intent.getLongExtra(Constants.SelectedBaseNote, 0L)
             val id = persistedId ?: selectedId
-            model.setState(id)
+            notallyModel.setState(id)
 
-            if (model.isNewNote && intent.action == Intent.ACTION_SEND) {
+            if (notallyModel.isNewNote && intent.action == Intent.ACTION_SEND) {
                 handleSharedNote()
-            } else if (model.isNewNote) {
-                intent.getStringExtra(Constants.SelectedLabel)?.let { model.setLabels(listOf(it)) }
+            } else if (notallyModel.isNewNote) {
+                intent.getStringExtra(Constants.SelectedLabel)?.let {
+                    notallyModel.setLabels(listOf(it))
+                }
             }
 
             setupToolbars()
@@ -152,7 +154,7 @@ abstract class EditActivity(private val type: Type) :
         recordAudioActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    model.addAudio()
+                    notallyModel.addAudio()
                 }
             }
         addImagesActivityResultLauncher =
@@ -162,11 +164,11 @@ abstract class EditActivity(private val type: Type) :
                     val clipData = result.data?.clipData
                     if (uri != null) {
                         val uris = arrayOf(uri)
-                        model.addImages(uris)
+                        notallyModel.addImages(uris)
                     } else if (clipData != null) {
                         val uris =
                             Array(clipData.itemCount) { index -> clipData.getItemAt(index).uri }
-                        model.addImages(uris)
+                        notallyModel.addImages(uris)
                     }
                 }
             }
@@ -182,7 +184,7 @@ abstract class EditActivity(private val type: Type) :
                             )
                         }
                     if (!list.isNullOrEmpty()) {
-                        model.deleteImages(list)
+                        notallyModel.deleteImages(list)
                     }
                 }
             }
@@ -191,12 +193,12 @@ abstract class EditActivity(private val type: Type) :
                 if (result.resultCode == RESULT_OK) {
                     val list =
                         result.data?.getStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS)
-                    if (list != null && list != model.labels) {
-                        model.setLabels(list)
+                    if (list != null && list != notallyModel.labels) {
+                        notallyModel.setLabels(list)
                         Operations.bindLabels(
                             binding.LabelGroup,
-                            model.labels,
-                            model.textSize,
+                            notallyModel.labels,
+                            notallyModel.textSize,
                             paddingTop = true,
                         )
                     }
@@ -214,7 +216,7 @@ abstract class EditActivity(private val type: Type) :
                             )
                         }
                     if (audio != null) {
-                        model.deleteAudio(audio)
+                        notallyModel.deleteAudio(audio)
                     }
                 }
             }
@@ -225,11 +227,11 @@ abstract class EditActivity(private val type: Type) :
                     val clipData = result.data?.clipData
                     if (uri != null) {
                         val uris = arrayOf(uri)
-                        model.addFiles(uris)
+                        notallyModel.addFiles(uris)
                     } else if (clipData != null) {
                         val uris =
                             Array(clipData.itemCount) { index -> clipData.getItemAt(index).uri }
-                        model.addFiles(uris)
+                        notallyModel.addFiles(uris)
                     }
                 }
             }
@@ -276,7 +278,7 @@ abstract class EditActivity(private val type: Type) :
                 add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { pin() }
             bindPinned()
 
-            when (model.folder) {
+            when (notallyModel.folder) {
                 Folder.NOTES -> {
                     add(R.string.delete, R.drawable.delete, MenuItem.SHOW_AS_ACTION_ALWAYS) {
                         delete()
@@ -425,7 +427,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     protected fun createFolderActions() =
-        when (model.folder) {
+        when (notallyModel.folder) {
             Folder.NOTES ->
                 listOf(
                     Action(R.string.archive, R.drawable.archive, callback = ::archive),
@@ -449,20 +451,26 @@ abstract class EditActivity(private val type: Type) :
 
     open fun setupListeners() {
         binding.EnterTitle.initHistory(changeHistory) { text ->
-            model.title = text.trim().toString()
+            notallyModel.title = text.trim().toString()
         }
     }
 
     open fun setStateFromModel() {
         val (date, datePrefixResId) =
             when (preferences.notesSorting.value.sortedBy) {
-                NotesSortBy.CREATION_DATE -> Pair(model.timestamp, R.string.creation_date)
-                NotesSortBy.MODIFIED_DATE -> Pair(model.modifiedTimestamp, R.string.modified_date)
+                NotesSortBy.CREATION_DATE -> Pair(notallyModel.timestamp, R.string.creation_date)
+                NotesSortBy.MODIFIED_DATE ->
+                    Pair(notallyModel.modifiedTimestamp, R.string.modified_date)
                 else -> Pair(null, null)
             }
         binding.Date.displayFormattedTimestamp(date, preferences.dateFormat.value, datePrefixResId)
-        binding.EnterTitle.setText(model.title)
-        Operations.bindLabels(binding.LabelGroup, model.labels, model.textSize, paddingTop = true)
+        binding.EnterTitle.setText(notallyModel.title)
+        Operations.bindLabels(
+            binding.LabelGroup,
+            notallyModel.labels,
+            notallyModel.textSize,
+            paddingTop = true,
+        )
 
         setColor()
     }
@@ -475,10 +483,10 @@ abstract class EditActivity(private val type: Type) :
         val body = charSequence ?: string
 
         if (body != null) {
-            model.body = Editable.Factory.getInstance().newEditable(body)
+            notallyModel.body = Editable.Factory.getInstance().newEditable(body)
         }
         if (title != null) {
-            model.title = title
+            notallyModel.title = title
         }
     }
 
@@ -499,7 +507,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     private fun startRecordAudioActivity() {
-        if (model.audioRoot != null) {
+        if (notallyModel.audioRoot != null) {
             val intent = Intent(this, RecordAudioActivity::class.java)
             recordAudioActivityResultLauncher.launch(intent)
         } else showToast(R.string.insert_an_sd_card_audio)
@@ -518,7 +526,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     override fun addImages() {
-        if (model.imageRoot != null) {
+        if (notallyModel.imageRoot != null) {
             val intent =
                 Intent(Intent.ACTION_GET_CONTENT)
                     .apply {
@@ -533,7 +541,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     override fun attachFiles() {
-        if (model.filesRoot != null) {
+        if (notallyModel.filesRoot != null) {
             val intent =
                 Intent(Intent.ACTION_GET_CONTENT)
                     .apply {
@@ -549,24 +557,24 @@ abstract class EditActivity(private val type: Type) :
 
     override fun changeColor() {
         showColorSelectDialog { selectedColor ->
-            model.color = selectedColor
+            notallyModel.color = selectedColor
             setColor()
         }
     }
 
     override fun changeLabels() {
         val intent = Intent(this, SelectLabelsActivity::class.java)
-        intent.putStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS, model.labels)
+        intent.putStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS, notallyModel.labels)
         selectLabelsActivityResultLauncher.launch(intent)
     }
 
     override fun share() {
         val body =
             when (type) {
-                Type.NOTE -> model.body
-                Type.LIST -> Operations.getBody(model.items.toMutableList())
+                Type.NOTE -> notallyModel.body
+                Type.LIST -> Operations.getBody(notallyModel.items.toMutableList())
             }
-        Operations.shareNote(this, model.title, body)
+        Operations.shareNote(this, notallyModel.title, body)
     }
 
     private fun delete() {
@@ -584,11 +592,11 @@ abstract class EditActivity(private val type: Type) :
     private fun moveNote(toFolder: Folder) {
         val resultIntent =
             Intent().apply {
-                putExtra(NOTE_ID, model.id)
-                putExtra(FOLDER_FROM, model.folder.name)
+                putExtra(NOTE_ID, notallyModel.id)
+                putExtra(FOLDER_FROM, notallyModel.folder.name)
                 putExtra(FOLDER_TO, toFolder.name)
             }
-        model.folder = toFolder
+        notallyModel.folder = toFolder
         setResult(RESULT_OK, resultIntent)
         finish()
     }
@@ -598,7 +606,7 @@ abstract class EditActivity(private val type: Type) :
             .setMessage(R.string.delete_note_forever)
             .setPositiveButton(R.string.delete) { _, _ ->
                 lifecycleScope.launch {
-                    model.deleteBaseNote()
+                    notallyModel.deleteBaseNote()
                     super.finish()
                 }
             }
@@ -607,17 +615,17 @@ abstract class EditActivity(private val type: Type) :
     }
 
     fun pin() {
-        model.pinned = !model.pinned
+        notallyModel.pinned = !notallyModel.pinned
         bindPinned()
     }
 
     private fun setupImages() {
         val imageAdapter =
-            PreviewImageAdapter(model.imageRoot) { position ->
+            PreviewImageAdapter(notallyModel.imageRoot) { position ->
                 val intent =
                     Intent(this, ViewImageActivity::class.java).apply {
                         putExtra(ViewImageActivity.POSITION, position)
-                        putExtra(Constants.SelectedBaseNote, model.id)
+                        putExtra(Constants.SelectedBaseNote, notallyModel.id)
                     }
                 viewImagesActivityResultLauncher.launch(intent)
             }
@@ -656,7 +664,7 @@ abstract class EditActivity(private val type: Type) :
             )
         }
 
-        model.images.observe(this) { list ->
+        notallyModel.images.observe(this) { list ->
             imageAdapter.submitList(list)
             binding.ImagePreview.isVisible = list.isNotEmpty()
             binding.ImagePreviewPosition.isVisible = list.size > 1
@@ -666,13 +674,13 @@ abstract class EditActivity(private val type: Type) :
     private fun setupFiles() {
         val fileAdapter =
             PreviewFileAdapter({ fileAttachment ->
-                if (model.filesRoot == null) {
+                if (notallyModel.filesRoot == null) {
                     return@PreviewFileAdapter
                 }
                 val intent =
                     Intent(Intent.ACTION_VIEW)
                         .apply {
-                            val file = File(model.filesRoot, fileAttachment.localName)
+                            val file = File(notallyModel.filesRoot, fileAttachment.localName)
                             val uri = this@EditActivity.getUriForFile(file)
                             setDataAndType(uri, fileAttachment.mimeType)
                             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
@@ -684,7 +692,7 @@ abstract class EditActivity(private val type: Type) :
                     .setMessage(getString(R.string.delete_file, fileAttachment.originalName))
                     .setNegativeButton(R.string.cancel, null)
                     .setPositiveButton(R.string.delete) { _, _ ->
-                        model.deleteFiles(arrayListOf(fileAttachment))
+                        notallyModel.deleteFiles(arrayListOf(fileAttachment))
                     }
                     .show()
                 return@PreviewFileAdapter true
@@ -696,7 +704,7 @@ abstract class EditActivity(private val type: Type) :
             layoutManager =
                 LinearLayoutManager(this@EditActivity, LinearLayoutManager.HORIZONTAL, false)
         }
-        model.files.observe(this) { list ->
+        notallyModel.files.observe(this) { list ->
             fileAdapter.submitList(list)
             val visible = list.isNotEmpty()
             binding.FilesPreview.apply {
@@ -741,7 +749,7 @@ abstract class EditActivity(private val type: Type) :
     private fun setupAudios() {
         val adapter = AudioAdapter { position: Int ->
             if (position != -1) {
-                val audio = model.audios.value[position]
+                val audio = notallyModel.audios.value[position]
                 val intent = Intent(this, PlayAudioActivity::class.java)
                 intent.putExtra(PlayAudioActivity.AUDIO, audio)
                 playAudioActivityResultLauncher.launch(intent)
@@ -749,7 +757,7 @@ abstract class EditActivity(private val type: Type) :
         }
         binding.AudioRecyclerView.adapter = adapter
 
-        model.audios.observe(this) { list ->
+        notallyModel.audios.observe(this) { list ->
             adapter.submitList(list)
             binding.AudioHeader.isVisible = list.isNotEmpty()
             binding.AudioRecyclerView.isVisible = list.isNotEmpty()
@@ -757,7 +765,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     open protected fun setColor() {
-        val color = Operations.extractColor(model.color, this)
+        val color = Operations.extractColor(notallyModel.color, this)
         binding.ScrollView.apply {
             setBackgroundColor(color)
             setControlsContrastColorForAllViews(color)
@@ -776,9 +784,9 @@ abstract class EditActivity(private val type: Type) :
             }
         }
 
-        val title = model.textSize.editTitleSize
-        val date = model.textSize.displayBodySize
-        val body = model.textSize.editBodySize
+        val title = notallyModel.textSize.editTitleSize
+        val date = notallyModel.textSize.displayBodySize
+        val body = notallyModel.textSize.editBodySize
 
         binding.EnterTitle.setTextSize(TypedValue.COMPLEX_UNIT_SP, title)
         binding.Date.setTextSize(TypedValue.COMPLEX_UNIT_SP, date)
@@ -787,8 +795,8 @@ abstract class EditActivity(private val type: Type) :
         setupImages()
         setupFiles()
         setupAudios()
-        model.addingFiles.setupProgressDialog(this, R.string.adding_files)
-        model.eventBus.observe(this) { event ->
+        notallyModel.addingFiles.setupProgressDialog(this, R.string.adding_files)
+        notallyModel.eventBus.observe(this) { event ->
             event.handle { errors -> displayFileErrors(errors) }
         }
 
@@ -798,7 +806,7 @@ abstract class EditActivity(private val type: Type) :
     private fun bindPinned() {
         val icon: Int
         val title: Int
-        if (model.pinned) {
+        if (notallyModel.pinned) {
             icon = R.drawable.unpin
             title = R.string.unpin
         } else {
