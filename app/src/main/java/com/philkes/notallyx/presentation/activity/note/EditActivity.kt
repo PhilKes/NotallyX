@@ -488,11 +488,9 @@ abstract class EditActivity(private val type: Type) :
         val title = intent.getStringExtra(Intent.EXTRA_SUBJECT)
 
         val string = intent.getStringExtra(Intent.EXTRA_TEXT)
-        val charSequence = intent.getCharSequenceExtra(Operations.extraCharSequence)
-        val body = charSequence ?: string
 
-        if (body != null) {
-            notallyModel.body = Editable.Factory.getInstance().newEditable(body)
+        if (string != null) {
+            notallyModel.body = Editable.Factory.getInstance().newEditable(string)
         }
         if (title != null) {
             notallyModel.title = title

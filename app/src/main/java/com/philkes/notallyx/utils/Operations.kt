@@ -41,7 +41,6 @@ object Operations {
 
     private const val TAG = "Operations"
 
-    const val extraCharSequence = "com.philkes.notallyx.extra.charSequence"
 
     fun getLastExceptionLog(app: Application): String? {
         val logFile = getLog(app)
@@ -98,13 +97,13 @@ object Operations {
     }
 
     fun shareNote(context: Context, title: String, body: CharSequence) {
-        val text = body.toString()
+        val text = body.truncate(150_000)
+
         val intent =
             Intent(Intent.ACTION_SEND)
                 .apply {
                     type = "text/plain"
-                    putExtra(extraCharSequence, body)
-                    putExtra(Intent.EXTRA_TEXT, text)
+                    putExtra(Intent.EXTRA_TEXT, text.toString())
                     putExtra(Intent.EXTRA_TITLE, title)
                     putExtra(Intent.EXTRA_SUBJECT, title)
                 }
