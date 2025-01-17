@@ -119,7 +119,7 @@ fun Context.canAuthenticateWithBiometrics(): Int {
     return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
 }
 
-fun String.truncate(limit: Int): String {
+fun CharSequence.truncate(limit: Int): CharSequence {
     return if (length > limit) {
         val truncated = take(limit)
         val remainingCharacters = length - limit
