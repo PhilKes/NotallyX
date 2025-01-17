@@ -83,6 +83,7 @@
     <string name="deleting_files">Suppression des fichiers</string>
     <string name="deleting_images">Suppression des images</string>
     <string name="descending">Décroissant</string>
+    <string name="disable">Désactiver</string>
     <string name="disable_auto_backup">Désactiver la sauvegarde automatique</string>
     <string name="disable_external_data">Replacer les données dans le stockage interne</string>
     <string name="disable_lock_description">La base de donnée sera aussi décryptée</string>
@@ -248,6 +249,7 @@
     <string name="unknown_error">Erreur inconnue</string>
     <string name="unknown_name">Nom inconnu</string>
     <string name="unlock">Déverrouiller par biométrie/code PIN</string>
+    <string name="unlock_with_biometrics_not_setup">Vous avez précédemment activé le verrouillage biométrique, mais les données biométriques/le code PIN ne sont plus configurés sur votre appareil.\n\nSi vous souhaitez désactiver le verrouillage biométrique, appuyez sur Désactiver, sinon configurez les données biométriques/le code PIN pour votre appareil</string>
     <string name="unpin">Détacher</string>
     <string name="updated_link">Lien mis à jour</string>
     <string name="view">Vue</string>
