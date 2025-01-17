@@ -57,9 +57,13 @@ class ListItemAdapter(
         this.list = list
     }
 
-    internal fun clearHighlights() {
+    internal fun clearHighlights() : Set<Int> {
+        val highlightedItemPos= highlights.entries.flatMap { (_, value) ->
+            value.map {it.itemPos }
+        }.toSet()
         highlights.clear()
-        notifyDataSetChanged()
+        return highlightedItemPos
+//        itemPos.forEach { notifyItemChanged(it) }
     }
 
     internal fun highlightText(highlight: ListItemHighlight) {

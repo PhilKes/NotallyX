@@ -1,6 +1,5 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.ncorti.ktfmt.gradle.tasks.KtfmtFormatTask
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.application")
@@ -9,7 +8,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.ncorti.ktfmt.gradle") version "0.20.1"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
-    id("io.github.philkes.android-translations-converter") version "1.0.0"
+    id("io.github.philkes.android-translations-converter") version "1.0.1"
 }
 
 android {

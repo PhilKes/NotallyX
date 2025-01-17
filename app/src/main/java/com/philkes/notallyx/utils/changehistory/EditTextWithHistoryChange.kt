@@ -1,6 +1,9 @@
 package com.philkes.notallyx.utils.changehistory
 
 import android.text.Editable
+import androidx.core.text.getSpans
+import com.philkes.notallyx.presentation.clone
+import com.philkes.notallyx.presentation.view.misc.HighlightSpan
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 
 class EditTextWithHistoryChange(
@@ -12,8 +15,9 @@ class EditTextWithHistoryChange(
 
     override fun update(value: EditTextState, isUndo: Boolean) {
         editText.applyWithoutTextWatcher {
-            setText(value.text)
-            updateModel.invoke(value.text)
+            val text = value.text.withoutSpans<HighlightSpan>()
+            setText(text)
+            updateModel.invoke(text)
             requestFocus()
             setSelection(value.cursorPos)
         }
@@ -21,3 +25,8 @@ class EditTextWithHistoryChange(
 }
 
 data class EditTextState(val text: Editable, val cursorPos: Int)
+
+
+ inline fun <reified T : Any> Editable.withoutSpans(): Editable = clone().apply {
+        this.getSpans<T>().forEach { removeSpan(it) }
+    }

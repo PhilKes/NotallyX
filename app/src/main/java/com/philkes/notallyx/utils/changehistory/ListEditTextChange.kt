@@ -1,6 +1,7 @@
 package com.philkes.notallyx.utils.changehistory
 
 import android.text.TextWatcher
+import android.text.style.CharacterStyle
 import android.widget.EditText
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 
@@ -17,7 +18,7 @@ open class ListEditTextChange(
         listManager.changeText(editText, listener, position, value, pushChange = false)
         editText.apply {
             removeTextChangedListener(listener)
-            text = value.text
+            text = value.text.withoutSpans<CharacterStyle>()
             requestFocus()
             setSelection(value.cursorPos)
             addTextChangedListener(listener)

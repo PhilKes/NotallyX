@@ -2,9 +2,9 @@ package com.philkes.notallyx.utils.changehistory
 
 import android.util.Log
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
+import kotlin.IllegalStateException
 
 class ChangeHistory {
-    private val TAG = "ChangeHistory"
     private val changeStack = ArrayList<Change>()
     private var stackPointer = NotNullLiveData(-1)
 
@@ -28,7 +28,7 @@ class ChangeHistory {
     fun redo() {
         stackPointer.value += 1
         if (stackPointer.value >= changeStack.size) {
-            throw RuntimeException("There is no Change to redo!")
+            throw ChangeHistoryException("There is no Change to redo!")
         }
         val makeListAction = changeStack[stackPointer.value]
         Log.d(TAG, "redo: $makeListAction")
@@ -37,7 +37,7 @@ class ChangeHistory {
 
     fun undo() {
         if (stackPointer.value < 0) {
-            throw RuntimeException("There is no Change to undo!")
+            throw ChangeHistoryException("There is no Change to undo!}")
         }
         val makeListAction = changeStack[stackPointer.value]
         Log.d(TAG, "undo: $makeListAction")
@@ -52,7 +52,7 @@ class ChangeHistory {
 
     internal fun lookUp(position: Int = 0): Change {
         if (stackPointer.value - position < 0) {
-            throw IllegalArgumentException("ChangeHistory only has $stackPointer.value changes!")
+            throw ChangeHistoryException("ChangeHistory only has ${stackPointer.value+1} changes!")
         }
         return changeStack[stackPointer.value - position]
     }
@@ -62,4 +62,11 @@ class ChangeHistory {
             changeStack.removeAt(stackPointer.value + 1)
         }
     }
+
+    inner class ChangeHistoryException(message: String) : IllegalStateException("$message\nstackPointer: ${stackPointer.value}\nchangeStack:\n${changeStack.joinToString("\n")}")
+
+    companion object{
+        private const val TAG = "ChangeHistory"
+    }
 }
+

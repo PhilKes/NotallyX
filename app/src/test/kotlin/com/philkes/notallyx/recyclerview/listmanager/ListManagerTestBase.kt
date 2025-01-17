@@ -54,7 +54,8 @@ open class ListManagerTestBase {
         changeHistory = ChangeHistory()
         listItemVH = mock(ListItemVH::class.java)
         preferences = mock(NotallyXPreferences::class.java)
-        listManager = ListManager(recyclerView, changeHistory, preferences, inputMethodManager) {}
+        listManager =
+            ListManager(recyclerView, changeHistory, preferences, inputMethodManager, {}) {}
         listManager.adapter = adapter as RecyclerView.Adapter<ListItemVH>
         // Prepare view holder
         `when`(recyclerView.findViewHolderForAdapterPosition(anyInt())).thenReturn(listItemVH)

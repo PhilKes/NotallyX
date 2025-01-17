@@ -93,7 +93,7 @@ class ChangeHistoryTest {
         assertEquals(change4, changeHistory.lookUp())
         assertEquals(change2, changeHistory.lookUp(1))
         assertEquals(change1, changeHistory.lookUp(2))
-        assertThrows(IllegalArgumentException::class.java) { changeHistory.lookUp(3) }
+        assertThrows(ChangeHistory.ChangeHistoryException::class.java) { changeHistory.lookUp(3) }
     }
 
     class TestChange : Change {

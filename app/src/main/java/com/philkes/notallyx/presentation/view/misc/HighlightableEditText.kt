@@ -5,6 +5,7 @@ import android.text.Spanned
 import android.text.style.BackgroundColorSpan
 import android.text.style.CharacterStyle
 import android.util.AttributeSet
+import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatEditText
 import com.philkes.notallyx.presentation.removeSelectionFromSpans
 import com.philkes.notallyx.presentation.withAlpha
@@ -62,13 +63,7 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
     fun highlight(startIdx: Int, endIdx: Int, selected: Boolean): Int? {
         // TODO: Could be replaced with EditText.highlights? (API >= 34)
         if (selected) {
-            selectedHighlightedSpan?.let {
-                val (previousHighlightedStartIdx, previousHighlightedEndIdx) = getSpanRange(it)
-                if (previousHighlightedStartIdx != -1) {
-                    removeSpan(it)
-                    highlight(previousHighlightedStartIdx, previousHighlightedEndIdx, false)
-                }
-            }
+            selectedHighlightedSpan?.unselect()
         }
         highlightedSpans
             .filter { getSpanRange(it) == Pair(startIdx, endIdx) }
@@ -77,7 +72,7 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
                 highlightedSpans.remove(it)
             }
         val span =
-            BackgroundColorSpan(if (selected) highlightColor else highlightColor.withAlpha(0.1f))
+            HighlightSpan(if (selected) highlightColor else highlightColor.withAlpha(0.1f))
         applySpan(span, startIdx, endIdx)
         highlightedSpans.add(span)
         if (selected) {
@@ -88,4 +83,18 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
             layout.getLineTop(line)
         }
     }
+
+    fun unselectHighlight() {
+        selectedHighlightedSpan?.unselect()
+    }
+
+    private fun CharacterStyle.unselect(){
+        val (previousHighlightedStartIdx, previousHighlightedEndIdx) = getSpanRange(this)
+        if (previousHighlightedStartIdx != -1) {
+            removeSpan(this)
+            highlight(previousHighlightedStartIdx, previousHighlightedEndIdx, false)
+        }
+    }
 }
+
+class HighlightSpan(@ColorInt color: Int): BackgroundColorSpan(color)
