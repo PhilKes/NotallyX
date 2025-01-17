@@ -1,0 +1,3 @@
+* Fix Absturz bei neue Notiz erstellen
+
+* Fix Absturz beim de-/aktivieren der biometrischen Sperre
