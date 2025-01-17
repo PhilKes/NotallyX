@@ -54,7 +54,7 @@ When using the app and an unknown error occurs, causing the app to crash you wil
 ### Translations
 All translations are crowd sourced.
 To contribute:
-1. Download current [translations.xlsx](https://github.com/PhilKes/NotallyX/raw/refs/heads/main/translations/translations.xlsx)
+1. Download current [translations.xlsx](https://github.com/PhilKes/NotallyX/raw/refs/heads/main/app/translations.xlsx)
 2. Open in Excel/LibreOffice and add missing translations
    Notes:
    - Missing translations are marked in red
@@ -64,20 +64,7 @@ To contribute:
 3. Open a [Update Translations Issue](https://github.com/PhilKes/NotallyX/issues/new?assignees=&labels=translations&projects=&template=translation.md&title=%3CINSERT+LANGUAGE+HERE%3E+translations+update)
 4. I will create a Pull-Request to add your updated translations
 
-#### Android Excel Converter
-
-See [AndroidExcelConverter](https://github.com/PhilKes/AndroidExcelConverter)
-
-To generate an up-to-date Excel file:
-```shell
-python -m pip install -r ./translations/requirements.txt
-python ./translations/export.py ./app/src/main/res/ ./translations/translations.xlsx
-```
-
-To import `strings.xml` for all languages from Excel file:
-```shell
-python ./translations/import.py ./translations/translations.xlsx ./app/src/main/res/
-```
+See [Android Translations Converter](https://github.com/PhilKes/android-translations-converter-plugin) for more details
 
 ### Contributing
 

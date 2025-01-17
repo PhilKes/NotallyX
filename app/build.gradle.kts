@@ -9,6 +9,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.ncorti.ktfmt.gradle") version "0.20.1"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
+    id("io.github.philkes.android-translations-converter") version "1.0.0"
 }
 
 android {
@@ -89,10 +90,6 @@ android {
     }
 }
 
-tasks.withType<KotlinCompile>().configureEach {
-    kotlinOptions.jvmTarget = "1.8"
-}
-
 ktfmt {
     kotlinLangStyle()
 }
@@ -111,10 +108,12 @@ tasks.register<Copy>("installLocalGitHooks") {
     into(hooksDir)
     inputs.files(file("${scriptsDir}/pre-commit"), file("${scriptsDir}/pre-commit.bat"))
     outputs.dir(hooksDir)
-    fileMode = 775
+    fileMode = 509 // 0775 octal in decimal
+    // If this throws permission denied:
+    // chmod +rwx ./.git/hooks/pre-commit*
 }
 
-tasks.preBuild.dependsOn(tasks.named("installLocalGitHooks"))
+tasks.preBuild.dependsOn(tasks.named("installLocalGitHooks"), tasks.exportTranslationsToExcel)
 
 afterEvaluate {
     tasks.named("bundleRelease").configure {
