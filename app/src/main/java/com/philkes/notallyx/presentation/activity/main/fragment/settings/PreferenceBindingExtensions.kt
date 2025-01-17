@@ -82,6 +82,9 @@ fun PreferenceBinding.setup(
             .setSingleChoiceItems(entries, checked) { dialog, which ->
                 dialog.cancel()
                 val newValue = enumEntries[which]
+                if (newValue == value) {
+                    return@setSingleChoiceItems
+                }
                 if (newValue == BiometricLock.ENABLED) {
                     when (context.canAuthenticateWithBiometrics()) {
                         BiometricManager.BIOMETRIC_SUCCESS -> onEnableSuccess()
