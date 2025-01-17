@@ -2,6 +2,7 @@ package com.philkes.notallyx.data
 
 import android.app.Application
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
 import androidx.room.Database
 import androidx.room.Room
@@ -21,6 +22,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.observeForeverSkipFirst
 import com.philkes.notallyx.utils.IO.getExternalMediaDirectory
+import com.philkes.notallyx.utils.security.SQLCipherUtils
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import java.io.File
 import net.sqlcipher.database.SupportFactory
@@ -103,12 +105,22 @@ abstract class NotallyDatabase : RoomDatabase() {
                     .addMigrations(Migration2, Migration3, Migration4, Migration5, Migration6)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (preferences.biometricLock.value == BiometricLock.ENABLED) {
-                    val initializationVector = preferences.iv.value!!
-                    val cipher = getInitializedCipherForDecryption(iv = initializationVector)
-                    val encryptedPassphrase = preferences.databaseEncryptionKey.value
-                    val passphrase = cipher.doFinal(encryptedPassphrase)
-                    val factory = SupportFactory(passphrase)
-                    instanceBuilder.openHelperFactory(factory)
+                    if (
+                        SQLCipherUtils.getDatabaseState(app, getCurrentDatabaseName(app)) ==
+                            SQLCipherUtils.State.ENCRYPTED
+                    ) {
+                        initializeDecryption(preferences, instanceBuilder)
+                    } else {
+                        preferences.biometricLock.save(BiometricLock.DISABLED)
+                    }
+                } else {
+                    if (
+                        SQLCipherUtils.getDatabaseState(app, getCurrentDatabaseName(app)) ==
+                            SQLCipherUtils.State.ENCRYPTED
+                    ) {
+                        preferences.biometricLock.save(BiometricLock.ENABLED)
+                        initializeDecryption(preferences, instanceBuilder)
+                    }
                 }
                 val instance = instanceBuilder.build()
                 if (observePreferences) {
@@ -143,6 +155,19 @@ abstract class NotallyDatabase : RoomDatabase() {
                 return instance
             }
             return instanceBuilder.build()
+        }
+
+        @RequiresApi(Build.VERSION_CODES.M)
+        private fun initializeDecryption(
+            preferences: NotallyXPreferences,
+            instanceBuilder: Builder<NotallyDatabase>,
+        ) {
+            val initializationVector = preferences.iv.value!!
+            val cipher = getInitializedCipherForDecryption(iv = initializationVector)
+            val encryptedPassphrase = preferences.databaseEncryptionKey.value
+            val passphrase = cipher.doFinal(encryptedPassphrase)
+            val factory = SupportFactory(passphrase)
+            instanceBuilder.openHelperFactory(factory)
         }
 
         object Migration2 : Migration(1, 2) {
