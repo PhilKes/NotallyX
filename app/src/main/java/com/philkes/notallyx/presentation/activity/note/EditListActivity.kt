@@ -15,6 +15,7 @@ import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
@@ -64,8 +65,9 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     override fun highlightSearchResults(search: String): Int {
         var resultPos = 0
+        val alreadyNotifiedItemPos = mutableSetOf<Int>()
         adapter?.clearHighlights()
-        return items
+        val amount=  items
             .mapIndexed { idx, item ->
                 val occurrences = item.body.findAllOccurrences(search)
                 occurrences.onEach { (startIdx, endIdx) ->
@@ -73,9 +75,14 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                         ListItemAdapter.ListItemHighlight(idx, resultPos++, startIdx, endIdx, false)
                     )
                 }
+                if(occurrences.isNotEmpty()){
+                    alreadyNotifiedItemPos.add(idx)
+                }
                 occurrences.size
             }
             .sum()
+        items.indices.filter { !alreadyNotifiedItemPos.contains(it) }.forEach { adapter?.notifyItemChanged(it) }
+        return amount
     }
 
     override fun selectSearchResult(resultPos: Int) {
@@ -111,9 +118,13 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 changeHistory,
                 preferences,
                 ContextCompat.getSystemService(baseContext, InputMethodManager::class.java),
-            ) {
-                if (binding.EnterSearchKeyword.visibility != GONE) {
-                    endSearch()
+                {
+                    if (isInSearchMode()) {
+                        endSearch()
+                    }
+                }){ _ ->
+                if (isInSearchMode() && search.results.value > 0) {
+                    updateSearchResults(search.query)
                 }
             }
         adapter =

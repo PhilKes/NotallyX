@@ -65,9 +65,9 @@ import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.mergeSkipFirst
 import com.philkes.notallyx.utils.observeSkipFirst
 import com.philkes.notallyx.utils.wrapWithChooser
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.io.File
 
 abstract class EditActivity(private val type: Type) :
     LockedActivity<ActivityEditBinding>(), AddActions, MoreActions {
@@ -80,16 +80,13 @@ abstract class EditActivity(private val type: Type) :
 
     private lateinit var pinMenuItem: MenuItem
 
-    private lateinit var searchPosPrev: MenuItem
-    private lateinit var searchPosNext: MenuItem
-    private val searchResultPos = NotNullLiveData(-1)
-    private val searchResultsAmount = NotNullLiveData(-1)
+    protected var search = Search()
 
     internal val notallyModel: NotallyModel by viewModels()
     internal lateinit var changeHistory: ChangeHistory
 
-    protected val undos: MutableList<View> = mutableListOf()
-    protected val redos: MutableList<View> = mutableListOf()
+    protected lateinit var undo: View
+    protected lateinit var redo: View
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -122,6 +119,7 @@ abstract class EditActivity(private val type: Type) :
         initialiseBinding()
         setContentView(binding.root)
 
+        initChangeHistory()
         lifecycleScope.launch {
             val persistedId = savedInstanceState?.getLong("id")
             val selectedId = intent.getLongExtra(Constants.SelectedBaseNote, 0L)
@@ -259,10 +257,10 @@ abstract class EditActivity(private val type: Type) :
         changeHistory =
             ChangeHistory().apply {
                 canUndo.observe(this@EditActivity) { canUndo ->
-                    undos.forEach { it.isEnabled = canUndo }
+                    undo.isEnabled = canUndo 
                 }
                 canRedo.observe(this@EditActivity) { canRedo ->
-                    redos.forEach { it.isEnabled = canRedo }
+                    redo.isEnabled = canRedo 
                 }
             }
     }
@@ -299,33 +297,36 @@ abstract class EditActivity(private val type: Type) :
             }
         }
 
-        searchResultsAmount.mergeSkipFirst(searchResultPos).observe(this) { (amount, pos) ->
+        search.results.mergeSkipFirst(search.resultPos).observe(this) { (amount, pos) ->
             val hasResults = amount > 0
             binding.SearchResults.text = if (hasResults) "${pos + 1}/$amount" else "0"
-            searchPosNext.isEnabled = hasResults
-            searchPosPrev.isEnabled = hasResults
+            search.nextMenuItem?.isEnabled = hasResults
+            search.prevMenuItem?.isEnabled = hasResults
         }
 
-        searchResultPos.observeSkipFirst(this) { pos -> selectSearchResult(pos) }
+        search.resultPos.observeSkipFirst(this) {
+            pos -> selectSearchResult(pos)
+        }
 
         binding.EnterSearchKeyword.apply {
             doAfterTextChanged { text ->
-                val amount = highlightSearchResults(text.toString())
-                searchResultsAmount.value = amount
-                if (amount > 0) {
-                    searchResultPos.value = 0
-                }
+                this@EditActivity.search.query = text.toString()
+                updateSearchResults(this@EditActivity.search.query)
             }
         }
-
-        initChangeHistory()
         initBottomMenu()
     }
 
-    protected fun setSearchResultsAmount(amount: Int) {
-        searchResultsAmount.value = amount
-        if (searchResultPos.value >= amount) {
-            searchResultPos.value = amount - 1
+    protected fun updateSearchResults(query: String) {
+        val amountBefore = search.results.value
+        val amount = highlightSearchResults(query)
+        this.search.results.value = amount
+        if (amount > 0) {
+            search.resultPos.value = when {
+                amountBefore < 1 -> 0
+                search.resultPos.value >= amount -> amount - 1
+                else -> search.resultPos.value
+            }
         }
     }
 
@@ -343,23 +344,23 @@ abstract class EditActivity(private val type: Type) :
     protected fun startSearch() {
         binding.Toolbar.apply {
             menu.clear()
-            searchPosNext =
+            search.nextMenuItem =
                 menu
                     .add(R.string.previous, R.drawable.arrow_upward) {
-                        searchResultPos.apply {
+                        search.resultPos.apply {
                             if (value > 0) {
                                 value -= 1
                             } else {
-                                value = searchResultsAmount.value - 1
+                                value = search.results.value - 1
                             }
                         }
                     }
                     .setEnabled(false)
-            searchPosPrev =
+            search.prevMenuItem =
                 menu
                     .add(R.string.next, R.drawable.arrow_downward) {
-                        searchResultPos.apply {
-                            if (value < searchResultsAmount.value - 1) {
+                        search.resultPos.apply {
+                            if (value < search.results.value - 1) {
                                 value += 1
                             } else {
                                 value = 0
@@ -382,9 +383,11 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
+    protected fun isInSearchMode(): Boolean = binding.EnterSearchKeyword.visibility == VISIBLE
+
     protected fun endSearch() {
         binding.EnterSearchKeyword.apply {
-            //            visibility = GONE
+            visibility = GONE
             setText("")
         }
         binding.SearchResults.apply {
@@ -404,18 +407,24 @@ abstract class EditActivity(private val type: Type) :
         }
         binding.BottomAppBarCenter.apply {
             removeAllViews()
-            undos.add(
-                addIconButton(R.string.undo, R.drawable.undo, marginStart = 2) {
+            undo = addIconButton(R.string.undo, R.drawable.undo, marginStart = 2) {
+                try {
                         changeHistory.undo()
-                    }
+                } catch (e: ChangeHistory.ChangeHistoryException) {
+                    Operations.log(application, e)
+                }
+            }
                     .apply { isEnabled = changeHistory.canUndo.value }
-            )
-            redos.add(
-                addIconButton(R.string.redo, R.drawable.redo, marginStart = 2) {
+
+            redo = addIconButton(R.string.redo, R.drawable.redo, marginStart = 2) {
+                try {
                         changeHistory.redo()
-                    }
+                } catch (e: ChangeHistory.ChangeHistoryException) {
+                    Operations.log(application, e)
+                }
+            }
                     .apply { isEnabled = changeHistory.canRedo.value }
-            )
+
         }
         binding.BottomAppBarRight.apply {
             removeAllViews()
@@ -819,6 +828,14 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
+    data class Search(
+        var query: String = "",
+        var prevMenuItem: MenuItem? = null,
+        var nextMenuItem: MenuItem? = null,
+        var resultPos: NotNullLiveData<Int> = NotNullLiveData(-1),
+        var results: NotNullLiveData<Int> = NotNullLiveData(-1)
+    )
+
     companion object {
         private const val REQUEST_AUDIO_PERMISSION = 36
 
@@ -826,4 +843,5 @@ abstract class EditActivity(private val type: Type) :
         const val FOLDER_FROM = "folder_from"
         const val FOLDER_TO = "folder_to"
     }
+
 }

@@ -61,7 +61,6 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     private var textFormattingAdapter: TextFormattingAdapter? = null
 
     private var searchResultIndices: List<Pair<Int, Int>>? = null
-    private var search = ""
 
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { binding.EnterBody.requestFocus() }
@@ -114,7 +113,6 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     }
 
     override fun highlightSearchResults(search: String): Int {
-        this.search = search
         binding.EnterBody.clearHighlights()
         if (search.isEmpty()) {
             return 0
@@ -127,6 +125,10 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     }
 
     override fun selectSearchResult(resultPos: Int) {
+        if(resultPos < 0){
+            binding.EnterBody.unselectHighlight()
+            return
+        }
         searchResultIndices?.get(resultPos)?.let { (startIdx, endIdx) ->
             val selectedLineTop = binding.EnterBody.highlight(startIdx, endIdx, true)
             selectedLineTop?.let { binding.ScrollView.scrollTo(0, it) }
@@ -138,9 +140,8 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         binding.EnterBody.initHistory(changeHistory) { text ->
             val textChanged = !notallyModel.body.toString().contentEquals(text)
             notallyModel.body = text
-            if (textChanged && searchResultIndices?.isNotEmpty() == true) {
-                val amount = highlightSearchResults(search)
-                setSearchResultsAmount(amount)
+            if (textChanged) {
+                updateSearchResults(search.query)
             }
         }
     }

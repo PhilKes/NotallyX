@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.view.note.listitem
 
 import android.text.TextWatcher
 import android.util.Log
+import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.EditText
 import androidx.recyclerview.widget.RecyclerView
@@ -45,6 +46,7 @@ class ListManager(
     private val preferences: NotallyXPreferences,
     private val inputMethodManager: InputMethodManager?,
     private val endSearch: (() -> Unit)?,
+    val refreshSearch: ((refocusView: View?) -> Unit)?,
 ) {
 
     private var nextItemId: Int = 0
@@ -230,12 +232,18 @@ class ListManager(
         before: EditTextState? = null,
         pushChange: Boolean = true,
     ) {
+//        if(!pushChange) {
+            endSearch?.invoke()
+//        }
         val item = items[position]
         item.body = value.text.toString()
         if (pushChange) {
             changeHistory.push(
                 ListEditTextChange(editText, position, before!!, value, listener, this)
             )
+            // TODO: fix focus change
+
+            // refreshSearch?.invoke(editText)
         }
     }
 
@@ -330,6 +338,7 @@ class ListManager(
     }
 
     fun deleteCheckedItems(pushChange: Boolean = true) {
+        endSearch?.invoke()
         val itemsToDelete =
             items.filter { it.checked }.map { it.clone() as ListItem }.sortedBy { it.isChild }
         items.beginBatchedUpdates()

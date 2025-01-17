@@ -114,8 +114,9 @@ class NotallyXPreferences private constructor(private val app: Application) {
     val iv = ByteArrayPreference("encryption_iv", preferences, null)
     val databaseEncryptionKey =
         EncryptedPassphrasePreference("database_encryption_key", preferences, ByteArray(0))
-    val fallbackDatabaseEncryptionKey =
+    val fallbackDatabaseEncryptionKey by lazy {
         ByteArrayPreference("fallback_database_encryption_key", encryptedPreferences, ByteArray(0))
+    }
 
     val dataOnExternalStorage =
         BooleanPreference("dataOnExternalStorage", preferences, false, R.string.data_on_external)
