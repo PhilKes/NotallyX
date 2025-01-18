@@ -12,7 +12,6 @@
     <string name="cant_open_link">Kan ikke åbne link</string>
     <string name="clear_formatting">Ryd formatering</string>
     <string name="content_density">Indhold densitet</string>
-    <string name="create_new">Ingen etiketter endnu. Opret en?</string>
     <string name="dark">Mørkt</string>
     <string name="date">Dato</string>
     <string name="delete">Slet</string>
@@ -25,6 +24,7 @@
     <string name="drag_handle">Træk håndtag</string>
     <string name="edit">Redigér</string>
     <string name="edit_label">Redigér etikette</string>
+    <string name="empty_labels">Ingen etiketter endnu. Opret en?</string>
     <string name="empty_list">Tom liste</string>
     <string name="empty_note">Tom note</string>
     <string name="export">Eksportér</string>

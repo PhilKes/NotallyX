@@ -28,6 +28,7 @@
 
 * Create **rich text** notes with support for bold, italics, mono space and strike-through
 * Create **task lists** and order them with subtasks
+* Set **reminders** for important notes
 * Complement your notes with any type of file such as **pictures**, PDFs, etc.
 * **Sort notes** by title, last modified date, creation date
 * **Color, pin and label** your notes for quick organisation

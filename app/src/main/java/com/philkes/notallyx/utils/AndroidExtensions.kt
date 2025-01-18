@@ -2,6 +2,7 @@ package com.philkes.notallyx.utils
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -26,6 +27,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.BuildConfig
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
+import com.philkes.notallyx.presentation.activity.note.EditListActivity
+import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import java.io.File
@@ -267,6 +273,30 @@ fun Context.shareNote(title: String, body: CharSequence) {
             }
             .wrapWithChooser(this)
     startActivity(intent)
+}
+
+fun Intent.embedIntentExtras() {
+    val string = toUri(Intent.URI_INTENT_SCHEME)
+    data = Uri.parse(string)
+}
+
+fun Context.getOpenNoteIntent(note: BaseNote) = getOpenNoteIntent(note.id, note.type)
+
+fun Context.getOpenNoteIntent(noteId: Long, noteType: Type): PendingIntent {
+    val intent =
+        when (noteType) {
+            Type.NOTE -> Intent(this, EditNoteActivity::class.java)
+            Type.LIST -> Intent(this, EditListActivity::class.java)
+        }.apply {
+            putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+    return PendingIntent.getActivity(
+        this,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
 }
 
 fun ContentResolver.determineMimeTypeAndExtension(uri: Uri, proposedMimeType: String?) =

@@ -18,15 +18,19 @@ import androidx.lifecycle.viewModelScope
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
+import com.philkes.notallyx.data.dao.NoteReminder
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.Reminder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.copy
 import com.philkes.notallyx.data.model.deepCopy
+import com.philkes.notallyx.presentation.activity.note.reminders.RemindersActivity.Companion.NEW_REMINDER_ID
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
@@ -43,6 +47,9 @@ import com.philkes.notallyx.utils.getExternalAudioDirectory
 import com.philkes.notallyx.utils.getExternalFilesDirectory
 import com.philkes.notallyx.utils.getExternalImagesDirectory
 import com.philkes.notallyx.utils.getTempAudioFile
+import com.philkes.notallyx.utils.cancelNoteReminders
+import com.philkes.notallyx.utils.cancelReminder
+import com.philkes.notallyx.utils.scheduleReminder
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -76,6 +83,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     val images = NotNullLiveData<List<FileAttachment>>(emptyList())
     val files = NotNullLiveData<List<FileAttachment>>(emptyList())
     val audios = NotNullLiveData<List<Audio>>(emptyList())
+    val reminders = NotNullLiveData<List<Reminder>>(emptyList())
 
     val addingFiles = MutableLiveData<Progress>()
     val eventBus = MutableLiveData<Event<List<FileError>>>()
@@ -233,6 +241,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 images.value = baseNote.images
                 files.value = baseNote.files
                 audios.value = baseNote.audios
+                reminders.value = baseNote.reminders
             } else {
                 originalNote = createBaseNote()
                 app.showToast(R.string.cant_find_note)
@@ -247,6 +256,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     suspend fun deleteBaseNote() {
+        app.cancelNoteReminders(listOf(NoteReminder(id, reminders.value)))
         withContext(Dispatchers.IO) { baseNoteDao.delete(id) }
         WidgetProvider.sendBroadcast(app, longArrayOf(id))
         val attachments = ArrayList(images.value + files.value + audios.value)
@@ -309,6 +319,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             images.value,
             files.value,
             audios.value,
+            reminders.value,
         )
     }
 
@@ -373,6 +384,38 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             }
         }
         return representations
+    }
+
+    suspend fun removeReminder(reminder: Reminder) {
+        app.cancelReminder(this.id, reminder.id)
+        val updatedReminders = reminders.value.filter { it.id != reminder.id }
+        updateReminders(updatedReminders)
+    }
+
+    suspend fun addReminder(reminder: Reminder) {
+        val updatedReminders = ArrayList(reminders.value)
+        val newReminder = reminder.copy(id = (updatedReminders.maxOfOrNull { it.id } ?: -1) + 1)
+        updatedReminders.add(newReminder)
+        updateReminders(updatedReminders)
+        app.scheduleReminder(id, newReminder)
+    }
+
+    suspend fun updateReminder(updatedReminder: Reminder) {
+        if (updatedReminder.id != NEW_REMINDER_ID) {
+            app.cancelReminder(id, updatedReminder.id)
+        }
+        val updatedReminders = reminders.value.copy().toMutableList()
+        val idx = updatedReminders.indexOfFirst { it.id == updatedReminder.id }
+        if (idx != -1) {
+            updatedReminders[idx] = updatedReminder
+            updateReminders(updatedReminders)
+            app.scheduleReminder(id, updatedReminder)
+        }
+    }
+
+    private suspend fun updateReminders(updatedReminders: List<Reminder>) {
+        reminders.value = updatedReminders
+        withContext(Dispatchers.IO) { baseNoteDao.updateReminders(id, updatedReminders) }
     }
 
     enum class FileType {

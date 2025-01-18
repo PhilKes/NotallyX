@@ -29,7 +29,6 @@
     <string name="clear_formatting">Usuń formatowanie</string>
     <string name="content_density">Zagęszczenie treści</string>
     <string name="continue_">Kontynuuj</string>
-    <string name="create_new">Nie masz jeszcze etykiet? Stworzyć jedną?</string>
     <string name="creation_date">Utworzono</string>
     <string name="dark">Ciemny</string>
     <string name="date">Data</string>
@@ -48,6 +47,7 @@
     <string name="drag_handle">Punkt zaczepienia</string>
     <string name="edit">Edytuj</string>
     <string name="edit_label">Edytuj etykietę</string>
+    <string name="empty_labels">Nie masz jeszcze etykiet? Stworzyć jedną?</string>
     <string name="empty_list">Pusta lista</string>
     <string name="empty_note">Pusta notatka</string>
     <string name="error_while_renaming_image">Błąd podczas zmiany nazwy obrazu</string>
@@ -88,7 +88,6 @@
     <string name="others">Pozostałe</string>
     <string name="pin">Przypnij</string>
     <string name="pinned">Przypięte</string>
-    <string name="please_grant_notally_notification">Przyznaj NotallyX uprawnienia do wysyłania powiadomień. Umożliwia to wyświetlanie postępu, jeśli operacje takie jak usuwanie obrazów lub przywracanie kopii zapasowych zajmuje więcej czasu</string>
     <string name="rate">Oceń aplikację</string>
     <string name="restore">Przywróć</string>
     <string name="save">Zapisz</string>

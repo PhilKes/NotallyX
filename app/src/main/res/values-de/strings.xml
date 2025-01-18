@@ -54,7 +54,6 @@
     <string name="copied_link">Link kopiert</string>
     <string name="copy">Kopieren</string>
     <string name="create_github_issue">Github Issue erstellen</string>
-    <string name="create_new">Keine Label vorhanden. Tippen, um ein neues Label zu erstellen.</string>
     <string name="creation_date">Erstellt am</string>
     <string name="daily">Täglich</string>
     <string name="dark">Dunkel</string>
@@ -88,6 +87,7 @@
     <string name="edit">Bearbeiten</string>
     <string name="edit_label">Label bearbeiten</string>
     <string name="edit_link">Link ändern</string>
+    <string name="empty_labels">Keine Label vorhanden. Tippen, um ein neues Label zu erstellen.</string>
     <string name="empty_list">Leere Liste</string>
     <string name="empty_note">Leere Notiz</string>
     <string name="enable_lock_description">Dies verschlüsselt außerdem die Datenbank</string>
@@ -178,7 +178,6 @@
     <string name="plain_text_files">Text Dateien</string>
     <string name="plain_text_files_help">Um deine Text-Notizen (einzele Datei oder Ordner) zu importieren, klicke Import.\n\nJede Datei wird als einzelne Notiz importiert, der Dateiname wird zum Notiz-Titel. Sollte der Textinhalt mit einer List-Syntax beginnen (z.B. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’), wird die Datei als List-Notiz importiert.</string>
     <string name="please_grant_notally_audio">Bitte gib NotallyX die Berechtigung Sprachnotizen zu erstellen. Die Aufnahmen verlassen niemals dein Gerät.</string>
-    <string name="please_grant_notally_notification">Bitte erteile NotallyX die Berechtigung, Benachrichtigungen zu senden. Dies wird verwendet, um den Fortschritt anzuzeigen, wenn Vorgänge wie das Löschen von Bildern oder das Importieren von Backupen Zeit in Anspruch nehmen</string>
     <string name="rate">App bewerten</string>
     <string name="ready_to_record">Bereit zum Aufnehmen</string>
     <string name="record_audio">Sprachnotiz aufnehmen</string>

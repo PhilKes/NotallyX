@@ -29,7 +29,7 @@ import java.io.File
 import net.sqlcipher.database.SupportFactory
 
 @TypeConverters(Converters::class)
-@Database(entities = [BaseNote::class, Label::class], version = 6)
+@Database(entities = [BaseNote::class, Label::class], version = 7)
 abstract class NotallyDatabase : RoomDatabase() {
 
     abstract fun getLabelDao(): LabelDao
@@ -107,7 +107,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                         NotallyDatabase::class.java,
                         getCurrentDatabaseName(context),
                     )
-                    .addMigrations(Migration2, Migration3, Migration4, Migration5, Migration6)
+                    .addMigrations(Migration2, Migration3, Migration4, Migration5, Migration6, Migration7)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (preferences.biometricLock.value == BiometricLock.ENABLED) {
                     if (
@@ -210,6 +210,15 @@ abstract class NotallyDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
                     "ALTER TABLE `BaseNote` ADD COLUMN `modifiedTimestamp` INTEGER NOT NULL DEFAULT 'timestamp'"
+                )
+            }
+        }
+
+        object Migration7 : Migration(6, 7) {
+
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE `BaseNote` ADD COLUMN `reminders` TEXT NOT NULL DEFAULT `[]`"
                 )
             }
         }

@@ -31,6 +31,7 @@ import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.SUBFOLDER_IMAGES
+import com.philkes.notallyx.utils.cancelNoteReminders
 import com.philkes.notallyx.utils.clearDirectory
 import com.philkes.notallyx.utils.copyToFile
 import com.philkes.notallyx.utils.determineMimeTypeAndExtension
@@ -41,6 +42,7 @@ import com.philkes.notallyx.utils.getFileName
 import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.mimeTypeToFileExtension
 import com.philkes.notallyx.utils.rename
+import com.philkes.notallyx.utils.scheduleNoteReminders
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -120,7 +122,7 @@ suspend fun ContextWrapper.importZip(
                 val fileRoot = getExternalFilesDirectory()
                 val audioRoot = getExternalAudioDirectory()
                 baseNotes.forEach { baseNote ->
-                    this@importZip.importFiles(
+                    importFiles(
                         baseNote.images,
                         SUBFOLDER_IMAGES,
                         imageRoot,
@@ -129,7 +131,7 @@ suspend fun ContextWrapper.importZip(
                         total,
                         importingBackup,
                     )
-                    this@importZip.importFiles(
+                    importFiles(
                         baseNote.files,
                         SUBFOLDER_FILES,
                         fileRoot,
@@ -161,10 +163,12 @@ suspend fun ContextWrapper.importZip(
                     }
                 }
 
-                NotallyDatabase.getDatabase(this@importZip, observePreferences = false)
-                    .value
-                    .getCommonDao()
-                    .importBackup(baseNotes, labels)
+                val notallyDatabase =
+                    NotallyDatabase.getDatabase(this@importZip, observePreferences = false).value
+                notallyDatabase.getCommonDao().importBackup(baseNotes, labels)
+                val reminders = notallyDatabase.getBaseNoteDao().getAllReminders()
+                cancelNoteReminders(reminders)
+                scheduleNoteReminders(reminders)
                 baseNotes.size
             }
         databaseFolder.clearDirectory()
@@ -174,8 +178,8 @@ suspend fun ContextWrapper.importZip(
         if (e.type == ZipException.Type.WRONG_PASSWORD) {
             showToast(R.string.wrong_password)
         } else {
-            showToast(R.string.invalid_backup)
             log(TAG, throwable = e)
+            showToast(R.string.invalid_backup)
         }
     } catch (e: Exception) {
         showToast(R.string.invalid_backup)
@@ -203,8 +207,8 @@ private fun ContextWrapper.importFiles(
                 zipFile.extractFile("$subFolder/${file.localName}", localFolder!!.path, name)
                 file.localName = name
             }
-        } catch (exception: Exception) {
-            log(TAG, throwable = exception)
+        } catch (e: Exception) {
+            log(TAG, throwable = e)
         } finally {
             importingBackup?.postValue(
                 ImportProgress(current.getAndIncrement(), total, stage = ImportStage.IMPORT_FILES)
@@ -270,6 +274,12 @@ private fun Cursor.toBaseNote(): BaseNote {
             Converters.jsonToAudios(getString(audiosIndex))
         } else emptyList()
 
+    val remindersIndex = getColumnIndex("reminders")
+    val reminders =
+        if (remindersIndex != -1) {
+            Converters.jsonToReminders(getString(remindersIndex))
+        } else emptyList()
+
     return BaseNote(
         0,
         type,
@@ -286,6 +296,7 @@ private fun Cursor.toBaseNote(): BaseNote {
         images,
         files,
         audios,
+        reminders,
     )
 }
 

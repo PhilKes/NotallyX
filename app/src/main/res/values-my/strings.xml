@@ -18,7 +18,6 @@
     <string name="choose_folder">ဖိုဒါ ရွေးပါ</string>
     <string name="clear_formatting">ပုံစံချထားသည်များ ဖျက်မည်</string>
     <string name="content_density">စာစု </string>
-    <string name="create_new">အမှတ်အသား မရှိ​သေးပါ။တစ်ခု ဖန်တီးမလား။</string>
     <string name="dark">အ​​မှောင်</string>
     <string name="date">နေ့ရက်</string>
     <string name="date_format">နေ့ရက်ပုံစံ</string>
@@ -33,6 +32,7 @@
     <string name="drag_handle">ဟန်ယ်ကို ရွှေ့မည်</string>
     <string name="edit">တည်းဖြတ်မည်</string>
     <string name="edit_label">အမှတ်အသားကို ပြင်မည်</string>
+    <string name="empty_labels">အမှတ်အသား မရှိ​သေးပါ။တစ်ခု ဖန်တီးမလား။</string>
     <string name="empty_list">စာရင်းအလွတ်</string>
     <string name="empty_note">မှတ်စုအလွတ်</string>
     <string name="export">ထုတ်မည်</string>

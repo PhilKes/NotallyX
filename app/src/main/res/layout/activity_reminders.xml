@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:navigationIcon="?attr/homeAsUpIndicator"
-        app:title="@string/select_labels" />
+        app:title="@string/edit_reminders" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RecyclerView"
@@ -24,7 +24,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/Toolbar"
         android:gravity="center"
-        android:text="@string/empty_labels"
+        android:text="@string/empty_reminders"
         android:textAppearance="?attr/textAppearanceBodyMedium" />
 
 </RelativeLayout>

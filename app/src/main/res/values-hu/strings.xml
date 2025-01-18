@@ -12,7 +12,6 @@
     <string name="cant_open_link">A hivatkozás nem nyitható meg</string>
     <string name="clear_formatting">Formázás törlése</string>
     <string name="content_density">Tartalom sűrűsége</string>
-    <string name="create_new">Nincsenek címkék. Szeretnél készíteni egyet?</string>
     <string name="dark">Sötét</string>
     <string name="date">Dátum</string>
     <string name="delete">Törlés</string>
@@ -25,6 +24,7 @@
     <string name="drag_handle">Megfogó nyél</string>
     <string name="edit">Szerkesztés</string>
     <string name="edit_label">Címke szerkesztése</string>
+    <string name="empty_labels">Nincsenek címkék. Szeretnél készíteni egyet?</string>
     <string name="empty_list">Üres lista</string>
     <string name="empty_note">Üres jegyzet</string>
     <string name="export">Exportálás</string>

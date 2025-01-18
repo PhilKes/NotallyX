@@ -39,6 +39,7 @@ import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.activity.note.SelectLabelsActivity.Companion.EXTRA_SELECTED_LABELS
+import com.philkes.notallyx.presentation.activity.note.reminders.RemindersActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addFastScroll
 import com.philkes.notallyx.presentation.addIconButton
@@ -582,6 +583,12 @@ abstract class EditActivity(private val type: Type) :
             notallyModel.color = selectedColor
             setColor()
         }
+    }
+
+    override fun changeReminders() {
+        val intent = Intent(this, RemindersActivity::class.java)
+        intent.putExtra(RemindersActivity.NOTE_ID, notallyModel.id)
+        startActivity(intent)
     }
 
     override fun changeLabels() {

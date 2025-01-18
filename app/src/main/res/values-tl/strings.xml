@@ -12,7 +12,6 @@
     <string name="cant_open_link">Hindi mabuksan ang link</string>
     <string name="clear_formatting">Tanggalin ang formatting</string>
     <string name="content_density">Siksikan ng laman</string>
-    <string name="create_new">Wala pang mga tatak. Gumawa ng isa?</string>
     <string name="dark">Madilim</string>
     <string name="date">Petsa</string>
     <string name="delete">Tanggalin</string>
@@ -25,6 +24,7 @@
     <string name="drag_handle">Hawakan sa pag-drag</string>
     <string name="edit">I-edit</string>
     <string name="edit_label">I-edit ang tatak</string>
+    <string name="empty_labels">Wala pang mga tatak. Gumawa ng isa?</string>
     <string name="empty_list">Walang laman na listahan</string>
     <string name="empty_note">Walang laman na tala</string>
     <string name="export">I-export</string>
