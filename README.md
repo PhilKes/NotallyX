@@ -51,6 +51,13 @@ If you find any bugs or want to propose a new Feature/Enhancement, feel free to 
 
 When using the app and an unknown error occurs, causing the app to crash you will see a dialog (see showcase video in https://github.com/PhilKes/NotallyX/pull/171) from which you can immediately create a bug report on Github with the crash details pre-filled.
 
+#### Beta Releases
+
+I occasionally release BETA versions of the app during development, since its very valuable for me to get feedback before publicly releasing a new version.
+These BETA releases have another `applicationId` as the release versions, thats why when you install a BETA version it will show up on your device as a separate app called `NotallyX BETA`.
+BETA versions also have their own data, they do not use the data of your NotallyX app
+You can download the most recent BETA release [here on Github](https://github.com/PhilKes/NotallyX/releases/tag/beta)
+
 ### Translations
 All translations are crowd sourced.
 To contribute:

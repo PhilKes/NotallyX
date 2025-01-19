@@ -19,8 +19,8 @@ android {
         applicationId = "com.philkes.notallyx"
         minSdk = 21
         targetSdk = 34
-        versionCode = 641
-        versionName = "6.4.1"
+        versionCode = 642
+        versionName = "7.0.0"
         resourceConfigurations += listOf(
             "en", "ca", "cs", "da", "de", "el", "es", "fr", "hu", "in", "it", "ja", "my", "nb", "nl", "nn", "pl", "pt-rBR", "pt-rPT", "ro", "ru", "sk", "sv", "tl", "tr", "uk", "vi", "zh-rCN"
         )
@@ -44,6 +44,8 @@ android {
     buildTypes {
         debug {
             applicationIdSuffix = ".debug"
+            versionNameSuffix = "-DEBUG"
+            resValue("string", "app_name", "NotallyX DEBUG")
         }
         release {
             isCrunchPngs = false
@@ -54,6 +56,12 @@ android {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
+        }
+        create("beta"){
+            initWith(getByName("release"))
+            applicationIdSuffix = ".beta"
+            versionNameSuffix = "-BETA"
+            resValue("string", "app_name", "NotallyX BETA")
         }
     }
 
