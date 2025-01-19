@@ -3,8 +3,8 @@ package com.philkes.notallyx.presentation.view.main
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.databinding.RecyclerColorBinding
+import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.view.misc.ItemListener
-import com.philkes.notallyx.utils.Operations
 
 class ColorVH(private val binding: RecyclerColorBinding, listener: ItemListener) :
     RecyclerView.ViewHolder(binding.root) {
@@ -14,7 +14,7 @@ class ColorVH(private val binding: RecyclerColorBinding, listener: ItemListener)
     }
 
     fun bind(color: Color) {
-        val value = Operations.extractColor(color, binding.root.context)
+        val value = binding.root.context.extractColor(color)
         binding.CardView.setCardBackgroundColor(value)
         binding.CardView.contentDescription = color.name
     }

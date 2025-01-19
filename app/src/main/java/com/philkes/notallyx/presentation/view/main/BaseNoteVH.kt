@@ -30,6 +30,7 @@ import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.dp
+import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getColorFromAttr
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
@@ -217,7 +218,7 @@ class BaseNoteVH(
                 setControlsContrastColorForAllViews(context.getColorFromAttr(R.attr.colorSurface))
             } else {
                 strokeColor = 0
-                val colorInt = Operations.extractColor(color, context)
+                val colorInt = context.extractColor(color)
                 setCardBackgroundColor(colorInt)
                 setControlsContrastColorForAllViews(colorInt)
             }

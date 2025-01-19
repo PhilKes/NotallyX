@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.activity.note
 import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.ColorStateList
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
@@ -18,6 +19,7 @@ import android.view.ViewGroup.VISIBLE
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
@@ -38,9 +40,12 @@ import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addFastScroll
 import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
+import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.getUriForFile
+import com.philkes.notallyx.presentation.isLightColor
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
+import com.philkes.notallyx.presentation.setLightStatusAndNavBar
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.showKeyboard
@@ -71,6 +76,8 @@ import kotlinx.coroutines.launch
 
 abstract class EditActivity(private val type: Type) :
     LockedActivity<ActivityEditBinding>(), AddActions, MoreActions {
+    private lateinit var audioAdapter: AudioAdapter
+    private lateinit var fileAdapter: PreviewFileAdapter
     private lateinit var recordAudioActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var addImagesActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var viewImagesActivityResultLauncher: ActivityResultLauncher<Intent>
@@ -87,6 +94,8 @@ abstract class EditActivity(private val type: Type) :
 
     protected var undo: View? = null
     protected var redo: View? = null
+
+    protected var colorInt: Int = -1
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -198,6 +207,7 @@ abstract class EditActivity(private val type: Type) :
                             notallyModel.labels,
                             notallyModel.textSize,
                             paddingTop = true,
+                            colorInt,
                         )
                     }
                 }
@@ -366,6 +376,7 @@ abstract class EditActivity(private val type: Type) :
             setNavigationOnClickListener { endSearch() }
             navigationIconBeforeSearch = navigationIcon
             setNavigationIcon(R.drawable.close)
+            setControlsContrastColorForAllViews(colorInt, overwriteBackground = false)
         }
         binding.EnterSearchKeyword.apply {
             visibility = VISIBLE
@@ -391,13 +402,15 @@ abstract class EditActivity(private val type: Type) :
         }
         setupToolbars()
         binding.Toolbar.navigationIcon = navigationIconBeforeSearch
+        binding.Toolbar.setControlsContrastColorForAllViews(colorInt, overwriteBackground = false)
     }
 
     protected open fun initBottomMenu() {
         binding.BottomAppBarLeft.apply {
             removeAllViews()
             addIconButton(R.string.adding_files, R.drawable.add, marginStart = 0) {
-                AddBottomSheet(this@EditActivity).show(supportFragmentManager, AddBottomSheet.TAG)
+                AddBottomSheet(this@EditActivity, colorInt)
+                    .show(supportFragmentManager, AddBottomSheet.TAG)
             }
         }
         binding.BottomAppBarCenter.apply {
@@ -425,10 +438,11 @@ abstract class EditActivity(private val type: Type) :
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
-                MoreNoteBottomSheet(this@EditActivity, createFolderActions())
+                MoreNoteBottomSheet(this@EditActivity, createFolderActions(), colorInt)
                     .show(supportFragmentManager, MoreNoteBottomSheet.TAG)
             }
         }
+        setBottomAppBarColor(colorInt)
     }
 
     protected fun createFolderActions() =
@@ -475,6 +489,7 @@ abstract class EditActivity(private val type: Type) :
             notallyModel.labels,
             notallyModel.textSize,
             paddingTop = true,
+            colorInt,
         )
 
         setColor()
@@ -559,7 +574,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     override fun changeColor() {
-        showColorSelectDialog { selectedColor ->
+        showColorSelectDialog(colorInt.isLightColor()) { selectedColor ->
             notallyModel.color = selectedColor
             setColor()
         }
@@ -675,7 +690,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     private fun setupFiles() {
-        val fileAdapter =
+        fileAdapter =
             PreviewFileAdapter({ fileAttachment ->
                 if (notallyModel.filesRoot == null) {
                     return@PreviewFileAdapter
@@ -750,7 +765,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     private fun setupAudios() {
-        val adapter = AudioAdapter { position: Int ->
+        audioAdapter = AudioAdapter { position: Int ->
             if (position != -1) {
                 val audio = notallyModel.audios.value[position]
                 val intent = Intent(this, PlayAudioActivity::class.java)
@@ -758,20 +773,42 @@ abstract class EditActivity(private val type: Type) :
                 playAudioActivityResultLauncher.launch(intent)
             }
         }
-        binding.AudioRecyclerView.adapter = adapter
+        binding.AudioRecyclerView.adapter = audioAdapter
 
         notallyModel.audios.observe(this) { list ->
-            adapter.submitList(list)
+            audioAdapter.submitList(list)
             binding.AudioHeader.isVisible = list.isNotEmpty()
             binding.AudioRecyclerView.isVisible = list.isNotEmpty()
         }
     }
 
-    open protected fun setColor() {
-        val color = Operations.extractColor(notallyModel.color, this)
-        binding.ScrollView.apply {
-            setBackgroundColor(color)
-            setControlsContrastColorForAllViews(color)
+    protected open fun setColor() {
+        colorInt = extractColor(notallyModel.color)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            window.statusBarColor = colorInt
+            window.navigationBarColor = colorInt
+            window.setLightStatusAndNavBar(colorInt.isLightColor())
+        }
+        binding.apply {
+            ScrollView.apply {
+                setBackgroundColor(colorInt)
+                setControlsContrastColorForAllViews(colorInt)
+            }
+            root.setBackgroundColor(colorInt)
+            RecyclerView.setBackgroundColor(colorInt)
+            Toolbar.backgroundTintList = ColorStateList.valueOf(colorInt)
+            Toolbar.setControlsContrastColorForAllViews(colorInt)
+        }
+        setBottomAppBarColor(colorInt)
+        fileAdapter.setColor(colorInt)
+        audioAdapter.setColor(colorInt)
+    }
+
+    protected fun setBottomAppBarColor(@ColorInt color: Int) {
+        binding.apply {
+            BottomAppBar.setBackgroundColor(color)
+            BottomAppBar.setControlsContrastColorForAllViews(color)
+            BottomAppBarLayout.backgroundTint = ColorStateList.valueOf(color)
         }
     }
 

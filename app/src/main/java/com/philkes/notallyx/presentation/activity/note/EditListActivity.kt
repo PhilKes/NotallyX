@@ -1,7 +1,6 @@
 package com.philkes.notallyx.presentation.activity.note
 
 import android.os.Bundle
-import android.view.View.GONE
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.philkes.notallyx.R
@@ -20,7 +19,6 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
-import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.findAllOccurrences
 
 class EditListActivity : EditActivity(Type.LIST), MoreListActions {
@@ -57,31 +55,41 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
-                MoreListBottomSheet(this@EditListActivity, createFolderActions())
+                MoreListBottomSheet(this@EditListActivity, createFolderActions(), colorInt)
                     .show(supportFragmentManager, MoreListBottomSheet.TAG)
             }
         }
+        setBottomAppBarColor(colorInt)
     }
 
     override fun highlightSearchResults(search: String): Int {
         var resultPos = 0
         val alreadyNotifiedItemPos = mutableSetOf<Int>()
         adapter?.clearHighlights()
-        val amount=  items
-            .mapIndexed { idx, item ->
-                val occurrences = item.body.findAllOccurrences(search)
-                occurrences.onEach { (startIdx, endIdx) ->
-                    adapter?.highlightText(
-                        ListItemAdapter.ListItemHighlight(idx, resultPos++, startIdx, endIdx, false)
-                    )
+        val amount =
+            items
+                .mapIndexed { idx, item ->
+                    val occurrences = item.body.findAllOccurrences(search)
+                    occurrences.onEach { (startIdx, endIdx) ->
+                        adapter?.highlightText(
+                            ListItemAdapter.ListItemHighlight(
+                                idx,
+                                resultPos++,
+                                startIdx,
+                                endIdx,
+                                false,
+                            )
+                        )
+                    }
+                    if (occurrences.isNotEmpty()) {
+                        alreadyNotifiedItemPos.add(idx)
+                    }
+                    occurrences.size
                 }
-                if(occurrences.isNotEmpty()){
-                    alreadyNotifiedItemPos.add(idx)
-                }
-                occurrences.size
-            }
-            .sum()
-        items.indices.filter { !alreadyNotifiedItemPos.contains(it) }.forEach { adapter?.notifyItemChanged(it) }
+                .sum()
+        items.indices
+            .filter { !alreadyNotifiedItemPos.contains(it) }
+            .forEach { adapter?.notifyItemChanged(it) }
         return amount
     }
 
@@ -122,14 +130,15 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                     if (isInSearchMode()) {
                         endSearch()
                     }
-                }){ _ ->
+                },
+            ) { _ ->
                 if (isInSearchMode() && search.results.value > 0) {
                     updateSearchResults(search.query)
                 }
             }
         adapter =
             ListItemAdapter(
-                Operations.extractColor(notallyModel.color, this),
+                colorInt,
                 notallyModel.textSize,
                 elevation,
                 NotallyXPreferences.getInstance(application),
@@ -153,6 +162,6 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     override fun setColor() {
         super.setColor()
-        adapter?.setBackgroundColor(Operations.extractColor(notallyModel.color, this))
+        adapter?.setBackgroundColor(colorInt)
     }
 }

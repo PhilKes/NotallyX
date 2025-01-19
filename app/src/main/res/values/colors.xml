@@ -146,6 +146,7 @@
 
     <color name="TextLight">#F1F0F7</color>
     <color name="TextDark">#1A1B21</color>
+    <color name="TextDarkLight">#261A1B21</color>
 
     <!-- Note Colors -->
     <color name="Coral">#FAAFA9</color>

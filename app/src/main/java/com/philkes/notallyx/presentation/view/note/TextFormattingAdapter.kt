@@ -6,11 +6,15 @@ import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
+import androidx.annotation.ColorInt
 import com.philkes.notallyx.R
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 
-class TextFormattingAdapter(context: Context, private val editText: StylableEditTextWithHistory) :
-    ToggleAdapter(mutableListOf()) {
+class TextFormattingAdapter(
+    context: Context,
+    private val editText: StylableEditTextWithHistory,
+    @ColorInt color: Int?,
+) : ToggleAdapter(mutableListOf(), color) {
 
     private var link: Toggle =
         Toggle(R.string.link, R.drawable.link, false) {

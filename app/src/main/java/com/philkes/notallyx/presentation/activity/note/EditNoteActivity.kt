@@ -39,6 +39,7 @@ import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companio
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.dp
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.showToast
@@ -125,7 +126,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     }
 
     override fun selectSearchResult(resultPos: Int) {
-        if(resultPos < 0){
+        if (resultPos < 0) {
             binding.EnterBody.unselectHighlight()
             return
         }
@@ -285,7 +286,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         binding.BottomAppBarLeft.apply {
             removeAllViews()
             addIconButton(R.string.add_item, R.drawable.add, marginStart = 0) {
-                AddNoteBottomSheet(this@EditNoteActivity)
+                AddNoteBottomSheet(this@EditNoteActivity, colorInt)
                     .show(supportFragmentManager, AddNoteBottomSheet.TAG)
             }
             updateLayoutParams<ConstraintLayout.LayoutParams> { endToStart = -1 }
@@ -295,10 +296,12 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                     }
                     .apply { isEnabled = binding.EnterBody.isActionModeOn }
         }
+        setBottomAppBarColor(colorInt)
     }
 
     private fun initBottomTextFormattingMenu() {
         binding.BottomAppBarCenter.visibility = GONE
+        val extractColor = colorInt
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addView(
@@ -311,6 +314,8 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                         marginEnd = 0
                         marginStart = 10.dp(context)
                     }
+                    setControlsContrastColorForAllViews(extractColor)
+                    setBackgroundColor(0)
                 }
             )
         }
@@ -323,7 +328,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
             val layout = BottomTextFormattingMenuBinding.inflate(layoutInflater, this, false)
             layout.RecyclerView.apply {
                 textFormattingAdapter =
-                    TextFormattingAdapter(this@EditNoteActivity, binding.EnterBody)
+                    TextFormattingAdapter(this@EditNoteActivity, binding.EnterBody, colorInt)
                 adapter = textFormattingAdapter
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             }

@@ -42,6 +42,7 @@
               android:paddingTop="10dp"
               android:paddingBottom="10dp"
               android:paddingEnd="10dp"
+              android:textIsSelectable="false"
               android:textAppearance="?attr/textAppearanceBody1"
               android:visibility="gone" />
         </LinearLayout>
@@ -176,6 +177,7 @@
                     android:text="@string/add_item"
                     android:textAppearance="?attr/textAppearanceSubtitle2"
                     android:textColor="?android:textColorHint"
+                    android:textIsSelectable="false"
                     app:drawableStartCompat="@drawable/add" />
 
                 <TextView

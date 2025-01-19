@@ -2,13 +2,16 @@ package com.philkes.notallyx.presentation.view.note
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.databinding.RecyclerToggleBinding
 
-open class ToggleAdapter(protected val toggles: MutableList<Toggle>) :
-    RecyclerView.Adapter<ToggleVH>() {
+open class ToggleAdapter(
+    protected val toggles: MutableList<Toggle>,
+    @ColorInt private val color: Int?,
+) : RecyclerView.Adapter<ToggleVH>() {
 
     override fun getItemCount() = toggles.size
 
@@ -20,7 +23,7 @@ open class ToggleAdapter(protected val toggles: MutableList<Toggle>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToggleVH {
         val inflater = LayoutInflater.from(parent.context)
         val binding = RecyclerToggleBinding.inflate(inflater, parent, false)
-        return ToggleVH(binding)
+        return ToggleVH(binding, color)
     }
 }
 
