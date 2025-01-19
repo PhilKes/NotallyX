@@ -4,6 +4,7 @@ import android.text.format.DateUtils
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.RecyclerAudioBinding
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import java.text.DateFormat
 
 class AudioVH(
@@ -16,8 +17,11 @@ class AudioVH(
         binding.root.setOnClickListener { onClick(adapterPosition) }
     }
 
-    fun bind(audio: Audio) {
-        binding.Date.text = formatter.format(audio.timestamp)
-        binding.Length.text = audio.duration?.let { DateUtils.formatElapsedTime(it / 1000) } ?: "-"
+    fun bind(audio: Audio, color: Int?) {
+        binding.apply {
+            Date.text = formatter.format(audio.timestamp)
+            Length.text = audio.duration?.let { DateUtils.formatElapsedTime(it / 1000) } ?: "-"
+            color?.let { root.setControlsContrastColorForAllViews(it) }
+        }
     }
 }

@@ -638,7 +638,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM
         ): MenuItem {
             return add(R.string.change_color, R.drawable.change_color, showAsAction) {
-                showColorSelectDialog { selectedColor -> model.colorBaseNote(selectedColor) }
+                showColorSelectDialog(null) { selectedColor -> model.colorBaseNote(selectedColor) }
             }
         }
 

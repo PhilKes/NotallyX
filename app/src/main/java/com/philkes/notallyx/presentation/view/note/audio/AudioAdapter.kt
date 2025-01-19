@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.view.note.audio
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.philkes.notallyx.data.model.Audio
@@ -11,11 +12,18 @@ import java.text.DateFormat
 class AudioAdapter(private val onClick: (position: Int) -> Unit) :
     ListAdapter<Audio, AudioVH>(DiffCallback) {
 
+    @ColorInt private var color: Int? = null
+
+    fun setColor(@ColorInt colorInt: Int) {
+        color = colorInt
+        notifyDataSetChanged()
+    }
+
     private val formatter = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.SHORT)
 
     override fun onBindViewHolder(holder: AudioVH, position: Int) {
         val audio = getItem(position)
-        holder.bind(audio)
+        holder.bind(audio, color)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AudioVH {

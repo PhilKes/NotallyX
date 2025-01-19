@@ -4,6 +4,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.databinding.RecyclerPreviewFileBinding
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 
 class PreviewFileVH(
     private val binding: RecyclerPreviewFileBinding,
@@ -18,10 +19,11 @@ class PreviewFileVH(
         }
     }
 
-    fun bind(fileAttachment: FileAttachment) {
+    fun bind(fileAttachment: FileAttachment, color: Int?) {
         binding.FileName.apply {
             text = fileAttachment.originalName
             setChipIconResource(getIconForMimeType(fileAttachment.mimeType))
+            color?.let { setControlsContrastColorForAllViews(it) }
         }
     }
 

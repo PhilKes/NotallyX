@@ -1,10 +1,12 @@
 package com.philkes.notallyx.presentation.view.note.action
 
 import android.os.Build
+import androidx.annotation.ColorInt
 import com.philkes.notallyx.R
 
 /** BottomSheet inside note for adding files, recording audio. */
-class AddBottomSheet(callbacks: AddActions) : ActionBottomSheet(createActions(callbacks)) {
+class AddBottomSheet(callbacks: AddActions, @ColorInt color: Int?) :
+    ActionBottomSheet(createActions(callbacks), color) {
 
     companion object {
         const val TAG = "AddBottomSheet"

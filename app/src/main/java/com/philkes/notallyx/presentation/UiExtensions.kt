@@ -7,6 +7,7 @@ import android.content.DialogInterface
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Typeface
+import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.text.Editable
@@ -27,6 +28,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.view.Window
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -45,6 +47,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.core.view.setPadding
@@ -52,6 +55,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.chip.Chip
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -459,9 +463,11 @@ private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
     }
 }
 
-fun Activity.showColorSelectDialog(callback: (selectedColor: Color) -> Unit) {
+fun Activity.showColorSelectDialog(
+    setNavigationbarLight: Boolean?,
+    callback: (selectedColor: Color) -> Unit,
+) {
     val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.change_color).create()
-
     val colorAdapter =
         ColorAdapter(
             object : ItemListener {
@@ -473,10 +479,12 @@ fun Activity.showColorSelectDialog(callback: (selectedColor: Color) -> Unit) {
                 override fun onLongClick(position: Int) {}
             }
         )
-
     DialogColorBinding.inflate(layoutInflater).apply {
         RecyclerView.adapter = colorAdapter
         dialog.setView(root)
+        dialog.setOnShowListener {
+            setNavigationbarLight?.let { window?.apply { setLightStatusAndNavBar(it, root) } }
+        }
         dialog.show()
     }
 }
@@ -524,33 +532,63 @@ fun Context.getColorFromAttr(@AttrRes attr: Int): Int {
     }
 }
 
-fun View.setControlsContrastColorForAllViews(@ColorInt backgroundColor: Int) {
+fun View.setControlsContrastColorForAllViews(
+    @ColorInt backgroundColor: Int,
+    overwriteBackground: Boolean = true,
+) {
     val controlsColor = context.getContrastFontColor(backgroundColor)
-    setControlsColorForAllViews(controlsColor, backgroundColor)
+    setControlsColorForAllViews(controlsColor, backgroundColor, overwriteBackground)
 }
 
-fun View.setControlsColorForAllViews(@ColorInt controlsColor: Int, @ColorInt backgroundColor: Int) {
+var counter = 0
+
+fun View.setControlsColorForAllViews(
+    @ColorInt controlsColor: Int,
+    @ColorInt backgroundColor: Int,
+    overwriteBackground: Boolean = true,
+) {
     if (this is ViewGroup) {
         for (i in 0 until childCount) {
             val child = getChildAt(i)
             child.setControlsColorForAllViews(
                 controlsColor,
                 backgroundColor,
+                overwriteBackground,
             ) // Recursive call for nested layouts
         }
     } else {
         if (this is Chip) {
-            // Chip should not be re-colored
+            setTextColor(controlsColor)
+            setLinkTextColor(controlsColor)
+            chipBackgroundColor = ColorStateList.valueOf(backgroundColor)
+            chipIconTint = ColorStateList.valueOf(controlsColor)
+            chipStrokeColor = ColorStateList.valueOf(controlsColor)
             return
         }
         if (this is TextView) {
             setCompoundDrawableTint(controlsColor)
             setTextColor(controlsColor)
             setLinkTextColor(controlsColor)
-            setHintTextColor(controlsColor.withAlpha(0.5f))
+            if (isTextSelectable || this is EditText) {
+                val highlight = controlsColor.withAlpha(0.4f)
+                setHintTextColor(highlight)
+                highlightColor = highlight
+                val selectHandleColor = controlsColor.withAlpha(0.8f)
+                textSelectHandleLeft?.withTint(selectHandleColor)?.let {
+                    setTextSelectHandleLeft(it)
+                }
+                textSelectHandleRight?.withTint(selectHandleColor)?.let {
+                    setTextSelectHandleRight(it)
+                }
+                textSelectHandle?.withTint(selectHandleColor)?.let { setTextSelectHandle(it) }
+                textCursorDrawable?.let { DrawableCompat.setTint(it, selectHandleColor) }
+            }
         }
         if (this is CompoundButton) {
             buttonTintList = ColorStateList.valueOf(controlsColor)
+        }
+        if (this is MaterialButton) {
+            iconTint = ColorStateList.valueOf(controlsColor)
         }
         if (this is ImageButton) {
             imageTintList = ColorStateList.valueOf(controlsColor)
@@ -558,7 +596,9 @@ fun View.setControlsColorForAllViews(@ColorInt controlsColor: Int, @ColorInt bac
         if (this is MaterialCheckBox) {
             buttonIconTintList = ColorStateList.valueOf(backgroundColor)
         }
-        backgroundTintList = ColorStateList.valueOf(controlsColor)
+        if (overwriteBackground) {
+            backgroundTintList = ColorStateList.valueOf(controlsColor)
+        }
     }
 }
 
@@ -566,34 +606,35 @@ fun TextView.setCompoundDrawableTint(@ColorInt color: Int) {
     compoundDrawablesRelative.forEach { drawable ->
         drawable?.let { DrawableCompat.setTint(DrawableCompat.wrap(it), color) }
     }
-
     compoundDrawables.forEach { drawable ->
         drawable?.let { DrawableCompat.setTint(DrawableCompat.wrap(it), color) }
     }
-
     (background as? MaterialShapeDrawable)?.setStrokeTint(color)
+}
 
-    //    setCompoundDrawablesRelativeWithIntrinsicBounds(
-    //        compoundDrawablesRelative[0], // Start
-    //        compoundDrawablesRelative[1], // Top
-    //        compoundDrawablesRelative[2], // End
-    //        compoundDrawablesRelative[3], // Bottom
-    //    )
+fun Drawable.withTint(@ColorInt color: Int): Drawable {
+    val oldDrawable = DrawableCompat.unwrap<Drawable>(this)
+    val newDrawable = oldDrawable.constantState?.newDrawable()?.mutate() ?: oldDrawable.mutate()
+    val wrappedDrawable = DrawableCompat.wrap(newDrawable)
+    DrawableCompat.setTint(wrappedDrawable, color)
+    return wrappedDrawable
 }
 
 @ColorInt
 private fun Context.getContrastFontColor(@ColorInt backgroundColor: Int): Int {
-    // Extract RGB components
-    val red = android.graphics.Color.red(backgroundColor) / 255.0
-    val green = android.graphics.Color.green(backgroundColor) / 255.0
-    val blue = android.graphics.Color.blue(backgroundColor) / 255.0
+    return if (backgroundColor.isLightColor()) ContextCompat.getColor(this, R.color.TextDark)
+    else ContextCompat.getColor(this, R.color.TextLight)
+}
+
+fun @receiver:ColorInt Int.isLightColor(): Boolean {
+    val red = android.graphics.Color.red(this) / 255.0
+    val green = android.graphics.Color.green(this) / 255.0
+    val blue = android.graphics.Color.blue(this) / 255.0
 
     // Calculate relative luminance
     val luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
 
-    // Return white for dark backgrounds, black for light backgrounds
-    return if (luminance > 0.5) ContextCompat.getColor(this, R.color.TextDark)
-    else ContextCompat.getColor(this, R.color.TextLight)
+    return luminance > 0.5
 }
 
 fun MaterialAlertDialogBuilder.addCancelButton(): MaterialAlertDialogBuilder {
@@ -639,4 +680,30 @@ fun ViewGroup.addFastScroll(context: Context) {
         .setTrackDrawable(ContextCompat.getDrawable(context, R.drawable.scroll_track)!!)
         .setPadding(0, 0, 2.dp(context), 0)
         .build()
+}
+
+@ColorInt
+fun Context.extractColor(color: Color): Int {
+    val id =
+        when (color) {
+            Color.DEFAULT -> return getColorFromAttr(R.attr.colorSurface)
+            Color.CORAL -> R.color.Coral
+            Color.ORANGE -> R.color.Orange
+            Color.SAND -> R.color.Sand
+            Color.STORM -> R.color.Storm
+            Color.FOG -> R.color.Fog
+            Color.SAGE -> R.color.Sage
+            Color.MINT -> R.color.Mint
+            Color.DUSK -> R.color.Dusk
+            Color.FLOWER -> R.color.Flower
+            Color.BLOSSOM -> R.color.Blossom
+            Color.CLAY -> R.color.Clay
+        }
+    return ContextCompat.getColor(this, id)
+}
+
+fun Window.setLightStatusAndNavBar(value: Boolean, view: View = decorView) {
+    val windowInsetsControllerCompat = WindowInsetsControllerCompat(this, view)
+    windowInsetsControllerCompat.isAppearanceLightStatusBars = value
+    windowInsetsControllerCompat.isAppearanceLightNavigationBars = value
 }

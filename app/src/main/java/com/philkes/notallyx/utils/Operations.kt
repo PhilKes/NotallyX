@@ -27,6 +27,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.LabelBinding
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getColorFromAttr
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import java.io.File
@@ -40,7 +41,6 @@ import java.text.DateFormat
 object Operations {
 
     private const val TAG = "Operations"
-
 
     fun getLastExceptionLog(app: Application): String? {
         val logFile = getLog(app)
@@ -124,6 +124,7 @@ object Operations {
         labels: List<String>,
         textSize: TextSize,
         paddingTop: Boolean,
+        color: Int? = null,
     ) {
         if (labels.isEmpty()) {
             group.visibility = View.GONE
@@ -140,6 +141,7 @@ object Operations {
                     background = getOutlinedDrawable(group.context)
                     setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
                     text = label
+                    color?.let { setControlsContrastColorForAllViews(it) }
                 }
             }
         }

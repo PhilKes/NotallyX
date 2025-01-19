@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetDialog
@@ -14,10 +15,15 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.BottomSheetActionBinding
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getColorFromAttr
+import com.philkes.notallyx.presentation.isLightColor
+import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
+import com.philkes.notallyx.presentation.setLightStatusAndNavBar
 
 /** Helper to create [BottomSheetDialogFragment] to display actions. */
-open class ActionBottomSheet(private val actions: Collection<Action>) :
-    BottomSheetDialogFragment() {
+open class ActionBottomSheet(
+    private val actions: Collection<Action>,
+    @ColorInt private val color: Int? = null,
+) : BottomSheetDialogFragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,13 +73,26 @@ open class ActionBottomSheet(private val actions: Collection<Action>) :
                     }
                 }
             view.addView(textView)
+            color?.let {
+                view.apply {
+                    setBackgroundColor(it)
+                    setControlsContrastColorForAllViews(it, overwriteBackground = false)
+                }
+            }
         }
 
         return view
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        return BottomSheetDialog(requireContext(), R.style.ThemeOverlay_App_BottomSheetDialog)
+        val dialog = BottomSheetDialog(requireContext(), R.style.ThemeOverlay_App_BottomSheetDialog)
+        color?.let {
+            dialog.window?.apply {
+                navigationBarColor = it
+                setLightStatusAndNavBar(it.isLightColor())
+            }
+        }
+        return dialog
     }
 
     private fun BottomSheetDialogFragment.hide() {
