@@ -13,6 +13,7 @@ import android.text.style.URLSpan
 import android.util.AttributeSet
 import android.view.ActionMode
 import android.view.LayoutInflater
+import android.view.WindowManager
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -313,19 +314,15 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
             if (urlAfter == null) {
                 return@showLinkDialog
             }
-            if (!isNewUnnamedLink && displayTextAfter == displayTextBefore) {
-                this.applySpan(URLSpan(urlAfter))
-            } else {
-                this.changeTextWithHistory { text ->
-                    val start = this.selectionStart
-                    text.replace(start, this.selectionEnd, displayTextAfter)
-                    text.setSpan(
-                        URLSpan(urlAfter),
-                        start,
-                        start + displayTextAfter.length,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
-                    )
-                }
+            this.changeTextWithHistory { text ->
+                val start = this.selectionStart
+                text.replace(start, this.selectionEnd, displayTextAfter)
+                text.setSpan(
+                    URLSpan(urlAfter),
+                    start,
+                    start + displayTextAfter.length,
+                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE,
+                )
             }
             mode?.finish()
         }
@@ -352,24 +349,34 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
                 }
             }
 
-        MaterialAlertDialogBuilder(context)
-            .setView(layout.root)
-            .setTitle(R.string.edit_link)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val displayTextAfter = layout.InputText1.text.toString()
-                val urlAfter = layout.InputText2.text.toString()
-                onSuccess.invoke(urlAfter, displayTextAfter)
-                onClose?.invoke()
-            }
-            .setNegativeButton(R.string.cancel) { dialog, _ ->
-                dialog.cancel()
-                onClose?.invoke()
-            }
-            .setNeutralButton(R.string.clear) { dialog, _ ->
-                dialog.cancel()
-                onSuccess.invoke(null, displayTextBefore)
-                onClose?.invoke()
-            }
-            .showAndFocus(if (isNoteUrl) layout.InputText1 else layout.InputText2, isNewUnnamedLink)
+        val dialog =
+            MaterialAlertDialogBuilder(context)
+                .setView(layout.root)
+                .setTitle(R.string.edit_link)
+                .setPositiveButton(R.string.save) { _, _ ->
+                    val displayTextAfter = layout.InputText1.text.toString()
+                    val urlAfter = layout.InputText2.text.toString()
+                    onSuccess.invoke(urlAfter, displayTextAfter)
+                    onClose?.invoke()
+                }
+                .setBackgroundInsetEnd(0)
+                .setBackgroundInsetStart(0)
+                .setNegativeButton(R.string.cancel) { dialog, _ ->
+                    dialog.cancel()
+                    onClose?.invoke()
+                }
+                .setNeutralButton(R.string.clear) { dialog, _ ->
+                    dialog.cancel()
+                    onSuccess.invoke(null, displayTextBefore)
+                    onClose?.invoke()
+                }
+                .showAndFocus(
+                    if (isNoteUrl) layout.InputText1 else layout.InputText2,
+                    isNewUnnamedLink,
+                )
+        dialog.window?.setLayout(
+            WindowManager.LayoutParams.MATCH_PARENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+        )
     }
 }
