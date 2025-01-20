@@ -557,18 +557,26 @@ fun View.setControlsColorForAllViews(
             ) // Recursive call for nested layouts
         }
     } else {
+        val controlsStateList =
+            ColorStateList(
+                arrayOf(
+                    intArrayOf(android.R.attr.state_enabled),
+                    intArrayOf(-android.R.attr.state_enabled),
+                ),
+                intArrayOf(controlsColor, controlsColor.withAlpha(0.3f)),
+            )
         if (this is Chip) {
-            setTextColor(controlsColor)
-            setLinkTextColor(controlsColor)
+            setTextColor(controlsStateList)
+            setLinkTextColor(controlsStateList)
             chipBackgroundColor = ColorStateList.valueOf(backgroundColor)
-            chipIconTint = ColorStateList.valueOf(controlsColor)
-            chipStrokeColor = ColorStateList.valueOf(controlsColor)
+            chipIconTint = controlsStateList
+            chipStrokeColor = controlsStateList
             return
         }
         if (this is TextView) {
             setCompoundDrawableTint(controlsColor)
-            setTextColor(controlsColor)
-            setLinkTextColor(controlsColor)
+            setTextColor(controlsStateList)
+            setLinkTextColor(controlsStateList)
             if (isTextSelectable || this is EditText) {
                 val highlight = controlsColor.withAlpha(0.4f)
                 setHintTextColor(highlight)
@@ -585,13 +593,13 @@ fun View.setControlsColorForAllViews(
             }
         }
         if (this is CompoundButton) {
-            buttonTintList = ColorStateList.valueOf(controlsColor)
+            buttonTintList = controlsStateList
         }
         if (this is MaterialButton) {
-            iconTint = ColorStateList.valueOf(controlsColor)
+            iconTint = controlsStateList
         }
         if (this is ImageButton) {
-            imageTintList = ColorStateList.valueOf(controlsColor)
+            imageTintList = controlsStateList
         }
         if (this is MaterialCheckBox) {
             buttonIconTintList = ColorStateList.valueOf(backgroundColor)
