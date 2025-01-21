@@ -11,8 +11,8 @@
     <string name="archive">Archive</string>
     <string name="archived">Archived</string>
     <plurals name="archived_selected_notes">
-        <item quantity="one">Archived %d note</item>
-        <item quantity="other">Archived %d notes</item>
+        <item quantity="one">Archived %1$d note</item>
+        <item quantity="other">Archived %1$d notes</item>
     </plurals>
     <string name="ascending">Ascending</string>
     <string name="attach_file">Attach file</string>
@@ -34,12 +34,12 @@
     <string name="calculating">Calculating…</string>
     <string name="cancel">Cancel</string>
     <plurals name="cant_add_files">
-        <item quantity="one">Can’t add %d file</item>
-        <item quantity="other">Can’t add %d files</item>
+        <item quantity="one">Can’t add %1$d file</item>
+        <item quantity="other">Can’t add %1$d files</item>
     </plurals>
     <plurals name="cant_add_images">
-        <item quantity="one">Can’t add %d image</item>
-        <item quantity="other">Can’t add %d images</item>
+        <item quantity="one">Can’t add %1$d image</item>
+        <item quantity="other">Can’t add %1$d images</item>
     </plurals>
     <string name="cant_find_folder">Can’t find folder. It may have been moved or deleted</string>
     <string name="cant_find_note">Can’t find note. It may have been deleted</string>
@@ -76,7 +76,7 @@
     <string name="delete_all_notes">Delete all notes?</string>
     <string name="delete_audio_recording_forever">Delete audio recording forever?</string>
     <string name="delete_checked_items">Delete checked items</string>
-    <string name="delete_file">Delete file \'%s\'?</string>
+    <string name="delete_file">Delete file \'%1$s\'?</string>
     <string name="delete_forever">Delete forever</string>
     <string name="delete_image_forever">Delete image forever?</string>
     <string name="delete_label">Delete label?</string>
@@ -84,8 +84,8 @@
     <string name="delete_selected_notes">Delete selected notes?</string>
     <string name="deleted">Deleted</string>
     <plurals name="deleted_selected_notes">
-        <item quantity="one">Deleted %d note</item>
-        <item quantity="other">Deleted %d notes</item>
+        <item quantity="one">Deleted %1$d note</item>
+        <item quantity="other">Deleted %1$d notes</item>
     </plurals>
     <string name="deleting_files">Deleting files</string>
     <string name="deleting_images">Deleting images</string>
@@ -139,8 +139,8 @@
     <string name="imported_files">Files imported</string>
     <string name="imported_notes">Notes imported</string>
     <plurals name="imported_notes">
-        <item quantity="one">Imported %s Note</item>
-        <item quantity="other">Imported %s Notes</item>
+        <item quantity="one">Imported %1$s Note</item>
+        <item quantity="other">Imported %1$s Notes</item>
     </plurals>
     <string name="importing_backup">Importing backup</string>
     <string name="insert_an_sd_card_audio">Insert an SD card to record audio</string>
@@ -178,10 +178,10 @@
     <string name="modified_date">Modified</string>
     <string name="monospace">Monospace</string>
     <string name="monthly">Monthly</string>
-    <string name="more">%d more</string>
+    <string name="more">%1$d more</string>
     <plurals name="more_files">
-        <item quantity="one">…%d more file</item>
-        <item quantity="other">…%d more files</item>
+        <item quantity="one">…%1$d more file</item>
+        <item quantity="other">…%1$d more files</item>
     </plurals>
     <string name="next">Next</string>
     <string name="no_auto_sort">Dont autosort</string>
@@ -215,8 +215,8 @@
     <string name="reset_settings_success">Successfully reset all settings</string>
     <string name="restore">Restore</string>
     <plurals name="restored_selected_notes">
-        <item quantity="one">Restored %d note</item>
-        <item quantity="other">Restored %d notes</item>
+        <item quantity="one">Restored %1$d note</item>
+        <item quantity="other">Restored %1$d notes</item>
     </plurals>
     <string name="resume">Resume</string>
     <string name="save">Save</string>
@@ -251,8 +251,8 @@
     <string name="to_record_audio">To record audio, allow NotallyX access to your microphone. Tap Settings &gt; Permissions and turn Microphone on</string>
     <string name="unarchive">Unarchive</string>
     <plurals name="unarchived_selected_notes">
-        <item quantity="one">Unarchived %d note</item>
-        <item quantity="other">Unarchived %d notes</item>
+        <item quantity="one">Unarchived %1$d note</item>
+        <item quantity="other">Unarchived %1$d notes</item>
     </plurals>
     <string name="uncheck_all_items">Uncheck all items</string>
     <string name="undo">Undo</string>

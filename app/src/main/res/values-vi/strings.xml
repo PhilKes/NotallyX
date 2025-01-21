@@ -14,8 +14,8 @@
     <string name="calculating">Đang xử lý…</string>
     <string name="cancel">Hủy</string>
     <plurals name="cant_add_images">
-        <item quantity="one">Không thể thêm %d ảnh</item>
-        <item quantity="other">Không thể thêm %d ảnh</item>
+        <item quantity="one">Không thể thêm %1$d ảnh</item>
+        <item quantity="other">Không thể thêm %1$d ảnh</item>
     </plurals>
     <string name="cant_find_folder">Không tìm thấy thư mục. Có lẽ nó đã bị đổi tên hoặc xóa</string>
     <string name="cant_find_note">Không tìm thấy ghi chú. Có lẽ nó đã bị xóa</string>

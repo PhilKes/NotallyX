@@ -14,8 +14,8 @@
     <string name="calculating">Beregner…</string>
     <string name="cancel">Avbryt</string>
     <plurals name="cant_add_images">
-        <item quantity="one">Kan ikke legge til %d bilde</item>
-        <item quantity="other">Kan ikke legge til %d bilder</item>
+        <item quantity="one">Kan ikke legge til %1$d bilde</item>
+        <item quantity="other">Kan ikke legge til %1$d bilder</item>
     </plurals>
     <string name="cant_find_folder">Finner ikke mappen. Den kan ha blitt flyttet eller slettet</string>
     <string name="cant_find_note">Finner ikke notat. Den kan ha blitt slettet</string>

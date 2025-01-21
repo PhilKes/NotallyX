@@ -10,8 +10,8 @@
     <string name="archive">Archivia</string>
     <string name="archived">Archivio</string>
     <plurals name="archived_selected_notes">
-        <item quantity="one">Archiviata %d nota</item>
-        <item quantity="other">Archiviate %d note</item>
+        <item quantity="one">Archiviata %1$d nota</item>
+        <item quantity="other">Archiviate %1$d note</item>
     </plurals>
     <string name="ascending">Crescente</string>
     <string name="attach_file">Allega file</string>
@@ -33,12 +33,12 @@
     <string name="calculating">Calcolo in corso…</string>
     <string name="cancel">Annulla</string>
     <plurals name="cant_add_files">
-        <item quantity="one">Impossibile aggiungere %d file</item>
-        <item quantity="other">Impossibile aggiungere %d file</item>
+        <item quantity="one">Impossibile aggiungere %1$d file</item>
+        <item quantity="other">Impossibile aggiungere %1$d file</item>
     </plurals>
     <plurals name="cant_add_images">
-        <item quantity="one">Impossibile aggiungere %d immagine</item>
-        <item quantity="other">Impossibile aggiungere %d immagini</item>
+        <item quantity="one">Impossibile aggiungere %1$d immagine</item>
+        <item quantity="other">Impossibile aggiungere %1$d immagini</item>
     </plurals>
     <string name="cant_find_folder">Impossibile trovare la cartella. Potrebbe essere stata spostata o rimossa</string>
     <string name="cant_find_note">Impossibile trovare la nota. Potrebbe essere stata eliminata</string>
@@ -74,7 +74,7 @@
     <string name="delete_all_notes">Eliminare tutte le note?</string>
     <string name="delete_audio_recording_forever">Eliminare la registrazione audio definitivamente?</string>
     <string name="delete_checked_items">Elimina gli elementi spuntati</string>
-    <string name="delete_file">Eliminare il file \’%s\’?</string>
+    <string name="delete_file">Eliminare il file \’%1$s\’?</string>
     <string name="delete_forever">Elimina definitivamente</string>
     <string name="delete_image_forever">Eliminare l’immagine definitivamente?</string>
     <string name="delete_label">Eliminare etichetta?</string>
@@ -82,8 +82,8 @@
     <string name="delete_selected_notes">Eliminare le note selezionate?</string>
     <string name="deleted">Cestino</string>
     <plurals name="deleted_selected_notes">
-        <item quantity="one">Eliminata %d nota</item>
-        <item quantity="other">Eliminate %d note</item>
+        <item quantity="one">Eliminata %1$d nota</item>
+        <item quantity="other">Eliminate %1$d note</item>
     </plurals>
     <string name="deleting_files">Eliminazione file in corso</string>
     <string name="deleting_images">Eliminazione immagini in corso</string>
@@ -127,8 +127,8 @@
     <string name="imported_files">File importati</string>
     <string name="imported_notes">Note importate</string>
     <plurals name="imported_notes">
-        <item quantity="one">Importata %s nota</item>
-        <item quantity="other">Importate %s note</item>
+        <item quantity="one">Importata %1$s nota</item>
+        <item quantity="other">Importate %1$s note</item>
     </plurals>
     <string name="importing_backup">Importazione backup in corso</string>
     <string name="insert_an_sd_card_audio">Inserisci una SD card per registrare audio</string>
@@ -164,10 +164,10 @@
     <string name="modified_date">Data di modifica</string>
     <string name="monospace">Monospazio</string>
     <string name="monthly">Mensile</string>
-    <string name="more">…ancora %d</string>
+    <string name="more">…ancora %1$d</string>
     <plurals name="more_files">
-        <item quantity="one">…%d altro file</item>
-        <item quantity="other">…altri %d file</item>
+        <item quantity="one">…%1$d altro file</item>
+        <item quantity="other">…altri %1$d file</item>
     </plurals>
     <string name="next">Prossimo</string>
     <string name="no_auto_sort">Non ordinare</string>
@@ -198,8 +198,8 @@
     <string name="report_bug">Segnala un problema/bug</string>
     <string name="restore">Ripristina</string>
     <plurals name="restored_selected_notes">
-        <item quantity="one">Ripristinata %d nota</item>
-        <item quantity="other">Ripristinate %d note</item>
+        <item quantity="one">Ripristinata %1$d nota</item>
+        <item quantity="other">Ripristinate %1$d note</item>
     </plurals>
     <string name="resume">Riprendi</string>
     <string name="save">Salva</string>
@@ -232,8 +232,8 @@
     <string name="to_record_audio">Per registrare audio, consenti a NotallyX di accedere al tuo microfono. Vai su Impostazioni &gt; Permessi e attiva il microfono</string>
     <string name="unarchive">Annulla Archiviazione</string>
     <plurals name="unarchived_selected_notes">
-        <item quantity="one">Annullata archiviazione di %d nota</item>
-        <item quantity="other">Annullata archiviazione di %d note</item>
+        <item quantity="one">Annullata archiviazione di %1$d nota</item>
+        <item quantity="other">Annullata archiviazione di %1$d note</item>
     </plurals>
     <string name="uncheck_all_items">Rimuovi spunta a tutti gli elementi</string>
     <string name="undo">Annulla</string>

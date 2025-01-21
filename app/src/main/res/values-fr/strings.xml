@@ -10,8 +10,8 @@
     <string name="archive">Archiver</string>
     <string name="archived">Éléments archivés</string>
     <plurals name="archived_selected_notes">
-        <item quantity="one">%d note archivée</item>
-        <item quantity="other">%d notes archivées</item>
+        <item quantity="one">%1$d note archivée</item>
+        <item quantity="other">%1$d notes archivées</item>
     </plurals>
     <string name="ascending">Croissant</string>
     <string name="attach_file">Joindre un fichier</string>
@@ -31,12 +31,12 @@
     <string name="calculating">Calcul…</string>
     <string name="cancel">Annuler</string>
     <plurals name="cant_add_files">
-        <item quantity="one">%d fichier n\'a pas pu être ajouté</item>
-        <item quantity="other">%d fichiers n\'ont pas pu être ajoutés</item>
+        <item quantity="one">%1$d fichier n\'a pas pu être ajouté</item>
+        <item quantity="other">%1$d fichiers n\'ont pas pu être ajoutés</item>
     </plurals>
     <plurals name="cant_add_images">
-        <item quantity="one">Impossible d\'ajouter %d image</item>
-        <item quantity="other">Impossible d\'ajouter %d images</item>
+        <item quantity="one">Impossible d\'ajouter %1$d image</item>
+        <item quantity="other">Impossible d\'ajouter %1$d images</item>
     </plurals>
     <string name="cant_find_folder">Impossible de trouver le dossier. Il a peut-être été déplacé ou supprimé.</string>
     <string name="cant_find_note">Impossible de trouver la note. Elle a peut-être été supprimée.</string>
@@ -69,7 +69,7 @@
     <string name="delete_all_notes">Supprimer toutes les notes ?</string>
     <string name="delete_audio_recording_forever">Supprimer définitivement l\'enregistrement ?</string>
     <string name="delete_checked_items">Supprimer les éléments cochés</string>
-    <string name="delete_file">Supprimer le fichier \'%s\'?</string>
+    <string name="delete_file">Supprimer le fichier \'%1$s\'?</string>
     <string name="delete_forever">Supprimer définitivement</string>
     <string name="delete_image_forever">Supprimer l\'image définitivement ?</string>
     <string name="delete_label">Supprimer l\'étiquette ?</string>
@@ -77,8 +77,8 @@
     <string name="delete_selected_notes">Supprimer les notes sélectionnées ?</string>
     <string name="deleted">Éléments supprimés</string>
     <plurals name="deleted_selected_notes">
-        <item quantity="one">%d note supprimée</item>
-        <item quantity="other">%d notes supprimées</item>
+        <item quantity="one">%1$d note supprimée</item>
+        <item quantity="other">%1$d notes supprimées</item>
     </plurals>
     <string name="deleting_files">Suppression des fichiers</string>
     <string name="deleting_images">Suppression des images</string>
@@ -133,8 +133,8 @@
     <string name="imported_files">Fichiers importés</string>
     <string name="imported_notes">Notes importées</string>
     <plurals name="imported_notes">
-        <item quantity="one">%s note importée</item>
-        <item quantity="other">%s notes importées</item>
+        <item quantity="one">%1$s note importée</item>
+        <item quantity="other">%1$s notes importées</item>
     </plurals>
     <string name="importing_backup">Importation de la sauvegarde</string>
     <string name="insert_an_sd_card_audio">Insérer une carte SD pour enregistrer de l\'audio</string>
@@ -170,10 +170,10 @@
     <string name="medium">Moyenne</string>
     <string name="modified_date">Modifié</string>
     <string name="monospace">Chasse fixe</string>
-    <string name="more">%d de plus</string>
+    <string name="more">%1$d de plus</string>
     <plurals name="more_files">
-        <item quantity="one">…et %d fichier </item>
-        <item quantity="other">…et %d fichiers</item>
+        <item quantity="one">…et %1$d fichier </item>
+        <item quantity="other">…et %1$d fichiers</item>
     </plurals>
     <string name="next">Suivant</string>
     <string name="none">Aucun</string>
@@ -205,8 +205,8 @@
     <string name="reset_settings_success">Tous les paramètres ont été réinitialisés avec succès</string>
     <string name="restore">Restaurer</string>
     <plurals name="restored_selected_notes">
-        <item quantity="one">%d note restaurée</item>
-        <item quantity="other">%d notes restaurées</item>
+        <item quantity="one">%1$d note restaurée</item>
+        <item quantity="other">%1$d notes restaurées</item>
     </plurals>
     <string name="resume">Reprendre</string>
     <string name="save">Sauvegarder</string>
@@ -241,8 +241,8 @@
     <string name="to_record_audio">Pour enregistrer de l\'audio, autorisez NotallyX à accéder à votre microphone. Cliquez sur Paramètres &gt; Autorisations et activez le microphone.</string>
     <string name="unarchive">Restaurer</string>
     <plurals name="unarchived_selected_notes">
-        <item quantity="one">%d note désarchivée</item>
-        <item quantity="other">%d notes désarchivées</item>
+        <item quantity="one">%1$d note désarchivée</item>
+        <item quantity="other">%1$d notes désarchivées</item>
     </plurals>
     <string name="uncheck_all_items">Décocher tous les éléments</string>
     <string name="undo">Annuler</string>

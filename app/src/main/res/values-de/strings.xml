@@ -29,8 +29,8 @@
     <string name="calculating">Berechne…</string>
     <string name="cancel">Abbrechen</string>
     <plurals name="cant_add_images">
-        <item quantity="one">Kann %d Bild nicht hinzufügen</item>
-        <item quantity="other">Kann %d Bilder nicht hinzufügen</item>
+        <item quantity="one">Kann %1$d Bild nicht hinzufügen</item>
+        <item quantity="other">Kann %1$d Bilder nicht hinzufügen</item>
     </plurals>
     <string name="cant_find_folder">Kann den Ordner nicht finden. Er kann verschoben oder gelöscht worden sein</string>
     <string name="cant_find_note">Kann Notiz nicht finden. Vielleicht wurde sie gelöscht</string>
@@ -66,7 +66,7 @@
     <string name="delete_all_notes">Alle Notizen löschen?</string>
     <string name="delete_audio_recording_forever">Aufnahme für immer löschen?</string>
     <string name="delete_checked_items">Abgehakte Elemente löschen</string>
-    <string name="delete_file">Datei \'%s\' löschen?</string>
+    <string name="delete_file">Datei \'%1$s\' löschen?</string>
     <string name="delete_forever">Endgültig löschen</string>
     <string name="delete_image_forever">Bild endgültig löschen?</string>
     <string name="delete_label">Label löschen?</string>
@@ -158,10 +158,10 @@
     <string name="modified_date">Zuletzt geändert am</string>
     <string name="monospace">Monospace</string>
     <string name="monthly">Monatlich</string>
-    <string name="more">%d mehr</string>
+    <string name="more">%1$d mehr</string>
     <plurals name="more_files">
-        <item quantity="one">…%d weitere Datei</item>
-        <item quantity="other">…%d weitere Dateien</item>
+        <item quantity="one">…%1$d weitere Datei</item>
+        <item quantity="other">…%1$d weitere Dateien</item>
     </plurals>
     <string name="no_auto_sort">Nicht automatisch sortieren</string>
     <string name="none">Keines</string>

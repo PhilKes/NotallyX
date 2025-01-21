@@ -14,9 +14,9 @@
     <string name="calculating">Probíhá výpočet…</string>
     <string name="cancel">Zrušit</string>
     <plurals name="cant_add_images">
-        <item quantity="few">Nepodařilo se přidat %d obrázky</item>
-        <item quantity="many">Nepodařilo se přidat %d obrázků</item>
-        <item quantity="one">Nepodařilo se přidat %d obrázek</item>
+        <item quantity="few">Nepodařilo se přidat %1$d obrázky</item>
+        <item quantity="many">Nepodařilo se přidat %1$d obrázků</item>
+        <item quantity="one">Nepodařilo se přidat %1$d obrázek</item>
     </plurals>
     <string name="cant_find_folder">Složka nebyla nalezena. Možná byla přesunuta nebo smazána.</string>
     <string name="cant_find_note">Poznámka nenalezena. Pravděpodobně byla smazána</string>

@@ -10,8 +10,8 @@
     <string name="archive">Archiveren</string>
     <string name="archived">Gearchiveerd</string>
     <plurals name="archived_selected_notes">
-        <item quantity="one">Gearchiveerde %d notitie</item>
-        <item quantity="other">Gearchiveerde %d notities</item>
+        <item quantity="one">Gearchiveerde %1$d notitie</item>
+        <item quantity="other">Gearchiveerde %1$d notities</item>
     </plurals>
     <string name="ascending">Oplopend</string>
     <string name="attach_file">Bestand bijvoegen</string>
@@ -33,12 +33,12 @@
     <string name="calculating">Berekenen…</string>
     <string name="cancel">Annuleren</string>
     <plurals name="cant_add_files">
-        <item quantity="one">Kan %d bestand niet toevoegen</item>
-        <item quantity="other">Kan %d bestanden niet toevoegen</item>
+        <item quantity="one">Kan %1$d bestand niet toevoegen</item>
+        <item quantity="other">Kan %1$d bestanden niet toevoegen</item>
     </plurals>
     <plurals name="cant_add_images">
-        <item quantity="one">Kan %d afbeelding niet toevoegen</item>
-        <item quantity="other">Kan %d afbeeldingen niet toevoegen</item>
+        <item quantity="one">Kan %1$d afbeelding niet toevoegen</item>
+        <item quantity="other">Kan %1$d afbeeldingen niet toevoegen</item>
     </plurals>
     <string name="cant_find_folder">Kan map niet vinden. Deze is mogelijk verplaatst of verwijderd</string>
     <string name="cant_find_note">Kan notitie niet vinden. Misschien is deze verwijderd</string>
@@ -73,7 +73,7 @@
     <string name="delete_all_notes">Alle notities verwijderen?</string>
     <string name="delete_audio_recording_forever">Audio-opname definitief verwijderen?</string>
     <string name="delete_checked_items">Geselecteerde items verwijderen</string>
-    <string name="delete_file">Bestand \'%s\' verwijderen?</string>
+    <string name="delete_file">Bestand \'%1$s\' verwijderen?</string>
     <string name="delete_forever">Definitief verwijderen</string>
     <string name="delete_image_forever">Afbeelding definitief verwijderen?</string>
     <string name="delete_label">Label verwijderen?</string>
@@ -81,8 +81,8 @@
     <string name="delete_selected_notes">Geselecteerde notities verwijderen?</string>
     <string name="deleted">Verwijderd</string>
     <plurals name="deleted_selected_notes">
-        <item quantity="one">Verwijderde %d notitie</item>
-        <item quantity="other">Verwijderde %d notities</item>
+        <item quantity="one">Verwijderde %1$d notitie</item>
+        <item quantity="other">Verwijderde %1$d notities</item>
     </plurals>
     <string name="deleting_files">Bestanden verwijderen</string>
     <string name="deleting_images">Afbeeldingen verwijderen</string>
@@ -124,8 +124,8 @@
     <string name="imported_files">Bestanden geïmporteerd</string>
     <string name="imported_notes">Notities geïmporteerd</string>
     <plurals name="imported_notes">
-        <item quantity="one">Geïmporteerde %s Notitie</item>
-        <item quantity="other">Geïmporteerde %s Notities</item>
+        <item quantity="one">Geïmporteerde %1$s Notitie</item>
+        <item quantity="other">Geïmporteerde %1$s Notities</item>
     </plurals>
     <string name="importing_backup">Back-up importeren</string>
     <string name="insert_an_sd_card_audio">Plaats een SD-kaart om audio op te nemen</string>
@@ -161,10 +161,10 @@
     <string name="modified_date">Gewijzigd</string>
     <string name="monospace">Monospace</string>
     <string name="monthly">Maandelijks</string>
-    <string name="more">%d meer</string>
+    <string name="more">%1$d meer</string>
     <plurals name="more_files">
-        <item quantity="one">…%d ander bestand</item>
-        <item quantity="other">…%d andere bestanden</item>
+        <item quantity="one">…%1$d ander bestand</item>
+        <item quantity="other">…%1$d andere bestanden</item>
     </plurals>
     <string name="no_auto_sort">Niet automatisch sorteren</string>
     <string name="none">Geen</string>
@@ -191,8 +191,8 @@
     <string name="report_bug">Rapporteer een probleem/fout</string>
     <string name="restore">Herstellen</string>
     <plurals name="restored_selected_notes">
-        <item quantity="one">Herstelde %d notitie</item>
-        <item quantity="other">Herstelde %d notities</item>
+        <item quantity="one">Herstelde %1$d notitie</item>
+        <item quantity="other">Herstelde %1$d notities</item>
     </plurals>
     <string name="resume">Hervatten</string>
     <string name="save">Opslaan</string>
@@ -225,8 +225,8 @@
     <string name="to_record_audio">Om audio op te nemen, geef NotallyX toegang tot je microfoon. Tik op Instellingen &gt; Machtigingen en zet Microfoon aan</string>
     <string name="unarchive">De-archiveren</string>
     <plurals name="unarchived_selected_notes">
-        <item quantity="one">De-gearchiveerde %d notitie</item>
-        <item quantity="other">De-gearchiveerde %d notities</item>
+        <item quantity="one">De-gearchiveerde %1$d notitie</item>
+        <item quantity="other">De-gearchiveerde %1$d notities</item>
     </plurals>
     <string name="uncheck_all_items">Selectie opheffen van alle items</string>
     <string name="undo">Ongedaan maken</string>

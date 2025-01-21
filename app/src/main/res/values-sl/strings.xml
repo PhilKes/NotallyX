@@ -14,10 +14,10 @@
     <string name="calculating">Izračun…</string>
     <string name="cancel">Prekliči</string>
     <plurals name="cant_add_images">
-        <item quantity="few">%d slike niso bile dodane.</item>
-        <item quantity="one">%d slika ni bila dodana.</item>
-        <item quantity="other">%d slik ni bilo dodanih.</item>
-        <item quantity="two">%d sliki nista bili dodani.</item>
+        <item quantity="few">%1$d slike niso bile dodane.</item>
+        <item quantity="one">%1$d slika ni bila dodana.</item>
+        <item quantity="other">%1$d slik ni bilo dodanih.</item>
+        <item quantity="two">%1$d sliki nista bili dodani.</item>
     </plurals>
     <string name="cant_find_folder">Mapa ne obstaja. Morda je bila premaknjena ali izbrisana.</string>
     <string name="cant_find_note">Zapisek ne obstaja. Morda je bil izbrisan.</string>
