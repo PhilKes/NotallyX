@@ -117,7 +117,7 @@
     <string name="folder">Dossier</string>
     <string name="follow_system">En fonction du système</string>
     <string name="google_keep">Google Keep</string>
-    <string name="google_keep_help">Pour importer vos notes depuis Google Keep, vous devez télécharger votre fichier ZIP Google Takeout. Cliquez sur "Aide" pour plus d
+    <string name="google_keep_help">Pour importer vos notes depuis Google Keep, vous devez télécharger votre fichier ZIP Google Takeout. Sélectionnez uniquement les données \"Conserver\". Cliquez sur "Aide" pour plus d
 	information.\n\nSi vous possédez déjà un fichier ZIP Google Takeout, cliquez sur "Importer" et choisissez le fichier ZIP.</string>
     <string name="grid">Grille</string>
     <string name="help">Aide</string>
