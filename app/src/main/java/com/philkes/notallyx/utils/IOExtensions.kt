@@ -16,6 +16,7 @@ import com.philkes.notallyx.data.model.isImage
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import java.io.File
+import java.io.FileFilter
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.nio.file.Files
@@ -179,4 +180,10 @@ fun String.mimeTypeToFileExtension(): String? {
         "image/webp" -> "webp"
         else -> null
     }
+}
+
+fun File.listFilesRecursive(filter: FileFilter): List<File> {
+    val files = mutableListOf<File>()
+    files.addAll(walkTopDown().filter { filter.accept(it) })
+    return files
 }

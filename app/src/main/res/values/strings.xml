@@ -124,7 +124,7 @@
     <string name="folder">Folder</string>
     <string name="follow_system">Follow system</string>
     <string name="google_keep">Google Keep</string>
-    <string name="google_keep_help">In order to import your Notes from Google Keep you must download your Google Takeout ZIP file. Click Help to get more information.\n\nIf you already have a Takeout ZIP file, click Import and choose the ZIP file.</string>
+    <string name="google_keep_help">In order to import your Notes from Google Keep you must download your Google Takeout ZIP file. Only select the \"Keep\" data. Click Help to get more information.\n\nIf you already have a Takeout ZIP file, click Import and choose the ZIP file.</string>
     <string name="grid">Grid</string>
     <string name="help">Help</string>
     <string name="image_format_not_supported">Image format not supported</string>

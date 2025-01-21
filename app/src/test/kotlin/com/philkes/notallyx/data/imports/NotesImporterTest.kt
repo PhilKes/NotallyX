@@ -39,13 +39,38 @@ class NotesImporterTest {
     }
 
     @Test
+    fun `importFiles Google Keep german Takeout zip`() {
+        testImport(
+            prepareImportSources(ImportSource.GOOGLE_KEEP, "Takeout_German.zip"),
+            ImportSource.GOOGLE_KEEP,
+            8,
+        )
+    }
+
+    @Test
+    fun `importFiles Google Keep other Takeout zip`() {
+        testImport(
+            prepareImportSources(ImportSource.GOOGLE_KEEP, "Takeout_Other.zip"),
+            ImportSource.GOOGLE_KEEP,
+            8,
+        )
+    }
+
+    @Test
     fun `importFiles Evernote`() {
         // Evernote does not export archived and deleted notes
         testImport(ImportSource.EVERNOTE, 6)
     }
 
     private fun testImport(importSource: ImportSource, expectedAmountNotes: Int) {
-        val importSourceFile = prepareImportSources(importSource)
+        testImport(prepareImportSources(importSource), importSource, expectedAmountNotes)
+    }
+
+    private fun testImport(
+        importSourceFile: File,
+        importSource: ImportSource,
+        expectedAmountNotes: Int,
+    ) {
         val importOutputFolder = prepareMediaFolder()
         runBlocking {
             NotesImporter(application, database).import(importSourceFile.toUri(), importSource)
@@ -121,10 +146,13 @@ class NotesImporterTest {
         return path
     }
 
-    private fun prepareImportSources(importSource: ImportSource): File {
+    private fun prepareImportSources(importSource: ImportSource, fileName: String? = null): File {
         val tempDir = Files.createTempDirectory("imports-${importSource.name.lowercase()}").toFile()
         copyTestFilesToTempDir("imports/${importSource.name.lowercase()}", tempDir)
         println("Input folder: ${tempDir.absolutePath}")
+        if (fileName != null) {
+            return File(tempDir, fileName)
+        }
         return when (importSource) {
             ImportSource.GOOGLE_KEEP -> File(tempDir, "Takeout.zip")
             ImportSource.EVERNOTE -> File(tempDir, "Notebook.enex")
