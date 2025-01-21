@@ -212,7 +212,7 @@
     <string name="please_grant_notally_alarm">Veuillez autoriser NotallyX à envoyer des rappels</string>
     <string name="please_grant_notally_audio">Veuillez accorder à NotallyX l\'autorisation d\'enregistrer de l\'audio. Les enregistrements ne quittent jamais votre appareil.</string>
     <string name="please_grant_notally_notification">Veuillez autoriser NotallyX à envoyer des notifications</string>
-    <string name="please_grant_notally_notification_auto_backup">Si une sauvegarde automatique échoue, vous pouvez recevoir une notification en accordant à NotallyX l'autorisation d'envoyer des notifications</string>
+    <string name="please_grant_notally_notification_auto_backup">Si une sauvegarde automatique échoue, vous pouvez recevoir une notification en accordant à NotallyX l\'autorisation d\'envoyer des notifications</string>
     <string name="previous">Précédent</string>
     <string name="rate">Noter cette application</string>
     <string name="ready_to_record">Prêt à enregistrer</string>

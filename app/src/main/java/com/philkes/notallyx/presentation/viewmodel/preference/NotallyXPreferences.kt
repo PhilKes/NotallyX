@@ -33,6 +33,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
         createEnumPreference(preferences, "textSize", TextSize.MEDIUM, R.string.text_size)
     val dateFormat =
         createEnumPreference(preferences, "dateFormat", DateFormat.RELATIVE, R.string.date_format)
+    val applyDateFormatInNoteView =
+        BooleanPreference("applyDateFormatInNoteView", preferences, true)
 
     val notesView = createEnumPreference(preferences, "view", NotesView.LIST, R.string.view)
     val notesSorting = NotesSortPreference(preferences)
@@ -194,6 +196,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 theme,
                 textSize,
                 dateFormat,
+                applyDateFormatInNoteView,
                 notesView,
                 notesSorting,
                 listItemSorting,

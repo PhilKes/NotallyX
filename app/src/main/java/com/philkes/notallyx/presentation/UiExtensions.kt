@@ -58,6 +58,7 @@ import androidx.core.view.setPadding
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -79,6 +80,7 @@ import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.LabelBinding
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.ItemListener
+import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
@@ -384,6 +386,13 @@ fun MutableLiveData<ImportProgress>.setupImportProgressDialog(fragment: Fragment
             )
         binding.Count.text =
             "${context.getString(R.string.count, progress.current, progress.total)} $stageStr"
+    }
+}
+
+fun <T, C> NotNullLiveData<T>.merge(liveData: NotNullLiveData<C>): MediatorLiveData<Pair<T, C>> {
+    return MediatorLiveData<Pair<T, C>>().apply {
+        addSource(this@merge) { value1 -> value = Pair(value1, liveData.value) }
+        addSource(liveData) { value2 -> value = Pair(this@merge.value, value2) }
     }
 }
 

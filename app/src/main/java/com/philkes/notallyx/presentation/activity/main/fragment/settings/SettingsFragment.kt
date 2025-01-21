@@ -25,8 +25,8 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.FOLDER_OR_FILE_MIMETYPE
 import com.philkes.notallyx.data.imports.ImportSource
 import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
+import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
-import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
@@ -177,7 +177,7 @@ class SettingsFragment : Fragment() {
             }
 
             "application/zip" -> {
-                val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
+                val layout = DialogTextInputBinding.inflate(layoutInflater, null, false)
                 val password = model.preferences.backupPassword.value
                 layout.InputText.apply {
                     if (password != PASSWORD_EMPTY) {
@@ -217,9 +217,17 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        dateFormat.observe(viewLifecycleOwner) { value ->
-            binding.DateFormat.setup(dateFormat, value, requireContext()) { newValue ->
-                model.savePreference(dateFormat, newValue)
+        dateFormat.merge(applyDateFormatInNoteView).observe(viewLifecycleOwner) {
+            (dateFormatValue, applyDateFormatInEditNoteValue) ->
+            binding.DateFormat.setup(
+                dateFormat,
+                dateFormatValue,
+                applyDateFormatInEditNoteValue,
+                requireContext(),
+                layoutInflater,
+            ) { newDateFormatValue, newApplyDateFormatInEditNote ->
+                model.savePreference(dateFormat, newDateFormatValue)
+                model.savePreference(applyDateFormatInNoteView, newApplyDateFormatInEditNote)
             }
         }
 

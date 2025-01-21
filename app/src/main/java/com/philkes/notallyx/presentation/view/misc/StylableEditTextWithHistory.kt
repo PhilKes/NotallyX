@@ -19,7 +19,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.isNoteUrl
-import com.philkes.notallyx.databinding.TextInputDialog2Binding
+import com.philkes.notallyx.databinding.DialogTextInput2Binding
 import com.philkes.notallyx.presentation.clone
 import com.philkes.notallyx.presentation.createTextWatcherWithHistory
 import com.philkes.notallyx.presentation.removeSelectionFromSpans
@@ -338,7 +338,7 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
     ) {
         val isNoteUrl = urlBefore.isNoteUrl()
         val layout =
-            TextInputDialog2Binding.inflate(LayoutInflater.from(context)).apply {
+            DialogTextInput2Binding.inflate(LayoutInflater.from(context)).apply {
                 InputText1.setText(displayTextBefore)
                 InputTextLayout1.setHint(R.string.display_text)
                 InputText2.setText(urlBefore)

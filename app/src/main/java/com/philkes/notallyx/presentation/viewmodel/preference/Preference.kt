@@ -8,6 +8,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.R
+import com.philkes.notallyx.presentation.merge
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.utils.createObserverSkipFirst
 import com.philkes.notallyx.utils.fromCamelCaseToEnumName
@@ -59,6 +60,10 @@ abstract class BasePreference<T>(
 
     fun observe(lifecycleOwner: LifecycleOwner, observer: Observer<T>) {
         getData().observe(lifecycleOwner, observer)
+    }
+
+    fun <C> merge(other: BasePreference<C>): MediatorLiveData<Pair<T, C>> {
+        return getData().merge(other.getData())
     }
 
     fun observeForever(observer: Observer<T>) {

@@ -216,7 +216,7 @@
     <string name="pin">Připnout</string>
     <string name="pinned">Připnuté</string>
     <string name="plain_text_files">Textové soubory</string>
-    <string name="plain_text_files_help">Chcete-li importovat poznámky z textových souborů (jednotlivých souborů nebo složek), klikněte na tlačítko Importovat. Každý soubor se importuje jako samostatná poznámka, název souboru se stane názvem poznámky. Pokud textový obsah začíná syntaxí seznamu (např. syntaxí Markdown '- [x]', NotallyX '[✓]' nebo '*', '-'), bude převeden na poznámku Seznam.</string>
+    <string name="plain_text_files_help">Chcete-li importovat poznámky z textových souborů (jednotlivých souborů nebo složek), klikněte na tlačítko Importovat. Každý soubor se importuje jako samostatná poznámka, název souboru se stane názvem poznámky. Pokud textový obsah začíná syntaxí seznamu (např. syntaxí Markdown \'- [x]\', NotallyX \'[✓]\' nebo \'*\', \'-\'), bude převeden na poznámku Seznam.</string>
     <string name="play">Přehrát</string>
     <string name="please_grant_notally_alarm">Povolte prosím aplikaci NotallyX zasílání upomínky</string>
     <string name="please_grant_notally_audio">Povolte prosím NotallyX nahrávání zvuku. Nahrávky nikdy neopustí vaše zařízení</string>
