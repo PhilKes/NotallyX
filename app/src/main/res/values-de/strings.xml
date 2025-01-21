@@ -109,7 +109,7 @@
     <string name="folder">Ordner</string>
     <string name="follow_system">Systemeinstellung folgen</string>
     <string name="google_keep">Google Notizen</string>
-    <string name="google_keep_help">Um deine Notizen aus Google Notizen zu importieren musst du deine Google Takeout ZIP Datei herunterladen\n\nFalls du das Takeout ZIP schon hast, klicke auf Import und wähle es aus.</string>
+    <string name="google_keep_help">Um deine Notizen aus Google Notizen zu importieren musst du deine Google Takeout ZIP Datei herunterladen. Wähle dabei nur die \"Google Notizen\" Daten aus.\n\nFalls du das Takeout ZIP schon hast, klicke auf Import und wähle es aus.</string>
     <string name="grid">Rasteransicht</string>
     <string name="help">Hilfe</string>
     <string name="image_format_not_supported">Bildformat nicht unterstützt</string>
@@ -118,7 +118,7 @@
     <string name="import_other">Notizen von anderer App importieren</string>
     <string name="import_settings">Einstellungen Importieren</string>
     <string name="import_settings_failure">Import der Einstellungen fehlgeschlagen, wurde die richtige Datei ausgewählt?</string>
-    <string name="import_settings_message">"Um Einstellungen zu importieren, wähle eine valide NotallyX JSON Datei aus "</string>
+    <string name="import_settings_message">Um Einstellungen zu importieren, wähle eine valide NotallyX JSON Datei aus </string>
     <string name="import_settings_success">Einstellungen erfolgreich importiert</string>
     <string name="imported_files">Dateien importiert</string>
     <string name="imported_notes">Notizen importiert</string>

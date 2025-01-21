@@ -113,7 +113,7 @@
     <string name="filter">Filteren</string>
     <string name="follow_system">Volg systeeminstellingen</string>
     <string name="google_keep">Google Keep</string>
-    <string name="google_keep_help">Om je notities van Google Keep te importeren, moet je je Google Takeout ZIP-bestand downloaden.\n\nAls je al een Takeout ZIP-bestand hebt, klik dan op Importeren en kies het ZIP-bestand.</string>
+    <string name="google_keep_help">Om je notities van Google Keep te importeren, moet je je Google Takeout ZIP-bestand downloaden. Selecteer alleen \"Keep\" gegevens.\n\nAls je al een Takeout ZIP-bestand hebt, klik dan op Importeren en kies het ZIP-bestand.</string>
     <string name="grid">Raster</string>
     <string name="help">Hulp</string>
     <string name="image_format_not_supported">Afbeeldingsformaat niet ondersteund</string>

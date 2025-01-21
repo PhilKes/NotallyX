@@ -16,6 +16,8 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.utils.listFilesRecursive
+import com.philkes.notallyx.utils.log
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -43,7 +45,7 @@ class GoogleKeepImporter : ExternalImporter {
         progress?.postValue(ImportProgress(indeterminate = true, stage = ImportStage.EXTRACT_FILES))
         val dataFolder =
             try {
-                unzip(destination, app.contentResolver.openInputStream(source)!!)
+                app.contentResolver.openInputStream(source)!!.use { unzip(destination, it) }
             } catch (e: Exception) {
                 throw ImportException(R.string.invalid_google_keep, e)
             }
@@ -57,17 +59,29 @@ class GoogleKeepImporter : ExternalImporter {
 
         val noteFiles =
             dataFolder
-                .listFiles { file ->
+                .listFilesRecursive { file ->
                     file.isFile && file.extension.equals("json", ignoreCase = true)
                 }
-                ?.toList() ?: emptyList()
+                .toList()
         val total = noteFiles.size
         progress?.postValue(ImportProgress(0, total, stage = ImportStage.IMPORT_NOTES))
         var counter = 1
         val baseNotes =
             noteFiles
                 .mapNotNull { file ->
-                    val baseNote = file.readText().parseToBaseNote()
+                    val baseNote =
+                        try {
+                            val relativePath = file.parentFile!!.toRelativeString(dataFolder)
+                            file.readText().parseToBaseNote(relativePath)
+                        } catch (e: Exception) {
+                            app.log(
+                                TAG,
+                                msg =
+                                    "Could not parse BaseNote from JSON in file '${file.absolutePath}'",
+                                throwable = e,
+                            )
+                            null
+                        }
                     progress?.postValue(
                         ImportProgress(counter++, total, stage = ImportStage.IMPORT_NOTES)
                     )
@@ -77,7 +91,7 @@ class GoogleKeepImporter : ExternalImporter {
         return Pair(baseNotes, dataFolder)
     }
 
-    fun String.parseToBaseNote(): BaseNote {
+    fun String.parseToBaseNote(relativePath: String? = null): BaseNote {
         val googleKeepNote = json.decodeFromString<GoogleKeepNote>(this)
         val (body, spans) =
             parseBodyAndSpansFromHtml(
@@ -89,15 +103,33 @@ class GoogleKeepImporter : ExternalImporter {
         val images =
             googleKeepNote.attachments
                 .filter { it.mimetype.startsWith("image") }
-                .map { FileAttachment(it.filePath, it.filePath, it.mimetype) }
+                .map { attachment ->
+                    FileAttachment(
+                        "${relativePath?.let { "$it/" } ?: ""}${attachment.filePath}",
+                        attachment.filePath,
+                        attachment.mimetype,
+                    )
+                }
         val files =
             googleKeepNote.attachments
                 .filter { !it.mimetype.startsWith("audio") && !it.mimetype.startsWith("image") }
-                .map { FileAttachment(it.filePath, it.filePath, it.mimetype) }
+                .map { attachment ->
+                    FileAttachment(
+                        "${relativePath?.let { "$it/" } ?: ""}${attachment.filePath}",
+                        attachment.filePath,
+                        attachment.mimetype,
+                    )
+                }
         val audios =
             googleKeepNote.attachments
                 .filter { it.mimetype.startsWith("audio") }
-                .map { Audio(it.filePath, 0L, System.currentTimeMillis()) }
+                .map { attachment ->
+                    Audio(
+                        "${relativePath?.let { "$it/" } ?: ""}${attachment.filePath}",
+                        0L,
+                        System.currentTimeMillis(),
+                    )
+                }
         val items =
             googleKeepNote.listContent.mapIndexed { index, item ->
                 ListItem(
@@ -163,18 +195,22 @@ class GoogleKeepImporter : ExternalImporter {
                         throw IOException("Failed to create directory $parent")
                     }
                 }
-                val fos = FileOutputStream(newFile)
-                var len: Int
-                while ((zis.read(buffer).also { len = it }) > 0) {
-                    fos.write(buffer, 0, len)
+                FileOutputStream(newFile).use {
+                    var len: Int
+                    while ((zis.read(buffer).also { length -> len = length }) > 0) {
+                        it.write(buffer, 0, len)
+                    }
                 }
-                fos.close()
             }
             zipEntry = zis.nextEntry
         }
 
         zis.closeEntry()
         zis.close()
-        return File(destinationPath, "Takeout/Keep")
+        return destinationPath
+    }
+
+    companion object {
+        private const val TAG = "GoogleKeepImporter"
     }
 }

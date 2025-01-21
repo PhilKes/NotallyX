@@ -116,7 +116,7 @@
     <string name="filter">Filtra</string>
     <string name="follow_system">Predefinito di Sistema</string>
     <string name="google_keep">Google Keep</string>
-    <string name="google_keep_help">Per importare le note da Google Keep devi scaricare il tuo file ZIP di Google Takeout. Clicca su Aiuto per ulteriori informazioni.\n\nSe hai già un file ZIP di Takeout, clicca Importa e selezionalo.</string>
+    <string name="google_keep_help">Per importare le note da Google Keep devi scaricare il tuo file ZIP di Google Takeout. Seleziona solo i dati "Keep". Clicca su Aiuto per ulteriori informazioni.\n\nSe hai già un file ZIP di Takeout, clicca Importa e selezionalo.</string>
     <string name="grid">Griglia</string>
     <string name="help">Aiuto</string>
     <string name="image_format_not_supported">Formato immagine non supportato</string>
