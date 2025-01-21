@@ -34,15 +34,18 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
+import com.philkes.notallyx.presentation.activity.note.SelectLabelsActivity.Companion.EXTRA_SELECTED_LABELS
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addFastScroll
 import com.philkes.notallyx.presentation.addIconButton
+import com.philkes.notallyx.presentation.bindLabels
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getQuantityString
-import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.isLightColor
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setLightStatusAndNavBar
@@ -50,7 +53,6 @@ import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.showToast
-import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.note.ErrorAdapter
 import com.philkes.notallyx.presentation.view.note.action.Action
@@ -65,10 +67,12 @@ import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.Operations
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.getUriForFile
+import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.mergeSkipFirst
 import com.philkes.notallyx.utils.observeSkipFirst
+import com.philkes.notallyx.utils.shareNote
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -131,14 +135,14 @@ abstract class EditActivity(private val type: Type) :
         initChangeHistory()
         lifecycleScope.launch {
             val persistedId = savedInstanceState?.getLong("id")
-            val selectedId = intent.getLongExtra(Constants.SelectedBaseNote, 0L)
+            val selectedId = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0L)
             val id = persistedId ?: selectedId
             notallyModel.setState(id)
 
             if (notallyModel.isNewNote && intent.action == Intent.ACTION_SEND) {
                 handleSharedNote()
             } else if (notallyModel.isNewNote) {
-                intent.getStringExtra(Constants.SelectedLabel)?.let {
+                intent.getStringExtra(EXTRA_DISPLAYED_LABEL)?.let {
                     notallyModel.setLabels(listOf(it))
                 }
             }
@@ -186,7 +190,7 @@ abstract class EditActivity(private val type: Type) :
                         result.data?.let {
                             IntentCompat.getParcelableArrayListExtra(
                                 it,
-                                ViewImageActivity.DELETED_IMAGES,
+                                ViewImageActivity.EXTRA_DELETED_IMAGES,
                                 FileAttachment::class.java,
                             )
                         }
@@ -199,11 +203,12 @@ abstract class EditActivity(private val type: Type) :
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     val list =
-                        result.data?.getStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS)
+                        result.data?.getStringArrayListExtra(
+                            SelectLabelsActivity.EXTRA_SELECTED_LABELS
+                        )
                     if (list != null && list != notallyModel.labels) {
                         notallyModel.setLabels(list)
-                        Operations.bindLabels(
-                            binding.LabelGroup,
+                        binding.LabelGroup.bindLabels(
                             notallyModel.labels,
                             notallyModel.textSize,
                             paddingTop = true,
@@ -219,7 +224,7 @@ abstract class EditActivity(private val type: Type) :
                         result.data?.let {
                             IntentCompat.getParcelableExtra(
                                 it,
-                                PlayAudioActivity.AUDIO,
+                                PlayAudioActivity.EXTRA_AUDIO,
                                 Audio::class.java,
                             )
                         }
@@ -420,7 +425,7 @@ abstract class EditActivity(private val type: Type) :
                         try {
                             changeHistory.undo()
                         } catch (e: ChangeHistory.ChangeHistoryException) {
-                            Operations.log(application, e)
+                            application.log(TAG, throwable = e)
                         }
                     }
                     .apply { isEnabled = changeHistory.canUndo.value }
@@ -430,7 +435,7 @@ abstract class EditActivity(private val type: Type) :
                         try {
                             changeHistory.redo()
                         } catch (e: ChangeHistory.ChangeHistoryException) {
-                            Operations.log(application, e)
+                            application.log(TAG, throwable = e)
                         }
                     }
                     .apply { isEnabled = changeHistory.canRedo.value }
@@ -484,8 +489,7 @@ abstract class EditActivity(private val type: Type) :
             }
         binding.Date.displayFormattedTimestamp(date, preferences.dateFormat.value, datePrefixResId)
         binding.EnterTitle.setText(notallyModel.title)
-        Operations.bindLabels(
-            binding.LabelGroup,
+        binding.LabelGroup.bindLabels(
             notallyModel.labels,
             notallyModel.textSize,
             paddingTop = true,
@@ -582,7 +586,7 @@ abstract class EditActivity(private val type: Type) :
 
     override fun changeLabels() {
         val intent = Intent(this, SelectLabelsActivity::class.java)
-        intent.putStringArrayListExtra(SelectLabelsActivity.SELECTED_LABELS, notallyModel.labels)
+        intent.putStringArrayListExtra(EXTRA_SELECTED_LABELS, notallyModel.labels)
         selectLabelsActivityResultLauncher.launch(intent)
     }
 
@@ -590,9 +594,9 @@ abstract class EditActivity(private val type: Type) :
         val body =
             when (type) {
                 Type.NOTE -> notallyModel.body
-                Type.LIST -> Operations.getBody(notallyModel.items.toMutableList())
+                Type.LIST -> notallyModel.items.toMutableList().toText()
             }
-        Operations.shareNote(this, notallyModel.title, body)
+        this.shareNote(notallyModel.title, body)
     }
 
     private fun delete() {
@@ -610,9 +614,9 @@ abstract class EditActivity(private val type: Type) :
     private fun moveNote(toFolder: Folder) {
         val resultIntent =
             Intent().apply {
-                putExtra(NOTE_ID, notallyModel.id)
-                putExtra(FOLDER_FROM, notallyModel.folder.name)
-                putExtra(FOLDER_TO, toFolder.name)
+                putExtra(EXTRA_NOTE_ID, notallyModel.id)
+                putExtra(EXTRA_FOLDER_FROM, notallyModel.folder.name)
+                putExtra(EXTRA_FOLDER_TO, toFolder.name)
             }
         notallyModel.folder = toFolder
         setResult(RESULT_OK, resultIntent)
@@ -642,8 +646,8 @@ abstract class EditActivity(private val type: Type) :
             PreviewImageAdapter(notallyModel.imageRoot) { position ->
                 val intent =
                     Intent(this, ViewImageActivity::class.java).apply {
-                        putExtra(ViewImageActivity.POSITION, position)
-                        putExtra(Constants.SelectedBaseNote, notallyModel.id)
+                        putExtra(ViewImageActivity.EXTRA_POSITION, position)
+                        putExtra(EXTRA_SELECTED_BASE_NOTE, notallyModel.id)
                     }
                 viewImagesActivityResultLauncher.launch(intent)
             }
@@ -769,7 +773,7 @@ abstract class EditActivity(private val type: Type) :
             if (position != -1) {
                 val audio = notallyModel.audios.value[position]
                 val intent = Intent(this, PlayAudioActivity::class.java)
-                intent.putExtra(PlayAudioActivity.AUDIO, audio)
+                intent.putExtra(PlayAudioActivity.EXTRA_AUDIO, audio)
                 playAudioActivityResultLauncher.launch(intent)
             }
         }
@@ -868,10 +872,12 @@ abstract class EditActivity(private val type: Type) :
     )
 
     companion object {
+        private const val TAG = "EditActivity"
         private const val REQUEST_AUDIO_PERMISSION = 36
 
-        const val NOTE_ID = "note_id"
-        const val FOLDER_FROM = "folder_from"
-        const val FOLDER_TO = "folder_to"
+        const val EXTRA_SELECTED_BASE_NOTE = "notallyx.intent.extra.SELECTED_BASE_NOTE"
+        const val EXTRA_NOTE_ID = "notallyx.intent.extra.NOTE_ID"
+        const val EXTRA_FOLDER_FROM = "notallyx.intent.extra.FOLDER_FROM"
+        const val EXTRA_FOLDER_TO = "notallyx.intent.extra.FOLDER_TO"
     }
 }

@@ -29,12 +29,12 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
         binding = ActivityLabelBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val savedList = savedInstanceState?.getStringArrayList(SELECTED_LABELS)
-        val passedList = requireNotNull(intent.getStringArrayListExtra(SELECTED_LABELS))
+        val savedList = savedInstanceState?.getStringArrayList(EXTRA_SELECTED_LABELS)
+        val passedList = requireNotNull(intent.getStringArrayListExtra(EXTRA_SELECTED_LABELS))
         selectedLabels = savedList ?: passedList
 
         val result = Intent()
-        result.putExtra(SELECTED_LABELS, selectedLabels)
+        result.putExtra(EXTRA_SELECTED_LABELS, selectedLabels)
         setResult(RESULT_OK, result)
 
         setupToolbar()
@@ -43,7 +43,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState.putStringArrayList(SELECTED_LABELS, selectedLabels)
+        outState.putStringArrayList(EXTRA_SELECTED_LABELS, selectedLabels)
     }
 
     private fun setupToolbar() {
@@ -104,6 +104,6 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
     }
 
     companion object {
-        const val SELECTED_LABELS = "SELECTED_LABELS"
+        const val EXTRA_SELECTED_LABELS = "notallyx.intent.extra.SELECTED_LABELS"
     }
 }

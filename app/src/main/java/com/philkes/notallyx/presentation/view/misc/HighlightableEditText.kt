@@ -71,8 +71,7 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
                 removeSpan(it)
                 highlightedSpans.remove(it)
             }
-        val span =
-            HighlightSpan(if (selected) highlightColor else highlightColor.withAlpha(0.1f))
+        val span = HighlightSpan(if (selected) highlightColor else highlightColor.withAlpha(0.1f))
         applySpan(span, startIdx, endIdx)
         highlightedSpans.add(span)
         if (selected) {
@@ -88,7 +87,7 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
         selectedHighlightedSpan?.unselect()
     }
 
-    private fun CharacterStyle.unselect(){
+    private fun CharacterStyle.unselect() {
         val (previousHighlightedStartIdx, previousHighlightedEndIdx) = getSpanRange(this)
         if (previousHighlightedStartIdx != -1) {
             removeSpan(this)
@@ -97,4 +96,4 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
     }
 }
 
-class HighlightSpan(@ColorInt color: Int): BackgroundColorSpan(color)
+class HighlightSpan(@ColorInt color: Int) : BackgroundColorSpan(color)

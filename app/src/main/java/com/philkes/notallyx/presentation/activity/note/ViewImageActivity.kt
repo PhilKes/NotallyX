@@ -19,11 +19,11 @@ import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.databinding.ActivityViewImageBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.add
-import com.philkes.notallyx.presentation.getUriForFile
-import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
-import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
+import com.philkes.notallyx.utils.getExternalImagesDirectory
+import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import java.io.FileInputStream
@@ -45,12 +45,16 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
 
         val savedList =
             savedInstanceState?.let {
-                BundleCompat.getParcelableArrayList(it, DELETED_IMAGES, FileAttachment::class.java)
+                BundleCompat.getParcelableArrayList(
+                    it,
+                    EXTRA_DELETED_IMAGES,
+                    FileAttachment::class.java,
+                )
             }
         deletedImages = savedList ?: ArrayList()
 
         val resultIntent = Intent()
-        resultIntent.putExtra(DELETED_IMAGES, deletedImages)
+        resultIntent.putExtra(EXTRA_DELETED_IMAGES, deletedImages)
         setResult(RESULT_OK, resultIntent)
 
         val savedImage =
@@ -68,11 +72,11 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
             PagerSnapHelper().attachToRecyclerView(binding.RecyclerView)
         }
 
-        val initial = intent.getIntExtra(POSITION, 0)
+        val initial = intent.getIntExtra(EXTRA_POSITION, 0)
         binding.RecyclerView.scrollToPosition(initial)
 
         val database = NotallyDatabase.getDatabase(application)
-        val id = intent.getLongExtra(Constants.SelectedBaseNote, 0)
+        val id = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0)
 
         database.observe(this@ViewImageActivity) {
             lifecycleScope.launch {
@@ -100,7 +104,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         super.onSaveInstanceState(outState)
         outState.apply {
             putParcelable(CURRENT_IMAGE, currentImage)
-            putParcelableArrayList(DELETED_IMAGES, deletedImages)
+            putParcelableArrayList(EXTRA_DELETED_IMAGES, deletedImages)
         }
     }
 
@@ -156,7 +160,6 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
         val file = if (mediaRoot != null) File(mediaRoot, image.localName) else null
         if (file != null && file.exists()) {
             val uri = getUriForFile(file)
-
             val intent =
                 Intent(Intent.ACTION_SEND)
                     .apply {
@@ -228,8 +231,8 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
     }
 
     companion object {
-        const val POSITION = "POSITION"
+        const val EXTRA_POSITION = "notallyx.intent.extra.POSITION"
         const val CURRENT_IMAGE = "CURRENT_IMAGE"
-        const val DELETED_IMAGES = "DELETED_IMAGES"
+        const val EXTRA_DELETED_IMAGES = "notallyx.intent.extra.DELETED_IMAGES"
     }
 }

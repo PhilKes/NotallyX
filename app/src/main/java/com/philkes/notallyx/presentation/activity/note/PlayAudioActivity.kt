@@ -17,10 +17,10 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.ActivityPlayAudioBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
-import com.philkes.notallyx.presentation.getUriForFile
-import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
 import com.philkes.notallyx.utils.audio.AudioPlayService
 import com.philkes.notallyx.utils.audio.LocalBinder
+import com.philkes.notallyx.utils.getExternalAudioDirectory
+import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import java.io.FileInputStream
@@ -45,7 +45,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
 
         audio =
             requireNotNull(
-                intent?.let { IntentCompat.getParcelableExtra(it, AUDIO, Audio::class.java) }
+                intent?.let { IntentCompat.getParcelableExtra(it, EXTRA_AUDIO, Audio::class.java) }
             )
         binding.AudioControlView.setDuration(audio.duration)
 
@@ -131,7 +131,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
             .setNegativeButton(R.string.cancel, null)
             .setPositiveButton(R.string.delete) { _, _ ->
                 val intent = Intent()
-                intent.putExtra(AUDIO, audio)
+                intent.putExtra(EXTRA_AUDIO, audio)
                 setResult(RESULT_OK, intent)
                 finish()
             }
@@ -202,6 +202,6 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
     }
 
     companion object {
-        const val AUDIO = "AUDIO"
+        const val EXTRA_AUDIO = "notallyx.intent.extra.AUDIO"
     }
 }

@@ -32,10 +32,10 @@ import com.philkes.notallyx.data.model.getNoteTypeFromUrl
 import com.philkes.notallyx.data.model.isNoteUrl
 import com.philkes.notallyx.databinding.BottomTextFormattingMenuBinding
 import com.philkes.notallyx.databinding.RecyclerToggleBinding
-import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXCLUDE_NOTE_ID
-import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_ID
-import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TITLE
-import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.PICKED_NOTE_TYPE
+import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXTRA_EXCLUDE_NOTE_ID
+import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXTRA_PICKED_NOTE_ID
+import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXTRA_PICKED_NOTE_TITLE
+import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXTRA_PICKED_NOTE_TYPE
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.dp
@@ -43,7 +43,6 @@ import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.showToast
-import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.note.TextFormattingAdapter
 import com.philkes.notallyx.presentation.view.note.action.AddNoteActions
 import com.philkes.notallyx.presentation.view.note.action.AddNoteBottomSheet
@@ -343,7 +342,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     fun linkNote(activityResultLauncher: ActivityResultLauncher<Intent>) {
         val intent =
             Intent(this, PickNoteActivity::class.java).apply {
-                putExtra(EXCLUDE_NOTE_ID, notallyModel.id)
+                putExtra(EXTRA_EXCLUDE_NOTE_ID, notallyModel.id)
             }
         activityResultLauncher.launch(intent)
     }
@@ -429,22 +428,22 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     private fun goToActivity(activity: Class<out Activity>, noteId: Long) {
         val intent = Intent(this, activity)
-        intent.putExtra(Constants.SelectedBaseNote, noteId)
+        intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
         startActivity(intent)
     }
 
     private fun Intent?.getPickedNoteData(): Triple<String, String, Boolean> {
-        val noteId = this?.getLongExtra(PICKED_NOTE_ID, -1L)!!
+        val noteId = this?.getLongExtra(EXTRA_PICKED_NOTE_ID, -1L)!!
         if (noteId == -1L) {
             throw IllegalArgumentException("Invalid note picked!")
         }
         var emptyTitle = false
         val noteTitle =
-            this.getStringExtra(PICKED_NOTE_TITLE)!!.ifEmpty {
+            this.getStringExtra(EXTRA_PICKED_NOTE_TITLE)!!.ifEmpty {
                 emptyTitle = true
                 this@EditNoteActivity.getString(R.string.note)
             }
-        val noteType = Type.valueOf(this.getStringExtra(PICKED_NOTE_TYPE)!!)
+        val noteType = Type.valueOf(this.getStringExtra(EXTRA_PICKED_NOTE_TYPE)!!)
         val noteUrl = noteId.createNoteUrl(noteType)
         return Triple(noteTitle, noteUrl, emptyTitle)
     }

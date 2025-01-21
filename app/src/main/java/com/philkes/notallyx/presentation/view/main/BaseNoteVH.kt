@@ -28,6 +28,7 @@ import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
 import com.philkes.notallyx.presentation.applySpans
+import com.philkes.notallyx.presentation.bindLabels
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.extractColor
@@ -38,7 +39,6 @@ import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
-import com.philkes.notallyx.utils.Operations
 import java.io.File
 
 data class BaseNoteVHPreferences(
@@ -142,8 +142,7 @@ class BaseNoteVH(
         if (preferences.hideLabels) {
             binding.LabelGroup.visibility = GONE
         } else {
-            Operations.bindLabels(
-                binding.LabelGroup,
+            binding.LabelGroup.bindLabels(
                 baseNote.labels,
                 preferences.textSize,
                 binding.Note.isVisible || binding.Title.isVisible,

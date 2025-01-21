@@ -3,7 +3,7 @@ package com.philkes.notallyx.presentation.activity.main
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.print.PostPDFGenerator
+import android.print.PdfPrintListener
 import android.transition.TransitionManager
 import android.view.Menu
 import android.view.Menu.CATEGORY_CONTAINER
@@ -41,8 +41,10 @@ import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.ActivityMainBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
 import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_FOLDER
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
@@ -50,21 +52,20 @@ import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
-import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.movedToResId
-import com.philkes.notallyx.presentation.nameWithoutExtension
 import com.philkes.notallyx.presentation.showColorSelectDialog
-import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
-import com.philkes.notallyx.utils.IO.getExportedPath
-import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.backup.Export.exportPdfFile
-import com.philkes.notallyx.utils.backup.Export.exportPlainTextFile
+import com.philkes.notallyx.utils.backup.exportPdfFile
+import com.philkes.notallyx.utils.backup.exportPlainTextFile
+import com.philkes.notallyx.utils.getExportedPath
+import com.philkes.notallyx.utils.getUriForFile
+import com.philkes.notallyx.utils.nameWithoutExtension
+import com.philkes.notallyx.utils.shareNote
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import kotlinx.coroutines.launch
@@ -178,8 +179,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                         .setVisible(index < maxLabelsToDisplay)
                         .setIcon(R.drawable.label)
                         .setOnMenuItemClickListener {
-                            val bundle =
-                                Bundle().apply { putString(Constants.SelectedLabel, label) }
+                            val bundle = Bundle().apply { putString(EXTRA_DISPLAYED_LABEL, label) }
                             navController.navigate(R.id.DisplayLabel, bundle)
                             false
                         }
@@ -266,9 +266,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         val body =
             when (baseNote.type) {
                 Type.NOTE -> baseNote.body.applySpans(baseNote.spans)
-                Type.LIST -> Operations.getBody(baseNote.items)
+                Type.LIST -> baseNote.items.toText()
             }
-        Operations.shareNote(this, baseNote.title, body)
+        this.shareNote(baseNote.title, body)
     }
 
     private fun deleteForever() {
@@ -356,8 +356,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                         application,
                         baseNote,
                         DocumentFile.fromFile(application.getExportedPath()),
-                        onResult =
-                            object : PostPDFGenerator.OnResult {
+                        pdfPrintListener =
+                            object : PdfPrintListener {
 
                                 override fun onSuccess(file: DocumentFile) {
                                     showFileOptionsDialog(file, ExportMimeType.PDF.mimeType)

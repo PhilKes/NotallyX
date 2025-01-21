@@ -26,7 +26,5 @@ class EditTextWithHistoryChange(
 
 data class EditTextState(val text: Editable, val cursorPos: Int)
 
-
- inline fun <reified T : Any> Editable.withoutSpans(): Editable = clone().apply {
-        this.getSpans<T>().forEach { removeSpan(it) }
-    }
+inline fun <reified T : Any> Editable.withoutSpans(): Editable =
+    clone().apply { this.getSpans<T>().forEach { removeSpan(it) } }

@@ -232,9 +232,9 @@ class ListManager(
         before: EditTextState? = null,
         pushChange: Boolean = true,
     ) {
-//        if(!pushChange) {
-            endSearch?.invoke()
-//        }
+        //        if(!pushChange) {
+        endSearch?.invoke()
+        //        }
         val item = items[position]
         item.body = value.text.toString()
         if (pushChange) {

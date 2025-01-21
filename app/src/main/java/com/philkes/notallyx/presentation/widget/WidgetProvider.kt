@@ -17,9 +17,9 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.findChildrenPositions
 import com.philkes.notallyx.data.model.findParentPosition
 import com.philkes.notallyx.presentation.activity.ConfigureWidgetActivity
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
-import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -49,7 +49,7 @@ class WidgetProvider : AppWidgetProvider() {
 
     @OptIn(DelicateCoroutinesApi::class)
     private fun checkChanged(intent: Intent, context: Context) {
-        val noteId = intent.getLongExtra(Constants.SelectedBaseNote, 0)
+        val noteId = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0)
         val position = intent.getIntExtra(EXTRA_POSITION, 0)
         val checked =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -167,7 +167,7 @@ class WidgetProvider : AppWidgetProvider() {
             // Widgets displaying the same note share the same factory since only the noteId is
             // embedded
             val intent = Intent(context, WidgetService::class.java)
-            intent.putExtra(Constants.SelectedBaseNote, noteId)
+            intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
             embedIntentExtras(intent)
 
@@ -187,7 +187,7 @@ class WidgetProvider : AppWidgetProvider() {
                                     Type.NOTE -> Intent(context, EditNoteActivity::class.java)
                                     Type.LIST -> Intent(context, EditListActivity::class.java)
                                 }.apply {
-                                    putExtra(Constants.SelectedBaseNote, noteId)
+                                    putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
                                     addFlags(
                                         Intent.FLAG_ACTIVITY_NEW_TASK or
                                             Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -220,7 +220,7 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         private fun openActivity(context: Context, originalIntent: Intent, clazz: Class<*>) {
-            val id = originalIntent.getLongExtra(Constants.SelectedBaseNote, 0)
+            val id = originalIntent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0)
             val widgetId = originalIntent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, 0)
             context.startActivity(createIntent(context, clazz, id, widgetId, originalIntent))
         }
@@ -233,18 +233,18 @@ class WidgetProvider : AppWidgetProvider() {
             originalIntent: Intent? = null,
         ): Intent {
             val intent = Intent(context, clazz)
-            intent.putExtra(Constants.SelectedBaseNote, noteId)
+            intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, widgetId)
             originalIntent?.let { intent.data = it.data }
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
             return intent
         }
 
-        fun sendBroadcast(app: Application, ids: LongArray) {
-            val intent = Intent(app, WidgetProvider::class.java)
+        fun sendBroadcast(context: Context, ids: LongArray) {
+            val intent = Intent(context, WidgetProvider::class.java)
             intent.action = ACTION_NOTES_MODIFIED
             intent.putExtra(EXTRA_MODIFIED_NOTES, ids)
-            app.sendBroadcast(intent)
+            context.sendBroadcast(intent)
         }
 
         fun getSelectNoteIntent(id: Int): Intent {
@@ -256,7 +256,7 @@ class WidgetProvider : AppWidgetProvider() {
 
         private fun getOpenNoteIntent(context: Context, noteId: Long): PendingIntent {
             val intent = Intent(context, WidgetProvider::class.java)
-            intent.putExtra(Constants.SelectedBaseNote, noteId)
+            intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
             embedIntentExtras(intent)
             val flags =
                 PendingIntent.FLAG_MUTABLE or
@@ -270,7 +270,8 @@ class WidgetProvider : AppWidgetProvider() {
             intent.data = Uri.parse(string)
         }
 
-        private const val EXTRA_MODIFIED_NOTES = "com.philkes.notallyx.EXTRA_MODIFIED_NOTES"
+        private const val EXTRA_MODIFIED_NOTES =
+            "notallyx.intent.extra.com.philkes.notallyx.EXTRA_MODIFIED_NOTES"
         private const val ACTION_NOTES_MODIFIED = "com.philkes.notallyx.ACTION_NOTE_MODIFIED"
 
         const val ACTION_OPEN_NOTE = "com.philkes.notallyx.ACTION_OPEN_NOTE"
@@ -278,6 +279,6 @@ class WidgetProvider : AppWidgetProvider() {
         const val ACTION_SELECT_NOTE = "com.philkes.notallyx.ACTION_SELECT_NOTE"
 
         const val ACTION_CHECKED_CHANGED = "com.philkes.notallyx.ACTION_CHECKED_CHANGED"
-        const val EXTRA_POSITION = "com.philkes.notallyx.EXTRA_POSITION"
+        const val EXTRA_POSITION = "notallyx.intent.extra.com.philkes.notallyx.EXTRA_POSITION"
     }
 }

@@ -42,14 +42,19 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
-import com.philkes.notallyx.utils.IO.deleteAttachments
-import com.philkes.notallyx.utils.IO.getBackupDir
-import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
-import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.backup.Export
-import com.philkes.notallyx.utils.backup.Import
-import com.philkes.notallyx.utils.backup.Migrations
-import com.philkes.notallyx.utils.backup.XMLUtils
+import com.philkes.notallyx.utils.backup.clearAllFolders
+import com.philkes.notallyx.utils.backup.clearAllLabels
+import com.philkes.notallyx.utils.backup.exportAsZip
+import com.philkes.notallyx.utils.backup.exportPdfFile
+import com.philkes.notallyx.utils.backup.exportPlainTextFile
+import com.philkes.notallyx.utils.backup.getPreviousLabels
+import com.philkes.notallyx.utils.backup.getPreviousNotes
+import com.philkes.notallyx.utils.backup.importZip
+import com.philkes.notallyx.utils.backup.readAsBackup
+import com.philkes.notallyx.utils.deleteAttachments
+import com.philkes.notallyx.utils.getBackupDir
+import com.philkes.notallyx.utils.getExternalImagesDirectory
+import com.philkes.notallyx.utils.log
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -143,14 +148,14 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
 
         viewModelScope.launch {
-            val previousNotes = Migrations.getPreviousNotes(app)
-            val previousLabels = Migrations.getPreviousLabels(app)
+            val previousNotes = app.getPreviousNotes()
+            val previousLabels = app.getPreviousLabels()
             if (previousNotes.isNotEmpty() || previousLabels.isNotEmpty()) {
                 database.withTransaction {
                     labelDao.insert(previousLabels)
                     baseNoteDao.insert(previousNotes)
-                    Migrations.clearAllLabels(app)
-                    Migrations.clearAllFolders(app)
+                    app.clearAllLabels()
+                    app.clearAllFolders()
                 }
             }
         }
@@ -233,26 +238,26 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun exportBackup(uri: Uri) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) { Export.exportAsZip(uri, app, exportProgress) }
+            withContext(Dispatchers.IO) { app.exportAsZip(uri, exportProgress) }
             app.showToast(R.string.saved_to_device)
         }
     }
 
     fun importZipBackup(uri: Uri, password: String) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Operations.log(app, throwable)
+            app.log(TAG, throwable = throwable)
             app.showToast(R.string.invalid_backup)
         }
 
         val backupDir = app.getBackupDir()
         viewModelScope.launch(exceptionHandler) {
-            Import.importZip(app, uri, backupDir, password, importProgress)
+            app.importZip(uri, backupDir, password, importProgress)
         }
     }
 
     fun importXmlBackup(uri: Uri) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Operations.log(app, throwable)
+            app.log(TAG, throwable = throwable)
             app.showToast(R.string.invalid_backup)
         }
 
@@ -260,7 +265,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             val importedNotes =
                 withContext(Dispatchers.IO) {
                     val stream = requireNotNull(app.contentResolver.openInputStream(uri))
-                    val (baseNotes, labels) = XMLUtils.readBackupFromStream(stream)
+                    val (baseNotes, labels) = stream.readAsBackup()
                     commonDao.importBackup(baseNotes, labels)
                     baseNotes.size
                 }
@@ -281,7 +286,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     Toast.LENGTH_LONG,
                 )
                 .show()
-            Operations.log(app, throwable)
+            app.log(TAG, throwable = throwable)
         }
         viewModelScope.launch(exceptionHandler) {
             val importedNotes =
@@ -306,7 +311,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun exportSelectedNotesToFolder(folderUri: Uri) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Operations.log(app, throwable)
+            app.log(TAG, throwable = throwable)
             actionMode.close(true)
             exportProgress.postValue(Progress(inProgress = false))
             app.showToast(R.string.something_went_wrong)
@@ -320,7 +325,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     ExportMimeType.TXT,
                     ExportMimeType.JSON,
                     ExportMimeType.HTML -> {
-                        Export.exportPlainTextFile(
+                        exportPlainTextFile(
                             app,
                             note,
                             selectedExportMimeType,
@@ -332,7 +337,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     }
 
                     ExportMimeType.PDF -> {
-                        Export.exportPdfFile(
+                        exportPdfFile(
                             app,
                             note,
                             DocumentFile.fromTreeUri(app, folderUri)!!,
@@ -490,6 +495,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     companion object {
+        private const val TAG = "BaseNoteModel"
 
         fun transform(list: List<BaseNote>, pinned: Header, others: Header): List<Item> {
             if (list.isEmpty()) {

@@ -27,7 +27,6 @@ import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.addCancelButton
-import com.philkes.notallyx.presentation.getUriForFile
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showDialog
@@ -39,9 +38,12 @@ import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackupPreferen
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
-import com.philkes.notallyx.utils.Operations
-import com.philkes.notallyx.utils.Operations.catchNoBrowserInstalled
-import com.philkes.notallyx.utils.Operations.reportBug
+import com.philkes.notallyx.utils.backup.exportPreferences
+import com.philkes.notallyx.utils.catchNoBrowserInstalled
+import com.philkes.notallyx.utils.getLastExceptionLog
+import com.philkes.notallyx.utils.getLogFile
+import com.philkes.notallyx.utils.getUriForFile
+import com.philkes.notallyx.utils.reportBug
 import com.philkes.notallyx.utils.security.disableBiometricLock
 import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
@@ -123,7 +125,7 @@ class SettingsFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        if (model.preferences.export(requireContext(), uri)) {
+                        if (requireContext().exportPreferences(model.preferences, uri)) {
                             showToast(R.string.export_settings_success)
                         } else {
                             showToast(R.string.export_settings_failure)
@@ -471,7 +473,7 @@ class SettingsFragment : Fragment() {
                             putExtra(Intent.EXTRA_EMAIL, arrayOf("notallyx@yahoo.com"))
                             putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
                             val app = requireContext().applicationContext as Application
-                            val log = Operations.getLog(app)
+                            val log = app.getLogFile()
                             if (log.exists()) {
                                 val uri = app.getUriForFile(log)
                                 putExtra(Intent.EXTRA_STREAM, uri)
@@ -496,7 +498,7 @@ class SettingsFragment : Fragment() {
                         when (which) {
                             0 -> {
                                 val app = requireContext().applicationContext as Application
-                                val logs = Operations.getLastExceptionLog(app)
+                                val logs = app.getLastExceptionLog()
                                 reportBug(logs)
                             }
 

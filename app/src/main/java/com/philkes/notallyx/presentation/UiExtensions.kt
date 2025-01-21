@@ -8,7 +8,6 @@ import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
-import android.net.Uri
 import android.os.Build
 import android.text.Editable
 import android.text.InputType
@@ -45,40 +44,44 @@ import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.core.view.setPadding
-import androidx.documentfile.provider.DocumentFile
+import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.chip.Chip
+import com.google.android.material.chip.ChipGroup
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.shape.MaterialShapeDrawable
+import com.google.android.material.shape.RelativeCornerSize
+import com.google.android.material.shape.RoundedCornerTreatment
+import com.google.android.material.shape.ShapeAppearanceModel
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
-import com.philkes.notallyx.data.model.getUrl
 import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
+import com.philkes.notallyx.databinding.LabelBinding
 import com.philkes.notallyx.presentation.view.main.ColorAdapter
 import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
+import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
-import java.io.File
+import com.philkes.notallyx.utils.getUrl
 import java.util.Date
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.ocpsoft.prettytime.PrettyTime
@@ -114,20 +117,6 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
         }
     }
     return editable
-}
-
-fun String.truncate(limit: Int): String {
-    return if (length > limit) {
-        val truncated = take(limit)
-        val remainingCharacters = length - limit
-        "$truncated... ($remainingCharacters more characters)"
-    } else {
-        this
-    }
-}
-
-fun String.removeTrailingParentheses(): String {
-    return substringBeforeLast(" (")
 }
 
 /**
@@ -516,12 +505,6 @@ fun @receiver:ColorInt Int.withAlpha(alpha: Float): Int {
     )
 }
 
-fun Context.getUriForFile(file: File): Uri =
-    FileProvider.getUriForFile(this, "${packageName}.provider", file)
-
-val DocumentFile.nameWithoutExtension: String?
-    get() = name?.substringBeforeLast(".")
-
 fun Context.getColorFromAttr(@AttrRes attr: Int): Int {
     val typedValue = TypedValue()
     val resolved = theme.resolveAttribute(attr, typedValue, true)
@@ -714,4 +697,45 @@ fun Window.setLightStatusAndNavBar(value: Boolean, view: View = decorView) {
     val windowInsetsControllerCompat = WindowInsetsControllerCompat(this, view)
     windowInsetsControllerCompat.isAppearanceLightStatusBars = value
     windowInsetsControllerCompat.isAppearanceLightNavigationBars = value
+}
+
+fun ChipGroup.bindLabels(
+    labels: List<String>,
+    textSize: TextSize,
+    paddingTop: Boolean,
+    color: Int? = null,
+) {
+    if (labels.isEmpty()) {
+        visibility = View.GONE
+    } else {
+        apply {
+            visibility = View.VISIBLE
+            removeAllViews()
+            updatePadding(top = if (paddingTop) 8.dp(context) else 0)
+        }
+        val inflater = LayoutInflater.from(context)
+        val labelSize = textSize.displayBodySize
+        for (label in labels) {
+            LabelBinding.inflate(inflater, this, true).root.apply {
+                background = getOutlinedDrawable(this@bindLabels.context)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
+                text = label
+                color?.let { setControlsContrastColorForAllViews(it) }
+            }
+        }
+    }
+}
+
+private fun getOutlinedDrawable(context: Context): MaterialShapeDrawable {
+    val model =
+        ShapeAppearanceModel.builder()
+            .setAllCorners(RoundedCornerTreatment())
+            .setAllCornerSizes(RelativeCornerSize(0.5f))
+            .build()
+
+    return MaterialShapeDrawable(model).apply {
+        fillColor = ColorStateList.valueOf(0)
+        strokeWidth = context.resources.displayMetrics.density
+        strokeColor = ContextCompat.getColorStateList(context, R.color.chip_stroke)
+    }
 }

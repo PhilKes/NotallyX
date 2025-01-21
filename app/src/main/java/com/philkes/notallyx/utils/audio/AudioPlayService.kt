@@ -5,8 +5,8 @@ import android.content.Intent
 import android.media.MediaPlayer
 import android.os.IBinder
 import com.philkes.notallyx.data.model.Audio
-import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
-import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.getExternalAudioDirectory
+import com.philkes.notallyx.utils.log
 import java.io.File
 
 class AudioPlayService : Service() {
@@ -55,7 +55,7 @@ class AudioPlayService : Service() {
                     player.prepareAsync()
                 } catch (exception: Exception) {
                     setIOError()
-                    Operations.log(application, exception)
+                    application.log(TAG, throwable = exception)
                 }
             } else setIOError()
         }
@@ -112,6 +112,7 @@ class AudioPlayService : Service() {
     }
 
     companion object {
+        private const val TAG = "AudioPlayService"
         const val IDLE = 0
         const val INITIALISED = 1
         const val PREPARED = 2

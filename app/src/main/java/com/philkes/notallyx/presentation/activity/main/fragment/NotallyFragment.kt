@@ -23,14 +23,14 @@ import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.activity.main.MainActivity
-import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FOLDER_FROM
-import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.FOLDER_TO
-import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.NOTE_ID
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_FOLDER_FROM
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_FOLDER_TO
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_NOTE_ID
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
-import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
 import com.philkes.notallyx.presentation.view.main.BaseNoteVHPreferences
 import com.philkes.notallyx.presentation.view.misc.ItemListener
@@ -70,10 +70,10 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                     // If a note has been moved inside of EditActivity
                     // present snackbar to undo it
                     val data = result.data
-                    val id = data?.getLongExtra(NOTE_ID, -1)
+                    val id = data?.getLongExtra(EXTRA_NOTE_ID, -1)
                     if (id != null) {
-                        val folderFrom = Folder.valueOf(data.getStringExtra(FOLDER_FROM)!!)
-                        val folderTo = Folder.valueOf(data.getStringExtra(FOLDER_TO)!!)
+                        val folderFrom = Folder.valueOf(data.getStringExtra(EXTRA_FOLDER_FROM)!!)
+                        val folderTo = Folder.valueOf(data.getStringExtra(EXTRA_FOLDER_TO)!!)
                         Snackbar.make(
                                 binding!!.root,
                                 requireContext().getQuantityString(folderTo.movedToResId(), 1),
@@ -225,7 +225,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
 
     private fun goToActivity(activity: Class<*>, baseNote: BaseNote) {
         val intent = Intent(requireContext(), activity)
-        intent.putExtra(Constants.SelectedBaseNote, baseNote.id)
+        intent.putExtra(EXTRA_SELECTED_BASE_NOTE, baseNote.id)
         openNoteActivityResultLauncher.launch(intent)
     }
 

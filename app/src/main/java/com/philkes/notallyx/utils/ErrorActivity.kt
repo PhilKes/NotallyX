@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import cat.ereza.customactivityoncrash.CustomActivityOnCrash
 import com.philkes.notallyx.R
 import com.philkes.notallyx.presentation.dp
-import com.philkes.notallyx.utils.Operations.reportBug
 
 /**
  * Activity used when the app is about to crash. Implicitly used by cat.ereza:customactivityoncrash.
@@ -44,7 +43,7 @@ class ErrorActivity : AppCompatActivity() {
                 }
             }
         val stackTrace = CustomActivityOnCrash.getStackTraceFromIntent(intent)
-        stackTrace?.let { Operations.log(application, stackTrace = it) }
+        stackTrace?.let { application.log(TAG, stackTrace = it) }
         findViewById<Button>(
                 cat.ereza.customactivityoncrash.R.id
                     .customactivityoncrash_error_activity_more_info_button
@@ -55,5 +54,9 @@ class ErrorActivity : AppCompatActivity() {
                     reportBug(CustomActivityOnCrash.getStackTraceFromIntent(intent))
                 }
             }
+    }
+
+    companion object {
+        private const val TAG = "ErrorActivity"
     }
 }

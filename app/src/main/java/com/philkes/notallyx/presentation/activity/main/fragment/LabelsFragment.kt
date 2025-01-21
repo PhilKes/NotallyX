@@ -19,10 +19,10 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.FragmentNotesBinding
+import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
-import com.philkes.notallyx.presentation.view.Constants
 import com.philkes.notallyx.presentation.view.main.label.LabelAdapter
 import com.philkes.notallyx.presentation.view.main.label.LabelData
 import com.philkes.notallyx.presentation.view.main.label.LabelListener
@@ -74,7 +74,7 @@ class LabelsFragment : Fragment(), LabelListener {
     override fun onClick(position: Int) {
         labelAdapter?.currentList?.get(position)?.let { (label, _) ->
             val bundle = Bundle()
-            bundle.putString(Constants.SelectedLabel, label)
+            bundle.putString(EXTRA_DISPLAYED_LABEL, label)
             findNavController().navigate(R.id.LabelsToDisplayLabel, bundle)
         }
     }

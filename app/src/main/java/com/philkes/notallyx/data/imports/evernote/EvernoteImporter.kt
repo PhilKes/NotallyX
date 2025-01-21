@@ -19,8 +19,9 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.utils.IO.write
-import com.philkes.notallyx.utils.Operations
+import com.philkes.notallyx.utils.log
+import com.philkes.notallyx.utils.startsWithAnyOf
+import com.philkes.notallyx.utils.write
 import java.io.File
 import java.io.InputStream
 import java.text.SimpleDateFormat
@@ -91,7 +92,7 @@ class EvernoteImporter : ExternalImporter {
                 val data = Base64.decode(it.data!!.content.trimStart(), Base64.DEFAULT)
                 file.write(data)
             } catch (e: Exception) {
-                Operations.log(app, e)
+                app.log(TAG, throwable = e)
             }
             progress?.postValue(
                 ImportProgress(
@@ -104,6 +105,8 @@ class EvernoteImporter : ExternalImporter {
     }
 
     companion object {
+        private const val TAG = "EvernoteImporter"
+
         fun parseTimestamp(timestamp: String): Long {
             val format = SimpleDateFormat(EVERNOTE_DATE_FORMAT, Locale.getDefault())
             format.timeZone = TimeZone.getTimeZone("UTC")
@@ -165,11 +168,6 @@ fun Collection<EvernoteResource>.filterByExcludedMimeTypePrefixes(
     vararg mimeTypePrefix: String
 ): List<EvernoteResource> {
     return filter { !it.mime.startsWithAnyOf(*mimeTypePrefix) }
-}
-
-private fun String.startsWithAnyOf(vararg s: String): Boolean {
-    s.forEach { if (startsWith(it)) return true }
-    return false
 }
 
 fun Collection<EvernoteResource>.toFileAttachments(): List<FileAttachment> {

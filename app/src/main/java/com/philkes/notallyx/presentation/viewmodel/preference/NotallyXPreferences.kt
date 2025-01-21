@@ -1,6 +1,5 @@
 package com.philkes.notallyx.presentation.viewmodel.preference
 
-import android.app.Application
 import android.content.Context
 import android.net.Uri
 import androidx.core.content.edit
@@ -10,21 +9,20 @@ import androidx.security.crypto.MasterKey
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
-import com.philkes.notallyx.utils.Operations
-import java.io.IOException
-import java.io.InputStream
+import com.philkes.notallyx.utils.backup.importPreferences
+import com.philkes.notallyx.utils.toCamelCase
 import org.json.JSONArray
 import org.json.JSONObject
 
-class NotallyXPreferences private constructor(private val app: Application) {
+class NotallyXPreferences private constructor(private val context: Context) {
 
-    private val preferences = PreferenceManager.getDefaultSharedPreferences(app)
+    private val preferences = PreferenceManager.getDefaultSharedPreferences(context)
 
     private val encryptedPreferences by lazy {
         EncryptedSharedPreferences.create(
-            app,
+            context,
             "secret_shared_prefs",
-            MasterKey.Builder(app).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
+            MasterKey.Builder(context).setKeyScheme(MasterKey.KeyScheme.AES256_GCM).build(),
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
         )
@@ -166,60 +164,22 @@ class NotallyXPreferences private constructor(private val app: Application) {
         return dateFormat.value != DateFormat.NONE
     }
 
-    fun export(context: Context, uri: Uri): Boolean {
+    fun toJsonString(): String {
         val jsonObject = JSONObject()
-        try {
-            for ((key, value) in preferences.all) {
-                if (key in listOf(biometricLock.key, iv.key, databaseEncryptionKey.key)) {
-                    continue
-                }
-                when (value) {
-                    is Collection<*> -> jsonObject.put(key, JSONArray(value))
-                    is Enum<*> -> jsonObject.put(key, value.name.toCamelCase())
-                    else -> jsonObject.put(key, value)
-                }
+        for ((key, value) in preferences.all) {
+            if (key in listOf(biometricLock.key, iv.key, databaseEncryptionKey.key)) {
+                continue
             }
-            context.contentResolver.openOutputStream(uri)?.use {
-                it.write(jsonObject.toString(4).toByteArray())
-            } ?: return false
-            return true
-        } catch (e: IOException) {
-            Operations.log(app, e)
-            return false
+            when (value) {
+                is Collection<*> -> jsonObject.put(key, JSONArray(value))
+                is Enum<*> -> jsonObject.put(key, value.name.toCamelCase())
+                else -> jsonObject.put(key, value)
+            }
         }
+        return jsonObject.toString(4)
     }
 
-    fun import(context: Context, uri: Uri): Boolean {
-        try {
-            val inputStream: InputStream? = context.contentResolver.openInputStream(uri)
-            val jsonString = inputStream?.bufferedReader()?.use { it.readText() } ?: return false
-
-            val jsonObject = JSONObject(jsonString)
-
-            val editor = preferences.edit()
-            editor.clear()
-
-            jsonObject.keys().forEach { key ->
-                when (val value = jsonObject.get(key)) {
-                    is Int -> editor.putInt(key, value)
-                    is Boolean -> editor.putBoolean(key, value)
-                    is Double -> editor.putFloat(key, value.toFloat())
-                    is Long -> editor.putLong(key, value)
-                    is JSONArray -> {
-                        val set = (0 until value.length()).map { value.getString(it) }.toSet()
-                        editor.putStringSet(key, set)
-                    }
-                    else -> editor.putString(key, value.toString())
-                }
-            }
-            editor.apply()
-            reload()
-            return true
-        } catch (e: Exception) {
-            Operations.log(app, e)
-            return false
-        }
-    }
+    fun import(context: Context, uri: Uri) = context.importPreferences(uri, preferences.edit())
 
     fun reset() {
         preferences.edit().clear().apply()
@@ -249,14 +209,15 @@ class NotallyXPreferences private constructor(private val app: Application) {
     }
 
     companion object {
+        private const val TAG = "NotallyXPreferences"
         const val EMPTY_PATH = "emptyPath"
 
         @Volatile private var instance: NotallyXPreferences? = null
 
-        fun getInstance(app: Application): NotallyXPreferences {
+        fun getInstance(context: Context): NotallyXPreferences {
             return instance
                 ?: synchronized(this) {
-                    val instance = NotallyXPreferences(app)
+                    val instance = NotallyXPreferences(context)
                     Companion.instance = instance
                     return instance
                 }

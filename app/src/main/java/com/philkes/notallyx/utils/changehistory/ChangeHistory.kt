@@ -63,10 +63,12 @@ class ChangeHistory {
         }
     }
 
-    inner class ChangeHistoryException(message: String) : IllegalStateException("$message\nstackPointer: ${stackPointer.value}\nchangeStack:\n${changeStack.joinToString("\n")}")
+    inner class ChangeHistoryException(message: String) :
+        IllegalStateException(
+            "$message\nstackPointer: ${stackPointer.value}\nchangeStack:\n${changeStack.joinToString("\n")}"
+        )
 
-    companion object{
+    companion object {
         private const val TAG = "ChangeHistory"
     }
 }
-

@@ -6,7 +6,6 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.DataUtil
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.imports.evernote.EvernoteImporter
 import com.philkes.notallyx.data.imports.google.GoogleKeepImporter
@@ -15,6 +14,9 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
+import com.philkes.notallyx.utils.backup.importAudio
+import com.philkes.notallyx.utils.backup.importFile
+import com.philkes.notallyx.utils.backup.importImage
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -75,9 +77,8 @@ class NotesImporter(private val app: Application, private val database: NotallyD
         files.forEach { file ->
             val uri = File(sourceFolder, file.localName).toUri()
             val (fileAttachment, error) =
-                if (fileType == NotallyModel.FileType.IMAGE)
-                    DataUtil.addImage(app, uri, file.mimeType)
-                else DataUtil.addFile(app, uri, file.mimeType)
+                if (fileType == NotallyModel.FileType.IMAGE) app.importImage(uri, file.mimeType)
+                else app.importFile(uri, file.mimeType)
             fileAttachment?.let {
                 file.localName = fileAttachment.localName
                 file.originalName = fileAttachment.originalName
@@ -103,7 +104,7 @@ class NotesImporter(private val app: Application, private val database: NotallyD
     ) {
         audios.forEach { originalAudio ->
             val file = File(sourceFolder, originalAudio.name)
-            val audio = DataUtil.addAudio(app, file, false)
+            val audio = app.importAudio(file, false)
             originalAudio.name = audio.name
             originalAudio.duration = if (audio.duration == 0L) null else audio.duration
             originalAudio.timestamp = audio.timestamp

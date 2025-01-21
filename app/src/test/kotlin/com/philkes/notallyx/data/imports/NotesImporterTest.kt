@@ -6,7 +6,7 @@ import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.philkes.notallyx.data.NotallyDatabase
-import com.philkes.notallyx.utils.IO.decodeToBitmap
+import com.philkes.notallyx.utils.decodeToBitmap
 import java.io.File
 import java.nio.file.Files
 import kotlinx.coroutines.runBlocking

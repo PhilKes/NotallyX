@@ -44,6 +44,6 @@ class SearchFragment : NotallyFragment() {
     override fun getObservable() = model.searchResults!!
 
     companion object {
-        const val EXTRA_INITIAL_FOLDER = "initialFolder"
+        const val EXTRA_INITIAL_FOLDER = "notallyx.intent.extra.INITIAL_FOLDER"
     }
 }

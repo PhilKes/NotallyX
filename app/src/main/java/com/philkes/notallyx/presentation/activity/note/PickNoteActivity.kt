@@ -18,7 +18,7 @@ import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesView
-import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
+import com.philkes.notallyx.utils.getExternalImagesDirectory
 import java.util.Collections
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -28,7 +28,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
 
     protected lateinit var adapter: BaseNoteAdapter
 
-    private val excludedNoteId by lazy { intent.getLongExtra(EXCLUDE_NOTE_ID, -1L) }
+    private val excludedNoteId by lazy { intent.getLongExtra(EXTRA_EXCLUDE_NOTE_ID, -1L) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,9 +91,9 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
         if (position != -1) {
             val note = (adapter.getItem(position) as BaseNote)
             val success = Intent()
-            success.putExtra(PICKED_NOTE_ID, note.id)
-            success.putExtra(PICKED_NOTE_TITLE, note.title)
-            success.putExtra(PICKED_NOTE_TYPE, note.type.name)
+            success.putExtra(EXTRA_PICKED_NOTE_ID, note.id)
+            success.putExtra(EXTRA_PICKED_NOTE_TITLE, note.title)
+            success.putExtra(EXTRA_PICKED_NOTE_TYPE, note.type.name)
             setResult(RESULT_OK, success)
             finish()
         }
@@ -102,10 +102,10 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
     override fun onLongClick(position: Int) {}
 
     companion object {
-        const val EXCLUDE_NOTE_ID = "EXCLUDE_NOTE_ID"
+        const val EXTRA_EXCLUDE_NOTE_ID = "notallyx.intent.extra.EXCLUDE_NOTE_ID"
 
-        const val PICKED_NOTE_ID = "PICKED_NOTE_ID"
-        const val PICKED_NOTE_TITLE = "PICKED_NOTE_TITLE"
-        const val PICKED_NOTE_TYPE = "PICKED_NOTE_TYPE"
+        const val EXTRA_PICKED_NOTE_ID = "notallyx.intent.extra.PICKED_NOTE_ID"
+        const val EXTRA_PICKED_NOTE_TITLE = "notallyx.intent.extra.PICKED_NOTE_TITLE"
+        const val EXTRA_PICKED_NOTE_TYPE = "notallyx.intent.extra.PICKED_NOTE_TYPE"
     }
 }

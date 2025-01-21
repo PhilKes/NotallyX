@@ -18,9 +18,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.model.findWebUrls
 import com.philkes.notallyx.data.model.isNoteUrl
-import com.philkes.notallyx.data.model.isWebUrl
 import com.philkes.notallyx.databinding.TextInputDialog2Binding
 import com.philkes.notallyx.presentation.clone
 import com.philkes.notallyx.presentation.createTextWatcherWithHistory
@@ -29,7 +27,9 @@ import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
+import com.philkes.notallyx.utils.findWebUrls
 import com.philkes.notallyx.utils.getLatestText
+import com.philkes.notallyx.utils.isWebUrl
 
 /**
  * [AppCompatEditText] whose changes (text edits or span changes) are pushed to [changeHistory].

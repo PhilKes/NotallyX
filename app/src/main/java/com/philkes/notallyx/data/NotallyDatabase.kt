@@ -1,6 +1,7 @@
 package com.philkes.notallyx.data
 
-import android.app.Application
+import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.Observer
@@ -21,7 +22,7 @@ import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.observeForeverSkipFirst
-import com.philkes.notallyx.utils.IO.getExternalMediaDirectory
+import com.philkes.notallyx.utils.getExternalMediaDirectory
 import com.philkes.notallyx.utils.security.SQLCipherUtils
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import java.io.File
@@ -50,63 +51,67 @@ abstract class NotallyDatabase : RoomDatabase() {
 
         @Volatile private var instance: NotNullLiveData<NotallyDatabase>? = null
 
-        fun getCurrentDatabaseFile(app: Application): File {
-            return if (NotallyXPreferences.getInstance(app).dataOnExternalStorage.value) {
-                getExternalDatabaseFile(app)
+        fun getCurrentDatabaseFile(context: ContextWrapper): File {
+            return if (NotallyXPreferences.getInstance(context).dataOnExternalStorage.value) {
+                getExternalDatabaseFile(context)
             } else {
-                getInternalDatabaseFile(app)
+                getInternalDatabaseFile(context)
             }
         }
 
-        fun getExternalDatabaseFile(app: Application): File {
-            return File(app.getExternalMediaDirectory(), DatabaseName)
+        fun getExternalDatabaseFile(context: ContextWrapper): File {
+            return File(context.getExternalMediaDirectory(), DatabaseName)
         }
 
-        fun getExternalDatabaseFiles(app: Application): List<File> {
+        fun getExternalDatabaseFiles(context: ContextWrapper): List<File> {
             return listOf(
-                File(app.getExternalMediaDirectory(), DatabaseName),
-                File(app.getExternalMediaDirectory(), "$DatabaseName-shm"),
-                File(app.getExternalMediaDirectory(), "$DatabaseName-wal"),
+                File(context.getExternalMediaDirectory(), DatabaseName),
+                File(context.getExternalMediaDirectory(), "$DatabaseName-shm"),
+                File(context.getExternalMediaDirectory(), "$DatabaseName-wal"),
             )
         }
 
-        fun getInternalDatabaseFile(app: Application): File {
-            return app.getDatabasePath(DatabaseName)
+        fun getInternalDatabaseFile(context: Context): File {
+            return context.getDatabasePath(DatabaseName)
         }
 
-        fun getCurrentDatabaseName(app: Application): String {
-            return if (NotallyXPreferences.getInstance(app).dataOnExternalStorage.value) {
-                getExternalDatabaseFile(app).absolutePath
+        fun getCurrentDatabaseName(context: ContextWrapper): String {
+            return if (NotallyXPreferences.getInstance(context).dataOnExternalStorage.value) {
+                getExternalDatabaseFile(context).absolutePath
             } else {
                 DatabaseName
             }
         }
 
         fun getDatabase(
-            app: Application,
+            context: ContextWrapper,
             observePreferences: Boolean = true,
         ): NotNullLiveData<NotallyDatabase> {
             return instance
                 ?: synchronized(this) {
-                    val preferences = NotallyXPreferences.getInstance(app)
+                    val preferences = NotallyXPreferences.getInstance(context)
                     this.instance =
-                        NotNullLiveData(createInstance(app, preferences, observePreferences))
+                        NotNullLiveData(createInstance(context, preferences, observePreferences))
                     return this.instance!!
                 }
         }
 
         private fun createInstance(
-            app: Application,
+            context: ContextWrapper,
             preferences: NotallyXPreferences,
             observePreferences: Boolean,
         ): NotallyDatabase {
             val instanceBuilder =
-                Room.databaseBuilder(app, NotallyDatabase::class.java, getCurrentDatabaseName(app))
+                Room.databaseBuilder(
+                        context,
+                        NotallyDatabase::class.java,
+                        getCurrentDatabaseName(context),
+                    )
                     .addMigrations(Migration2, Migration3, Migration4, Migration5, Migration6)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (preferences.biometricLock.value == BiometricLock.ENABLED) {
                     if (
-                        SQLCipherUtils.getDatabaseState(app, getCurrentDatabaseName(app)) ==
+                        SQLCipherUtils.getDatabaseState(context, getCurrentDatabaseName(context)) ==
                             SQLCipherUtils.State.ENCRYPTED
                     ) {
                         initializeDecryption(preferences, instanceBuilder)
@@ -115,7 +120,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                     }
                 } else {
                     if (
-                        SQLCipherUtils.getDatabaseState(app, getCurrentDatabaseName(app)) ==
+                        SQLCipherUtils.getDatabaseState(context, getCurrentDatabaseName(context)) ==
                             SQLCipherUtils.State.ENCRYPTED
                     ) {
                         preferences.biometricLock.save(BiometricLock.ENABLED)
@@ -128,7 +133,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                         NotallyDatabase.instance?.value?.biometricLockObserver?.let {
                             preferences.biometricLock.removeObserver(it)
                         }
-                        val newInstance = createInstance(app, preferences, true)
+                        val newInstance = createInstance(context, preferences, true)
                         NotallyDatabase.instance?.postValue(newInstance)
                         preferences.biometricLock.observeForeverSkipFirst(
                             newInstance.biometricLockObserver!!
@@ -142,7 +147,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                         NotallyDatabase.instance?.value?.externalDataFolderObserver?.let {
                             preferences.dataOnExternalStorage.removeObserver(it)
                         }
-                        val newInstance = createInstance(app, preferences, true)
+                        val newInstance = createInstance(context, preferences, true)
                         NotallyDatabase.instance?.postValue(newInstance)
                         preferences.dataOnExternalStorage.observeForeverSkipFirst(
                             newInstance.externalDataFolderObserver!!

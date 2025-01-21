@@ -16,7 +16,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.DataUtil
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.Audio
@@ -37,11 +36,13 @@ import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.IO.deleteAttachments
-import com.philkes.notallyx.utils.IO.getExternalAudioDirectory
-import com.philkes.notallyx.utils.IO.getExternalFilesDirectory
-import com.philkes.notallyx.utils.IO.getExternalImagesDirectory
-import com.philkes.notallyx.utils.IO.getTempAudioFile
+import com.philkes.notallyx.utils.backup.importAudio
+import com.philkes.notallyx.utils.backup.importFile
+import com.philkes.notallyx.utils.deleteAttachments
+import com.philkes.notallyx.utils.getExternalAudioDirectory
+import com.philkes.notallyx.utils.getExternalFilesDirectory
+import com.philkes.notallyx.utils.getExternalImagesDirectory
+import com.philkes.notallyx.utils.getTempAudioFile
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -91,7 +92,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     fun addAudio() {
         viewModelScope.launch {
-            val audio = DataUtil.addAudio(app, app.getTempAudioFile(), true)
+            val audio = app.importAudio(app.getTempAudioFile(), true)
             val copy = ArrayList(audios.value)
             copy.add(audio)
             audios.value = copy
@@ -144,7 +145,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
             uris.forEachIndexed { index, uri ->
                 val (fileAttachment, error) =
-                    DataUtil.addFile(app, uri, directory, fileType, errorWhileRenaming)
+                    app.importFile(uri, directory, fileType, errorWhileRenaming)
                 fileAttachment?.let { successes.add(it) }
                 error?.let { errors.add(it) }
                 addingFiles.postValue(Progress(index + 1, uris.size))

@@ -75,6 +75,6 @@
     <fragment
         android:id="@+id/DisplayLabel"
         android:name="com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment"
-        android:label="{SelectedLabel}" />
+        android:label="{notallyx.intent.extra.DISPLAYED_LABEL}" />
 
 </navigation>

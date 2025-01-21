@@ -8,13 +8,14 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.model.toPreservedByteArray
-import com.philkes.notallyx.data.model.toPreservedString
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.utils.createObserverSkipFirst
+import com.philkes.notallyx.utils.fromCamelCaseToEnumName
+import com.philkes.notallyx.utils.toCamelCase
+import com.philkes.notallyx.utils.toPreservedByteArray
+import com.philkes.notallyx.utils.toPreservedString
 import java.security.SecureRandom
 import java.util.Date
-import java.util.Locale
 import javax.crypto.Cipher
 import org.ocpsoft.prettytime.PrettyTime
 
@@ -341,27 +342,4 @@ enum class BiometricLock(override val textResId: Int) : StaticTextProvider {
 
 object Constants {
     const val PASSWORD_EMPTY = "None"
-}
-
-fun String.toCamelCase(): String {
-    return this.lowercase()
-        .split("_")
-        .mapIndexed { index, word ->
-            if (index == 0) word
-            else
-                word.replaceFirstChar {
-                    if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
-                }
-        }
-        .joinToString("")
-}
-
-fun String.fromCamelCaseToEnumName(): String {
-    return this.fold(StringBuilder()) { acc, char ->
-            if (char.isUpperCase() && acc.isNotEmpty()) {
-                acc.append("_")
-            }
-            acc.append(char.uppercase())
-        }
-        .toString()
 }

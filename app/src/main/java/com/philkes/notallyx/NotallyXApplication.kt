@@ -13,8 +13,8 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.presentation.widget.WidgetProvider
-import com.philkes.notallyx.utils.backup.Export.cancelAutoBackup
-import com.philkes.notallyx.utils.backup.Export.scheduleAutoBackup
+import com.philkes.notallyx.utils.backup.cancelAutoBackup
+import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 import com.philkes.notallyx.utils.security.UnlockReceiver
 
 class NotallyXApplication : Application() {
@@ -50,7 +50,7 @@ class NotallyXApplication : Application() {
                 ) {
                     cancelAutoBackup(this)
                 }
-                scheduleAutoBackup(autoBackup.periodInDays.toLong(), this)
+                this.scheduleAutoBackup(autoBackup.periodInDays.toLong())
             }
         }
 
