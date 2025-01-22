@@ -7,10 +7,12 @@ import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.NotesSortDialogBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
@@ -27,6 +29,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.BooleanPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
@@ -35,6 +38,8 @@ import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 import com.philkes.notallyx.presentation.viewmodel.preference.StringPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.TextProvider
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
+import com.philkes.notallyx.utils.toReadablePath
+import java.util.Date
 
 inline fun <reified T> PreferenceBinding.setup(
     enumPreference: EnumPreference<T>,
@@ -266,6 +271,8 @@ fun PreferenceBinding.setupBackupPassword(
 fun PreferenceBinding.setupAutoBackup(
     value: String,
     context: Context,
+    lifecycleOwner: LifecycleOwner,
+    lastExecutionPreference: LongPreference,
     chooseBackupFolder: () -> Unit,
     onDisable: () -> Unit,
 ) {
@@ -279,7 +286,17 @@ fun PreferenceBinding.setupAutoBackup(
         val uri = Uri.parse(value)
         val folder = requireNotNull(DocumentFile.fromTreeUri(context, uri))
         if (folder.exists()) {
-            Value.text = folder.name
+            val path = uri.toReadablePath()
+            Value.text = path
+            lastExecutionPreference.removeObservers(lifecycleOwner)
+            lastExecutionPreference.observe(lifecycleOwner) { time ->
+                if (time != -1L) {
+                    Value.post {
+                        Value.text =
+                            "${path}\n${context.getString(R.string.auto_backup_last)}: ${Date(time).toText()}"
+                    }
+                }
+            }
         } else Value.setText(R.string.cant_find_folder)
 
         root.setOnClickListener {

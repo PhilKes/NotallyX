@@ -48,6 +48,7 @@ import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFrag
 import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
 import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_FOLDER
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
+import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
@@ -59,7 +60,6 @@ import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateChec
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
-import com.philkes.notallyx.utils.backup.createBackup
 import com.philkes.notallyx.utils.backup.exportPdfFile
 import com.philkes.notallyx.utils.backup.exportPlainTextFile
 import com.philkes.notallyx.utils.getExportedPath
@@ -68,9 +68,7 @@ import com.philkes.notallyx.utils.nameWithoutExtension
 import com.philkes.notallyx.utils.shareNote
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MainActivity : LockedActivity<ActivityMainBinding>() {
 
@@ -115,9 +113,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     private fun setupFAB() {
         binding.TakeNote.setOnClickListener {
-            lifecycleScope.launch {
-                withContext(Dispatchers.IO) { this@MainActivity.createBackup("MainActivityBackup") }
-            }
+            val intent = Intent(this, EditNoteActivity::class.java)
+            startActivity(prepareNewNoteIntent(intent))
         }
         binding.MakeList.setOnClickListener {
             val intent = Intent(this, EditListActivity::class.java)

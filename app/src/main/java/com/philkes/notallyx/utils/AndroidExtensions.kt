@@ -338,3 +338,20 @@ fun NotificationManager.createChannelIfNotExists(
         createNotificationChannel(channel)
     }
 }
+
+fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
+    val wrapperObserver =
+        object : Observer<T> {
+            override fun onChanged(value: T) {
+                this@observeOnce.removeObserver(this)
+                observer.onChanged(value)
+            }
+        }
+    this.observeForever(wrapperObserver)
+}
+
+fun Uri.toReadablePath(): String {
+    return path!!
+        .replaceFirst("/tree/primary:", "Internal Storage/")
+        .replaceFirst("/tree/.*:".toRegex(), "External Storage/")
+}

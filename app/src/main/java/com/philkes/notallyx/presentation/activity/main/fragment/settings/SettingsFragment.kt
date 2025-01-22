@@ -38,6 +38,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackupPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.backup.exportPreferences
 import com.philkes.notallyx.utils.catchNoBrowserInstalled
@@ -275,7 +276,7 @@ class SettingsFragment : Fragment() {
 
     private fun NotallyXPreferences.setupAutoBackup(binding: FragmentSettingsBinding) {
         autoBackup.observe(viewLifecycleOwner) { value ->
-            setupAutoBackup(binding, value, autoBackup)
+            setupAutoBackup(binding, value, autoBackup, autoBackupLastExecutionTime)
         }
 
         binding.apply {
@@ -596,6 +597,7 @@ class SettingsFragment : Fragment() {
         binding: FragmentSettingsBinding,
         value: AutoBackup,
         preference: AutoBackupPreference,
+        lastExecutionPreference: LongPreference,
     ) {
         binding.AutoBackupMax.setup(
             value.maxBackups,
@@ -609,6 +611,8 @@ class SettingsFragment : Fragment() {
         binding.AutoBackup.setupAutoBackup(
             value.path,
             requireContext(),
+            viewLifecycleOwner,
+            lastExecutionPreference,
             ::displayChooseBackupFolderDialog,
         ) {
             model.disableAutoBackup()

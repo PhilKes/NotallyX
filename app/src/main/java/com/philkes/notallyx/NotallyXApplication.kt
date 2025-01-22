@@ -7,15 +7,23 @@ import android.content.IntentFilter
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.presentation.widget.WidgetProvider
+import com.philkes.notallyx.utils.backup.AUTO_BACKUP_WORK_NAME
 import com.philkes.notallyx.utils.backup.cancelAutoBackup
+import com.philkes.notallyx.utils.backup.containsNonCancelled
+import com.philkes.notallyx.utils.backup.isEqualTo
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
+import com.philkes.notallyx.utils.backup.updateAutoBackup
+import com.philkes.notallyx.utils.observeOnce
 import com.philkes.notallyx.utils.security.UnlockReceiver
+import java.util.concurrent.TimeUnit
 
 class NotallyXApplication : Application() {
 
@@ -32,8 +40,10 @@ class NotallyXApplication : Application() {
             when (theme) {
                 Theme.DARK ->
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+
                 Theme.LIGHT ->
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
                 Theme.FOLLOW_SYSTEM ->
                     AppCompatDelegate.setDefaultNightMode(
                         AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
@@ -41,16 +51,29 @@ class NotallyXApplication : Application() {
             }
         }
 
-        preferences.autoBackup.observeForeverWithPrevious { (prevAutoBackup, autoBackup) ->
-            if (autoBackup.path == EMPTY_PATH) {
-                cancelAutoBackup(this)
-            } else {
-                if (
-                    prevAutoBackup != null && prevAutoBackup.periodInDays != autoBackup.periodInDays
+        val workManager = WorkManager.getInstance(this)
+        val backupWorkInfoObservable =
+            workManager.getWorkInfosForUniqueWorkLiveData(AUTO_BACKUP_WORK_NAME)
+        preferences.autoBackup.observeForeverWithPrevious { (autoBackBefore, autoBackup) ->
+            backupWorkInfoObservable.observeOnce { workInfos ->
+                if (autoBackup.path == EMPTY_PATH) {
+                    if (workInfos?.containsNonCancelled() == true) {
+                        workManager.cancelAutoBackup()
+                    }
+                } else if (
+                    workInfos.isNullOrEmpty() ||
+                        workInfos.all { it.state == WorkInfo.State.CANCELLED } ||
+                        (autoBackBefore != null && autoBackBefore.path != autoBackup.path)
                 ) {
-                    cancelAutoBackup(this)
+                    workManager.scheduleAutoBackup(this, autoBackup.periodInDays.toLong())
+                } else if (
+                    workInfos
+                        .first()
+                        .periodicityInfo
+                        ?.isEqualTo(autoBackup.periodInDays.toLong(), TimeUnit.DAYS) == false
+                ) {
+                    workManager.updateAutoBackup(workInfos, autoBackup.periodInDays)
                 }
-                this.scheduleAutoBackup(autoBackup.periodInDays.toLong())
             }
         }
 

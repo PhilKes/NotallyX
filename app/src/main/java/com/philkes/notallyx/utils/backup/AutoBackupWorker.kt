@@ -24,6 +24,7 @@ import com.philkes.notallyx.utils.createChannelIfNotExists
 import com.philkes.notallyx.utils.createReportBugIntent
 import com.philkes.notallyx.utils.logToFile
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 
 class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
@@ -38,6 +39,11 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
     }
 }
 
+private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs.txt"
+
+const val OUTPUT_DATA_EXCEPTION = "exception"
+private const val OUTPUT_DATA_BACKUP_URI = "backupUri"
+
 fun Context.createBackup(tag: String): Result {
     val app = applicationContext as Application
     val preferences = NotallyXPreferences.getInstance(app)
@@ -50,7 +56,7 @@ fun Context.createBackup(tag: String): Result {
             logToFile(
                 tag,
                 folder,
-                "notallyx-backup-logs.txt",
+                NOTALLYX_BACKUP_LOGS_FILE,
                 msg = msg,
                 throwable = throwable,
                 stackTrace = stackTrace,
@@ -58,8 +64,8 @@ fun Context.createBackup(tag: String): Result {
         }
 
         if (folder.exists()) {
-            val formatter = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ENGLISH)
-            val backupFilePrefix = "NotallyX_Backup_"
+            val formatter = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
+            val backupFilePrefix = "NotallyX_"
             val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
             log(msg = "Creating '$uri/$name.zip'...")
             try {
@@ -80,9 +86,11 @@ fun Context.createBackup(tag: String): Result {
                         it.delete()
                     }
                 }
-                throw IllegalArgumentException("THIS IS BULLSHIT") // TODO
                 log(msg = "Finished backup to '$zipUri'")
-                return Result.success(Data.Builder().putString("backupUri", zipUri.path!!).build())
+                preferences.autoBackupLastExecutionTime.save(Date().time)
+                return Result.success(
+                    Data.Builder().putString(OUTPUT_DATA_BACKUP_URI, zipUri.path!!).build()
+                )
             } catch (e: Exception) {
                 log(msg = "Failed creating backup to '$uri/$name'", throwable = e)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -95,7 +103,9 @@ fun Context.createBackup(tag: String): Result {
                 } else {
                     postErrorNotification(e)
                 }
-                return Result.success(Data.Builder().putString("exception", e.message).build())
+                return Result.success(
+                    Data.Builder().putString(OUTPUT_DATA_EXCEPTION, e.message).build()
+                )
             }
         } else {
             log(msg = "Folder '${folder.uri}' does not exist, therefore skipping auto-backup")

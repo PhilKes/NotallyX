@@ -21,6 +21,7 @@
     <string name="auto_backup">Auto backup</string>
     <string name="auto_backup_error_message">An error occurred during auto backup:\n\'%1$s\'\nPlease check your settings or report a bug</string>
     <string name="auto_backup_failed">NotallyX Auto Backup failed</string>
+    <string name="auto_backup_last">Last Backup</string>
     <string name="auto_backup_period">Auto backup period</string>
     <string name="auto_sort_by_checked">Autosort by checked items</string>
     <string name="back">Back</string>

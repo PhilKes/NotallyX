@@ -177,6 +177,18 @@ class IntPreference(
     }
 }
 
+class LongPreference(val key: String, sharedPreferences: SharedPreferences, defaultValue: Long) :
+    BasePreference<Long>(sharedPreferences, defaultValue) {
+
+    override fun getValue(sharedPreferences: SharedPreferences): Long {
+        return sharedPreferences.getLong(key, defaultValue)
+    }
+
+    override fun SharedPreferences.Editor.put(value: Long) {
+        putLong(key, value)
+    }
+}
+
 class StringPreference(
     private val key: String,
     sharedPreferences: SharedPreferences,
