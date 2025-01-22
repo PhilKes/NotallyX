@@ -18,6 +18,7 @@ import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.initListView
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
@@ -116,7 +117,7 @@ class LabelsFragment : Fragment(), LabelListener {
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.add_label)
             .setView(dialogBinding.root)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setPositiveButton(R.string.save) { dialog, _ ->
                 val value = dialogBinding.EditText.text.toString().trim()
                 if (value.isNotEmpty()) {
@@ -138,7 +139,7 @@ class LabelsFragment : Fragment(), LabelListener {
             .setTitle(R.string.delete_label)
             .setMessage(R.string.your_notes_associated)
             .setPositiveButton(R.string.delete) { _, _ -> model.deleteLabel(value) }
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .show()
     }
 
@@ -150,7 +151,7 @@ class LabelsFragment : Fragment(), LabelListener {
         MaterialAlertDialogBuilder(requireContext())
             .setView(dialogBinding.root)
             .setTitle(R.string.edit_label)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setPositiveButton(R.string.save) { dialog, _ ->
                 val value = dialogBinding.EditText.text.toString().trim()
                 if (value.isNotEmpty()) {

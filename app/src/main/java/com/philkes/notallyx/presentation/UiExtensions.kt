@@ -32,6 +32,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -451,7 +452,7 @@ fun Activity.checkNotificationPermission(
             if (shouldShowRequestPermissionRationale(permission)) {
                 MaterialAlertDialogBuilder(this)
                     .setMessage(R.string.please_grant_notally_notification)
-                    .addCancelButton()
+                    .setCancelButton()
                     .setPositiveButton(R.string.continue_) { _, _ ->
                         requestPermissions(arrayOf(permission), requestCode)
                     }
@@ -524,14 +525,30 @@ fun Activity.showColorSelectDialog(
     }
 }
 
-fun MaterialAlertDialogBuilder.showAndFocus(view: View, selectAll: Boolean = false): AlertDialog {
+fun MaterialAlertDialogBuilder.showAndFocus(
+    viewToFocus: View? = null,
+    selectAll: Boolean = false,
+    fullWidth: Boolean = false,
+): AlertDialog {
+    if (fullWidth) {
+        setBackgroundInsetEnd(0)
+        setBackgroundInsetStart(0)
+        setBackgroundInsetBottom(0)
+        setBackgroundInsetTop(0)
+    }
     return create().apply {
-        view.requestFocus()
-        if (view is EditText) {
+        viewToFocus?.requestFocus()
+        if (viewToFocus is EditText) {
             if (selectAll) {
-                view.selectAll()
+                viewToFocus.selectAll()
             }
             window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE)
+        }
+        if (fullWidth) {
+            window?.setLayout(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.WRAP_CONTENT,
+            )
         }
         show()
     }
@@ -674,10 +691,8 @@ fun @receiver:ColorInt Int.isLightColor(): Boolean {
     return luminance > 0.5
 }
 
-fun MaterialAlertDialogBuilder.addCancelButton(): MaterialAlertDialogBuilder {
-    setNegativeButton(R.string.cancel, null)
-    return this
-}
+fun MaterialAlertDialogBuilder.setCancelButton(listener: DialogInterface.OnClickListener? = null) =
+    setNegativeButton(R.string.cancel, listener)
 
 fun Fragment.showDialog(
     messageResId: Int,
@@ -695,7 +710,7 @@ fun Context.showDialog(
     MaterialAlertDialogBuilder(this)
         .setMessage(messageResId)
         .setPositiveButton(positiveButtonTextResId, onPositiveButtonClickListener)
-        .addCancelButton()
+        .setCancelButton()
         .show()
 }
 

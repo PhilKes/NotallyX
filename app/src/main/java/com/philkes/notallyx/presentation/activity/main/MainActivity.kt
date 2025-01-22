@@ -53,6 +53,7 @@ import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
@@ -284,7 +285,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         MaterialAlertDialogBuilder(this)
             .setMessage(R.string.delete_selected_notes)
             .setPositiveButton(R.string.delete) { _, _ -> baseModel.deleteSelectedBaseNotes() }
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .show()
     }
 
@@ -317,7 +318,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.labels)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setMultiChoiceTriStateItems(this, labels, checkedPositions) { idx, state ->
                 checkedPositions[idx] = state
             }

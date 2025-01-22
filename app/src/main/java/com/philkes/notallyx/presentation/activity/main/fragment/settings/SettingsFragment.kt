@@ -29,9 +29,11 @@ import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
 import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
-import com.philkes.notallyx.presentation.addCancelButton
+import com.philkes.notallyx.databinding.TextInputDialogBinding
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
+import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showDialog
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
@@ -206,7 +208,7 @@ class SettingsFragment : Fragment() {
                         val usedPassword = layout.InputText.text.toString()
                         model.importZipBackup(uri, usedPassword)
                     }
-                    .addCancelButton()
+                    .setCancelButton()
                     .show()
             }
         }
@@ -409,7 +411,7 @@ class SettingsFragment : Fragment() {
                                                 )
                                         }
                                     }
-                                    .addCancelButton()
+                                    .setCancelButton()
                                     .show()
                             else ->
                                 importOtherActivityResultLauncher.launch(
@@ -438,9 +440,9 @@ class SettingsFragment : Fragment() {
                         }
                     }
                     .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
-                    .show()
+                    .showAndFocus(fullWidth = true)
             }
-            .addCancelButton()
+            .setCancelButton()
             .show()
     }
 
@@ -576,7 +578,7 @@ class SettingsFragment : Fragment() {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(R.string.clear_data_message)
                     .setPositiveButton(R.string.delete_all) { _, _ -> model.deleteAll() }
-                    .addCancelButton()
+                    .setCancelButton()
                     .show()
             }
         }
@@ -636,7 +638,7 @@ class SettingsFragment : Fragment() {
                                 }
                         }
                     }
-                    .addCancelButton()
+                    .setCancelButton()
                     .show()
             }
             SourceCode.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
@@ -677,7 +679,7 @@ class SettingsFragment : Fragment() {
                             8 -> openLink("https://github.com/zhanghai/AndroidFastScroll")
                         }
                     }
-                    .addCancelButton()
+                    .setCancelButton()
                     .show()
             }
 
