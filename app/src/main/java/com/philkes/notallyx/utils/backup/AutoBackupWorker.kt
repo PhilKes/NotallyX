@@ -5,6 +5,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.documentfile.provider.DocumentFile
 import androidx.work.Data
+import androidx.work.ListenableWorker.Result
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -17,65 +18,67 @@ class AutoBackupWorker(private val context: Context, params: WorkerParameters) :
     Worker(context, params) {
 
     override fun doWork(): Result {
-        val app = context.applicationContext as Application
-        val preferences = NotallyXPreferences.getInstance(app)
-        val (path, _, maxBackups) = preferences.autoBackup.value
-
-        if (path != EMPTY_PATH) {
-            val uri = Uri.parse(path)
-            val folder = requireNotNull(DocumentFile.fromTreeUri(app, uri))
-            fun log(msg: String? = null, throwable: Throwable? = null, stackTrace: String? = null) {
-                context.logToFile(
-                    TAG,
-                    folder,
-                    "notallyx-backup-logs.txt",
-                    msg = msg,
-                    throwable = throwable,
-                    stackTrace = stackTrace,
-                )
-            }
-
-            if (folder.exists()) {
-                val formatter = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ENGLISH)
-                val backupFilePrefix = "NotallyX_Backup_"
-                val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
-                log(msg = "Creating '$uri/$name.zip'...")
-                try {
-                    val zipUri = requireNotNull(folder.createFile("application/zip", name)).uri
-                    app.exportAsZip(zipUri)
-                    val backupFiles = folder.listZipFiles(backupFilePrefix)
-                    log(msg = "Found ${backupFiles.size} backups")
-                    val backupsToBeDeleted = backupFiles.drop(maxBackups)
-                    if (backupsToBeDeleted.isNotEmpty()) {
-                        log(
-                            msg =
-                                "Deleting ${backupsToBeDeleted.size} oldest backups (maxBackups: $maxBackups): ${backupsToBeDeleted.joinToString { "'${it.name.toString()}'" }}"
-                        )
-                    }
-                    backupsToBeDeleted.forEach {
-                        if (it.exists()) {
-                            it.delete()
-                        }
-                    }
-
-                    log(msg = "Finished backup to '$zipUri'")
-                    return Result.success(
-                        Data.Builder().putString("backupUri", zipUri.path!!).build()
-                    )
-                } catch (e: Exception) {
-                    log(msg = "Failed creating backup to '$uri/$name'", throwable = e)
-                    return Result.success(Data.Builder().putString("exception", e.message).build())
-                }
-            } else {
-                log(msg = "Folder '${folder.uri}' does not exist, therefore skipping auto-backup")
-            }
-        }
-        return Result.success()
+        return context.createBackup(TAG)
     }
 
     companion object {
         private const val TAG = "AutoBackupWorker"
     }
+}
+
+fun Context.createBackup(tag: String): Result {
+    val app = applicationContext as Application
+    val preferences = NotallyXPreferences.getInstance(app)
+    val (path, _, maxBackups) = preferences.autoBackup.value
+
+    if (path != EMPTY_PATH) {
+        val uri = Uri.parse(path)
+        val folder = requireNotNull(DocumentFile.fromTreeUri(app, uri))
+        fun log(msg: String? = null, throwable: Throwable? = null, stackTrace: String? = null) {
+            logToFile(
+                tag,
+                folder,
+                "notallyx-backup-logs.txt",
+                msg = msg,
+                throwable = throwable,
+                stackTrace = stackTrace,
+            )
+        }
+
+        if (folder.exists()) {
+            val formatter = SimpleDateFormat("yyyyMMdd-HHmmss", Locale.ENGLISH)
+            val backupFilePrefix = "NotallyX_Backup_"
+            val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
+            log(msg = "Creating '$uri/$name.zip'...")
+            try {
+                val zipUri = requireNotNull(folder.createFile("application/zip", name)).uri
+                val exportedNotes = app.exportAsZip(zipUri)
+                log(msg = "Exported $exportedNotes notes")
+                val backupFiles = folder.listZipFiles(backupFilePrefix)
+                log(msg = "Found ${backupFiles.size} backups")
+                val backupsToBeDeleted = backupFiles.drop(maxBackups)
+                if (backupsToBeDeleted.isNotEmpty()) {
+                    log(
+                        msg =
+                            "Deleting ${backupsToBeDeleted.size} oldest backups (maxBackups: $maxBackups): ${backupsToBeDeleted.joinToString { "'${it.name.toString()}'" }}"
+                    )
+                }
+                backupsToBeDeleted.forEach {
+                    if (it.exists()) {
+                        it.delete()
+                    }
+                }
+                log(msg = "Finished backup to '$zipUri'")
+                return Result.success(Data.Builder().putString("backupUri", zipUri.path!!).build())
+            } catch (e: Exception) {
+                log(msg = "Failed creating backup to '$uri/$name'", throwable = e)
+                return Result.success(Data.Builder().putString("exception", e.message).build())
+            }
+        } else {
+            log(msg = "Folder '${folder.uri}' does not exist, therefore skipping auto-backup")
+        }
+    }
+    return Result.success()
 }
 
 fun DocumentFile.listZipFiles(prefix: String): List<DocumentFile> {

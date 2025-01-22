@@ -28,6 +28,8 @@ interface BaseNoteDao {
 
     @Update(entity = BaseNote::class) suspend fun update(labelsInBaseNotes: List<LabelsInBaseNote>)
 
+    @Query("SELECT COUNT(*) FROM BaseNote") fun count(): Int
+
     @Query("DELETE FROM BaseNote WHERE id = :id") suspend fun delete(id: Long)
 
     @Query("DELETE FROM BaseNote WHERE id IN (:ids)") suspend fun delete(ids: LongArray)

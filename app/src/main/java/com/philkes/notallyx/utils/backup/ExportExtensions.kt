@@ -52,7 +52,10 @@ import net.lingala.zip4j.model.enums.EncryptionMethod
 private const val TAG = "ExportExtensions"
 private const val AUTO_BACKUP_WORK_NAME = "Auto Backup"
 
-fun ContextWrapper.exportAsZip(fileUri: Uri, backupProgress: MutableLiveData<Progress>? = null) {
+fun ContextWrapper.exportAsZip(
+    fileUri: Uri,
+    backupProgress: MutableLiveData<Progress>? = null,
+): Int {
     backupProgress?.postValue(Progress(indeterminate = true))
     val preferences = NotallyXPreferences.getInstance(this)
     val backupPassword = preferences.backupPassword.value
@@ -78,11 +81,12 @@ fun ContextWrapper.exportAsZip(fileUri: Uri, backupProgress: MutableLiveData<Pro
     val fileRoot = getExternalFilesDirectory()
     val audioRoot = getExternalAudioDirectory()
 
+    val totalNotes = databaseOriginal.getBaseNoteDao().count()
     val images = databaseOriginal.getBaseNoteDao().getAllImages().toFileAttachments()
     val files = databaseOriginal.getBaseNoteDao().getAllFiles().toFileAttachments()
     val audios = databaseOriginal.getBaseNoteDao().getAllAudios()
-    val total = images.count() + files.count() + audios.size
-    backupProgress?.postValue(Progress(0, total))
+    val totalAttachments = images.count() + files.count() + audios.size
+    backupProgress?.postValue(Progress(0, totalAttachments))
 
     val counter = AtomicInteger(0)
     images.export(
@@ -92,7 +96,7 @@ fun ContextWrapper.exportAsZip(fileUri: Uri, backupProgress: MutableLiveData<Pro
         SUBFOLDER_IMAGES,
         this,
         backupProgress,
-        total,
+        totalAttachments,
         counter,
     )
     files.export(
@@ -102,7 +106,7 @@ fun ContextWrapper.exportAsZip(fileUri: Uri, backupProgress: MutableLiveData<Pro
         SUBFOLDER_FILES,
         this,
         backupProgress,
-        total,
+        totalAttachments,
         counter,
     )
     audios
@@ -114,7 +118,7 @@ fun ContextWrapper.exportAsZip(fileUri: Uri, backupProgress: MutableLiveData<Pro
             } catch (exception: Exception) {
                 log(TAG, throwable = exception)
             } finally {
-                backupProgress?.postValue(Progress(counter.incrementAndGet(), total))
+                backupProgress?.postValue(Progress(counter.incrementAndGet(), totalAttachments))
             }
         }
 
@@ -127,6 +131,7 @@ fun ContextWrapper.exportAsZip(fileUri: Uri, backupProgress: MutableLiveData<Pro
         zipFile.file.delete()
     }
     backupProgress?.postValue(Progress(inProgress = false))
+    return totalNotes
 }
 
 private fun ContextWrapper.copyDatabase(): Pair<NotallyDatabase, File> {
