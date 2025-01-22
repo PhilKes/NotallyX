@@ -476,7 +476,7 @@ fun Activity.checkAlarmPermission(
         } else {
             MaterialAlertDialogBuilder(this)
                 .setMessage(R.string.please_grant_notally_alarm)
-                .addCancelButton()
+                .setCancelButton()
                 .setPositiveButton(R.string.continue_) { _, _ ->
                     val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
                     intent.data = Uri.parse("package:$packageName")

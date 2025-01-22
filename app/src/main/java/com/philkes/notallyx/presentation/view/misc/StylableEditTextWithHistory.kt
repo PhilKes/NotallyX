@@ -362,10 +362,14 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
                 dialog.cancel()
                 onClose?.invoke()
             }
-            .setNeutralButton(R.string.clear) { dialog, _ ->
-                dialog.cancel()
-                onSuccess.invoke(null, displayTextBefore)
-                onClose?.invoke()
+            .apply {
+                if (!isNoteUrl) {
+                    setNeutralButton(R.string.clear) { dialog, _ ->
+                        dialog.cancel()
+                        onSuccess.invoke(null, displayTextBefore)
+                        onClose?.invoke()
+                    }
+                }
             }
             .showAndFocus(
                 viewToFocus = if (isNoteUrl) layout.InputText1 else layout.InputText2,

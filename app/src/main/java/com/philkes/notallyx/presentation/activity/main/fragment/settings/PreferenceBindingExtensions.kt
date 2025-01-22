@@ -18,8 +18,6 @@ import com.philkes.notallyx.databinding.DialogPreferenceBooleanBinding
 import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
-import com.philkes.notallyx.databinding.TextInputDialogBinding
-import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.checkedTag
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
@@ -220,7 +218,7 @@ fun PreferenceBinding.setup(
                 val applyToNoteView = layout.ApplyToNoteView.isChecked
                 onSave(dateFormat, applyToNoteView)
             }
-            .addCancelButton()
+            .setCancelButton()
             .show()
     }
 }
@@ -301,7 +299,7 @@ fun PreferenceBinding.setupPeriodicBackup(
                 }
             }
         val dialog =
-            MaterialAlertDialogBuilder(context).setView(layout.root).addCancelButton().show()
+            MaterialAlertDialogBuilder(context).setView(layout.root).setCancelButton().show()
         layout.apply {
             EnabledButton.setOnClickListener {
                 dialog.cancel()

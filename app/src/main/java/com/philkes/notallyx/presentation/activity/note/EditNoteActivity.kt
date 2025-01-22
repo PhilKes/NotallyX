@@ -391,7 +391,11 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                 .setItems(items) { _, which ->
                     when (which) {
                         0 -> {
-                            binding.EnterBody.removeSpanWithHistory(span, true)
+                            binding.EnterBody.removeSpanWithHistory(
+                                span,
+                                span.url.isNoteUrl() ||
+                                    span.url == binding.EnterBody.getSpanText(span),
+                            )
                         }
                         1 ->
                             if (span.url.isNoteUrl()) {

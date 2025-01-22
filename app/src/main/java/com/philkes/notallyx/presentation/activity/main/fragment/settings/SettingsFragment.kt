@@ -29,7 +29,6 @@ import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
 import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
-import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
