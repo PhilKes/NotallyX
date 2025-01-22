@@ -12,6 +12,7 @@ import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.MutableLiveData
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
@@ -50,7 +51,7 @@ import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.EncryptionMethod
 
 private const val TAG = "ExportExtensions"
-private const val AUTO_BACKUP_WORK_NAME = "Auto Backup"
+const val AUTO_BACKUP_WORK_NAME = "com.philkes.notallyx.AutoBackupWork"
 
 fun ContextWrapper.exportAsZip(
     fileUri: Uri,
@@ -184,27 +185,41 @@ private fun Sequence<FileAttachment>.export(
     }
 }
 
-fun Context.scheduleAutoBackup(periodInDays: Long) {
+fun WorkInfo.PeriodicityInfo.isEqualTo(value: Long, unit: TimeUnit): Boolean {
+    return repeatIntervalMillis == unit.toMillis(value)
+}
+
+fun List<WorkInfo>.containsNonCancelled(): Boolean = any { it.state != WorkInfo.State.CANCELLED }
+
+fun WorkManager.cancelAutoBackup() {
+    Log.d(TAG, "Cancelling auto backup work")
+    cancelUniqueWork(AUTO_BACKUP_WORK_NAME)
+}
+
+fun WorkManager.updateAutoBackup(workInfos: List<WorkInfo>, autoBackPeriodInDays: Int) {
+    Log.d(TAG, "Updating auto backup schedule for period: $autoBackPeriodInDays days")
+    val workInfoId = workInfos.first().id
+    val updatedWorkRequest =
+        PeriodicWorkRequest.Builder(
+                AutoBackupWorker::class.java,
+                autoBackPeriodInDays.toLong(),
+                TimeUnit.DAYS,
+            )
+            .setId(workInfoId)
+            .build()
+    updateWork(updatedWorkRequest)
+}
+
+fun WorkManager.scheduleAutoBackup(context: ContextWrapper, periodInDays: Long) {
+    Log.d(TAG, "Scheduling auto backup for period: $periodInDays days")
     val request =
         PeriodicWorkRequest.Builder(AutoBackupWorker::class.java, periodInDays, TimeUnit.DAYS)
             .build()
     try {
-        WorkManager.getInstance(this)
-            .enqueueUniquePeriodicWork(
-                AUTO_BACKUP_WORK_NAME,
-                ExistingPeriodicWorkPolicy.UPDATE,
-                request,
-            )
+        enqueueUniquePeriodicWork(AUTO_BACKUP_WORK_NAME, ExistingPeriodicWorkPolicy.UPDATE, request)
     } catch (e: IllegalStateException) {
         // only happens in Unit-Tests
-    }
-}
-
-fun cancelAutoBackup(context: Context) {
-    try {
-        WorkManager.getInstance(context).cancelUniqueWork(AUTO_BACKUP_WORK_NAME)
-    } catch (e: IllegalStateException) {
-        // only happens in Unit-Tests
+        context.log(TAG, "Scheduling auto backup failed", throwable = e)
     }
 }
 

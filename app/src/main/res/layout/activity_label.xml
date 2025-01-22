@@ -24,7 +24,7 @@
         android:layout_height="match_parent"
         android:layout_below="@id/Toolbar"
         android:gravity="center"
-        android:text="@string/create_new"
+        android:text="@string/empty_labels"
         android:textAppearance="?attr/textAppearanceBodyMedium" />
 
 </RelativeLayout>

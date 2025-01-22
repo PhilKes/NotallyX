@@ -27,7 +27,6 @@
     <string name="clear_formatting">Xóa định dạng</string>
     <string name="content_density">Mật độ hiển thị nội dung</string>
     <string name="continue_">Tiếp tục</string>
-    <string name="create_new">Chưa có nhãn nào. Thử tạo mới?</string>
     <string name="dark">Tối</string>
     <string name="date">Ngày</string>
     <string name="date_format">Định dạng ngày tháng</string>
@@ -45,6 +44,7 @@
     <string name="drag_handle">Kéo thả</string>
     <string name="edit">Sửa</string>
     <string name="edit_label">Đổi nhãn</string>
+    <string name="empty_labels">Chưa có nhãn nào. Thử tạo mới?</string>
     <string name="empty_list">Nội dung liệt kê trống</string>
     <string name="empty_note">Nội dung ghi chú trống</string>
     <string name="error_while_renaming_image">Xảy ra lỗi khi đổi tên ảnh</string>
@@ -84,7 +84,6 @@
     <string name="others">Còn lại</string>
     <string name="pin">Ghim</string>
     <string name="pinned">Đã ghim</string>
-    <string name="please_grant_notally_notification">Xin cho phép NotallyX quyền gửi thông báo. Nó sẽ cho phép hiển thị tiến trình nếu các thao tác xóa hình ảnh hoặc nhập bản sao lưu mất nhiều thời gian</string>
     <string name="rate">Đánh giá app</string>
     <string name="restore">Khôi phục</string>
     <string name="save">Lưu</string>

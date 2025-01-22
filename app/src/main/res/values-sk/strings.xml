@@ -12,7 +12,6 @@
     <string name="cant_open_link">Odkaz sa nedá otvoriť</string>
     <string name="clear_formatting">Odstrániť formátovanie</string>
     <string name="content_density">Hustota obsahu</string>
-    <string name="create_new">Žiadne štítky. Vytvoriť nový?</string>
     <string name="dark">Tmavá</string>
     <string name="date">Dátum</string>
     <string name="delete">Vymazať</string>
@@ -25,6 +24,7 @@
     <string name="drag_handle">Rukoväť na uchopenie</string>
     <string name="edit">Upraviť</string>
     <string name="edit_label">Upraviť štítok</string>
+    <string name="empty_labels">Žiadne štítky. Vytvoriť nový?</string>
     <string name="empty_list">Prázdny zoznam</string>
     <string name="empty_note">Prázdna poznámka</string>
     <string name="export">Exportovať</string>

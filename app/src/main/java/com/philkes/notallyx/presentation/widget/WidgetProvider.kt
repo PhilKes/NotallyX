@@ -21,6 +21,8 @@ import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EX
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.utils.embedIntentExtras
+import com.philkes.notallyx.utils.getOpenNoteIntent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -135,6 +137,15 @@ class WidgetProvider : AppWidgetProvider() {
         }
     }
 
+    private fun Context.getOpenNoteIntent(noteId: Long): PendingIntent {
+        val intent = Intent(this, WidgetProvider::class.java)
+        intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
+        intent.embedIntentExtras()
+        val flags =
+            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT or Intent.FILL_IN_ACTION
+        return PendingIntent.getBroadcast(this, 0, intent, flags)
+    }
+
     companion object {
 
         fun updateWidgets(context: Context, noteIds: LongArray? = null, locked: Boolean = false) {
@@ -169,7 +180,7 @@ class WidgetProvider : AppWidgetProvider() {
             val intent = Intent(context, WidgetService::class.java)
             intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
-            embedIntentExtras(intent)
+            intent.embedIntentExtras()
 
             val view =
                 if (!locked) {
@@ -177,30 +188,15 @@ class WidgetProvider : AppWidgetProvider() {
                         setRemoteAdapter(R.id.ListView, intent)
                         setEmptyView(R.id.ListView, R.id.Empty)
                         setOnClickFillInIntent(R.id.Empty, getSelectNoteIntent(id))
-                        setPendingIntentTemplate(R.id.ListView, getOpenNoteIntent(context, noteId))
+                        setPendingIntentTemplate(
+                            R.id.ListView,
+                            noteType?.let { context.getOpenNoteIntent(noteId, it) },
+                        )
                     }
                 } else {
                     RemoteViews(context.packageName, R.layout.widget_locked).apply {
                         noteType?.let {
-                            val openNoteIntent =
-                                when (it) {
-                                    Type.NOTE -> Intent(context, EditNoteActivity::class.java)
-                                    Type.LIST -> Intent(context, EditListActivity::class.java)
-                                }.apply {
-                                    putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
-                                    addFlags(
-                                        Intent.FLAG_ACTIVITY_NEW_TASK or
-                                            Intent.FLAG_ACTIVITY_CLEAR_TASK
-                                    )
-                                }
-                            val lockedPendingIntent =
-                                PendingIntent.getActivity(
-                                    context,
-                                    0,
-                                    openNoteIntent,
-                                    PendingIntent.FLAG_UPDATE_CURRENT or
-                                        PendingIntent.FLAG_IMMUTABLE,
-                                )
+                            val lockedPendingIntent = context.getOpenNoteIntent(noteId, noteType)
                             setOnClickPendingIntent(R.id.Layout, lockedPendingIntent)
                             setOnClickPendingIntent(R.id.Text, lockedPendingIntent)
                         }
@@ -254,24 +250,7 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }
 
-        private fun getOpenNoteIntent(context: Context, noteId: Long): PendingIntent {
-            val intent = Intent(context, WidgetProvider::class.java)
-            intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
-            embedIntentExtras(intent)
-            val flags =
-                PendingIntent.FLAG_MUTABLE or
-                    PendingIntent.FLAG_UPDATE_CURRENT or
-                    Intent.FILL_IN_ACTION
-            return PendingIntent.getBroadcast(context, 0, intent, flags)
-        }
-
-        private fun embedIntentExtras(intent: Intent) {
-            val string = intent.toUri(Intent.URI_INTENT_SCHEME)
-            intent.data = Uri.parse(string)
-        }
-
-        private const val EXTRA_MODIFIED_NOTES =
-            "notallyx.intent.extra.com.philkes.notallyx.EXTRA_MODIFIED_NOTES"
+        private const val EXTRA_MODIFIED_NOTES = "com.philkes.notallyx.EXTRA_MODIFIED_NOTES"
         private const val ACTION_NOTES_MODIFIED = "com.philkes.notallyx.ACTION_NOTE_MODIFIED"
 
         const val ACTION_OPEN_NOTE = "com.philkes.notallyx.ACTION_OPEN_NOTE"

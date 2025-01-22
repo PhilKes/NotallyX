@@ -103,6 +103,12 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
         setupActivityResultLaunchers()
         onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
+
+        val fragmentIdToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_OPEN, -1)
+        if (fragmentIdToLoad != -1) {
+            val bundle = Bundle()
+            navController.navigate(fragmentIdToLoad, bundle)
+        }
     }
 
     private fun setupFAB() {
@@ -703,5 +709,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_FRAGMENT_TO_OPEN = "notallyx.intent.extra.FRAGMENT_TO_OPEN"
     }
 }

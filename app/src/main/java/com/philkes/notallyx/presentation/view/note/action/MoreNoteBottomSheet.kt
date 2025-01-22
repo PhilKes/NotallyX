@@ -17,6 +17,9 @@ class MoreNoteBottomSheet(
             listOf(
                 Action(R.string.share, R.drawable.share) { callbacks.share() },
                 Action(R.string.change_color, R.drawable.change_color) { callbacks.changeColor() },
+                Action(R.string.reminders, R.drawable.notifications) {
+                    callbacks.changeReminders()
+                },
                 Action(R.string.labels, R.drawable.label) { callbacks.changeLabels() },
             ) + additionalActions
     }
@@ -26,6 +29,8 @@ interface MoreActions {
     fun share()
 
     fun changeColor()
+
+    fun changeReminders()
 
     fun changeLabels()
 }

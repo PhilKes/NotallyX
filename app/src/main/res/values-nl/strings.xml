@@ -62,7 +62,6 @@
     <string name="copied_link">Link naar klembord gekopieerd</string>
     <string name="copy">Kopiëren</string>
     <string name="create_github_issue">Meld een bug op GitHub</string>
-    <string name="create_new">Nog geen labels. Nieuw label aanmaken?</string>
     <string name="creation_date">Gemaakt</string>
     <string name="daily">Dagelijks</string>
     <string name="dark">Donker</string>
@@ -97,6 +96,7 @@
     <string name="edit">Bewerken</string>
     <string name="edit_label">Label bewerken</string>
     <string name="edit_link">Link bewerken</string>
+    <string name="empty_labels">Nog geen labels. Nieuw label aanmaken?</string>
     <string name="empty_list">Lege lijst</string>
     <string name="empty_note">Lege notitie</string>
     <string name="enable_lock_description">Dit versleutelt ook de database</string>
@@ -181,7 +181,6 @@
     <string name="pinned">Vastgemaakt</string>
     <string name="play">Afspelen</string>
     <string name="please_grant_notally_audio">Geef NotallyX toestemming om audio op te nemen. Opnames verlaten nooit je apparaat</string>
-    <string name="please_grant_notally_notification">Geef NotallyX toestemming om meldingen te verzenden. Dit wordt gebruikt om de voortgang weer te geven als operaties zoals het verwijderen van afbeeldingen of het importeren van back-ups langer duren</string>
     <string name="rate">Beoordeel deze app</string>
     <string name="ready_to_record">Klaar om op te nemen</string>
     <string name="record_audio">Audio opnemen</string>

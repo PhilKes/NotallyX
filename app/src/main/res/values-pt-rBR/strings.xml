@@ -13,7 +13,6 @@
     <string name="change_color">Mudar cor</string>
     <string name="clear_formatting">Limpar formatação</string>
     <string name="content_density">Densidade do conteúdo</string>
-    <string name="create_new">Nenhuma etiqueta ainda. Criar uma?</string>
     <string name="dark">Escuro</string>
     <string name="date">Data</string>
     <string name="delete">Deletar</string>
@@ -26,6 +25,7 @@
     <string name="drag_handle">Arrastar e soltar</string>
     <string name="edit">Editar</string>
     <string name="edit_label">Editar etiqueta</string>
+    <string name="empty_labels">Nenhuma etiqueta ainda. Criar uma?</string>
     <string name="empty_list">Lista vazia</string>
     <string name="empty_note">Nota vazia</string>
     <string name="export">Exportar</string>

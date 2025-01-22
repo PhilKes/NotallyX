@@ -17,7 +17,6 @@
     <string name="choose_folder">Elegir carpeta</string>
     <string name="clear_formatting">Borrar formato</string>
     <string name="content_density">Densidad de contenido</string>
-    <string name="create_new">No hay etiquetas. ¿Crear una?</string>
     <string name="dark">Oscuro</string>
     <string name="date">Fecha</string>
     <string name="date_format">Formato de fecha</string>
@@ -32,6 +31,7 @@
     <string name="drag_handle">Arrastra la asa</string>
     <string name="edit">Editar</string>
     <string name="edit_label">Editar etiqueta</string>
+    <string name="empty_labels">No hay etiquetas. ¿Crear una?</string>
     <string name="empty_list">Vaciar lista</string>
     <string name="empty_note">Vaciar nota</string>
     <string name="export">Exportar</string>

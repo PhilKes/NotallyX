@@ -1,5 +1,6 @@
 package com.philkes.notallyx.presentation.activity.main.fragment.settings
 
+import android.Manifest
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -37,6 +38,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackupPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.backup.exportPreferences
 import com.philkes.notallyx.utils.catchNoBrowserInstalled
@@ -110,7 +112,28 @@ class SettingsFragment : Fragment() {
         chooseBackupFolderActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> model.setAutoBackupPath(uri) }
+                    result.data?.data?.let { uri ->
+                        model.setAutoBackupPath(uri)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                            activity?.let {
+                                val permission = Manifest.permission.POST_NOTIFICATIONS
+                                if (
+                                    it.checkSelfPermission(permission) !=
+                                        PackageManager.PERMISSION_GRANTED
+                                ) {
+                                    MaterialAlertDialogBuilder(it)
+                                        .setMessage(
+                                            R.string.please_grant_notally_notification_auto_backup
+                                        )
+                                        .setNegativeButton(R.string.skip, null)
+                                        .setPositiveButton(R.string.continue_) { _, _ ->
+                                            it.requestPermissions(arrayOf(permission), 0)
+                                        }
+                                        .show()
+                                }
+                            }
+                        }
+                    }
                 }
             }
         setupLockActivityResultLauncher =
@@ -253,7 +276,7 @@ class SettingsFragment : Fragment() {
 
     private fun NotallyXPreferences.setupAutoBackup(binding: FragmentSettingsBinding) {
         autoBackup.observe(viewLifecycleOwner) { value ->
-            setupAutoBackup(binding, value, autoBackup)
+            setupAutoBackup(binding, value, autoBackup, autoBackupLastExecutionTime)
         }
 
         binding.apply {
@@ -574,6 +597,7 @@ class SettingsFragment : Fragment() {
         binding: FragmentSettingsBinding,
         value: AutoBackup,
         preference: AutoBackupPreference,
+        lastExecutionPreference: LongPreference,
     ) {
         binding.AutoBackupMax.setup(
             value.maxBackups,
@@ -587,6 +611,8 @@ class SettingsFragment : Fragment() {
         binding.AutoBackup.setupAutoBackup(
             value.path,
             requireContext(),
+            viewLifecycleOwner,
+            lastExecutionPreference,
             ::displayChooseBackupFolderDialog,
         ) {
             model.disableAutoBackup()

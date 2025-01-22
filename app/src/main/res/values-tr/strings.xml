@@ -13,7 +13,6 @@
     <string name="change_color">Rengi değiştir</string>
     <string name="clear_formatting">Biçimlendirmeyi temizle</string>
     <string name="content_density">İçerik yoğunluğu</string>
-    <string name="create_new">Henüz etiket yok. Oluşturmaya ne dersin?</string>
     <string name="dark">Koyu</string>
     <string name="date">Tarih</string>
     <string name="date_format">Zaman biçimi</string>
@@ -27,6 +26,7 @@
     <string name="drag_handle">Sürükleme Tutamacı</string>
     <string name="edit">Düzenle</string>
     <string name="edit_label">Etiketi düzenle</string>
+    <string name="empty_labels">Henüz etiket yok. Oluşturmaya ne dersin?</string>
     <string name="empty_list">Boş liste</string>
     <string name="empty_note">Boş not</string>
     <string name="export">Dışa aktar</string>

@@ -13,7 +13,6 @@
     <string name="change_color">Изменить цвет</string>
     <string name="clear_formatting">Стандартный стиль</string>
     <string name="content_density">Плотность контента</string>
-    <string name="create_new">Еще нет меток, создать?</string>
     <string name="dark">Тёмная</string>
     <string name="date">Дата</string>
     <string name="date_format">Формат даты</string>
@@ -27,6 +26,7 @@
     <string name="drag_handle">Перетащить</string>
     <string name="edit">Редактировать</string>
     <string name="edit_label">Изменить метку</string>
+    <string name="empty_labels">Еще нет меток, создать?</string>
     <string name="empty_list">Пустой список</string>
     <string name="empty_note">Пустая заметка</string>
     <string name="export">Экспортировать</string>

@@ -58,7 +58,6 @@
     <string name="continue_">Continuer</string>
     <string name="copied_link">Lien copié dans le presse-papier</string>
     <string name="copy">Copier</string>
-    <string name="create_new">Il n\'existe pas encore d\'étiquettes. En créer une ?</string>
     <string name="creation_date">Crée</string>
     <string name="dark">Sombre</string>
     <string name="data_on_external">Stocker les données sur le stockage externe</string>
@@ -95,6 +94,7 @@
     <string name="edit">Modifier</string>
     <string name="edit_label">Modifier l\'étiquette</string>
     <string name="edit_link">Éditer le lien</string>
+    <string name="empty_labels">Il n\'existe pas encore d\'étiquettes. En créer une ?</string>
     <string name="empty_list">Liste vide</string>
     <string name="empty_note">Note vide</string>
     <string name="enable_lock_description">La base de donnée sera aussi chiffrée</string>
@@ -192,7 +192,6 @@
     <string name="plain_text_files_help">Pour importer vos notes à partir de fichiers (un seul fichier ou dossier) texte bruts, cliquez sur "Importer". Chaque fichier est importé comme une note séparée, le nom du fichier devient le titre de la note. Si le contenu du texte commence par une syntaxe de liste (par exemple, Markdown ‘- [x]’, syntaxe NotallyX ‘[✓]’, ou ‘*’, ‘-’), il sera converti en une note sous forme de liste.</string>
     <string name="play">Lecture</string>
     <string name="please_grant_notally_audio">Veuillez accorder à NotallyX l\'autorisation d\'enregistrer de l\'audio. Les enregistrements ne quittent jamais votre appareil.</string>
-    <string name="please_grant_notally_notification"> Veuillez accordez à NotallyX l\'autorisation d\'envoyer des notifications. Cela permet d\'afficher la progression des opérations telles que la suppression d\'images ou l\'importation de sauvegarde si elles prennent du temps.</string>
     <string name="previous">Précédent</string>
     <string name="rate">Noter cette application</string>
     <string name="ready_to_record">Prêt à enregistrer</string>

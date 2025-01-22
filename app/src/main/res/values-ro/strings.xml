@@ -18,7 +18,6 @@
     <string name="choose_folder">Alegeți dosarul</string>
     <string name="clear_formatting">Formatare clară</string>
     <string name="content_density">Densitatea conținutului</string>
-    <string name="create_new">Încă nu există etichete. Creați una?</string>
     <string name="dark">Întunecat</string>
     <string name="date">Date</string>
     <string name="date_format">Formatul datei</string>
@@ -33,6 +32,7 @@
     <string name="drag_handle">Trage mânerul</string>
     <string name="edit">Editează</string>
     <string name="edit_label">Editează eticheta</string>
+    <string name="empty_labels">Încă nu există etichete. Creați una?</string>
     <string name="empty_list">Lista goală</string>
     <string name="empty_note">Nota goală</string>
     <string name="export">Exportați</string>

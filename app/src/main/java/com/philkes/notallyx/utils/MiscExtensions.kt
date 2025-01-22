@@ -1,6 +1,7 @@
 package com.philkes.notallyx.utils
 
 import android.util.Patterns
+import java.util.Calendar
 import java.util.Locale
 
 fun CharSequence.truncate(limit: Int): CharSequence {
@@ -95,4 +96,10 @@ val String.toPreservedByteArray: ByteArray
 val ByteArray.toPreservedString: String
     get() {
         return String(this, Charsets.ISO_8859_1)
+    }
+
+fun now(): Calendar =
+    Calendar.getInstance().apply {
+        set(Calendar.SECOND, 0)
+        set(Calendar.MILLISECOND, 0)
     }

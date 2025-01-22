@@ -2,6 +2,9 @@ package com.philkes.notallyx.utils
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
 import android.content.ClipboardManager
@@ -16,6 +19,7 @@ import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
@@ -26,6 +30,11 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.BuildConfig
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
+import com.philkes.notallyx.presentation.activity.note.EditListActivity
+import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import java.io.File
@@ -243,11 +252,15 @@ fun Context.catchNoBrowserInstalled(callback: () -> Unit) {
     }
 }
 
-private fun Context.createReportBugIntent(stackTrace: String?): Intent {
+fun Context.createReportBugIntent(
+    stackTrace: String?,
+    title: String? = null,
+    body: String? = null,
+): Intent {
     return Intent(
             Intent.ACTION_VIEW,
             Uri.parse(
-                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let {  "&logs=$stackTrace"} ?: ""}"
+                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${title?.let { "&title=$it" }}${body?.let { "&what-happened=$it" }}&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let { "&logs=$stackTrace" } ?: ""}"
                     .take(2000)
             ),
         )
@@ -267,6 +280,30 @@ fun Context.shareNote(title: String, body: CharSequence) {
             }
             .wrapWithChooser(this)
     startActivity(intent)
+}
+
+fun Intent.embedIntentExtras() {
+    val string = toUri(Intent.URI_INTENT_SCHEME)
+    data = Uri.parse(string)
+}
+
+fun Context.getOpenNoteIntent(note: BaseNote) = getOpenNoteIntent(note.id, note.type)
+
+fun Context.getOpenNoteIntent(noteId: Long, noteType: Type): PendingIntent {
+    val intent =
+        when (noteType) {
+            Type.NOTE -> Intent(this, EditNoteActivity::class.java)
+            Type.LIST -> Intent(this, EditListActivity::class.java)
+        }.apply {
+            putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        }
+    return PendingIntent.getActivity(
+        this,
+        0,
+        intent,
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+    )
 }
 
 fun ContentResolver.determineMimeTypeAndExtension(uri: Uri, proposedMimeType: String?) =
@@ -290,3 +327,31 @@ fun DocumentFile.isLargerThanKb(kilobytes: Long): Boolean {
 
 val DocumentFile.nameWithoutExtension: String?
     get() = name?.substringBeforeLast(".")
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun NotificationManager.createChannelIfNotExists(
+    channelId: String,
+    importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
+) {
+    if (getNotificationChannel(channelId) == null) {
+        val channel = NotificationChannel(channelId, channelId, importance)
+        createNotificationChannel(channel)
+    }
+}
+
+fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
+    val wrapperObserver =
+        object : Observer<T> {
+            override fun onChanged(value: T) {
+                this@observeOnce.removeObserver(this)
+                observer.onChanged(value)
+            }
+        }
+    this.observeForever(wrapperObserver)
+}
+
+fun Uri.toReadablePath(): String {
+    return path!!
+        .replaceFirst("/tree/primary:", "Internal Storage/")
+        .replaceFirst("/tree/.*:".toRegex(), "External Storage/")
+}

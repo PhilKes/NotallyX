@@ -13,7 +13,6 @@
     <string name="change_color">Ubah warna</string>
     <string name="clear_formatting">Hapus pemformatan</string>
     <string name="content_density">Kerapatan konten</string>
-    <string name="create_new">Belum ada label. Buat baru?</string>
     <string name="dark">Gelap</string>
     <string name="date">Tanggal</string>
     <string name="date_format">Format tanggal</string>
@@ -27,6 +26,7 @@
     <string name="drag_handle">Handel Seret</string>
     <string name="edit">Sunting</string>
     <string name="edit_label">Sunting label</string>
+    <string name="empty_labels">Belum ada label. Buat baru?</string>
     <string name="empty_list">Daftar kosong</string>
     <string name="empty_note">Catatan kosong</string>
     <string name="export">Ekspor</string>

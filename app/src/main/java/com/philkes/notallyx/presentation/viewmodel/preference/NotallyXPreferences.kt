@@ -91,6 +91,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
         )
 
     val autoBackup = AutoBackupPreference(preferences)
+    val autoBackupLastExecutionTime =
+        LongPreference("autoBackupLastExecutionTime", preferences, -1L)
 
     val backupPassword by lazy {
         StringPreference(

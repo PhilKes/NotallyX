@@ -11,8 +11,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
+  <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+  <uses-permission android:name="android.permission.USE_BIOMETRIC" />
 
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
 
@@ -76,6 +78,8 @@
 
         <activity android:name=".presentation.activity.note.SelectLabelsActivity" />
 
+        <activity android:name=".presentation.activity.note.reminders.RemindersActivity" />
+
         <activity
             android:name=".presentation.activity.note.RecordAudioActivity"
             android:launchMode="singleTask" />
@@ -120,6 +124,14 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget" />
 
+        </receiver>
+
+        <receiver android:name=".presentation.activity.note.reminders.ReminderReceiver" android:enabled="true" android:exported="true" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.app.action.SCHEDULE_EXACT_ALARM_PERMISSION_STATE_CHANGED" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </receiver>
 
         <service

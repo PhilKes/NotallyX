@@ -62,7 +62,6 @@
     <string name="copied_link">Link copiato negli appunti</string>
     <string name="copy">Copia</string>
     <string name="create_github_issue">Crea una Issue su Github</string>
-    <string name="create_new">Non ci sono etichette. Vuoi crearne una?</string>
     <string name="creation_date">Data di creazione</string>
     <string name="daily">Giornaliera</string>
     <string name="dark">Scuro</string>
@@ -99,6 +98,7 @@
     <string name="edit">Modifica</string>
     <string name="edit_label">Modifica etichetta</string>
     <string name="edit_link">Modifica link</string>
+    <string name="empty_labels">Non ci sono etichette. Vuoi crearne una?</string>
     <string name="empty_list">Lista vuota</string>
     <string name="empty_note">Nota vuota</string>
     <string name="enable_lock_description">Questo inoltre crittograferà il database</string>
@@ -187,7 +187,6 @@
     <string name="plain_text_files_help">Per importare le note da file (singolo file o cartella) di testo semplice, clicca Importa. Ogni file verrà importato in una nota separata, il nome del file diventerà il titolo della nota. Se il contenuto inizia con la sintassi di lista (per esempio ’- [x]’ in Markdown, ’[✓]’ nella sintassi di Notallyx, oppure ’*’, ’-’) verrà importato come Lista.</string>
     <string name="play">Play</string>
     <string name="please_grant_notally_audio">Per favore concedi a NotallyX il permesso di registrare audio. Le registrazioni non lasceranno mai il dispositivo</string>
-    <string name="please_grant_notally_notification">Per favore concedi a NotallyX il permesso di inviare notifiche. Nel caso operazioni come l’eliminazione di immagini o l’importazione di backup richiedano del tempo, le notifiche vengono usate per mostrarne l’avanzamento</string>
     <string name="previous">Precedente</string>
     <string name="rate">Recensisci questa app</string>
     <string name="ready_to_record">Pronto per registrare</string>

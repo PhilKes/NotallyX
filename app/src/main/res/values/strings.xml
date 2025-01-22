@@ -4,6 +4,7 @@
     <string name="add_images">Add images</string>
     <string name="add_item">Add Item</string>
     <string name="add_label">Add label</string>
+    <string name="add_reminder">Add Reminder</string>
     <string name="adding_files">Adding files</string>
     <string name="adding_images">Adding images</string>
     <string name="app_name" translatable="false">NotallyX</string>
@@ -18,8 +19,12 @@
     <string name="attach_file">Attach file</string>
     <string name="audio_recordings">Audio Recordings</string>
     <string name="auto_backup">Auto backup</string>
+    <string name="auto_backup_error_message">An error occurred during auto backup:\n\'%1$s\'\nPlease check your settings or report a bug</string>
+    <string name="auto_backup_failed">NotallyX Auto Backup failed</string>
+    <string name="auto_backup_last">Last Backup</string>
     <string name="auto_backup_period">Auto backup period</string>
     <string name="auto_sort_by_checked">Autosort by checked items</string>
+    <string name="back">Back</string>
     <string name="backup">Backup</string>
     <string name="backup_password">Backup Password</string>
     <string name="backup_password_hint">By setting this, all future backup ZIPs will be encrypted and password-protected</string>
@@ -64,13 +69,14 @@
     <string name="copy">Copy</string>
     <string name="count" translatable="false">%1$d / %2$d</string>
     <string name="create_github_issue">Create Github Issue</string>
-    <string name="create_new">No labels yet. Create one?</string>
     <string name="creation_date">Created</string>
+    <string name="custom">Custom</string>
     <string name="daily">Daily</string>
     <string name="dark">Dark</string>
     <string name="data_on_external">Store Data on External Storage</string>
     <string name="date">Date</string>
     <string name="date_format">Date format</string>
+    <string name="days">Days</string>
     <string name="delete">Delete</string>
     <string name="delete_all">Delete all</string>
     <string name="delete_all_notes">Delete all notes?</string>
@@ -81,6 +87,7 @@
     <string name="delete_image_forever">Delete image forever?</string>
     <string name="delete_label">Delete label?</string>
     <string name="delete_note_forever">Delete note forever?</string>
+    <string name="delete_reminder">Delete reminder?</string>
     <string name="delete_selected_notes">Delete selected notes?</string>
     <string name="deleted">Deleted</string>
     <plurals name="deleted_selected_notes">
@@ -102,8 +109,11 @@
     <string name="edit">Edit</string>
     <string name="edit_label">Edit label</string>
     <string name="edit_link">Edit Link</string>
+    <string name="edit_reminders">Edit Reminders</string>
+    <string name="empty_labels">No labels yet. Create one?</string>
     <string name="empty_list">Empty list</string>
     <string name="empty_note">Empty note</string>
+    <string name="empty_reminders">No reminders yet. Create one?</string>
     <string name="enable_lock_description">This will also encrypt the database</string>
     <string name="enable_lock_title">Enable lock via Biometric/PIN</string>
     <string name="enabled">Enabled</string>
@@ -111,6 +121,7 @@
     <string name="error_while_renaming_image">Error while renaming image</string>
     <string name="evernote">Evernote</string>
     <string name="evernote_help">In order to import your Notes from Evernote you must export your Evernote Notebook as ENEX. Click Help to get more information.\n\nIf you already have a ENEX file, click Import and choose it.</string>
+    <string name="every">Every</string>
     <string name="export">Export</string>
     <string name="export_backup">Export backup</string>
     <string name="export_settings">Export Settings</string>
@@ -127,6 +138,7 @@
     <string name="google_keep_help">In order to import your Notes from Google Keep you must download your Google Takeout ZIP file. Only select the \"Keep\" data. Click Help to get more information.\n\nIf you already have a Takeout ZIP file, click Import and choose the ZIP file.</string>
     <string name="grid">Grid</string>
     <string name="help">Help</string>
+    <string name="hours">Hours</string>
     <string name="image_format_not_supported">Image format not supported</string>
     <string name="import_action">Import</string>
     <string name="import_backup">Import backup</string>
@@ -175,9 +187,11 @@
     <string name="max_lines_to_display">Max lines to display in note</string>
     <string name="max_lines_to_display_title">Max lines to display in title</string>
     <string name="medium">Medium</string>
+    <string name="minutes">Minutes</string>
     <string name="modified_date">Modified</string>
     <string name="monospace">Monospace</string>
     <string name="monthly">Monthly</string>
+    <string name="months">Months</string>
     <string name="more">%1$d more</string>
     <plurals name="more_files">
         <item quantity="one">…%1$d more file</item>
@@ -200,15 +214,22 @@
     <string name="plain_text_files">Plain Text Files</string>
     <string name="plain_text_files_help">In order to import your Notes from plain text files (single file or folder), click Import. Every file is imported as a separate note, the file’s name becomes the note’s title. If the text contents start with list syntax (e.g. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’) it will be converted to a List note.</string>
     <string name="play">Play</string>
+    <string name="please_grant_notally_alarm">Please grant NotallyX to send reminders</string>
     <string name="please_grant_notally_audio">Please grant NotallyX the permission to record audio. Recordings never leave your device</string>
-    <string name="please_grant_notally_notification">Please grant NotallyX the permission to send notifications. This is used to display the progress if operations like deleting images or importing backups take time</string>
+    <string name="please_grant_notally_notification">Please grant NotallyX the permission to send notifications</string>
+    <string name="please_grant_notally_notification_auto_backup">If an auto backup fails you can receive a notification, if you grant NotallyX permission to send notifications</string>
     <string name="previous">Previous</string>
     <string name="rate">Rate this app</string>
     <string name="ready_to_record">Ready to record</string>
     <string name="record_audio">Record audio</string>
     <string name="recording">Recording…</string>
     <string name="redo">Redo</string>
+    <string name="reminder_no_repetition">No repetition</string>
+    <string name="reminders">Reminders</string>
     <string name="remove_link">Remove Link</string>
+    <string name="repetition">Repetition</string>
+    <string name="repetition_custom">Custom Repetition</string>
+    <string name="repetition_value_hint">Value</string>
     <string name="report_bug">Report an issue/bug</string>
     <string name="reset_settings">Reset Settings</string>
     <string name="reset_settings_message">All Settings will be reset to their default value</string>
@@ -234,6 +255,7 @@
     <string name="share">Share</string>
     <string name="single_file">Single File</string>
     <string name="single_note_or_list">Single note or list</string>
+    <string name="skip">Skip</string>
     <string name="small">Small</string>
     <string name="something_went_wrong">Something went wrong. Please try again.</string>
     <string name="something_went_wrong_audio">Something went wrong. The audio recording may have been moved or deleted.\n\nError : (%1$d, %2$d)</string>
@@ -266,6 +288,9 @@
     <string name="view_file">View file</string>
     <string name="view_note">View note</string>
     <string name="weekly">Weekly</string>
+    <string name="weeks">Weeks</string>
     <string name="wrong_password">Wrong password provided</string>
+    <string name="yearly">Yearly</string>
+    <string name="years">Years</string>
     <string name="your_notes_associated">Your notes attached to this label will not be deleted</string>
 </resources>

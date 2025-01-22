@@ -16,6 +16,9 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.LabelsInBaseNote
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.Reminder
+
+data class NoteReminder(val id: Long, val reminders: List<Reminder>)
 
 @Dao
 interface BaseNoteDao {
@@ -60,6 +63,9 @@ interface BaseNoteDao {
 
     @Query("SELECT audios FROM BaseNote") fun getAllAudios(): List<String>
 
+    @Query("SELECT id, reminders FROM BaseNote WHERE reminders IS NOT NULL")
+    suspend fun getAllReminders(): List<NoteReminder>
+
     @Query("SELECT id FROM BaseNote WHERE folder = 'DELETED'")
     suspend fun getDeletedNoteIds(): LongArray
 
@@ -98,6 +104,9 @@ interface BaseNoteDao {
 
     @Query("UPDATE BaseNote SET audios = :audios WHERE id = :id")
     suspend fun updateAudios(id: Long, audios: List<Audio>)
+
+    @Query("UPDATE BaseNote SET reminders = :reminders WHERE id = :id")
+    suspend fun updateReminders(id: Long, reminders: List<Reminder>)
 
     /**
      * Both id and position can be invalid.

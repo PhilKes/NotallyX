@@ -28,7 +28,6 @@
     <string name="clear_formatting">Odstranit formátování</string>
     <string name="content_density">Kompaktnost obsahu</string>
     <string name="continue_">Pokračovat</string>
-    <string name="create_new">Žádné štítky. Vytvořit nový?</string>
     <string name="dark">Tmavé</string>
     <string name="date">Datum</string>
     <string name="date_format">Formát data</string>
@@ -46,6 +45,7 @@
     <string name="drag_handle">Chytni a přetáhni</string>
     <string name="edit">Upravit</string>
     <string name="edit_label">Upravit štítek</string>
+    <string name="empty_labels">Žádné štítky. Vytvořit nový?</string>
     <string name="empty_list">Prázdný seznam</string>
     <string name="empty_note">Prázdná poznámka</string>
     <string name="error_while_renaming_image">Chyba při přejmenování obrázku</string>
@@ -86,7 +86,6 @@
     <string name="others">Jiné</string>
     <string name="pin">Připnout</string>
     <string name="pinned">Připnuté</string>
-    <string name="please_grant_notally_notification">Udělte NotallyX oprávnění k zasílání oznámení. Tato se používájí k zobrazení průběhu, pokud operace, jako je mazání obrázků nebo import záloh, trvají dlouho.</string>
     <string name="rate">Ohodnotit aplikaci</string>
     <string name="restore">Obnovit</string>
     <string name="save">Uložit</string>

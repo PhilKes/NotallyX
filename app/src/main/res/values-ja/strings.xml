@@ -13,7 +13,6 @@
     <string name="change_color">色を変更</string>
     <string name="clear_formatting">書式を削除</string>
     <string name="content_density">プレビュー</string>
-    <string name="create_new">新規作成</string>
     <string name="dark">ダーク</string>
     <string name="date">日時</string>
     <string name="date_format">日付の表示</string>
@@ -27,6 +26,7 @@
     <string name="drag_handle">ドラッグハンドル</string>
     <string name="edit">編集</string>
     <string name="edit_label">ラベルを編集</string>
+    <string name="empty_labels">新規作成</string>
     <string name="empty_list">空のリスト</string>
     <string name="empty_note">空のノート</string>
     <string name="export">ファイルに出力</string>

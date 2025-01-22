@@ -30,7 +30,6 @@
     <string name="clear_formatting">清除格式</string>
     <string name="content_density">内容密度</string>
     <string name="create_github_issue">在Github发布议题</string>
-    <string name="create_new">还没有标签。创建一个？</string>
     <string name="creation_date">创建时间</string>
     <string name="dark">深</string>
     <string name="data_on_external">用外部存储保存数据</string>
@@ -50,6 +49,7 @@
     <string name="drag_handle">拖动处理</string>
     <string name="edit">编辑</string>
     <string name="edit_label">编辑标签</string>
+    <string name="empty_labels">还没有标签。创建一个？</string>
     <string name="empty_list">空白列表</string>
     <string name="empty_note">空白笔记</string>
     <string name="enabled">启用</string>

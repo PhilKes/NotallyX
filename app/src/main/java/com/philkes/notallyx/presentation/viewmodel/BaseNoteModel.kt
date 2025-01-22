@@ -33,6 +33,7 @@ import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.SearchResult
+import com.philkes.notallyx.data.model.toNoteReminders
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
@@ -55,6 +56,9 @@ import com.philkes.notallyx.utils.deleteAttachments
 import com.philkes.notallyx.utils.getBackupDir
 import com.philkes.notallyx.utils.getExternalImagesDirectory
 import com.philkes.notallyx.utils.log
+import com.philkes.notallyx.utils.cancelNoteReminders
+import com.philkes.notallyx.utils.scheduleNoteReminders
+
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -374,7 +378,15 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun moveBaseNotes(ids: LongArray, folder: Folder) {
-        executeAsync { baseNoteDao.move(ids, folder) }
+        executeAsync {
+            baseNoteDao.move(ids, folder)
+            val notes = baseNoteDao.getByIds(ids).toNoteReminders()
+            // Only reminders of notes in NOTES folder are active
+            when (folder) {
+                Folder.NOTES -> app.scheduleNoteReminders(notes)
+                else -> app.cancelNoteReminders(notes)
+            }
+        }
     }
 
     fun updateBaseNoteLabels(labels: List<String>, id: Long) {
@@ -388,7 +400,12 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun deleteAll() {
         viewModelScope.launch {
-            deleteBaseNotes(withContext(Dispatchers.IO) { baseNoteDao.getAllIds().toLongArray() })
+            val (ids, noteReminders) =
+                withContext(Dispatchers.IO) {
+                    Pair(baseNoteDao.getAllIds().toLongArray(), baseNoteDao.getAllReminders())
+                }
+            app.cancelNoteReminders(noteReminders)
+            deleteBaseNotes(ids)
             withContext(Dispatchers.IO) { labelDao.deleteAll() }
             app.showToast(R.string.cleared_data)
         }
@@ -405,6 +422,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 attachments.addAll(note.audios)
             }
             actionMode.close(false)
+            app.cancelNoteReminders(notes.toNoteReminders())
             withContext(Dispatchers.IO) {
                 baseNoteDao.delete(ids)
                 app.deleteAttachments(attachments, ids, deletionProgress)

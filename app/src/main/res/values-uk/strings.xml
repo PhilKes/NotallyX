@@ -12,7 +12,6 @@
     <string name="cant_open_link">Неможливо відкрити посилання</string>
     <string name="clear_formatting">Очистити форматування</string>
     <string name="content_density">Щільність вмісту</string>
-    <string name="create_new">Мітки відсутні. Створити?</string>
     <string name="dark">Темна</string>
     <string name="date">Дата</string>
     <string name="delete">Видалити</string>
@@ -25,6 +24,7 @@
     <string name="drag_handle">Перетягніть вручну</string>
     <string name="edit">Редагувати</string>
     <string name="edit_label">Редагувати мітку</string>
+    <string name="empty_labels">Мітки відсутні. Створити?</string>
     <string name="empty_list">Пустий список</string>
     <string name="empty_note">Пустий запис</string>
     <string name="export">Експорт</string>

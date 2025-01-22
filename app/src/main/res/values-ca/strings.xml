@@ -12,7 +12,6 @@
     <string name="cant_open_link">No es pot obrir l\'enllaç</string>
     <string name="clear_formatting">Netejar la formatació</string>
     <string name="content_density">Densitat del contingut</string>
-    <string name="create_new">Encara no hi ha etiquetes. Crear-ne una?</string>
     <string name="dark">Fosc</string>
     <string name="date">Data</string>
     <string name="delete">Esborrar</string>
@@ -25,6 +24,7 @@
     <string name="drag_handle">Arrossega la nansa</string>
     <string name="edit">Editar</string>
     <string name="edit_label">Editar etiqueta</string>
+    <string name="empty_labels">Encara no hi ha etiquetes. Crear-ne una?</string>
     <string name="empty_list">Llista buida</string>
     <string name="empty_note">Nota buida</string>
     <string name="export">Exportar</string>

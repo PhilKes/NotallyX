@@ -6,6 +6,7 @@ import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.Reminder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import org.assertj.core.api.Assertions.assertThat
@@ -233,6 +234,7 @@ class GoogleKeepImporterTest {
             images: List<FileAttachment> = listOf(),
             files: List<FileAttachment> = listOf(),
             audios: List<Audio> = listOf(),
+            reminders: List<Reminder> = listOf(),
         ): BaseNote {
             return BaseNote(
                 id,
@@ -250,6 +252,7 @@ class GoogleKeepImporterTest {
                 images,
                 files,
                 audios,
+                reminders,
             )
         }
     }

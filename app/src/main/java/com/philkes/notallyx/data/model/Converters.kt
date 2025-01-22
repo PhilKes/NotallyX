@@ -1,6 +1,7 @@
 package com.philkes.notallyx.data.model
 
 import androidx.room.TypeConverter
+import java.util.Date
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -116,6 +117,49 @@ object Converters {
                 jsonObject.put("end", representation.end)
             }
         return JSONArray(objects)
+    }
+
+    @TypeConverter
+    fun remindersToJson(reminders: List<Reminder>): String {
+        val objects =
+            reminders.map { reminder ->
+                JSONObject().apply {
+                    put("id", reminder.id) // Store date as long timestamp
+                    put("dateTime", reminder.dateTime.time) // Store date as long timestamp
+                    put("repetition", reminder.repetition?.let { repetitionToJson(it) })
+                }
+            }
+        return JSONArray(objects).toString()
+    }
+
+    @TypeConverter
+    fun jsonToReminders(json: String): List<Reminder> {
+        val iterable = JSONArray(json).iterable<JSONObject>()
+        return iterable.map { jsonObject ->
+            val id = jsonObject.getLong("id")
+            val dateTime = Date(jsonObject.getLong("dateTime"))
+            val repetition = jsonObject.getSafeString("repetition")?.let { jsonToRepetition(it) }
+            Reminder(id, dateTime, repetition)
+        }
+    }
+
+    @TypeConverter
+    fun repetitionToJson(repetition: Repetition): String {
+        val jsonObject = JSONObject()
+        jsonObject.put("value", repetition.value)
+        jsonObject.put("unit", repetition.unit.name) // Store the TimeUnit as a string
+        return jsonObject.toString()
+    }
+
+    @TypeConverter
+    fun jsonToRepetition(json: String): Repetition {
+        val jsonObject = JSONObject(json)
+        val value = jsonObject.getInt("value")
+        val unit =
+            RepetitionTimeUnit.valueOf(
+                jsonObject.getString("unit")
+            ) // Convert string back to TimeUnit
+        return Repetition(value, unit)
     }
 
     private fun getSafeLocalName(jsonObject: JSONObject): String {

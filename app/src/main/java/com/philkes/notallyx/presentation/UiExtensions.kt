@@ -2,13 +2,17 @@ package com.philkes.notallyx.presentation
 
 import android.Manifest
 import android.app.Activity
+import android.app.AlarmManager
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.text.Editable
 import android.text.InputType
 import android.text.Spannable
@@ -40,10 +44,12 @@ import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
+import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
@@ -424,7 +430,8 @@ private fun <T : Progress> MutableLiveData<T>.setupProgressDialog(
 
 fun Activity.checkNotificationPermission(
     requestCode: Int,
-    messageResId: Int,
+    alsoCheckAlarmPermission: Boolean = false,
+    alarmPermissionResultLauncher: ActivityResultLauncher<Intent>? = null,
     onSuccess: () -> Unit,
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -432,15 +439,43 @@ fun Activity.checkNotificationPermission(
         if (checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED) {
             if (shouldShowRequestPermissionRationale(permission)) {
                 MaterialAlertDialogBuilder(this)
-                    .setMessage(messageResId)
-                    .setNegativeButton(R.string.cancel) { _, _ -> onSuccess() }
+                    .setMessage(R.string.please_grant_notally_notification)
+                    .addCancelButton()
                     .setPositiveButton(R.string.continue_) { _, _ ->
                         requestPermissions(arrayOf(permission), requestCode)
                     }
-                    .setOnDismissListener { onSuccess() }
                     .show()
             } else requestPermissions(arrayOf(permission), requestCode)
-        } else onSuccess()
+        } else if (alsoCheckAlarmPermission)
+            checkAlarmPermission(alarmPermissionResultLauncher, onSuccess)
+        else onSuccess()
+    } else if (alsoCheckAlarmPermission)
+        checkAlarmPermission(alarmPermissionResultLauncher, onSuccess)
+    else onSuccess()
+}
+
+fun Activity.checkAlarmPermission(
+    resultLauncher: ActivityResultLauncher<Intent>?,
+    onSuccess: () -> Unit,
+) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (getSystemService<AlarmManager>()!!.canScheduleExactAlarms()) {
+            onSuccess()
+        } else {
+            MaterialAlertDialogBuilder(this)
+                .setMessage(R.string.please_grant_notally_alarm)
+                .addCancelButton()
+                .setPositiveButton(R.string.continue_) { _, _ ->
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+                    intent.data = Uri.parse("package:$packageName")
+                    if (resultLauncher != null) {
+                        resultLauncher.launch(intent)
+                    } else {
+                        startActivity(intent)
+                    }
+                }
+                .show()
+        }
     } else onSuccess()
 }
 
