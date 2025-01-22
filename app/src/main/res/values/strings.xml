@@ -19,6 +19,8 @@
     <string name="attach_file">Attach file</string>
     <string name="audio_recordings">Audio Recordings</string>
     <string name="auto_backup">Auto backup</string>
+    <string name="auto_backup_error_message">An error occurred during auto backup:\n\'%1$s\'\nPlease check your settings or report a bug</string>
+    <string name="auto_backup_failed">NotallyX Auto Backup failed</string>
     <string name="auto_backup_period">Auto backup period</string>
     <string name="auto_sort_by_checked">Autosort by checked items</string>
     <string name="back">Back</string>
@@ -214,6 +216,7 @@
     <string name="please_grant_notally_alarm">Please grant NotallyX to send reminders</string>
     <string name="please_grant_notally_audio">Please grant NotallyX the permission to record audio. Recordings never leave your device</string>
     <string name="please_grant_notally_notification">Please grant NotallyX the permission to send notifications</string>
+    <string name="please_grant_notally_notification_auto_backup">If an auto backup fails you can receive a notification, if you grant NotallyX permission to send notifications</string>
     <string name="previous">Previous</string>
     <string name="rate">Rate this app</string>
     <string name="ready_to_record">Ready to record</string>
@@ -251,6 +254,7 @@
     <string name="share">Share</string>
     <string name="single_file">Single File</string>
     <string name="single_note_or_list">Single note or list</string>
+    <string name="skip">Skip</string>
     <string name="small">Small</string>
     <string name="something_went_wrong">Something went wrong. Please try again.</string>
     <string name="something_went_wrong_audio">Something went wrong. The audio recording may have been moved or deleted.\n\nError : (%1$d, %2$d)</string>

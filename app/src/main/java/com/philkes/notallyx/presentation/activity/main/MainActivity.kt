@@ -48,7 +48,6 @@ import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFrag
 import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
 import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_FOLDER
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
-import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
@@ -60,6 +59,7 @@ import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateChec
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
+import com.philkes.notallyx.utils.backup.createBackup
 import com.philkes.notallyx.utils.backup.exportPdfFile
 import com.philkes.notallyx.utils.backup.exportPlainTextFile
 import com.philkes.notallyx.utils.getExportedPath
@@ -68,7 +68,9 @@ import com.philkes.notallyx.utils.nameWithoutExtension
 import com.philkes.notallyx.utils.shareNote
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : LockedActivity<ActivityMainBinding>() {
 
@@ -103,12 +105,19 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
         setupActivityResultLaunchers()
         onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
+
+        val fragmentIdToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_OPEN, -1)
+        if (fragmentIdToLoad != -1) {
+            val bundle = Bundle()
+            navController.navigate(fragmentIdToLoad, bundle)
+        }
     }
 
     private fun setupFAB() {
         binding.TakeNote.setOnClickListener {
-            val intent = Intent(this, EditNoteActivity::class.java)
-            startActivity(prepareNewNoteIntent(intent))
+            lifecycleScope.launch {
+                withContext(Dispatchers.IO) { this@MainActivity.createBackup("MainActivityBackup") }
+            }
         }
         binding.MakeList.setOnClickListener {
             val intent = Intent(this, EditListActivity::class.java)
@@ -703,5 +712,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 }
             }
         }
+    }
+
+    companion object {
+        const val EXTRA_FRAGMENT_TO_OPEN = "notallyx.intent.extra.FRAGMENT_TO_OPEN"
     }
 }

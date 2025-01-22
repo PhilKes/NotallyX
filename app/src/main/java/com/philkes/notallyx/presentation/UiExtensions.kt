@@ -430,7 +430,8 @@ private fun <T : Progress> MutableLiveData<T>.setupProgressDialog(
 
 fun Activity.checkNotificationPermission(
     requestCode: Int,
-    resultLauncher: ActivityResultLauncher<Intent>?,
+    alsoCheckAlarmPermission: Boolean = false,
+    alarmPermissionResultLauncher: ActivityResultLauncher<Intent>? = null,
     onSuccess: () -> Unit,
 ) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -445,8 +446,12 @@ fun Activity.checkNotificationPermission(
                     }
                     .show()
             } else requestPermissions(arrayOf(permission), requestCode)
-        } else checkAlarmPermission(resultLauncher, onSuccess)
-    } else checkAlarmPermission(resultLauncher, onSuccess)
+        } else if (alsoCheckAlarmPermission)
+            checkAlarmPermission(alarmPermissionResultLauncher, onSuccess)
+        else onSuccess()
+    } else if (alsoCheckAlarmPermission)
+        checkAlarmPermission(alarmPermissionResultLauncher, onSuccess)
+    else onSuccess()
 }
 
 fun Activity.checkAlarmPermission(

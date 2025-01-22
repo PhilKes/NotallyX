@@ -2,6 +2,8 @@ package com.philkes.notallyx.utils
 
 import android.app.Activity
 import android.app.KeyguardManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.ActivityNotFoundException
 import android.content.ClipData
@@ -17,6 +19,7 @@ import android.os.Build
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.documentfile.provider.DocumentFile
@@ -249,11 +252,15 @@ fun Context.catchNoBrowserInstalled(callback: () -> Unit) {
     }
 }
 
-private fun Context.createReportBugIntent(stackTrace: String?): Intent {
+fun Context.createReportBugIntent(
+    stackTrace: String?,
+    title: String? = null,
+    body: String? = null,
+): Intent {
     return Intent(
             Intent.ACTION_VIEW,
             Uri.parse(
-                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let {  "&logs=$stackTrace"} ?: ""}"
+                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${title?.let { "&title=$it" }}${body?.let { "&what-happened=$it" }}&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let { "&logs=$stackTrace" } ?: ""}"
                     .take(2000)
             ),
         )
@@ -320,3 +327,14 @@ fun DocumentFile.isLargerThanKb(kilobytes: Long): Boolean {
 
 val DocumentFile.nameWithoutExtension: String?
     get() = name?.substringBeforeLast(".")
+
+@RequiresApi(Build.VERSION_CODES.O)
+fun NotificationManager.createChannelIfNotExists(
+    channelId: String,
+    importance: Int = NotificationManager.IMPORTANCE_DEFAULT,
+) {
+    if (getNotificationChannel(channelId) == null) {
+        val channel = NotificationChannel(channelId, channelId, importance)
+        createNotificationChannel(channel)
+    }
+}
