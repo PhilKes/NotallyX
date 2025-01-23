@@ -41,6 +41,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
+import com.philkes.notallyx.utils.MIME_TYPE_ZIP
 import com.philkes.notallyx.utils.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.SUBFOLDER_IMAGES
@@ -79,11 +80,13 @@ private const val TAG = "ExportExtensions"
 private const val NOTIFICATION_CHANNEL_ID = "AutoBackups"
 private const val NOTIFICATION_ID = 123412
 private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs.txt"
-private const val NOTE_MODIFICATION_BACKUP_FILE = "NotallyX_AutoBackup.zip"
 private const val OUTPUT_DATA_BACKUP_URI = "backupUri"
 
 const val AUTO_BACKUP_WORK_NAME = "com.philkes.notallyx.AutoBackupWork"
 const val OUTPUT_DATA_EXCEPTION = "exception"
+
+private const val ON_SAVE_BACKUP_FILE = "NotallyX_AutoBackup.zip"
+private const val PERIODIC_BACKUP_FILE_PREFIX = "NotallyX_Backup_"
 
 fun Context.createBackup(): Result {
     val app = applicationContext as Application
@@ -107,11 +110,11 @@ fun Context.createBackup(): Result {
 
         if (folder.exists()) {
             val formatter = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
-            val backupFilePrefix = "NotallyX_"
+            val backupFilePrefix = PERIODIC_BACKUP_FILE_PREFIX
             val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
             log(msg = "Creating '$uri/$name.zip'...")
             try {
-                val zipUri = requireNotNull(folder.createFile("application/zip", name)).uri
+                val zipUri = requireNotNull(folder.createFile(MIME_TYPE_ZIP, name)).uri
                 val exportedNotes =
                     app.exportAsZip(zipUri, password = preferences.backupPassword.value)
                 log(msg = "Exported $exportedNotes notes")
@@ -171,9 +174,9 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
             return
         }
     try {
-        var backupFile = backupFolder.findFile(NOTE_MODIFICATION_BACKUP_FILE)
+        var backupFile = backupFolder.findFile(ON_SAVE_BACKUP_FILE)
         if (savedNote == null || backupFile == null || !backupFile.exists()) {
-            backupFile = backupFolder.createFile("application/zip", NOTE_MODIFICATION_BACKUP_FILE)
+            backupFile = backupFolder.createFile(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE)
             exportAsZip(backupFile!!.uri, password = password)
         } else {
             NotallyDatabase.getDatabase(this, observePreferences = false).value.checkpoint()
@@ -213,15 +216,29 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
     }
 }
 
+fun ContextWrapper.checkAutoSave(
+    preferences: NotallyXPreferences,
+    note: BaseNote? = null,
+    forceFullBackup: Boolean = false,
+) {
+    if (preferences.backupOnSave.value) {
+        val backupPath = preferences.backupsFolder.value
+        if (backupPath != EMPTY_PATH) {
+            if (forceFullBackup) {
+                deleteModifiedNoteBackup(backupPath)
+            }
+            autoBackupOnSave(backupPath, preferences.backupPassword.value, note)
+        }
+    }
+}
+
 fun ContextWrapper.deleteModifiedNoteBackup(backupPath: String) {
-    DocumentFile.fromTreeUri(this, backupPath.toUri())
-        ?.findFile(NOTE_MODIFICATION_BACKUP_FILE)
-        ?.delete()
+    DocumentFile.fromTreeUri(this, backupPath.toUri())?.findFile(ON_SAVE_BACKUP_FILE)?.delete()
 }
 
 fun ContextWrapper.modifiedNoteBackupExists(backupPath: String): Boolean {
     return DocumentFile.fromTreeUri(this, backupPath.toUri())
-        ?.findFile(NOTE_MODIFICATION_BACKUP_FILE)
+        ?.findFile(ON_SAVE_BACKUP_FILE)
         ?.exists() ?: false
 }
 

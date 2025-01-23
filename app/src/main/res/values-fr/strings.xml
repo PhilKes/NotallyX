@@ -68,7 +68,8 @@
     <string name="custom">Personnalisé</string>
     <string name="daily">Tous les jours</string>
     <string name="dark">Sombre</string>
-    <string name="data_in_public">Stocker les données sur le stockage externe</string>
+    <string name="data_in_public">Stocker les données sur le dossier public</string>
+    <string name="data_in_public_message">En activant cette option, la base de données interne de l\'application sera déplacée dans le dossier public de l\'application (Android/media/com.philkes.notallyx). En combinaison avec des applications de synchronisation de fichiers, cela peut être utilisé pour synchroniser les données de NotallyX entre plusieurs appareils.</string>
     <string name="date">Date</string>
     <string name="date_format">Format de la date</string>
     <string name="days">Jours</string>
@@ -93,7 +94,6 @@
     <string name="deleting_images">Suppression des images</string>
     <string name="descending">Décroissant</string>
     <string name="disable">Désactiver</string>
-    <string name="disable_auto_backup">Désactiver la sauvegarde automatique</string>
     <string name="disable_data_in_public">Replacer les données dans le stockage interne</string>
     <string name="disable_lock_description">La base de donnée sera aussi décryptée</string>
     <string name="disable_lock_title">Désactiver le verrouillage biométrique/code PIN</string>
@@ -124,7 +124,6 @@
     <string name="export_settings_message">Tous les paramètres seront exportés dans un fichier JSON, qui pourra être utilisé pour réimporter les paramètres enregistrés.\n\nVeuillez noter que cela n\'inclut pas les paramètres chiffrés, tels que le mot de passe de sauvegarde automatique ou la clé de chiffrement biométrique.</string>
     <string name="export_settings_success">Paramètres exportés avec succès</string>
     <string name="exporting_backup">Exportation de la sauvegarde</string>
-    <string name="data_in_public_message">En activant cette option, la base de données interne de l\'application sera déplacée vers le stockage externe de l\'application (Android/media/com.philkes.notallyx).\nEn combinaison avec des applications de synchronisation de fichiers, cela peut être utilisé pour synchroniser les données de NotallyX entre plusieurs appareils.</string>
     <string name="extracted_files">Fichiers extraits</string>
     <string name="filter">Filtrer</string>
     <string name="folder">Dossier</string>
@@ -198,7 +197,6 @@
     <string name="note">Note</string>
     <string name="notes">Notes</string>
     <string name="notes_sorted_by">Notes triées par</string>
-    <string name="notes_will_be">Les notes seront sauvegardées dans le stockage interne de votre téléphone tous les jours.\n\nCela peut ne pas fonctionner si le mode d\'économie d\'énergie est activé</string>
     <string name="open_link">Ouvrir le lien</string>
     <string name="open_note">Ouvrir la note</string>
     <string name="others">Autres</string>

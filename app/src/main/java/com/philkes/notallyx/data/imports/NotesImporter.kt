@@ -14,6 +14,7 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
+import com.philkes.notallyx.utils.MIME_TYPE_ZIP
 import com.philkes.notallyx.utils.backup.importAudio
 import com.philkes.notallyx.utils.backup.importFile
 import com.philkes.notallyx.utils.backup.importImage
@@ -133,7 +134,7 @@ enum class ImportSource(
 ) {
     GOOGLE_KEEP(
         R.string.google_keep,
-        "application/zip",
+        MIME_TYPE_ZIP,
         R.string.google_keep_help,
         "https://support.google.com/keep/answer/10017039",
         R.drawable.icon_google_keep,

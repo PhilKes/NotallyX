@@ -70,13 +70,6 @@ abstract class BasePreference<T>(
         getData().observeForever(observer)
     }
 
-    fun <C> merge(other: BasePreference<C>): MediatorLiveData<Pair<T, C>> {
-        return MediatorLiveData<Pair<T, C>>().apply {
-            addSource(getData()) { value1 -> value = Pair(value1, other.getData().value) }
-            addSource(other.getData()) { value2 -> value = Pair(getData().value, value2) }
-        }
-    }
-
     fun removeObserver(observer: Observer<T>) {
         getData().removeObserver(observer)
     }

@@ -40,7 +40,6 @@
     <string name="delete_selected_notes">Xóa những ghi chú đã chọn?</string>
     <string name="deleted">Thùng rác</string>
     <string name="deleting_images">Đang xóa ảnh</string>
-    <string name="disable_auto_backup">Tắt sao lưu tự động</string>
     <string name="drag_handle">Kéo thả</string>
     <string name="edit">Sửa</string>
     <string name="edit_label">Đổi nhãn</string>
@@ -79,7 +78,6 @@
     <string name="none">Không</string>
     <string name="note">Ghi chú</string>
     <string name="notes">Ghi chú</string>
-    <string name="notes_will_be">Ghi chú sẽ được lưu vào bộ nhớ trong của điện thoại.\n\nTính năng sẽ không hoạt động nếu bạn bật tiết kiệm pin</string>
     <string name="open_link">Mở liên kết</string>
     <string name="others">Còn lại</string>
     <string name="pin">Ghim</string>

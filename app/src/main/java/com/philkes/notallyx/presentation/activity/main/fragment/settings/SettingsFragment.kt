@@ -16,6 +16,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -26,6 +27,7 @@ import com.philkes.notallyx.data.imports.FOLDER_OR_FILE_MIMETYPE
 import com.philkes.notallyx.data.imports.ImportSource
 import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
 import com.philkes.notallyx.databinding.DialogTextInputBinding
+import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.setupImportProgressDialog
@@ -34,14 +36,16 @@ import com.philkes.notallyx.presentation.showDialog
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
-import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
-import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup.Companion.BACKUP_PERIOD_DAYS_MIN
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
+import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackup
+import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackup.Companion.BACKUP_PERIOD_DAYS_MIN
 import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackupsPreference
+import com.philkes.notallyx.utils.MIME_TYPE_JSON
+import com.philkes.notallyx.utils.MIME_TYPE_ZIP
 import com.philkes.notallyx.utils.backup.exportPreferences
 import com.philkes.notallyx.utils.catchNoBrowserInstalled
 import com.philkes.notallyx.utils.getLastExceptionLog
@@ -52,6 +56,7 @@ import com.philkes.notallyx.utils.security.disableBiometricLock
 import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 import com.philkes.notallyx.utils.wrapWithChooser
+import java.util.Date
 
 class SettingsFragment : Fragment() {
 
@@ -78,11 +83,10 @@ class SettingsFragment : Fragment() {
             setupAppearance(binding)
             setupContentDensity(binding)
             setupBackup(binding)
-            setupPeriodicBackups(binding)
-            setupDataInPublicFolder(binding)
+            setupAutoBackups(binding)
             setupSecurity(binding)
+            setupSettings(binding)
         }
-        setupSettings(binding)
         setupAbout(binding)
         return binding.root
     }
@@ -180,7 +184,7 @@ class SettingsFragment : Fragment() {
                 model.importXmlBackup(uri)
             }
 
-            "application/zip" -> {
+            MIME_TYPE_ZIP -> {
                 val layout = DialogTextInputBinding.inflate(layoutInflater, null, false)
                 val password = model.preferences.backupPassword.value
                 layout.InputText.apply {
@@ -287,26 +291,13 @@ class SettingsFragment : Fragment() {
     }
 
     private fun NotallyXPreferences.setupBackup(binding: FragmentSettingsBinding) {
-        backupsFolder.observe(viewLifecycleOwner) { value ->
-            binding.BackupsFolder.setupBackupsFolder(
-                value,
-                requireContext(),
-                ::displayChooseBackupFolderDialog,
-            ) {
-                model.disableBackups()
-            }
-        }
-
         binding.apply {
             ImportBackup.setOnClickListener {
                 val intent =
                     Intent(Intent.ACTION_OPEN_DOCUMENT)
                         .apply {
                             type = "*/*"
-                            putExtra(
-                                Intent.EXTRA_MIME_TYPES,
-                                arrayOf("application/zip", "text/xml"),
-                            )
+                            putExtra(Intent.EXTRA_MIME_TYPES, arrayOf(MIME_TYPE_ZIP, "text/xml"))
                             addCategory(Intent.CATEGORY_OPENABLE)
                         }
                         .wrapWithChooser(requireContext())
@@ -317,7 +308,7 @@ class SettingsFragment : Fragment() {
                 val intent =
                     Intent(Intent.ACTION_CREATE_DOCUMENT)
                         .apply {
-                            type = "application/zip"
+                            type = MIME_TYPE_ZIP
                             addCategory(Intent.CATEGORY_OPENABLE)
                             putExtra(Intent.EXTRA_TITLE, "NotallyX Backup")
                         }
@@ -332,34 +323,38 @@ class SettingsFragment : Fragment() {
         )
     }
 
-    private fun NotallyXPreferences.setupPeriodicBackups(binding: FragmentSettingsBinding) {
+    private fun NotallyXPreferences.setupAutoBackups(binding: FragmentSettingsBinding) {
+        backupsFolder.observe(viewLifecycleOwner) { value ->
+            binding.BackupsFolder.setupBackupsFolder(
+                value,
+                requireContext(),
+                ::displayChooseBackupFolderDialog,
+            ) {
+                model.disableBackups()
+            }
+        }
+        backupOnSave.merge(backupsFolder).observe(viewLifecycleOwner) { (onSave, backupFolder) ->
+            binding.BackupOnSave.setup(
+                backupOnSave,
+                onSave,
+                requireContext(),
+                layoutInflater,
+                messageResId = R.string.auto_backup_on_save,
+                enabled = backupFolder != EMPTY_PATH,
+                disabledTextResId = R.string.auto_backups_folder_set,
+            ) { enabled ->
+                model.savePreference(backupOnSave, enabled)
+            }
+        }
         periodicBackups.merge(backupsFolder).observe(viewLifecycleOwner) {
             (periodicBackup, backupFolder) ->
-            setupPeriodicBackups(
+            setupPeriodicBackup(
                 binding,
                 periodicBackup,
                 backupFolder,
                 periodicBackups,
                 periodicBackupLastExecution,
             )
-        }
-    }
-
-    private fun NotallyXPreferences.setupDataInPublicFolder(binding: FragmentSettingsBinding) {
-        dataInPublicFolder.observe(viewLifecycleOwner) { value ->
-            binding.ExternalDataFolder.setup(
-                dataInPublicFolder,
-                value,
-                requireContext(),
-                layoutInflater,
-                R.string.data_in_public_message,
-            ) { enabled ->
-                if (enabled) {
-                    model.enableDataInPublic()
-                } else {
-                    model.disableDataInPublic()
-                }
-            }
         }
     }
 
@@ -449,18 +444,16 @@ class SettingsFragment : Fragment() {
             .show()
     }
 
-    private fun setupPeriodicBackups(
+    private fun setupPeriodicBackup(
         binding: FragmentSettingsBinding,
-        value: AutoBackup,
+        value: PeriodicBackup,
         backupFolder: String,
         preference: PeriodicBackupsPreference,
         lastExecutionPreference: LongPreference,
     ) {
         val periodicBackupsEnabled = value.periodInDays > 0 && backupFolder != EMPTY_PATH
-        binding.PeriodicBackups.setupPeriodicBackups(
+        binding.PeriodicBackups.setupPeriodicBackup(
             periodicBackupsEnabled,
-            lastExecutionPreference,
-            viewLifecycleOwner,
             requireContext(),
             layoutInflater,
             enabled = backupFolder != EMPTY_PATH,
@@ -474,11 +467,20 @@ class SettingsFragment : Fragment() {
                 model.savePreference(preference, preference.value.copy(periodInDays = 0))
             }
         }
+        lastExecutionPreference.observe(viewLifecycleOwner) { time ->
+            binding.PeriodicBackupLastExecution.apply {
+                if (time != -1L) {
+                    isVisible = true
+                    text =
+                        "${requireContext().getString(R.string.auto_backup_last)}: ${Date(time).toText()}"
+                } else isVisible = false
+            }
+        }
         binding.PeriodicBackupsPeriodInDays.setup(
             value.periodInDays,
             R.string.backup_period_days,
-            AutoBackup.BACKUP_PERIOD_DAYS_MIN,
-            AutoBackup.BACKUP_PERIOD_DAYS_MAX,
+            PeriodicBackup.BACKUP_PERIOD_DAYS_MIN,
+            PeriodicBackup.BACKUP_PERIOD_DAYS_MAX,
             requireContext(),
             enabled = periodicBackupsEnabled,
         ) { newValue ->
@@ -487,8 +489,8 @@ class SettingsFragment : Fragment() {
         binding.PeriodicBackupsMax.setup(
             value.maxBackups,
             R.string.max_backups,
-            AutoBackup.BACKUP_MAX_MIN,
-            AutoBackup.BACKUP_MAX_MAX,
+            PeriodicBackup.BACKUP_MAX_MIN,
+            PeriodicBackup.BACKUP_MAX_MAX,
             requireContext(),
             enabled = value.periodInDays > 0,
         ) { newValue: Int ->
@@ -521,14 +523,14 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun setupSettings(binding: FragmentSettingsBinding) {
+    private fun NotallyXPreferences.setupSettings(binding: FragmentSettingsBinding) {
         binding.apply {
             ImportSettings.setOnClickListener {
                 showDialog(R.string.import_settings_message, R.string.import_action) { _, _ ->
                     val intent =
                         Intent(Intent.ACTION_OPEN_DOCUMENT)
                             .apply {
-                                type = "application/json"
+                                type = MIME_TYPE_JSON
                                 addCategory(Intent.CATEGORY_OPENABLE)
                                 putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
                             }
@@ -541,7 +543,7 @@ class SettingsFragment : Fragment() {
                     val intent =
                         Intent(Intent.ACTION_CREATE_DOCUMENT)
                             .apply {
-                                type = "application/json"
+                                type = MIME_TYPE_JSON
                                 addCategory(Intent.CATEGORY_OPENABLE)
                                 putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
                             }
@@ -555,6 +557,21 @@ class SettingsFragment : Fragment() {
                     showToast(R.string.reset_settings_success)
                 }
             }
+            dataInPublicFolder.observe(viewLifecycleOwner) { value ->
+                binding.DataInPublicFolder.setup(
+                    dataInPublicFolder,
+                    value,
+                    requireContext(),
+                    layoutInflater,
+                    R.string.data_in_public_message,
+                ) { enabled ->
+                    if (enabled) {
+                        model.enableDataInPublic()
+                    } else {
+                        model.disableDataInPublic()
+                    }
+                }
+            }
             ClearData.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(R.string.clear_data_message)
@@ -563,7 +580,7 @@ class SettingsFragment : Fragment() {
                     .show()
             }
         }
-        model.deletionProgress.setupProgressDialog(this, R.string.deleting_files)
+        model.deletionProgress.setupProgressDialog(this@SettingsFragment, R.string.deleting_files)
     }
 
     private fun setupAbout(binding: FragmentSettingsBinding) {
@@ -674,7 +691,7 @@ class SettingsFragment : Fragment() {
     }
 
     private fun displayChooseBackupFolderDialog() {
-        showDialog(R.string.notes_will_be, R.string.choose_folder) { _, _ ->
+        showDialog(R.string.auto_backups_folder_hint, R.string.choose_folder) { _, _ ->
             val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).wrapWithChooser(requireContext())
             chooseBackupFolderActivityResultLauncher.launch(intent)
         }

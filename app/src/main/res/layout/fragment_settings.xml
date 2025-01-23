@@ -81,10 +81,6 @@
             android:layout_height="wrap_content"
             android:text="@string/backup" />
 
-        <include
-            android:id="@+id/BackupsFolder"
-            layout="@layout/preference" />
-
         <TextView
             android:id="@+id/ImportBackup"
             style="@style/Preference"
@@ -110,11 +106,27 @@
           style="@style/PreferenceHeader"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/backup_periodic" />
+          android:text="@string/auto_backup" />
+
+        <include
+          android:id="@+id/BackupsFolder"
+          layout="@layout/preference" />
+
+        <include
+          android:id="@+id/BackupOnSave"
+          layout="@layout/preference" />
 
         <include
           android:id="@+id/PeriodicBackups"
           layout="@layout/preference" />
+
+        <TextView
+          android:id="@+id/PeriodicBackupLastExecution"
+          android:textAppearance="?attr/textAppearanceBodySmall"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content" />
 
         <include
           android:id="@+id/PeriodicBackupsPeriodInDays"
@@ -128,15 +140,6 @@
           android:layout_width="match_parent"
           android:layout_height="1dp"
           android:background="?android:attr/listDivider" />
-
-        <include
-          android:id="@+id/ExternalDataFolder"
-          layout="@layout/preference" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="?android:attr/listDivider" />
 
         <TextView
             style="@style/PreferenceHeader"
@@ -183,6 +186,10 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:text="@string/reset_settings" />
+
+        <include
+          android:id="@+id/DataInPublicFolder"
+          layout="@layout/preference" />
 
         <TextView
           android:id="@+id/ClearData"

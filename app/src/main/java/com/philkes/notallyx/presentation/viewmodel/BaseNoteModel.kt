@@ -43,6 +43,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
+import com.philkes.notallyx.utils.MIME_TYPE_JSON
 import com.philkes.notallyx.utils.backup.clearAllFolders
 import com.philkes.notallyx.utils.backup.clearAllLabels
 import com.philkes.notallyx.utils.backup.exportAsZip
@@ -550,6 +551,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 enum class ExportMimeType(val mimeType: String, val fileExtension: String) {
     TXT("text/plain", "txt"),
     PDF("application/pdf", "pdf"),
-    JSON("application/json", "json"),
+    JSON(MIME_TYPE_JSON, "json"),
     HTML("text/html", "html"),
 }

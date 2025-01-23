@@ -196,3 +196,6 @@ fun File.listFilesRecursive(filter: FileFilter? = null): List<File> {
     files.addAll(walkTopDown().filter { filter?.accept(it) ?: true })
     return files
 }
+
+const val MIME_TYPE_ZIP = "application/zip"
+const val MIME_TYPE_JSON = "application/json"

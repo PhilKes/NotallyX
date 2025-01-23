@@ -27,7 +27,6 @@
     <string name="delete_label">¿Eliminar etiqueta?</string>
     <string name="delete_note_forever">¿Eliminar nota para siempre?</string>
     <string name="deleted">Eliminados</string>
-    <string name="disable_auto_backup">Desactivar copia de seguridad automática</string>
     <string name="drag_handle">Arrastra la asa</string>
     <string name="edit">Editar</string>
     <string name="edit_label">Editar etiqueta</string>
@@ -59,7 +58,6 @@
     <string name="none">Ninguno</string>
     <string name="note">Nota</string>
     <string name="notes">Notas</string>
-    <string name="notes_will_be">Se realizará una copia de seguridad de las notas en el almacenamiento interno de su teléfono todos los días.\n\nEs posible que esto no funcione si tiene habilitado el modo de ahorro de energía</string>
     <string name="others">Otros</string>
     <string name="pin">Fijar</string>
     <string name="pinned">Fijados</string>

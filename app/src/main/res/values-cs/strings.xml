@@ -207,7 +207,6 @@
     <string name="note">Poznámka</string>
     <string name="notes">Poznámky</string>
     <string name="notes_sorted_by">Poznámky řazeny dle</string>
-    <string name="notes_will_be">Poznámky budou každý den zálohovány do interního uložiště telefonu.\n\nPokud máte zapnutý úsporný režim, nemusí to fungovat.</string>
     <string name="open_link">Otevřít odkaz</string>
     <string name="open_note">Otevřít poznámku</string>
     <string name="others">Jiné</string>

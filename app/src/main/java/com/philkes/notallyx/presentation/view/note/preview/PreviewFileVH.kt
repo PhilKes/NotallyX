@@ -5,6 +5,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.databinding.RecyclerPreviewFileBinding
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
+import com.philkes.notallyx.utils.MIME_TYPE_ZIP
 
 class PreviewFileVH(
     private val binding: RecyclerPreviewFileBinding,
@@ -32,7 +33,7 @@ class PreviewFileVH(
             mimeType.startsWith("image/") -> R.drawable.add_images
             mimeType.startsWith("video/") -> R.drawable.video
             mimeType.startsWith("audio/") -> R.drawable.record_audio
-            mimeType.startsWith("application/zip") -> R.drawable.archive
+            mimeType.startsWith(MIME_TYPE_ZIP) -> R.drawable.archive
             else -> R.drawable.text_file
         }
     }

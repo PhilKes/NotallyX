@@ -4,16 +4,16 @@ import android.content.SharedPreferences
 import android.content.SharedPreferences.Editor
 
 class PeriodicBackupsPreference(sharedPreferences: SharedPreferences) :
-    BasePreference<AutoBackup>(sharedPreferences, AutoBackup()) {
+    BasePreference<PeriodicBackup>(sharedPreferences, PeriodicBackup()) {
 
-    override fun getValue(sharedPreferences: SharedPreferences): AutoBackup {
+    override fun getValue(sharedPreferences: SharedPreferences): PeriodicBackup {
         val periodInDays =
             sharedPreferences.getInt(BACKUP_PERIOD_DAYS_KEY, defaultValue.periodInDays)
         val maxBackups = sharedPreferences.getInt(BACKUP_MAX_KEY, defaultValue.periodInDays)
-        return AutoBackup(periodInDays, maxBackups)
+        return PeriodicBackup(periodInDays, maxBackups)
     }
 
-    override fun Editor.put(value: AutoBackup) {
+    override fun Editor.put(value: PeriodicBackup) {
         putInt(BACKUP_PERIOD_DAYS_KEY, value.periodInDays)
         putInt(BACKUP_MAX_KEY, value.maxBackups)
     }
@@ -24,7 +24,7 @@ class PeriodicBackupsPreference(sharedPreferences: SharedPreferences) :
     }
 }
 
-data class AutoBackup(val periodInDays: Int = BACKUP_PERIOD_DAYS_MIN, val maxBackups: Int = 3) {
+data class PeriodicBackup(val periodInDays: Int = BACKUP_PERIOD_DAYS_MIN, val maxBackups: Int = 3) {
     companion object {
 
         const val BACKUP_PERIOD_DAYS_MIN = 1

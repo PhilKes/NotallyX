@@ -65,7 +65,8 @@
     <string name="creation_date">Data di creazione</string>
     <string name="daily">Giornaliera</string>
     <string name="dark">Scuro</string>
-    <string name="data_in_public">Salva i dati sulla memoria esterna</string>
+    <string name="data_in_public">Salvare i dati nella cartella pubblica</string>
+    <string name="data_in_public_message">Attivandolo, il database interno dell’app verrà spostato nella cartella pubblica dell’app (Android/media/com.philkes.notallyx).\nAbbinandolo con un’app di sincronizzazione file potrai così sincronizzare i dati di NotallyX tra dispositivi diversi.</string>
     <string name="date">Data</string>
     <string name="date_format">Formato data</string>
     <string name="delete">Elimina</string>
@@ -87,7 +88,6 @@
     <string name="deleting_files">Eliminazione file in corso</string>
     <string name="deleting_images">Eliminazione immagini in corso</string>
     <string name="descending">Decrescente</string>
-    <string name="disable_auto_backup">Disattiva il backup automatico</string>
     <string name="disable_data_in_public">Riporta i dati nella memoria interna</string>
     <string name="disable_lock_description">Questo inoltre decritterà il database</string>
     <string name="disable_lock_title">Disattiva blocco con Biometria/PIN</string>
@@ -111,7 +111,6 @@
     <string name="export">Esporta</string>
     <string name="export_backup">Esporta backup</string>
     <string name="exporting_backup">Esportazione backup in corso</string>
-    <string name="data_in_public_message">Attivandolo, il database interno dell’app verrà spostato nella memoria esterna dell’app (Android/media/com.philkes.notallyx).\nAbbinandolo con un’app di sincronizzazione file potrai così sincronizzare i dati di NotallyX tra dispositivi diversi.</string>
     <string name="extracted_files">File estratti</string>
     <string name="filter">Filtra</string>
     <string name="follow_system">Predefinito di Sistema</string>
@@ -175,7 +174,6 @@
     <string name="note">Nota</string>
     <string name="notes">Note</string>
     <string name="notes_sorted_by">Ordina note per</string>
-    <string name="notes_will_be">Il backup delle note verrà salvato nella memoria interna del tuo telefono ogni giorno.\n\nCiò potrebbe non funzionare se hai la modalità di risparmio energetico attivata</string>
     <string name="open_link">Apri link</string>
     <string name="open_note">Apri nota</string>
     <string name="others">Altro</string>

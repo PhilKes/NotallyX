@@ -92,20 +92,23 @@ class NotallyXApplication : Application() {
 
         preferences.backupPassword.observeForeverWithPrevious {
             (previousBackupPassword, backupPassword) ->
-            val backupPath = preferences.backupsFolder.value
-            if (backupPath != EMPTY_PATH) {
-                if (
-                    !modifiedNoteBackupExists(backupPath) ||
-                        (previousBackupPassword != null && previousBackupPassword != backupPassword)
-                ) {
-                    deleteModifiedNoteBackup(backupPath)
-                    MainScope().launch {
-                        withContext(Dispatchers.IO) {
-                            autoBackupOnSave(
-                                backupPath,
-                                savedNote = null,
-                                password = backupPassword,
-                            )
+            if (preferences.backupOnSave.value) {
+                val backupPath = preferences.backupsFolder.value
+                if (backupPath != EMPTY_PATH) {
+                    if (
+                        !modifiedNoteBackupExists(backupPath) ||
+                            (previousBackupPassword != null &&
+                                previousBackupPassword != backupPassword)
+                    ) {
+                        deleteModifiedNoteBackup(backupPath)
+                        MainScope().launch {
+                            withContext(Dispatchers.IO) {
+                                autoBackupOnSave(
+                                    backupPath,
+                                    savedNote = null,
+                                    password = backupPassword,
+                                )
+                            }
                         }
                     }
                 }

@@ -28,6 +28,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Reminder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.attachmentsDifferFrom
 import com.philkes.notallyx.data.model.copy
 import com.philkes.notallyx.data.model.deepCopy
 import com.philkes.notallyx.presentation.activity.note.reminders.RemindersActivity.Companion.NEW_REMINDER_ID
@@ -36,12 +37,11 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
-import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.backup.autoBackupOnSave
+import com.philkes.notallyx.utils.backup.checkAutoSave
 import com.philkes.notallyx.utils.backup.importAudio
 import com.philkes.notallyx.utils.backup.importFile
 import com.philkes.notallyx.utils.cancelNoteReminders
@@ -268,6 +268,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         if (attachments.isNotEmpty()) {
             withContext(Dispatchers.IO) { app.deleteAttachments(attachments) }
         }
+        app.checkAutoSave(preferences, forceFullBackup = true)
     }
 
     fun setItems(items: List<ListItem>) {
@@ -278,12 +279,13 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     suspend fun saveNote(): Long {
         return withContext(Dispatchers.IO) {
             val note = getBaseNote()
-            val x = baseNoteDao.insert(note)
-            val backupPath = preferences.backupsFolder.value
-            if (backupPath != EMPTY_PATH) {
-                app.autoBackupOnSave(backupPath, preferences.backupPassword.value, note)
-            }
-            return@withContext x
+            val id = baseNoteDao.insert(note)
+            app.checkAutoSave(
+                preferences,
+                note = note,
+                forceFullBackup = originalNote.attachmentsDifferFrom(note),
+            )
+            return@withContext id
         }
     }
 
