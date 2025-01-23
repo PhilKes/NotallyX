@@ -36,31 +36,36 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
+import com.philkes.notallyx.utils.backup.autoBackupOnSave
 import com.philkes.notallyx.utils.backup.importAudio
 import com.philkes.notallyx.utils.backup.importFile
+import com.philkes.notallyx.utils.cancelNoteReminders
+import com.philkes.notallyx.utils.cancelReminder
 import com.philkes.notallyx.utils.deleteAttachments
 import com.philkes.notallyx.utils.getExternalAudioDirectory
 import com.philkes.notallyx.utils.getExternalFilesDirectory
 import com.philkes.notallyx.utils.getExternalImagesDirectory
 import com.philkes.notallyx.utils.getTempAudioFile
-import com.philkes.notallyx.utils.cancelNoteReminders
-import com.philkes.notallyx.utils.cancelReminder
 import com.philkes.notallyx.utils.scheduleReminder
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+typealias BackupFile = Pair<String?, File>
+
 class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     private val database = NotallyDatabase.getDatabase(app)
     private lateinit var baseNoteDao: BaseNoteDao
 
-    val textSize = NotallyXPreferences.getInstance(app).textSize.value
+    val preferences = NotallyXPreferences.getInstance(app)
+    val textSize = preferences.textSize.value
 
     var isNewNote = true
 
@@ -271,7 +276,15 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     suspend fun saveNote(): Long {
-        return withContext(Dispatchers.IO) { baseNoteDao.insert(getBaseNote()) }
+        return withContext(Dispatchers.IO) {
+            val note = getBaseNote()
+            val x = baseNoteDao.insert(note)
+            val backupPath = preferences.backupsFolder.value
+            if (backupPath != EMPTY_PATH) {
+                app.autoBackupOnSave(backupPath, preferences.backupPassword.value, note)
+            }
+            return@withContext x
+        }
     }
 
     fun isEmpty(): Boolean {

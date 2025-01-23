@@ -47,12 +47,12 @@ abstract class NotallyDatabase : RoomDatabase() {
 
     companion object {
 
-        const val DatabaseName = "NotallyDatabase"
+        const val DATABASE_NAME = "NotallyDatabase"
 
         @Volatile private var instance: NotNullLiveData<NotallyDatabase>? = null
 
         fun getCurrentDatabaseFile(context: ContextWrapper): File {
-            return if (NotallyXPreferences.getInstance(context).dataOnExternalStorage.value) {
+            return if (NotallyXPreferences.getInstance(context).dataInPublicFolder.value) {
                 getExternalDatabaseFile(context)
             } else {
                 getInternalDatabaseFile(context)
@@ -60,26 +60,26 @@ abstract class NotallyDatabase : RoomDatabase() {
         }
 
         fun getExternalDatabaseFile(context: ContextWrapper): File {
-            return File(context.getExternalMediaDirectory(), DatabaseName)
+            return File(context.getExternalMediaDirectory(), DATABASE_NAME)
         }
 
         fun getExternalDatabaseFiles(context: ContextWrapper): List<File> {
             return listOf(
-                File(context.getExternalMediaDirectory(), DatabaseName),
-                File(context.getExternalMediaDirectory(), "$DatabaseName-shm"),
-                File(context.getExternalMediaDirectory(), "$DatabaseName-wal"),
+                File(context.getExternalMediaDirectory(), DATABASE_NAME),
+                File(context.getExternalMediaDirectory(), "$DATABASE_NAME-shm"),
+                File(context.getExternalMediaDirectory(), "$DATABASE_NAME-wal"),
             )
         }
 
         fun getInternalDatabaseFile(context: Context): File {
-            return context.getDatabasePath(DatabaseName)
+            return context.getDatabasePath(DATABASE_NAME)
         }
 
         fun getCurrentDatabaseName(context: ContextWrapper): String {
-            return if (NotallyXPreferences.getInstance(context).dataOnExternalStorage.value) {
+            return if (NotallyXPreferences.getInstance(context).dataInPublicFolder.value) {
                 getExternalDatabaseFile(context).absolutePath
             } else {
-                DatabaseName
+                DATABASE_NAME
             }
         }
 
@@ -107,7 +107,14 @@ abstract class NotallyDatabase : RoomDatabase() {
                         NotallyDatabase::class.java,
                         getCurrentDatabaseName(context),
                     )
-                    .addMigrations(Migration2, Migration3, Migration4, Migration5, Migration6, Migration7)
+                    .addMigrations(
+                        Migration2,
+                        Migration3,
+                        Migration4,
+                        Migration5,
+                        Migration6,
+                        Migration7,
+                    )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 if (preferences.biometricLock.value == BiometricLock.ENABLED) {
                     if (
@@ -145,15 +152,15 @@ abstract class NotallyDatabase : RoomDatabase() {
 
                     instance.externalDataFolderObserver = Observer {
                         NotallyDatabase.instance?.value?.externalDataFolderObserver?.let {
-                            preferences.dataOnExternalStorage.removeObserver(it)
+                            preferences.dataInPublicFolder.removeObserver(it)
                         }
                         val newInstance = createInstance(context, preferences, true)
                         NotallyDatabase.instance?.postValue(newInstance)
-                        preferences.dataOnExternalStorage.observeForeverSkipFirst(
+                        preferences.dataInPublicFolder.observeForeverSkipFirst(
                             newInstance.externalDataFolderObserver!!
                         )
                     }
-                    preferences.dataOnExternalStorage.observeForeverSkipFirst(
+                    preferences.dataInPublicFolder.observeForeverSkipFirst(
                         instance.externalDataFolderObserver!!
                     )
                 }

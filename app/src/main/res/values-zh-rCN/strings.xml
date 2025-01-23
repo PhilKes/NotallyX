@@ -32,7 +32,7 @@
     <string name="create_github_issue">在Github发布议题</string>
     <string name="creation_date">创建时间</string>
     <string name="dark">深</string>
-    <string name="data_on_external">用外部存储保存数据</string>
+    <string name="data_in_public">用外部存储保存数据</string>
     <string name="date">日期</string>
     <string name="date_format">日期格式</string>
     <string name="delete">删除</string>
@@ -55,7 +55,7 @@
     <string name="enabled">启用</string>
     <string name="export">导出</string>
     <string name="export_backup">导出备份</string>
-    <string name="external_data_message">启用此项，应用程序的内部数据库将被移动到应用程序的外部存储（Android / Media / Com.Philkes.notallyX）中。与文件同步应用组合，这可用于同步多个设备之间的数据。</string>
+    <string name="data_in_public_message">启用此项，应用程序的内部数据库将被移动到应用程序的外部存储（Android / Media / Com.Philkes.notallyX）中。与文件同步应用组合，这可用于同步多个设备之间的数据。</string>
     <string name="filter">过滤</string>
     <string name="follow_system">系统主题</string>
     <string name="grid">网格</string>

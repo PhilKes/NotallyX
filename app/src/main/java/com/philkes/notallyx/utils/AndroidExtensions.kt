@@ -325,6 +325,17 @@ fun DocumentFile.isLargerThanKb(kilobytes: Long): Boolean {
     return (length() / 1024.0) > kilobytes
 }
 
+fun DocumentFile.listZipFiles(prefix: String): List<DocumentFile> {
+    if (!this.isDirectory) return emptyList()
+    val zipFiles =
+        this.listFiles().filter { file ->
+            file.isFile &&
+                file.name?.endsWith(".zip", ignoreCase = true) == true &&
+                file.name?.startsWith(prefix, ignoreCase = true) == true
+        }
+    return zipFiles.sortedByDescending { it.lastModified() }
+}
+
 val DocumentFile.nameWithoutExtension: String?
     get() = name?.substringBeforeLast(".")
 

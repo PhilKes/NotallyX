@@ -57,7 +57,7 @@
     <string name="creation_date">Erstellt am</string>
     <string name="daily">Täglich</string>
     <string name="dark">Dunkel</string>
-    <string name="data_on_external">Daten in ext. Speicher auslagern</string>
+    <string name="data_in_public">Daten in ext. Speicher auslagern</string>
     <string name="date">Datum</string>
     <string name="date_format">Datumsformat</string>
     <string name="delete">Löschen</string>
@@ -77,7 +77,7 @@
     <string name="descending">Absteigend</string>
     <string name="disable">Deaktivieren</string>
     <string name="disable_auto_backup">Automatisches Backup deaktivieren</string>
-    <string name="disable_external_data">Verschiebe die Daten zurück in den internen Speicher</string>
+    <string name="disable_data_in_public">Verschiebe die Daten zurück in den internen Speicher</string>
     <string name="disable_lock_description">Dies entschlüsselt außerdem die Datenbank</string>
     <string name="disable_lock_title">Deaktivierte Biometrie/PIN Sperre</string>
     <string name="disabled">Deaktiviert</string>
@@ -103,7 +103,7 @@
     <string name="export_settings_message">Alle Einstellungen werden als JSON Datei exportiert, die dann zum Re-Import genutzt werden kann.\n\nBeachte das hier bei verschlüsselte Einstellungen wie das Auto-Backup Passwort oder die biometrische Verschlüssung nicht exportiert wird</string>
     <string name="export_settings_success">Einstellungen erfolgreich exportiert</string>
     <string name="exporting_backup">Backup Exportieren</string>
-    <string name="external_data_message">Wird dies aktiviert, wird die app-interne Datenbank in den app-externen Speicher ausgelagert (Android/media/com.philkes.notallyx). In Kombination mit Datei-Synchronisations Apps kann dies genutzt werden um NotallyX Daten zwischen mehrere Geräte zu synchronisieren.</string>
+    <string name="data_in_public_message">Wird dies aktiviert, wird die app-interne Datenbank in den app-externen Speicher ausgelagert (Android/media/com.philkes.notallyx). In Kombination mit Datei-Synchronisations Apps kann dies genutzt werden um NotallyX Daten zwischen mehrere Geräte zu synchronisieren.</string>
     <string name="extracted_files">Dateien extrahiert</string>
     <string name="filter">Filtern</string>
     <string name="folder">Ordner</string>

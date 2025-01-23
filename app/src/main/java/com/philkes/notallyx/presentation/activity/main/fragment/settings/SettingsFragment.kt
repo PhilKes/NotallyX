@@ -35,11 +35,13 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup
-import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackupPreference
+import com.philkes.notallyx.presentation.viewmodel.preference.AutoBackup.Companion.BACKUP_PERIOD_DAYS_MIN
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
+import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackupsPreference
 import com.philkes.notallyx.utils.backup.exportPreferences
 import com.philkes.notallyx.utils.catchNoBrowserInstalled
 import com.philkes.notallyx.utils.getLastExceptionLog
@@ -75,7 +77,9 @@ class SettingsFragment : Fragment() {
         model.preferences.apply {
             setupAppearance(binding)
             setupContentDensity(binding)
-            setupAutoBackup(binding)
+            setupBackup(binding)
+            setupPeriodicBackups(binding)
+            setupDataInPublicFolder(binding)
             setupSecurity(binding)
         }
         setupSettings(binding)
@@ -113,7 +117,7 @@ class SettingsFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        model.setAutoBackupPath(uri)
+                        model.setupBackupsFolder(uri)
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                             activity?.let {
                                 val permission = Manifest.permission.POST_NOTIFICATIONS
@@ -282,9 +286,15 @@ class SettingsFragment : Fragment() {
         }
     }
 
-    private fun NotallyXPreferences.setupAutoBackup(binding: FragmentSettingsBinding) {
-        autoBackup.observe(viewLifecycleOwner) { value ->
-            setupAutoBackup(binding, value, autoBackup, autoBackupLastExecutionTime)
+    private fun NotallyXPreferences.setupBackup(binding: FragmentSettingsBinding) {
+        backupsFolder.observe(viewLifecycleOwner) { value ->
+            binding.BackupsFolder.setupBackupsFolder(
+                value,
+                requireContext(),
+                ::displayChooseBackupFolderDialog,
+            ) {
+                model.disableBackups()
+            }
         }
 
         binding.apply {
@@ -320,19 +330,34 @@ class SettingsFragment : Fragment() {
             this@SettingsFragment,
             R.string.importing_backup,
         )
+    }
 
-        dataOnExternalStorage.observe(viewLifecycleOwner) { value ->
+    private fun NotallyXPreferences.setupPeriodicBackups(binding: FragmentSettingsBinding) {
+        periodicBackups.merge(backupsFolder).observe(viewLifecycleOwner) {
+            (periodicBackup, backupFolder) ->
+            setupPeriodicBackups(
+                binding,
+                periodicBackup,
+                backupFolder,
+                periodicBackups,
+                periodicBackupLastExecution,
+            )
+        }
+    }
+
+    private fun NotallyXPreferences.setupDataInPublicFolder(binding: FragmentSettingsBinding) {
+        dataInPublicFolder.observe(viewLifecycleOwner) { value ->
             binding.ExternalDataFolder.setup(
-                dataOnExternalStorage,
+                dataInPublicFolder,
                 value,
                 requireContext(),
                 layoutInflater,
-                R.string.external_data_message,
+                R.string.data_in_public_message,
             ) { enabled ->
                 if (enabled) {
-                    model.enableExternalData()
+                    model.enableDataInPublic()
                 } else {
-                    model.disableExternalData()
+                    model.disableDataInPublic()
                 }
             }
         }
@@ -422,6 +447,53 @@ class SettingsFragment : Fragment() {
             }
             .addCancelButton()
             .show()
+    }
+
+    private fun setupPeriodicBackups(
+        binding: FragmentSettingsBinding,
+        value: AutoBackup,
+        backupFolder: String,
+        preference: PeriodicBackupsPreference,
+        lastExecutionPreference: LongPreference,
+    ) {
+        val periodicBackupsEnabled = value.periodInDays > 0 && backupFolder != EMPTY_PATH
+        binding.PeriodicBackups.setupPeriodicBackups(
+            periodicBackupsEnabled,
+            lastExecutionPreference,
+            viewLifecycleOwner,
+            requireContext(),
+            layoutInflater,
+            enabled = backupFolder != EMPTY_PATH,
+        ) { enabled ->
+            if (enabled) {
+                model.savePreference(
+                    preference,
+                    preference.value.copy(periodInDays = BACKUP_PERIOD_DAYS_MIN),
+                )
+            } else {
+                model.savePreference(preference, preference.value.copy(periodInDays = 0))
+            }
+        }
+        binding.PeriodicBackupsPeriodInDays.setup(
+            value.periodInDays,
+            R.string.backup_period_days,
+            AutoBackup.BACKUP_PERIOD_DAYS_MIN,
+            AutoBackup.BACKUP_PERIOD_DAYS_MAX,
+            requireContext(),
+            enabled = periodicBackupsEnabled,
+        ) { newValue ->
+            model.savePreference(preference, preference.value.copy(periodInDays = newValue))
+        }
+        binding.PeriodicBackupsMax.setup(
+            value.maxBackups,
+            R.string.max_backups,
+            AutoBackup.BACKUP_MAX_MIN,
+            AutoBackup.BACKUP_MAX_MAX,
+            requireContext(),
+            enabled = value.periodInDays > 0,
+        ) { newValue: Int ->
+            model.savePreference(preference, preference.value.copy(maxBackups = newValue))
+        }
     }
 
     private fun NotallyXPreferences.setupSecurity(binding: FragmentSettingsBinding) {
@@ -598,41 +670,6 @@ class SettingsFragment : Fragment() {
                 val version = pInfo.versionName
                 VersionText.text = "v$version"
             } catch (_: PackageManager.NameNotFoundException) {}
-        }
-    }
-
-    private fun setupAutoBackup(
-        binding: FragmentSettingsBinding,
-        value: AutoBackup,
-        preference: AutoBackupPreference,
-        lastExecutionPreference: LongPreference,
-    ) {
-        binding.AutoBackupMax.setup(
-            value.maxBackups,
-            R.string.max_backups,
-            AutoBackup.BACKUP_MAX_MIN,
-            AutoBackup.BACKUP_MAX_MAX,
-            requireContext(),
-        ) { newValue: Int ->
-            model.savePreference(preference, preference.value.copy(maxBackups = newValue))
-        }
-        binding.AutoBackup.setupAutoBackup(
-            value.path,
-            requireContext(),
-            viewLifecycleOwner,
-            lastExecutionPreference,
-            ::displayChooseBackupFolderDialog,
-        ) {
-            model.disableAutoBackup()
-        }
-        binding.AutoBackupPeriodDays.setup(
-            value.periodInDays,
-            R.string.backup_period_days,
-            AutoBackup.BACKUP_PERIOD_DAYS_MIN,
-            AutoBackup.BACKUP_PERIOD_DAYS_MAX,
-            requireContext(),
-        ) { newValue ->
-            model.savePreference(preference, preference.value.copy(periodInDays = newValue))
         }
     }
 

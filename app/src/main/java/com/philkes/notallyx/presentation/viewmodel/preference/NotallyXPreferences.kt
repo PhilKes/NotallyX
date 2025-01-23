@@ -92,9 +92,16 @@ class NotallyXPreferences private constructor(private val context: Context) {
             R.string.max_labels_to_display,
         )
 
-    val autoBackup = AutoBackupPreference(preferences)
-    val autoBackupLastExecutionTime =
-        LongPreference("autoBackupLastExecutionTime", preferences, -1L)
+    val backupsFolder =
+        StringPreference(
+            "autoBackup",
+            encryptedPreferences,
+            EMPTY_PATH,
+            R.string.auto_backups_folder,
+        )
+    val periodicBackups = PeriodicBackupsPreference(preferences)
+    val periodicBackupLastExecution =
+        LongPreference("periodicBackupLastExecution", preferences, -1L)
 
     val backupPassword by lazy {
         StringPreference(
@@ -120,8 +127,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
         ByteArrayPreference("fallback_database_encryption_key", encryptedPreferences, ByteArray(0))
     }
 
-    val dataOnExternalStorage =
-        BooleanPreference("dataOnExternalStorage", preferences, false, R.string.data_on_external)
+    val dataInPublicFolder =
+        BooleanPreference("dataOnExternalStorage", preferences, false, R.string.data_in_public)
 
     fun getWidgetData(id: Int) = preferences.getLong("widget:$id", 0)
 
@@ -206,7 +213,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 labelsHiddenInNavigation,
                 labelsHiddenInOverview,
                 maxLabels,
-                autoBackup,
+                periodicBackups,
                 backupPassword,
                 biometricLock,
             )

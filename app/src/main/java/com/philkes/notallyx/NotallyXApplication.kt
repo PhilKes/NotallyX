@@ -16,14 +16,21 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.backup.AUTO_BACKUP_WORK_NAME
+import com.philkes.notallyx.utils.backup.autoBackupOnSave
 import com.philkes.notallyx.utils.backup.cancelAutoBackup
 import com.philkes.notallyx.utils.backup.containsNonCancelled
+import com.philkes.notallyx.utils.backup.deleteModifiedNoteBackup
 import com.philkes.notallyx.utils.backup.isEqualTo
+import com.philkes.notallyx.utils.backup.modifiedNoteBackupExists
 import com.philkes.notallyx.utils.backup.scheduleAutoBackup
 import com.philkes.notallyx.utils.backup.updateAutoBackup
 import com.philkes.notallyx.utils.observeOnce
 import com.philkes.notallyx.utils.security.UnlockReceiver
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class NotallyXApplication : Application() {
 
@@ -51,29 +58,16 @@ class NotallyXApplication : Application() {
             }
         }
 
-        preferences.autoBackup.observeForeverWithPrevious { (autoBackBefore, autoBackup) ->
-            val workManager = WorkManager.getInstance(this)
-            workManager.getWorkInfosForUniqueWorkLiveData(AUTO_BACKUP_WORK_NAME).observeOnce {
-                workInfos ->
-                if (autoBackup.path == EMPTY_PATH) {
-                    if (workInfos?.containsNonCancelled() == true) {
-                        workManager.cancelAutoBackup()
-                    }
-                } else if (
-                    workInfos.isNullOrEmpty() ||
-                        workInfos.all { it.state == WorkInfo.State.CANCELLED } ||
-                        (autoBackBefore != null && autoBackBefore.path != autoBackup.path)
-                ) {
-                    workManager.scheduleAutoBackup(this, autoBackup.periodInDays.toLong())
-                } else if (
-                    workInfos
-                        .first()
-                        .periodicityInfo
-                        ?.isEqualTo(autoBackup.periodInDays.toLong(), TimeUnit.DAYS) == false
-                ) {
-                    workManager.updateAutoBackup(workInfos, autoBackup.periodInDays)
-                }
-            }
+        preferences.backupsFolder.observeForeverWithPrevious { (backupFolderBefore, backupFolder) ->
+            checkUpdatePeriodicBackup(
+                backupFolderBefore,
+                backupFolder,
+                preferences.periodicBackups.value.periodInDays.toLong(),
+            )
+        }
+        preferences.periodicBackups.observeForever { value ->
+            val backupFolder = preferences.backupsFolder.value
+            checkUpdatePeriodicBackup(backupFolder, backupFolder, value.periodInDays.toLong())
         }
 
         val filter = IntentFilter().apply { addAction(Intent.ACTION_SCREEN_OFF) }
@@ -95,5 +89,53 @@ class NotallyXApplication : Application() {
         preferences.biometricLock.observeForever(biometricLockObserver)
 
         locked.observeForever { isLocked -> WidgetProvider.updateWidgets(this, locked = isLocked) }
+
+        preferences.backupPassword.observeForeverWithPrevious {
+            (previousBackupPassword, backupPassword) ->
+            val backupPath = preferences.backupsFolder.value
+            if (backupPath != EMPTY_PATH) {
+                if (
+                    !modifiedNoteBackupExists(backupPath) ||
+                        (previousBackupPassword != null && previousBackupPassword != backupPassword)
+                ) {
+                    deleteModifiedNoteBackup(backupPath)
+                    MainScope().launch {
+                        withContext(Dispatchers.IO) {
+                            autoBackupOnSave(
+                                backupPath,
+                                savedNote = null,
+                                password = backupPassword,
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun checkUpdatePeriodicBackup(
+        backupFolderBefore: String?,
+        backupFolder: String,
+        periodInDays: Long,
+    ) {
+        val workManager = WorkManager.getInstance(this)
+        workManager.getWorkInfosForUniqueWorkLiveData(AUTO_BACKUP_WORK_NAME).observeOnce { workInfos
+            ->
+            if (backupFolder == EMPTY_PATH || periodInDays < 1) {
+                if (workInfos?.containsNonCancelled() == true) {
+                    workManager.cancelAutoBackup()
+                }
+            } else if (
+                workInfos.isNullOrEmpty() ||
+                    workInfos.all { it.state == WorkInfo.State.CANCELLED } ||
+                    (backupFolderBefore != null && backupFolderBefore != backupFolder)
+            ) {
+                workManager.scheduleAutoBackup(this, periodInDays)
+            } else if (
+                workInfos.first().periodicityInfo?.isEqualTo(periodInDays, TimeUnit.DAYS) == false
+            ) {
+                workManager.updateAutoBackup(workInfos, periodInDays)
+            }
+        }
     }
 }

@@ -82,16 +82,8 @@
             android:text="@string/backup" />
 
         <include
-            android:id="@+id/AutoBackup"
+            android:id="@+id/BackupsFolder"
             layout="@layout/preference" />
-
-        <include
-            android:id="@+id/AutoBackupPeriodDays"
-            layout="@layout/preference_seekbar" />
-
-        <include
-            android:id="@+id/AutoBackupMax"
-            layout="@layout/preference_seekbar" />
 
         <TextView
             android:id="@+id/ImportBackup"
@@ -114,6 +106,28 @@
             android:layout_height="wrap_content"
             android:text="@string/export_backup" />
 
+        <TextView
+          style="@style/PreferenceHeader"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/backup_periodic" />
+
+        <include
+          android:id="@+id/PeriodicBackups"
+          layout="@layout/preference" />
+
+        <include
+          android:id="@+id/PeriodicBackupsPeriodInDays"
+          layout="@layout/preference_seekbar" />
+
+        <include
+          android:id="@+id/PeriodicBackupsMax"
+          layout="@layout/preference_seekbar" />
+
+        <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:background="?android:attr/listDivider" />
 
         <include
           android:id="@+id/ExternalDataFolder"

@@ -19,6 +19,8 @@
     <string name="attach_file">Attach file</string>
     <string name="audio_recordings">Audio Recordings</string>
     <string name="auto_backup">Auto backup</string>
+    <string name="auto_backups_folder">Backups Folder</string>
+    <string name="auto_backups_folder_set">Set up a Backups Folder above first</string>
     <string name="auto_backup_error_message">An error occurred during auto backup:\n\'%1$s\'\nPlease check your settings or report a bug</string>
     <string name="auto_backup_failed">NotallyX Auto Backup failed</string>
     <string name="auto_backup_last">Last Backup</string>
@@ -26,6 +28,8 @@
     <string name="auto_sort_by_checked">Autosort by checked items</string>
     <string name="back">Back</string>
     <string name="backup">Backup</string>
+    <string name="backup_periodic">Periodic Backups</string>
+    <string name="backup_periodic_hint">By enabling this, periodic backups are automatically created in the configured backups folder.</string>
     <string name="backup_password">Backup Password</string>
     <string name="backup_password_hint">By setting this, all future backup ZIPs will be encrypted and password-protected</string>
     <string name="backup_period_days">Auto backup period in days</string>
@@ -73,7 +77,7 @@
     <string name="custom">Custom</string>
     <string name="daily">Daily</string>
     <string name="dark">Dark</string>
-    <string name="data_on_external">Store Data on External Storage</string>
+    <string name="data_in_public">Store Data in public Folder</string>
     <string name="date">Date</string>
     <string name="date_format">Date format</string>
     <string name="date_format_apply_in_note_view">Also apply in Note View</string>
@@ -101,7 +105,7 @@
     <string name="descending">Descending</string>
     <string name="disable">Disable</string>
     <string name="disable_auto_backup">Disable auto backup</string>
-    <string name="disable_external_data">Move data back to internal storage</string>
+    <string name="disable_data_in_public">Move data back to internal folder</string>
     <string name="disable_lock_description">This will also decrypt the database</string>
     <string name="disable_lock_title">Disable lock via Biometric/PIN</string>
     <string name="disabled">Disabled</string>
@@ -131,7 +135,7 @@
     <string name="export_settings_message">All Settings will be exported to a JSON file, which can be used to re-import stored settings.\n\nBe aware, that this does not include encrypted settings like the auto-backup password or the biometric encryption key</string>
     <string name="export_settings_success">Successfully exported settings</string>
     <string name="exporting_backup">Exporting backup</string>
-    <string name="external_data_message">By enabling this, the app’s internal database will be moved into the app’s external storage (Android/media/com.philkes.notallyx).\nIn combination with file synchronization apps this can be used to synchronize NotallyX data between multiple devices.</string>
+    <string name="data_in_public_message">By enabling this, the app’s internal database will be moved into the app’s public folder (Android/media/com.philkes.notallyx).\nIn combination with file synchronization apps this can be used to synchronize NotallyX data between multiple devices.</string>
     <string name="extracted_files">Files extracted</string>
     <string name="filter">Filter</string>
     <string name="folder">Folder</string>

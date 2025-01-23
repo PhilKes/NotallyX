@@ -269,6 +269,64 @@ fun PreferenceBinding.setup(
     }
 }
 
+fun PreferenceBinding.setupPeriodicBackups(
+    value: Boolean,
+    lastExecutionPreference: LongPreference,
+    lifecycleOwner: LifecycleOwner,
+    context: Context,
+    layoutInflater: LayoutInflater,
+    enabled: Boolean,
+    onSave: (newValue: Boolean) -> Unit,
+) {
+    Title.setText(R.string.backup_periodic)
+    val enabledText = context.getString(R.string.enabled)
+    val disabledText = context.getString(R.string.disabled)
+    val text =
+        if (enabled) {
+            if (value) enabledText else disabledText
+        } else context.getString(R.string.auto_backups_folder_set)
+    Value.text = text
+    lastExecutionPreference.removeObservers(lifecycleOwner)
+    lastExecutionPreference.observe(lifecycleOwner) { time ->
+        if (time != -1L) {
+            Value.post {
+                Value.text =
+                    "$text\n${context.getString(R.string.auto_backup_last)}: ${Date(time).toText()}"
+            }
+        }
+    }
+    if (enabled) {
+        root.setOnClickListener {
+            val layout =
+                PreferenceBooleanDialogBinding.inflate(layoutInflater, null, false).apply {
+                    Title.setText(R.string.backup_periodic)
+                    Message.setText(R.string.backup_periodic_hint)
+                    if (value) {
+                        EnabledButton.isChecked = true
+                    } else {
+                        DisabledButton.isChecked = true
+                    }
+                }
+            val dialog =
+                MaterialAlertDialogBuilder(context).setView(layout.root).addCancelButton().show()
+            layout.apply {
+                EnabledButton.setOnClickListener {
+                    dialog.cancel()
+                    if (!value) {
+                        onSave.invoke(true)
+                    }
+                }
+                DisabledButton.setOnClickListener {
+                    dialog.cancel()
+                    if (value) {
+                        onSave.invoke(false)
+                    }
+                }
+            }
+        }
+    } else root.setOnClickListener(null)
+}
+
 fun PreferenceBinding.setupBackupPassword(
     preference: StringPreference,
     password: String,
@@ -312,15 +370,13 @@ fun PreferenceBinding.setupBackupPassword(
     }
 }
 
-fun PreferenceBinding.setupAutoBackup(
+fun PreferenceBinding.setupBackupsFolder(
     value: String,
     context: Context,
-    lifecycleOwner: LifecycleOwner,
-    lastExecutionPreference: LongPreference,
     chooseBackupFolder: () -> Unit,
     onDisable: () -> Unit,
 ) {
-    Title.setText(R.string.auto_backup)
+    Title.setText(R.string.auto_backups_folder)
 
     if (value == EMPTY_PATH) {
         Value.setText(R.string.tap_to_set_up)
@@ -332,15 +388,6 @@ fun PreferenceBinding.setupAutoBackup(
         if (folder.exists()) {
             val path = uri.toReadablePath()
             Value.text = path
-            lastExecutionPreference.removeObservers(lifecycleOwner)
-            lastExecutionPreference.observe(lifecycleOwner) { time ->
-                if (time != -1L) {
-                    Value.post {
-                        Value.text =
-                            "${path}\n${context.getString(R.string.auto_backup_last)}: ${Date(time).toText()}"
-                    }
-                }
-            }
         } else Value.setText(R.string.cant_find_folder)
 
         root.setOnClickListener {
@@ -358,15 +405,17 @@ fun PreferenceSeekbarBinding.setup(
     min: Int,
     max: Int,
     context: Context,
+    enabled: Boolean = true,
     onChange: (newValue: Int) -> Unit,
 ) {
     Title.setText(titleResId)
 
     Slider.apply {
+        isEnabled = enabled
         valueTo = max.toFloat()
         valueFrom = min.toFloat()
         this@apply.value =
-            if (value < min) min.toFloat() else if (value > max) max.toFloat() else value.toFloat()
+            if (!enabled || value < min) min.toFloat() else if (value > max) max.toFloat() else value.toFloat()
         clearOnSliderTouchListeners()
         addOnSliderTouchListener(
             object : Slider.OnSliderTouchListener {

@@ -94,6 +94,15 @@ fun File.isAudioFile(context: Context): Boolean {
     }
 }
 
+fun File.toRelativePathFrom(baseFolderName: String): String {
+    val parentFolderIndex = absolutePath.indexOf("/$baseFolderName/")
+    if (parentFolderIndex == -1) {
+        return name
+    }
+    val relativePath = absolutePath.substring(parentFolderIndex + baseFolderName.length + 2)
+    return relativePath.trimStart(File.separatorChar)
+}
+
 fun ContextWrapper.deleteAttachments(
     attachments: Collection<Attachment>,
     ids: LongArray? = null,
@@ -182,8 +191,8 @@ fun String.mimeTypeToFileExtension(): String? {
     }
 }
 
-fun File.listFilesRecursive(filter: FileFilter): List<File> {
+fun File.listFilesRecursive(filter: FileFilter? = null): List<File> {
     val files = mutableListOf<File>()
-    files.addAll(walkTopDown().filter { filter.accept(it) })
+    files.addAll(walkTopDown().filter { filter?.accept(it) ?: true })
     return files
 }
