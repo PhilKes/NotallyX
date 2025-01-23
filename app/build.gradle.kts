@@ -65,6 +65,14 @@ android {
         }
     }
 
+    applicationVariants.all {
+        this.outputs
+            .map { it as com.android.build.gradle.internal.api.ApkVariantOutputImpl }
+            .forEach { output ->
+                output.outputFileName = "NotallyX-$versionName.apk"
+            }
+    }
+
     dependenciesInfo {
         includeInApk = false
         includeInBundle = false
