@@ -65,6 +65,7 @@ import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
+import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
@@ -488,7 +489,11 @@ abstract class EditActivity(private val type: Type) :
                     Pair(notallyModel.modifiedTimestamp, R.string.modified_date)
                 else -> Pair(null, null)
             }
-        binding.Date.displayFormattedTimestamp(date, preferences.dateFormat.value, datePrefixResId)
+        val dateFormat =
+            if (preferences.applyDateFormatInNoteView.value) {
+                preferences.dateFormat.value
+            } else DateFormat.ABSOLUTE
+        binding.Date.displayFormattedTimestamp(date, dateFormat, datePrefixResId)
         binding.EnterTitle.setText(notallyModel.title)
         binding.LabelGroup.bindLabels(
             notallyModel.labels,
@@ -496,7 +501,6 @@ abstract class EditActivity(private val type: Type) :
             paddingTop = true,
             colorInt,
         )
-
         setColor()
     }
 

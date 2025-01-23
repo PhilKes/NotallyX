@@ -14,11 +14,12 @@ import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_T
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.ChoiceItemBinding
-import com.philkes.notallyx.databinding.NotesSortDialogBinding
+import com.philkes.notallyx.databinding.DialogDateFormatBinding
+import com.philkes.notallyx.databinding.DialogNotesSortBinding
+import com.philkes.notallyx.databinding.DialogPreferenceBooleanBinding
+import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
-import com.philkes.notallyx.databinding.PreferenceBooleanDialogBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
-import com.philkes.notallyx.databinding.TextInputDialogBinding
 import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.checkedTag
 import com.philkes.notallyx.presentation.showToast
@@ -27,6 +28,7 @@ import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.BooleanPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
@@ -137,7 +139,7 @@ fun PreferenceBinding.setup(
     Value.text = value.getText(context)
 
     root.setOnClickListener {
-        val layout = NotesSortDialogBinding.inflate(layoutInflater, null, false)
+        val layout = DialogNotesSortBinding.inflate(layoutInflater, null, false)
         NotesSortBy.entries.forEachIndexed { idx, notesSortBy ->
             ChoiceItemBinding.inflate(layoutInflater).root.apply {
                 id = idx
@@ -183,6 +185,48 @@ fun PreferenceBinding.setup(
 }
 
 fun PreferenceBinding.setup(
+    dateFormatPreference: EnumPreference<DateFormat>,
+    dateFormatValue: DateFormat,
+    applyToNoteViewValue: Boolean,
+    context: Context,
+    layoutInflater: LayoutInflater,
+    onSave: (dateFormat: DateFormat, applyToEditMode: Boolean) -> Unit,
+) {
+    Title.setText(dateFormatPreference.titleResId!!)
+
+    Value.text = dateFormatValue.getText(context)
+
+    root.setOnClickListener {
+        val layout = DialogDateFormatBinding.inflate(layoutInflater, null, false)
+        DateFormat.entries.forEachIndexed { idx, dateFormat ->
+            ChoiceItemBinding.inflate(layoutInflater).root.apply {
+                id = idx
+                text = dateFormat.getText(context)
+                tag = dateFormat
+                layout.DateFormatRadioGroup.addView(this)
+                if (dateFormat == dateFormatValue) {
+                    layout.DateFormatRadioGroup.check(this.id)
+                }
+            }
+        }
+
+        layout.ApplyToNoteView.isChecked = applyToNoteViewValue
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(dateFormatPreference.titleResId)
+            .setView(layout.root)
+            .setPositiveButton(R.string.save) { dialog, _ ->
+                dialog.cancel()
+                val dateFormat = layout.DateFormatRadioGroup.checkedTag() as DateFormat
+                val applyToNoteView = layout.ApplyToNoteView.isChecked
+                onSave(dateFormat, applyToNoteView)
+            }
+            .addCancelButton()
+            .show()
+    }
+}
+
+fun PreferenceBinding.setup(
     preference: BooleanPreference,
     value: Boolean,
     context: Context,
@@ -197,7 +241,7 @@ fun PreferenceBinding.setup(
     Value.text = if (value) enabledText else disabledText
     root.setOnClickListener {
         val layout =
-            PreferenceBooleanDialogBinding.inflate(layoutInflater, null, false).apply {
+            DialogPreferenceBooleanBinding.inflate(layoutInflater, null, false).apply {
                 Title.setText(preference.titleResId)
                 messageResId?.let { Message.setText(it) }
                 if (value) {
@@ -239,7 +283,7 @@ fun PreferenceBinding.setupBackupPassword(
     Value.text =
         if (password != PASSWORD_EMPTY) password else context.getText(R.string.tap_to_set_up)
     root.setOnClickListener {
-        val layout = TextInputDialogBinding.inflate(layoutInflater, null, false)
+        val layout = DialogTextInputBinding.inflate(layoutInflater, null, false)
         layout.InputText.apply {
             if (password != PASSWORD_EMPTY) {
                 setText(password)
@@ -321,7 +365,8 @@ fun PreferenceSeekbarBinding.setup(
     Slider.apply {
         valueTo = max.toFloat()
         valueFrom = min.toFloat()
-        this@apply.value = value.toFloat()
+        this@apply.value =
+            if (value < min) min.toFloat() else if (value > max) max.toFloat() else value.toFloat()
         clearOnSliderTouchListeners()
         addOnSliderTouchListener(
             object : Slider.OnSliderTouchListener {

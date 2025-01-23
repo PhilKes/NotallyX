@@ -76,6 +76,8 @@
     <string name="data_on_external">Store Data on External Storage</string>
     <string name="date">Date</string>
     <string name="date_format">Date format</string>
+    <string name="date_format_apply_in_note_view">Also apply in Note View</string>
+    <string name="date_format_hint">Applies selected date format in Notes Overview</string>
     <string name="days">Days</string>
     <string name="delete">Delete</string>
     <string name="delete_all">Delete all</string>
