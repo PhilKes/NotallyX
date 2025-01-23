@@ -74,7 +74,6 @@
     <string name="custom">Vlastní</string>
     <string name="daily">Denně</string>
     <string name="dark">Tmavé</string>
-    <string name="data_on_external">Ukládat data na externí úložiště</string>
     <string name="date">Datum</string>
     <string name="date_format">Formát data</string>
     <string name="days">Dny</string>
@@ -100,8 +99,6 @@
     <string name="deleting_images">Odstraňování obrázků</string>
     <string name="descending">Sestupně</string>
     <string name="disable">Zakázat</string>
-    <string name="disable_auto_backup">Zakázat automatickou zálohu</string>
-    <string name="disable_external_data">Přesunout data zpět na interní uložiště</string>
     <string name="disable_lock_description">Toto rovněž dešifruje databázi</string>
     <string name="disable_lock_title">Vypnout zámek pomocí biometrických údajů/PIN</string>
     <string name="disabled">Zakázat</string>
@@ -131,7 +128,6 @@
     <string name="export_settings_message">Všechna nastavení se vyexportují do souboru JSON, který lze použít k opětovnému importu uložených nastavení.\n\Všimněte si, že toto nastavení nezahrnuje šifrovaná nastavení, jako je heslo pro automatické zálohování nebo biometrický šifrovací klíč.</string>
     <string name="export_settings_success">Nastavení úspěšně exportováno</string>
     <string name="exporting_backup">Vytváří se záloha</string>
-    <string name="external_data_message">Povolením této funkce se interní databáze aplikace přesune do externího úložiště aplikace (Android/media/com.philkes.notallyx).\nV kombinaci s aplikacemi pro synchronizaci souborů lze tuto funkci použít k synchronizaci dat NotallyX mezi více zařízeními.</string>
     <string name="extracted_files">Soubory byly extrahovány</string>
     <string name="filter">Filtrovat</string>
     <string name="folder">Adresář</string>
