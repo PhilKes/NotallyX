@@ -4,6 +4,7 @@
     <string name="add_images">Ajouter des images</string>
     <string name="add_item">Ajouter un élément</string>
     <string name="add_label">Ajouter une étiquette</string>
+    <string name="add_reminder">Ajouter un rappel</string>
     <string name="adding_files">Ajout des fichiers</string>
     <string name="adding_images">Ajout des images</string>
     <string name="appearance">Apparence</string>
@@ -17,6 +18,10 @@
     <string name="attach_file">Joindre un fichier</string>
     <string name="audio_recordings">Enregistrements audio</string>
     <string name="auto_backup">Sauvegarde automatique</string>
+    <string name="auto_backup_error_message">Une erreur est survenue lors de la sauvegarde automatique:\n\'%1$s\'\nVeuillez vérifier vos paramètres ou signaler un bug</string>
+    <string name="auto_backup_failed">La sauvegarde automatique de NotallyX a échoué </string>
+    <string name="auto_backup_last">Dernière sauvegarde</string>
+    <string name="back">Retour</string>
     <string name="backup">Sauvegarde</string>
     <string name="backup_password">Mot de passe des sauvegardes</string>
     <string name="backup_password_hint">En activant cette option, tous les futurs fichiers ZIP de sauvegarde seront chiffrés et protégés par un mot de passe</string>
@@ -58,11 +63,15 @@
     <string name="continue_">Continuer</string>
     <string name="copied_link">Lien copié dans le presse-papier</string>
     <string name="copy">Copier</string>
+    <string name="create_github_issue">Créer une issue Github</string>
     <string name="creation_date">Crée</string>
+    <string name="custom">Personnalisé</string>
+    <string name="daily">Tous les jours</string>
     <string name="dark">Sombre</string>
     <string name="data_on_external">Stocker les données sur le stockage externe</string>
     <string name="date">Date</string>
     <string name="date_format">Format de la date</string>
+    <string name="days">Jours</string>
     <string name="delete">Supprimer</string>
     <string name="delete_all">Tout supprimer</string>
     <string name="delete_all_notes">Supprimer toutes les notes ?</string>
@@ -73,6 +82,7 @@
     <string name="delete_image_forever">Supprimer l\'image définitivement ?</string>
     <string name="delete_label">Supprimer l\'étiquette ?</string>
     <string name="delete_note_forever">Supprimer la note définitivement ?</string>
+    <string name="delete_reminder">Supprimer le rappel ?</string>
     <string name="delete_selected_notes">Supprimer les notes sélectionnées ?</string>
     <string name="deleted">Éléments supprimés</string>
     <plurals name="deleted_selected_notes">
@@ -94,9 +104,11 @@
     <string name="edit">Modifier</string>
     <string name="edit_label">Modifier l\'étiquette</string>
     <string name="edit_link">Éditer le lien</string>
+    <string name="edit_reminders">Éditer les rappels</string>
     <string name="empty_labels">Il n\'existe pas encore d\'étiquettes. En créer une ?</string>
     <string name="empty_list">Liste vide</string>
     <string name="empty_note">Note vide</string>
+    <string name="empty_reminders">Aucun rappel réglé. En créer un ?</string>
     <string name="enable_lock_description">La base de donnée sera aussi chiffrée</string>
     <string name="enable_lock_title">Activer le verrouillage biométrique/code PIN</string>
     <string name="enabled">Activé</string>
@@ -104,6 +116,7 @@
     <string name="error_while_renaming_image">Erreur lors du renommage de l\'image</string>
     <string name="evernote">Evernote</string>
     <string name="evernote_help">Pour importer vos notes depuis Evernote, vous devez exporter votre carnet de notes Evernote au format ENEX. Cliquez sur "Aide" pour plus d\'information.\n\nSi vous possédez déjà un fichier ENEX, cliquez sur "Importer" et sélectionnez-le.</string>
+    <string name="every">Chaque</string>
     <string name="export">Exporter</string>
     <string name="export_backup">Exporter la sauvegarde</string>
     <string name="export_settings">Exporter les paramètres</string>
@@ -121,6 +134,7 @@
 	information.\n\nSi vous possédez déjà un fichier ZIP Google Takeout, cliquez sur "Importer" et choisissez le fichier ZIP.</string>
     <string name="grid">Grille</string>
     <string name="help">Aide</string>
+    <string name="hours">Heures</string>
     <string name="image_format_not_supported">Format d\'image non supporté</string>
     <string name="import_action">Importer</string>
     <string name="import_backup">Importer une sauvegarde</string>
@@ -161,6 +175,7 @@
     <string name="link_note">Lier une note</string>
     <string name="list">Liste</string>
     <string name="locked">Verrouillé</string>
+    <string name="make_feature_request">Suggérer une amélioration</string>
     <string name="make_list">Créer une liste</string>
     <string name="max_backups">Nombre de sauvegardes à conserver</string>
     <string name="max_items_to_display">Nombre maximum d\'éléments à afficher pour une liste</string>
@@ -168,15 +183,18 @@
     <string name="max_lines_to_display">Nombre maximum de lignes à afficher pour une note</string>
     <string name="max_lines_to_display_title">Nombre maximum de lignes à afficher pour un titre</string>
     <string name="medium">Moyenne</string>
+    <string name="minutes">Minutes</string>
     <string name="modified_date">Modifié</string>
     <string name="monospace">Chasse fixe</string>
+    <string name="monthly">Tous les mois</string>
+    <string name="months">Mois</string>
     <string name="more">%1$d de plus</string>
     <plurals name="more_files">
         <item quantity="one">…et %1$d fichier </item>
         <item quantity="other">…et %1$d fichiers</item>
     </plurals>
     <string name="next">Suivant</string>
-    <string name="none">Aucun</string>
+    <string name="none">Aucune </string>
     <string name="note">Note</string>
     <string name="notes">Notes</string>
     <string name="notes_sorted_by">Notes triées par</string>
@@ -191,14 +209,23 @@
     <string name="plain_text_files">Fichiers texte bruts</string>
     <string name="plain_text_files_help">Pour importer vos notes à partir de fichiers (un seul fichier ou dossier) texte bruts, cliquez sur "Importer". Chaque fichier est importé comme une note séparée, le nom du fichier devient le titre de la note. Si le contenu du texte commence par une syntaxe de liste (par exemple, Markdown ‘- [x]’, syntaxe NotallyX ‘[✓]’, ou ‘*’, ‘-’), il sera converti en une note sous forme de liste.</string>
     <string name="play">Lecture</string>
+    <string name="please_grant_notally_alarm">Veuillez autoriser NotallyX à envoyer des rappels</string>
     <string name="please_grant_notally_audio">Veuillez accorder à NotallyX l\'autorisation d\'enregistrer de l\'audio. Les enregistrements ne quittent jamais votre appareil.</string>
+    <string name="please_grant_notally_notification">Veuillez autoriser NotallyX à envoyer des notifications</string>
+    <string name="please_grant_notally_notification_auto_backup">Si une sauvegarde automatique échoue, vous pouvez recevoir une notification en accordant à NotallyX l'autorisation d'envoyer des notifications</string>
     <string name="previous">Précédent</string>
     <string name="rate">Noter cette application</string>
     <string name="ready_to_record">Prêt à enregistrer</string>
     <string name="record_audio">Enregistrer un audio</string>
     <string name="recording">Enregistrement en cours…</string>
     <string name="redo">Rétablir</string>
+    <string name="reminder_no_repetition">Aucune répétition</string>
+    <string name="reminders">Rappels</string>
     <string name="remove_link">Supprimer le lien</string>
+    <string name="repetition">Répétition</string>
+    <string name="repetition_custom">Répétition personnalisée</string>
+    <string name="repetition_value_hint">Valeur</string>
+    <string name="report_bug">Signaler un problème/un bug</string>
     <string name="reset_settings">Réinitialiser les paramètres</string>
     <string name="reset_settings_message">Tous les paramètres seront réinitialisés à leur valeur par défaut</string>
     <string name="reset_settings_success">Tous les paramètres ont été réinitialisés avec succès</string>
@@ -223,6 +250,7 @@
     <string name="share">Partager</string>
     <string name="single_file">Fichier unique</string>
     <string name="single_note_or_list">Note ou liste unique</string>
+    <string name="skip">Passer</string>
     <string name="small">Petite</string>
     <string name="something_went_wrong">Quelque chose a mal tourné. Veuillez réessayer.</string>
     <string name="something_went_wrong_audio">Une erreur est survenue. l\'enregistrement audio a peut-être été déplacé ou supprimé.\n\nErreur : (%1$d, %2$d)</string>
@@ -254,6 +282,10 @@
     <string name="view">Vue</string>
     <string name="view_file">Voir le fichier</string>
     <string name="view_note">Voir la note…</string>
+    <string name="weekly">Toutes les semaines</string>
+    <string name="weeks">Semaines</string>
     <string name="wrong_password">Mot de passe incorrect</string>
+    <string name="yearly">Tous les ans</string>
+    <string name="years">Ans</string>
     <string name="your_notes_associated">Vos notes associées à cette étiquette ne seront pas supprimées</string>
 </resources>
