@@ -80,14 +80,14 @@ suspend fun ContextWrapper.importZip(
                     zipFile.setPassword(zipPassword.toCharArray())
                 }
                 zipFile.extractFile(
-                    NotallyDatabase.DatabaseName,
+                    NotallyDatabase.DATABASE_NAME,
                     databaseFolder.path,
-                    NotallyDatabase.DatabaseName,
+                    NotallyDatabase.DATABASE_NAME,
                 )
 
                 val database =
                     SQLiteDatabase.openDatabase(
-                        File(databaseFolder, NotallyDatabase.DatabaseName).path,
+                        File(databaseFolder, NotallyDatabase.DATABASE_NAME).path,
                         null,
                         SQLiteDatabase.OPEN_READONLY,
                     )

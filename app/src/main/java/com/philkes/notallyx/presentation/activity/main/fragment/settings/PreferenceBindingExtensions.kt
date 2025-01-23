@@ -7,12 +7,10 @@ import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
 import androidx.documentfile.provider.DocumentFile
-import androidx.lifecycle.LifecycleOwner
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.DialogDateFormatBinding
 import com.philkes.notallyx.databinding.DialogNotesSortBinding
@@ -31,7 +29,6 @@ import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
-import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
@@ -41,7 +38,6 @@ import com.philkes.notallyx.presentation.viewmodel.preference.StringPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.TextProvider
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
 import com.philkes.notallyx.utils.toReadablePath
-import java.util.Date
 
 inline fun <reified T> PreferenceBinding.setup(
     enumPreference: EnumPreference<T>,
@@ -232,18 +228,69 @@ fun PreferenceBinding.setup(
     context: Context,
     layoutInflater: LayoutInflater,
     messageResId: Int? = null,
+    enabled: Boolean = true,
+    disabledTextResId: Int? = null,
     onSave: (newValue: Boolean) -> Unit,
 ) {
     Title.setText(preference.titleResId!!)
 
-    val enabledText = context.getString(R.string.enabled)
-    val disabledText = context.getString(R.string.disabled)
-    Value.text = if (value) enabledText else disabledText
+    if (enabled) {
+        Value.setText(if (value) R.string.enabled else R.string.disabled)
+    } else {
+        disabledTextResId?.let { Value.setText(it) }
+    }
+    root.isEnabled = enabled
     root.setOnClickListener {
         val layout =
             DialogPreferenceBooleanBinding.inflate(layoutInflater, null, false).apply {
                 Title.setText(preference.titleResId)
                 messageResId?.let { Message.setText(it) }
+                if (value) {
+                    EnabledButton.isChecked = true
+                } else {
+                    DisabledButton.isChecked = true
+                }
+            }
+        val dialog =
+            MaterialAlertDialogBuilder(context).setView(layout.root).addCancelButton().show()
+        layout.apply {
+            EnabledButton.setOnClickListener {
+                dialog.cancel()
+                if (!value) {
+                    onSave.invoke(true)
+                }
+            }
+            DisabledButton.setOnClickListener {
+                dialog.cancel()
+                if (value) {
+                    onSave.invoke(false)
+                }
+            }
+        }
+    }
+}
+
+fun PreferenceBinding.setupPeriodicBackup(
+    value: Boolean,
+    context: Context,
+    layoutInflater: LayoutInflater,
+    enabled: Boolean,
+    onSave: (newValue: Boolean) -> Unit,
+) {
+    Title.setText(R.string.backup_periodic)
+    val enabledText = context.getString(R.string.enabled)
+    val disabledText = context.getString(R.string.disabled)
+    val text =
+        if (enabled) {
+            if (value) enabledText else disabledText
+        } else context.getString(R.string.auto_backups_folder_set)
+    Value.text = text
+    root.isEnabled = enabled
+    root.setOnClickListener {
+        val layout =
+            DialogPreferenceBooleanBinding.inflate(layoutInflater, null, false).apply {
+                Title.setText(R.string.backup_periodic)
+                Message.setText(R.string.backup_periodic_hint)
                 if (value) {
                     EnabledButton.isChecked = true
                 } else {
@@ -312,15 +359,13 @@ fun PreferenceBinding.setupBackupPassword(
     }
 }
 
-fun PreferenceBinding.setupAutoBackup(
+fun PreferenceBinding.setupBackupsFolder(
     value: String,
     context: Context,
-    lifecycleOwner: LifecycleOwner,
-    lastExecutionPreference: LongPreference,
     chooseBackupFolder: () -> Unit,
     onDisable: () -> Unit,
 ) {
-    Title.setText(R.string.auto_backup)
+    Title.setText(R.string.auto_backups_folder)
 
     if (value == EMPTY_PATH) {
         Value.setText(R.string.tap_to_set_up)
@@ -332,20 +377,11 @@ fun PreferenceBinding.setupAutoBackup(
         if (folder.exists()) {
             val path = uri.toReadablePath()
             Value.text = path
-            lastExecutionPreference.removeObservers(lifecycleOwner)
-            lastExecutionPreference.observe(lifecycleOwner) { time ->
-                if (time != -1L) {
-                    Value.post {
-                        Value.text =
-                            "${path}\n${context.getString(R.string.auto_backup_last)}: ${Date(time).toText()}"
-                    }
-                }
-            }
         } else Value.setText(R.string.cant_find_folder)
 
         root.setOnClickListener {
             MenuDialog(context)
-                .add(R.string.disable_auto_backup) { onDisable() }
+                .add(R.string.clear) { onDisable() }
                 .add(R.string.choose_another_folder) { chooseBackupFolder() }
                 .show()
         }
@@ -358,15 +394,16 @@ fun PreferenceSeekbarBinding.setup(
     min: Int,
     max: Int,
     context: Context,
+    enabled: Boolean = true,
     onChange: (newValue: Int) -> Unit,
 ) {
     Title.setText(titleResId)
-
+    val valueInBoundaries = (if (value < min) min else if (value > max) max else value).toFloat()
     Slider.apply {
+        isEnabled = enabled
         valueTo = max.toFloat()
         valueFrom = min.toFloat()
-        this@apply.value =
-            if (value < min) min.toFloat() else if (value > max) max.toFloat() else value.toFloat()
+        this@apply.value = valueInBoundaries
         clearOnSliderTouchListeners()
         addOnSliderTouchListener(
             object : Slider.OnSliderTouchListener {

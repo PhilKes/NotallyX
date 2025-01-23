@@ -86,7 +86,6 @@
     <string name="deleting_files">Bestanden verwijderen</string>
     <string name="deleting_images">Afbeeldingen verwijderen</string>
     <string name="descending">Aflopend</string>
-    <string name="disable_auto_backup">Automatische back-up uitschakelen</string>
     <string name="disable_lock_description">Dit ontsleutelt ook de database</string>
     <string name="disable_lock_title">Vergrendeling uitschakelen via Biometrisch/PIN</string>
     <string name="disabled">Uitgeschakeld</string>
@@ -171,7 +170,6 @@
     <string name="note">Notitie</string>
     <string name="notes">Notities</string>
     <string name="notes_sorted_by">Notities gesorteerd op</string>
-    <string name="notes_will_be">Notities worden dagelijks geback-upt naar de interne opslag van je telefoon.\n\nDit werkt mogelijk niet als je de energiebesparende modus hebt ingeschakeld</string>
     <string name="open_link">Link openen</string>
     <string name="open_note">Open Notitie</string>
     <string name="others">Anderen</string>

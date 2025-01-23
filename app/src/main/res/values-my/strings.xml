@@ -28,7 +28,6 @@
     <string name="delete_label">အမှတ်အသားကိုဖျက်မည်လား။</string>
     <string name="delete_note_forever">မှတ်စုကို အပြီးဖျက်မည်</string>
     <string name="deleted">ဖျက်ထား​သော</string>
-    <string name="disable_auto_backup">အလိုအ​လျောက်အရန်သိမ်းဆည်းခြင်းကိုပိတ်မည်</string>
     <string name="drag_handle">ဟန်ယ်ကို ရွှေ့မည်</string>
     <string name="edit">တည်းဖြတ်မည်</string>
     <string name="edit_label">အမှတ်အသားကို ပြင်မည်</string>
@@ -63,7 +62,6 @@
     <string name="none">ဘာမှမရှိ</string>
     <string name="note">မှတ်စု</string>
     <string name="notes">မှတ်စုများ</string>
-    <string name="notes_will_be">မှတ်စု​ဖိုင်များသည်သင့် ဖုန်းထဲသို့​နေ့စဥ်အရန်သိမ်းမည်ဖြစ်သည်။သင့်ဖုန်းမှာဘက်ထ္ထရီ​ချွေတာ​ရေးလုပ်​ဆောင်ချက် ဖွင့်ထားရင်အလုပ်မလုပ်နိုင်ပါ။</string>
     <string name="open_link">လင့်ကိုဖွင့်မည်</string>
     <string name="others">အခြား</string>
     <string name="pin">ပင်တွဲမည်</string>

@@ -5,7 +5,7 @@ import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.annotation.RequiresApi
-import com.philkes.notallyx.data.NotallyDatabase.Companion.DatabaseName
+import com.philkes.notallyx.data.NotallyDatabase.Companion.DATABASE_NAME
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import java.io.File
@@ -20,16 +20,16 @@ private const val ENCRYPTION_KEY_NAME = "notallyx_database_encryption_key"
 private const val ANDROID_KEYSTORE = "AndroidKeyStore"
 
 fun encryptDatabase(context: Context, passphrase: ByteArray) {
-    val state = SQLCipherUtils.getDatabaseState(context, DatabaseName)
+    val state = SQLCipherUtils.getDatabaseState(context, DATABASE_NAME)
     if (state == SQLCipherUtils.State.UNENCRYPTED) {
-        SQLCipherUtils.encrypt(context, DatabaseName, passphrase)
+        SQLCipherUtils.encrypt(context, DATABASE_NAME, passphrase)
     }
 }
 
 fun decryptDatabase(context: Context, passphrase: ByteArray) {
-    val state = SQLCipherUtils.getDatabaseState(context, DatabaseName)
+    val state = SQLCipherUtils.getDatabaseState(context, DATABASE_NAME)
     if (state == SQLCipherUtils.State.ENCRYPTED) {
-        SQLCipherUtils.decrypt(context, DatabaseName, passphrase)
+        SQLCipherUtils.decrypt(context, DATABASE_NAME, passphrase)
     }
 }
 

@@ -43,7 +43,6 @@
     <string name="delete_selected_notes">Usunąć zaznaczone notatki?</string>
     <string name="deleted">Usunięte</string>
     <string name="deleting_images">Usuwanie obrazów</string>
-    <string name="disable_auto_backup">Wyłącz automatyczną kopię zapasową</string>
     <string name="drag_handle">Punkt zaczepienia</string>
     <string name="edit">Edytuj</string>
     <string name="edit_label">Edytuj etykietę</string>
@@ -83,7 +82,6 @@
     <string name="none">Brak</string>
     <string name="note">Notatka</string>
     <string name="notes">Notatki</string>
-    <string name="notes_will_be">Notatki będą codziennie zapisywane w wewnętrznej pamięci telefonu.\n\nTo może nie działać, jeśli masz włączony tryb oszczędzania energii.</string>
     <string name="open_link">Otwórz odnośnik</string>
     <string name="others">Pozostałe</string>
     <string name="pin">Przypnij</string>

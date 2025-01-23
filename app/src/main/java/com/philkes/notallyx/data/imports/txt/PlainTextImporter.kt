@@ -11,6 +11,7 @@ import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.utils.MIME_TYPE_JSON
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -85,7 +86,7 @@ class PlainTextImporter : ExternalImporter {
 
 val APPLICATION_TEXT_MIME_TYPES =
     arrayOf(
-        "application/json",
+        MIME_TYPE_JSON,
         "application/xml",
         "application/javascript",
         "application/xhtml+xml",

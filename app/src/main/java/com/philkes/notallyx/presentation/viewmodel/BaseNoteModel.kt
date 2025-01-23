@@ -43,6 +43,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
+import com.philkes.notallyx.utils.MIME_TYPE_JSON
 import com.philkes.notallyx.utils.backup.clearAllFolders
 import com.philkes.notallyx.utils.backup.clearAllLabels
 import com.philkes.notallyx.utils.backup.exportAsZip
@@ -52,13 +53,12 @@ import com.philkes.notallyx.utils.backup.getPreviousLabels
 import com.philkes.notallyx.utils.backup.getPreviousNotes
 import com.philkes.notallyx.utils.backup.importZip
 import com.philkes.notallyx.utils.backup.readAsBackup
+import com.philkes.notallyx.utils.cancelNoteReminders
 import com.philkes.notallyx.utils.deleteAttachments
 import com.philkes.notallyx.utils.getBackupDir
 import com.philkes.notallyx.utils.getExternalImagesDirectory
 import com.philkes.notallyx.utils.log
-import com.philkes.notallyx.utils.cancelNoteReminders
 import com.philkes.notallyx.utils.scheduleNoteReminders
-
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
@@ -174,25 +174,29 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     private fun transform(list: List<BaseNote>) = transform(list, pinned, others)
 
-    fun disableAutoBackup() {
-        val value = preferences.autoBackup.value
-        if (value.path != EMPTY_PATH) {
-            clearPersistedUriPermissions(value.path)
+    fun disableBackups() {
+        val value = preferences.backupsFolder.value
+        if (value != EMPTY_PATH) {
+            clearPersistedUriPermissions(value)
         }
-        savePreference(preferences.autoBackup, value.copy(path = EMPTY_PATH))
+        savePreference(preferences.backupsFolder, EMPTY_PATH)
+        savePreference(
+            preferences.periodicBackups,
+            preferences.periodicBackups.value.copy(periodInDays = 0),
+        )
     }
 
-    fun setAutoBackupPath(uri: Uri) {
-        val value = preferences.autoBackup.value
+    fun setupBackupsFolder(uri: Uri) {
+        val value = preferences.backupsFolder.value
         val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         app.contentResolver.takePersistableUriPermission(uri, flags)
-        if (value.path != EMPTY_PATH) {
-            clearPersistedUriPermissions(value.path)
+        if (value != EMPTY_PATH) {
+            clearPersistedUriPermissions(value)
         }
-        savePreference(preferences.autoBackup, value.copy(path = uri.toString()))
+        savePreference(preferences.backupsFolder, uri.toString())
     }
 
-    fun enableExternalData() {
+    fun enableDataInPublic() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
@@ -200,11 +204,11 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 NotallyDatabase.getInternalDatabaseFile(app)
                     .copyTo(NotallyDatabase.getExternalDatabaseFile(app), overwrite = true)
             }
-            savePreference(preferences.dataOnExternalStorage, true)
+            savePreference(preferences.dataInPublicFolder, true)
         }
     }
 
-    fun disableExternalData() {
+    fun disableDataInPublic() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
@@ -217,7 +221,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     }
                 }
             }
-            savePreference(preferences.dataOnExternalStorage, false)
+            savePreference(preferences.dataInPublicFolder, false)
         }
     }
 
@@ -242,7 +246,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun exportBackup(uri: Uri) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) { app.exportAsZip(uri, exportProgress) }
+            withContext(Dispatchers.IO) {
+                app.exportAsZip(
+                    uri,
+                    password = preferences.backupPassword.value,
+                    backupProgress = exportProgress,
+                )
+            }
             app.showToast(R.string.saved_to_device)
         }
     }
@@ -500,16 +510,16 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     private fun refreshDataOnExternalStorage() {
-        val dataOnExternalStorageBefore = preferences.dataOnExternalStorage.value
-        val dataOnExternalStorageAfter = preferences.dataOnExternalStorage.getFreshValue()
+        val dataOnExternalStorageBefore = preferences.dataInPublicFolder.value
+        val dataOnExternalStorageAfter = preferences.dataInPublicFolder.getFreshValue()
         if (dataOnExternalStorageBefore != dataOnExternalStorageAfter) {
             if (dataOnExternalStorageAfter) {
-                enableExternalData()
+                enableDataInPublic()
             } else {
-                disableExternalData()
+                disableDataInPublic()
             }
         }
-        preferences.dataOnExternalStorage.refresh()
+        preferences.dataInPublicFolder.refresh()
     }
 
     companion object {
@@ -541,6 +551,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 enum class ExportMimeType(val mimeType: String, val fileExtension: String) {
     TXT("text/plain", "txt"),
     PDF("application/pdf", "pdf"),
-    JSON("application/json", "json"),
+    JSON(MIME_TYPE_JSON, "json"),
     HTML("text/html", "html"),
 }

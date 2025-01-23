@@ -42,7 +42,6 @@
     <string name="delete_selected_notes">Izbriši izbrane zapiske?</string>
     <string name="deleted">Smetnjak</string>
     <string name="deleting_images">Brisanje slik</string>
-    <string name="disable_auto_backup">Onemogoči samodejno kopiranje</string>
     <string name="drag_handle">Ročica za vlečenje</string>
     <string name="edit">Uredi</string>
     <string name="edit_label">Uredi oznako</string>
@@ -82,7 +81,6 @@
     <string name="none">Brez</string>
     <string name="note">Zapisek</string>
     <string name="notes">Zapiski</string>
-    <string name="notes_will_be">Zapiski bodo dnevno varnostno kopirani v notranji pomnilnik vaše naprave.\n\nKopiranje morda ne bo delovalo v kolikor ste omogočili varčevanje z energijo baterije.</string>
     <string name="open_link">Odpri povezavo</string>
     <string name="others">Drugi</string>
     <string name="pin">Pripni</string>

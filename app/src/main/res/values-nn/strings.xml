@@ -39,7 +39,6 @@
     <string name="delete_note_forever">Vil du sletta notatet for godt?</string>
     <string name="deleted">Papirkorg</string>
     <string name="deleting_images">Slettar bilete</string>
-    <string name="disable_auto_backup">Slå av automatisk sikkerheitskopiering</string>
     <string name="drag_handle">Drahandtak</string>
     <string name="edit">Rediger</string>
     <string name="edit_label">Rediger etikett</string>
@@ -78,7 +77,6 @@
     <string name="none">Ikkje vis</string>
     <string name="note">Notat</string>
     <string name="notes">Notat</string>
-    <string name="notes_will_be">Notata vil bli sikkerheitskopiert til den interne lagringa kvar dag.\n\nDette fungerer muligens ikkje viss strømsparingsmodus er aktivert</string>
     <string name="open_link">Opna lenkje</string>
     <string name="others">Anna</string>
     <string name="pin">Fest</string>

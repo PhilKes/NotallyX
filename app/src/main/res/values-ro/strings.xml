@@ -28,7 +28,6 @@
     <string name="delete_label">Ștergeți eticheta?</string>
     <string name="delete_note_forever">Ștergeți nota definitiv?</string>
     <string name="deleted">Șterse</string>
-    <string name="disable_auto_backup">Dezactivați backup-ul automat</string>
     <string name="drag_handle">Trage mânerul</string>
     <string name="edit">Editează</string>
     <string name="edit_label">Editează eticheta</string>
@@ -63,7 +62,6 @@
     <string name="none">Nici unul</string>
     <string name="note">Notă</string>
     <string name="notes">Notiţe</string>
-    <string name="notes_will_be">Notele vor fi salvate în memoria internă a telefonului dvs. în fiecare zi.\n\nEste posibil ca aceasta să nu funcționeze dacă aveți modul "Power saving" activat.</string>
     <string name="open_link">Deschide link-ul</string>
     <string name="others">Altele</string>
     <string name="pin">Fixaţi</string>

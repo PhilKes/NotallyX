@@ -123,6 +123,16 @@ fun BaseNote.toHtml(showDateCreated: Boolean) = buildString {
 
 fun List<BaseNote>.toNoteReminders() = map { NoteReminder(it.id, it.reminders) }
 
+fun BaseNote.attachmentsDifferFrom(other: BaseNote): Boolean {
+    return files.size != other.files.size ||
+        files.any { file -> other.files.none { it.localName == file.localName } } ||
+        other.files.any { file -> files.none { it.localName == file.localName } } ||
+        images.any { image -> other.images.none { it.localName == image.localName } } ||
+        other.images.any { image -> images.none { it.localName == image.localName } } ||
+        audios.any { audio -> other.audios.none { it.name == audio.name } } ||
+        other.audios.any { audio -> audios.none { it.name == audio.name } }
+}
+
 fun Date.toText(): String = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(this)
 
 fun Repetition.toText(context: Context): String =
