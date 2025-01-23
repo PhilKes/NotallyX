@@ -51,11 +51,10 @@ class NotallyXApplication : Application() {
             }
         }
 
-        val workManager = WorkManager.getInstance(this)
-        val backupWorkInfoObservable =
-            workManager.getWorkInfosForUniqueWorkLiveData(AUTO_BACKUP_WORK_NAME)
         preferences.autoBackup.observeForeverWithPrevious { (autoBackBefore, autoBackup) ->
-            backupWorkInfoObservable.observeOnce { workInfos ->
+            val workManager = WorkManager.getInstance(this)
+            workManager.getWorkInfosForUniqueWorkLiveData(AUTO_BACKUP_WORK_NAME).observeOnce {
+                workInfos ->
                 if (autoBackup.path == EMPTY_PATH) {
                     if (workInfos?.containsNonCancelled() == true) {
                         workManager.cancelAutoBackup()
