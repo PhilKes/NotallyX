@@ -211,16 +211,36 @@ class ListManager(
     }
 
     fun undoMove(positionAfter: Int, positionFrom: Int, itemBeforeMove: ListItem) {
+        val isMoveUp = positionAfter < positionFrom
         val actualPositionTo =
-            if (positionAfter < positionFrom) {
+            if (isMoveUp) {
                 positionFrom + itemBeforeMove.children.size
             } else {
                 positionFrom
             }
+        val isChildBefore = items[positionAfter].isChild
+        if (isChildBefore != itemBeforeMove.isChild) {
+            items.setIsChild(positionAfter, itemBeforeMove.isChild, forceNotify = false)
+        }
         val positionBefore =
             move(positionAfter, actualPositionTo, pushChange = false, updateChildren = false)!!
-        if (items[positionBefore].isChild != itemBeforeMove.isChild) {
-            items.setIsChild(positionBefore, itemBeforeMove.isChild)
+        itemBeforeMove.children.forEachIndexed { idx, child ->
+            val actualPositionBef =
+                if (isMoveUp) {
+                    positionAfter
+                } else {
+                    positionAfter + idx + 1
+                }
+            val acutalPositionAft =
+                if (isMoveUp) {
+                    positionBefore
+                } else {
+                    actualPositionTo + idx + 1
+                }
+            move(actualPositionBef, acutalPositionAft, pushChange = false, updateChildren = false)
+            //            if(items[actualPositionTo+idx +1].isChild != child.isChild){
+            //                items.setIsChild(actualPositionTo+idx +1, child.isChild)
+            //            }
         }
     }
 
