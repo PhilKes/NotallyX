@@ -26,8 +26,8 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.FOLDER_OR_FILE_MIMETYPE
 import com.philkes.notallyx.data.imports.ImportSource
 import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
-import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.data.model.toText
+import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.setupImportProgressDialog
@@ -645,7 +645,7 @@ class SettingsFragment : Fragment() {
                     arrayOf(
                         "Glide",
                         "Pretty Time",
-                        "Swipe Layout",
+                        "SwipeDrawer",
                         "Work Manager",
                         "Subsampling Scale ImageView",
                         "Material Components for Android",
@@ -659,7 +659,7 @@ class SettingsFragment : Fragment() {
                         when (which) {
                             0 -> openLink("https://github.com/bumptech/glide")
                             1 -> openLink("https://github.com/ocpsoft/prettytime")
-                            2 -> openLink("https://github.com/zerobranch/SwipeLayout")
+                            2 -> openLink("https://leaqi.github.io/SwipeDrawer_en")
                             3 ->
                                 openLink(
                                     "https://developer.android.com/jetpack/androidx/releases/work"
