@@ -260,7 +260,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         return baseNote.copy(id = id)
     }
 
-    suspend fun deleteBaseNote() {
+    suspend fun deleteBaseNote(checkAutoSave: Boolean = true) {
         app.cancelNoteReminders(listOf(NoteReminder(id, reminders.value)))
         withContext(Dispatchers.IO) { baseNoteDao.delete(id) }
         WidgetProvider.sendBroadcast(app, longArrayOf(id))
@@ -268,7 +268,9 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         if (attachments.isNotEmpty()) {
             withContext(Dispatchers.IO) { app.deleteAttachments(attachments) }
         }
-        app.checkAutoSave(preferences, forceFullBackup = true)
+        if (checkAutoSave) {
+            app.checkAutoSave(preferences, forceFullBackup = true)
+        }
     }
 
     fun setItems(items: List<ListItem>) {
