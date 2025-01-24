@@ -155,8 +155,7 @@ class ListManager(
         val checkChildPosition = if (positionTo < positionFrom) positionTo - 1 else positionTo
         val forceIsChild =
             when {
-                isDrag ->
-                    if (itemFrom.isChild && checkChildPosition.isBeforeChildItem) true else null
+                isDrag -> null
                 positionTo == 0 && itemFrom.isChild -> false
                 itemFrom.isChild -> true // if child is moved parent could change
                 updateChildren && checkChildPosition.isBeforeChildItemOfOtherParent -> true
@@ -241,22 +240,19 @@ class ListManager(
     }
 
     fun changeChecked(position: Int, checked: Boolean, pushChange: Boolean = true) {
+        val before = getItems()
         val item = items[position]
         if (item.checked == checked) {
             return
         }
         if (item.isChild) {
-            changeCheckedForChild(checked, item, pushChange, position)
+            changeCheckedForChild(checked, item, pushChange, position, before)
             return
         }
         items.setCheckedWithChildren(position, checked)
         if (pushChange) {
-            changeHistory.push(ListCheckedChange(checked, item.id, this))
+            changeHistory.push(ListCheckedChange(before, getItems(), this))
         }
-    }
-
-    fun changeCheckedById(id: Int, checked: Boolean, pushChange: Boolean = true) {
-        changeChecked(items.findById(id)!!.first, checked, pushChange)
     }
 
     private fun changeCheckedForChild(
@@ -264,6 +260,7 @@ class ListManager(
         item: ListItem,
         pushChange: Boolean,
         position: Int,
+        before: List<ListItem>,
     ) {
         var actualPosition = position
         val (parentPosition, parent) = items.findParent(item)!!
@@ -280,7 +277,7 @@ class ListManager(
             items.setChecked(parentPosition, true, recalcChildrenPositions = true)
         }
         if (pushChange) {
-            changeHistory.push(ListCheckedChange(checked, item.id, this))
+            changeHistory.push(ListCheckedChange(before, getItems(), this))
         }
     }
 

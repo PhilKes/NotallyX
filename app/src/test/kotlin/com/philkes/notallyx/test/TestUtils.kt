@@ -9,7 +9,6 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableSt
 import com.philkes.notallyx.utils.changehistory.ChangeCheckedForAllChange
 import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
 import com.philkes.notallyx.utils.changehistory.ListAddChange
-import com.philkes.notallyx.utils.changehistory.ListCheckedChange
 import com.philkes.notallyx.utils.changehistory.ListDeleteChange
 import com.philkes.notallyx.utils.changehistory.ListIsChildChange
 import com.philkes.notallyx.utils.changehistory.ListMoveChange
@@ -110,10 +109,10 @@ fun ListMoveChange.assert(from: Int, itemsBeforeMove: List<ListItem>) {
     assertEquals("itemsBeforeMove", itemsBeforeMove, this.itemsBefore)
 }
 
-fun ListCheckedChange.assert(newValue: Boolean, itemId: Int) {
-    assertEquals("checked", newValue, this.newValue)
-    assertEquals("itemId", itemId, this.itemId)
-}
+// fun ListCheckedChange.assert(newValue: Boolean, itemId: Int) {
+//    assertEquals("checked", newValue, this.newValue)
+//    assertEquals("itemId", itemId, this.itemId)
+// }
 
 fun ListIsChildChange.assert(newValue: Boolean, position: Int) {
     assertEquals("isChild", newValue, this.newValue)
