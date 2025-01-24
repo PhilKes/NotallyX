@@ -16,13 +16,13 @@
     <string name="date">Datum</string>
     <string name="delete">Radera</string>
     <string name="delete_forever">Radera för alltid</string>
-    <string name="delete_label">Radera etikett?</string>
-    <string name="delete_note_forever">Radera anteckning för alltid?</string>
+    <string name="delete_label">Radera etikett\?</string>
+    <string name="delete_note_forever">Radera anteckning för alltid\?</string>
     <string name="deleted">Raderat</string>
     <string name="drag_handle">Grepphandtag</string>
     <string name="edit">Redigera</string>
     <string name="edit_label">Redigera etikett</string>
-    <string name="empty_labels">Inga etiketter än. Skapa en?</string>
+    <string name="empty_labels">Inga etiketter än. Skapa en\?</string>
     <string name="empty_list">Tom lista</string>
     <string name="empty_note">Tom anteckning</string>
     <string name="export">Exportera</string>

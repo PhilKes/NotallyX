@@ -8,7 +8,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.ncorti.ktfmt.gradle") version "0.20.1"
     id("org.jetbrains.kotlin.plugin.serialization") version "1.9.0"
-    id("io.github.philkes.android-translations-converter") version "1.0.3"
+    id("io.github.philkes.android-translations-converter") version "1.0.4"
 }
 
 android {

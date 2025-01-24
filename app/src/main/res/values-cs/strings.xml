@@ -79,16 +79,16 @@
     <string name="days">Dny</string>
     <string name="delete">Smazat</string>
     <string name="delete_all">Smazat vše</string>
-    <string name="delete_all_notes">Smazat všechny poznámky?</string>
-    <string name="delete_audio_recording_forever">Smazat trvale zvukový záznam?</string>
+    <string name="delete_all_notes">Smazat všechny poznámky\?</string>
+    <string name="delete_audio_recording_forever">Smazat trvale zvukový záznam\?</string>
     <string name="delete_checked_items">Smazat vybrané položky</string>
-    <string name="delete_file">Smazat soubor \'%1$s\'?</string>
+    <string name="delete_file">Smazat soubor \'%1$s\'\?</string>
     <string name="delete_forever">Smazat navždy</string>
-    <string name="delete_image_forever">Smazat obrázek?</string>
-    <string name="delete_label">Smazat štítek?</string>
-    <string name="delete_note_forever">Smazat poznámku?</string>
-    <string name="delete_reminder">Odebrat upomínku?</string>
-    <string name="delete_selected_notes">Smazat vybrané poznámky?</string>
+    <string name="delete_image_forever">Smazat obrázek\?</string>
+    <string name="delete_label">Smazat štítek\?</string>
+    <string name="delete_note_forever">Smazat poznámku\?</string>
+    <string name="delete_reminder">Odebrat upomínku\?</string>
+    <string name="delete_selected_notes">Smazat vybrané poznámky\?</string>
     <string name="deleted">Smazané</string>
     <plurals name="deleted_selected_notes">
         <item quantity="few">Smazány %1$d poznámky</item>
@@ -109,10 +109,10 @@
     <string name="edit_label">Upravit štítek</string>
     <string name="edit_link">Upravit odkaz</string>
     <string name="edit_reminders">Upravit upomínky</string>
-    <string name="empty_labels">Žádné štítky. Vytvořit nový?</string>
+    <string name="empty_labels">Žádné štítky. Vytvořit nový\?</string>
     <string name="empty_list">Prázdný seznam</string>
     <string name="empty_note">Prázdná poznámka</string>
-    <string name="empty_reminders">Žádné upomínky. Vytvořit novou?</string>
+    <string name="empty_reminders">Žádné upomínky. Vytvořit novou\?</string>
     <string name="enable_lock_description">Toto rovněž zašifruje databázi</string>
     <string name="enable_lock_title">Vypnout zámek pomocí biometrických údajů/PIN</string>
     <string name="enabled">Povoleno</string>
@@ -124,7 +124,7 @@
     <string name="export">Exportovat</string>
     <string name="export_backup">Exportovat zálohu</string>
     <string name="export_settings">Exportovat nastavení</string>
-    <string name="export_settings_failure">Nepodařilo se exportovat nastavení, nezvolili jste neplatnou cestu?</string>
+    <string name="export_settings_failure">Nepodařilo se exportovat nastavení, nezvolili jste neplatnou cestu\?</string>
     <string name="export_settings_message">Všechna nastavení se vyexportují do souboru JSON, který lze použít k opětovnému importu uložených nastavení.\n\Všimněte si, že toto nastavení nezahrnuje šifrovaná nastavení, jako je heslo pro automatické zálohování nebo biometrický šifrovací klíč.</string>
     <string name="export_settings_success">Nastavení úspěšně exportováno</string>
     <string name="exporting_backup">Vytváří se záloha</string>
@@ -143,7 +143,7 @@
     <string name="import_backup_password_hint">Pokud vaše záloha není chráněna heslem, jednoduše stiskněte tlačítko Importovat, jinak zadejte správné heslo.</string>
     <string name="import_other">Import poznámek z jiné aplikace</string>
     <string name="import_settings">Import nastavení</string>
-    <string name="import_settings_failure">Nepodařilo se importovat nastavení, vybrali jste správný soubor?</string>
+    <string name="import_settings_failure">Nepodařilo se importovat nastavení, vybrali jste správný soubor\?</string>
     <string name="import_settings_message">Chcete-li importovat nastavení, vyberte prosím platný soubor JSON s nastavením NotallyX</string>
     <string name="import_settings_success">Import nastavení proběhl úspěšně</string>
     <string name="imported_files">Soubory byly importovány</string>
@@ -241,7 +241,7 @@
     </plurals>
     <string name="resume">Pokračovat</string>
     <string name="save">Uložit</string>
-    <string name="save_recording">Uložit záznam?</string>
+    <string name="save_recording">Uložit záznam\?</string>
     <string name="save_to_device">Uložit do zařízení</string>
     <string name="saved_to_device">Uloženo do zařízení</string>
     <string name="saved_to_notally">Uloženo do NotallyX</string>

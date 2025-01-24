@@ -89,16 +89,16 @@
     <string name="days">Days</string>
     <string name="delete">Delete</string>
     <string name="delete_all">Delete all</string>
-    <string name="delete_all_notes">Delete all notes?</string>
-    <string name="delete_audio_recording_forever">Delete audio recording forever?</string>
+    <string name="delete_all_notes">Delete all notes\?</string>
+    <string name="delete_audio_recording_forever">Delete audio recording forever\?</string>
     <string name="delete_checked_items">Delete checked items</string>
-    <string name="delete_file">Delete file \'%1$s\'?</string>
+    <string name="delete_file">Delete file \'%1$s\'\?</string>
     <string name="delete_forever">Delete forever</string>
-    <string name="delete_image_forever">Delete image forever?</string>
-    <string name="delete_label">Delete label?</string>
-    <string name="delete_note_forever">Delete note forever?</string>
-    <string name="delete_reminder">Delete reminder?</string>
-    <string name="delete_selected_notes">Delete selected notes?</string>
+    <string name="delete_image_forever">Delete image forever\?</string>
+    <string name="delete_label">Delete label\?</string>
+    <string name="delete_note_forever">Delete note forever\?</string>
+    <string name="delete_reminder">Delete reminder\?</string>
+    <string name="delete_selected_notes">Delete selected notes\?</string>
     <string name="deleted">Deleted</string>
     <plurals name="deleted_selected_notes">
         <item quantity="one">Deleted %1$d note</item>
@@ -119,10 +119,10 @@
     <string name="edit_label">Edit label</string>
     <string name="edit_link">Edit Link</string>
     <string name="edit_reminders">Edit Reminders</string>
-    <string name="empty_labels">No labels yet. Create one?</string>
+    <string name="empty_labels">No labels yet. Create one\?</string>
     <string name="empty_list">Empty list</string>
     <string name="empty_note">Empty note</string>
-    <string name="empty_reminders">No reminders yet. Create one?</string>
+    <string name="empty_reminders">No reminders yet. Create one\?</string>
     <string name="enable_lock_description">This will also encrypt the database</string>
     <string name="enable_lock_title">Enable lock via Biometric/PIN</string>
     <string name="enabled">Enabled</string>
@@ -134,7 +134,7 @@
     <string name="export">Export</string>
     <string name="export_backup">Export backup</string>
     <string name="export_settings">Export Settings</string>
-    <string name="export_settings_failure">Failed to export settings, did you choose an invalid path?</string>
+    <string name="export_settings_failure">Failed to export settings, did you choose an invalid path\?</string>
     <string name="export_settings_message">All Settings will be exported to a JSON file, which can be used to re-import stored settings.\n\nBe aware, that this does not include encrypted settings like the auto-backup password or the biometric encryption key</string>
     <string name="export_settings_success">Successfully exported settings</string>
     <string name="exporting_backup">Exporting backup</string>
@@ -153,7 +153,7 @@
     <string name="import_backup_password_hint">If your backup is not password-protected simply press Import, otherwise enter the correct password.</string>
     <string name="import_other">Import Notes from other App</string>
     <string name="import_settings">Import Settings</string>
-    <string name="import_settings_failure">Failed to import settings, did you choose the correct file?</string>
+    <string name="import_settings_failure">Failed to import settings, did you choose the correct file\?</string>
     <string name="import_settings_message">In order to import settings, please choose a valid NotallyX settings JSON file</string>
     <string name="import_settings_success">Successfully imported settings</string>
     <string name="imported_files">Files imported</string>
@@ -248,7 +248,7 @@
     </plurals>
     <string name="resume">Resume</string>
     <string name="save">Save</string>
-    <string name="save_recording">Save recording?</string>
+    <string name="save_recording">Save recording\?</string>
     <string name="save_to_device">Save to device</string>
     <string name="saved_to_device">Saved to device</string>
     <string name="saved_to_notally">Saved to NotallyX</string>

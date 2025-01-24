@@ -69,15 +69,15 @@
     <string name="date_format">Datumformaat</string>
     <string name="delete">Verwijderen</string>
     <string name="delete_all">Alles verwijderen</string>
-    <string name="delete_all_notes">Alle notities verwijderen?</string>
-    <string name="delete_audio_recording_forever">Audio-opname definitief verwijderen?</string>
+    <string name="delete_all_notes">Alle notities verwijderen\?</string>
+    <string name="delete_audio_recording_forever">Audio-opname definitief verwijderen\?</string>
     <string name="delete_checked_items">Geselecteerde items verwijderen</string>
-    <string name="delete_file">Bestand \'%1$s\' verwijderen?</string>
+    <string name="delete_file">Bestand \'%1$s\' verwijderen\?</string>
     <string name="delete_forever">Definitief verwijderen</string>
-    <string name="delete_image_forever">Afbeelding definitief verwijderen?</string>
-    <string name="delete_label">Label verwijderen?</string>
-    <string name="delete_note_forever">Notitie definitief verwijderen?</string>
-    <string name="delete_selected_notes">Geselecteerde notities verwijderen?</string>
+    <string name="delete_image_forever">Afbeelding definitief verwijderen\?</string>
+    <string name="delete_label">Label verwijderen\?</string>
+    <string name="delete_note_forever">Notitie definitief verwijderen\?</string>
+    <string name="delete_selected_notes">Geselecteerde notities verwijderen\?</string>
     <string name="deleted">Verwijderd</string>
     <plurals name="deleted_selected_notes">
         <item quantity="one">Verwijderde %1$d notitie</item>
@@ -95,7 +95,7 @@
     <string name="edit">Bewerken</string>
     <string name="edit_label">Label bewerken</string>
     <string name="edit_link">Link bewerken</string>
-    <string name="empty_labels">Nog geen labels. Nieuw label aanmaken?</string>
+    <string name="empty_labels">Nog geen labels. Nieuw label aanmaken\?</string>
     <string name="empty_list">Lege lijst</string>
     <string name="empty_note">Lege notitie</string>
     <string name="enable_lock_description">Dit versleutelt ook de database</string>
@@ -193,7 +193,7 @@
     </plurals>
     <string name="resume">Hervatten</string>
     <string name="save">Opslaan</string>
-    <string name="save_recording">Opname opslaan?</string>
+    <string name="save_recording">Opname opslaan\?</string>
     <string name="save_to_device">Opslaan op apparaat</string>
     <string name="saved_to_device">Opgeslagen op apparaat</string>
     <string name="saved_to_notally">Opgeslagen in NotallyX</string>
