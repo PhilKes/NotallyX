@@ -21,11 +21,18 @@
     <string name="auto_backup_error_message">Une erreur est survenue lors de la sauvegarde automatique:\n\'%1$s\'\nVeuillez vérifier vos paramètres ou signaler un bug</string>
     <string name="auto_backup_failed">La sauvegarde automatique de NotallyX a échoué </string>
     <string name="auto_backup_last">Dernière sauvegarde</string>
+    <string name="auto_backup_on_save">Sauvegarde automatique après chaque édition</string>
+    <string name="auto_backup_on_save_hint">En activant cette option, une sauvegarde (\"NotallyX_AutoBackup.zip\") est automatiquement créée dans le \"Dossier des sauvegardes\" configuré, à chaque fois qu'une note est enregistrée.\nAttention, cela pourrait affecter les performances.</string>
+    <string name="auto_backups_folder">Dossier des sauvegardes</string>
+    <string name="auto_backups_folder_hint">Dossier dans lequel toutes les sauvegardes automatiques seront stockées.</string>
+    <string name="auto_backups_folder_set">Configurer d\'abord le Dossier des sauvegardes</string>
     <string name="back">Retour</string>
     <string name="backup">Sauvegarde</string>
     <string name="backup_password">Mot de passe des sauvegardes</string>
     <string name="backup_password_hint">En activant cette option, tous les futurs fichiers ZIP de sauvegarde seront chiffrés et protégés par un mot de passe</string>
-    <string name="backup_period_days">Fréquence de sauvegarde automatique en jours</string>
+    <string name="backup_period_days">Fréquence de sauvegarde périodique en jours</string>
+    <string name="backup_periodic">Sauvegardes périodiques</string>
+    <string name="backup_periodic_hint">En activant cette option, des sauvegardes sont automatiquement créées dans le Dossier de sauvegardes configuré.\nCela peut ne pas fonctionner si le mode économie d'énergie est activé. </string>
     <string name="biometric_lock">Verrouiller l\'application avec la biométrie ou le code PIN de l\'appareil</string>
     <string name="biometrics_disable_success">Le verrouillage biométrique/code PIN a été désactivé</string>
     <string name="biometrics_failure">Échec de l\'authentification biométrique/code PIN</string>
@@ -72,6 +79,8 @@
     <string name="data_in_public_message">En activant cette option, la base de données interne de l\'application sera déplacée dans le dossier public de l\'application (Android/media/com.philkes.notallyx). En combinaison avec des applications de synchronisation de fichiers, cela peut être utilisé pour synchroniser les données de NotallyX entre plusieurs appareils.</string>
     <string name="date">Date</string>
     <string name="date_format">Format de la date</string>
+    <string name="date_format_apply_in_note_view">Appliquer aussi dans les notes</string>
+    <string name="date_format_hint">Applique le format de date sélectionné dans la vue d’ensemble</string>
     <string name="days">Jours</string>
     <string name="delete">Supprimer</string>
     <string name="delete_all">Tout supprimer</string>
@@ -129,8 +138,7 @@
     <string name="folder">Dossier</string>
     <string name="follow_system">En fonction du système</string>
     <string name="google_keep">Google Keep</string>
-    <string name="google_keep_help">Pour importer vos notes depuis Google Keep, vous devez télécharger votre fichier ZIP Google Takeout. Sélectionnez uniquement les données \"Conserver\". Cliquez sur "Aide" pour plus d
-	information.\n\nSi vous possédez déjà un fichier ZIP Google Takeout, cliquez sur "Importer" et choisissez le fichier ZIP.</string>
+    <string name="google_keep_help">Pour importer vos notes depuis Google Keep, vous devez télécharger votre fichier ZIP Google Takeout. Sélectionnez uniquement les données \"Conserver\". Cliquez sur "Aide" pour plus d\'information.\n\nSi vous possédez déjà un fichier ZIP Google Takeout, cliquez sur "Importer" et choisissez le fichier ZIP.</string>
     <string name="grid">Grille</string>
     <string name="help">Aide</string>
     <string name="hours">Heures</string>
