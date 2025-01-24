@@ -48,6 +48,9 @@ fun ListItemSortedList.moveItemRange(
         if (forceIsChild != null) {
             val (_, item) = this.findById(it.id)!!
             this.forceItemIsChild(item, forceIsChild, resetBefore = true)
+            itemsToMove.forEach { listItem ->
+                this.updateItemAt(this.findById(listItem.id)!!.first, listItem)
+            }
         }
     }
     this.recalcPositions(
@@ -92,6 +95,7 @@ fun ListItemSortedList.setIsChild(
     position: Int,
     isChild: Boolean,
     forceOnChildren: Boolean = false,
+    forceNotify: Boolean = false,
 ) {
     if (position == 0 && isChild) {
         return
@@ -100,7 +104,8 @@ fun ListItemSortedList.setIsChild(
         this.setIsChild((position..position + this[position].children.size).toList(), isChild)
     } else {
         val item = this[position].clone() as ListItem
-        if (item.isChild != isChild) {
+        val valueChanged = item.isChild != isChild
+        if (valueChanged || forceNotify) {
             item.isChild = isChild
             this.updateItemAt(position, item)
             if (!item.isChild) {

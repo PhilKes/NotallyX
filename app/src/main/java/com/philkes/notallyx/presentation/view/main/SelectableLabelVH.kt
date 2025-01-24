@@ -10,7 +10,7 @@ class SelectableLabelVH(
 
     init {
         binding.root.setOnCheckedChangeListener { _, isChecked ->
-            onChecked(adapterPosition, isChecked)
+            onChecked(absoluteAdapterPosition, isChecked)
         }
     }
 

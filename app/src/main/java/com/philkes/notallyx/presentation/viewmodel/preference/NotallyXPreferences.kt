@@ -93,12 +93,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
         )
 
     val backupsFolder =
-        StringPreference(
-            "autoBackup",
-            encryptedPreferences,
-            EMPTY_PATH,
-            R.string.auto_backups_folder,
-        )
+        StringPreference("autoBackup", preferences, EMPTY_PATH, R.string.auto_backups_folder)
     val backupOnSave =
         BooleanPreference("backupOnSave", preferences, false, R.string.auto_backup_on_save)
     val periodicBackups = PeriodicBackupsPreference(preferences)

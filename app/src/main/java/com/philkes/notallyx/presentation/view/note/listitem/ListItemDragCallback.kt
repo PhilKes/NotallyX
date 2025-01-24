@@ -16,6 +16,7 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
     private var childViewHolders: List<ViewHolder> = mutableListOf()
 
     private var draggedItem: ListItem? = null
+    private var itemsBefore: List<ListItem>? = null
     private var positionFrom: Int? = null
     private var positionTo: Int? = null
     private var newPosition: Int? = null
@@ -30,8 +31,8 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
     }
 
     override fun onMove(view: RecyclerView, viewHolder: ViewHolder, target: ViewHolder): Boolean {
-        val from = viewHolder.adapterPosition
-        val to = target.adapterPosition
+        val from = viewHolder.absoluteAdapterPosition
+        val to = target.absoluteAdapterPosition
         if (from == -1 || to == -1) {
             return false
         }
@@ -41,6 +42,7 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
     internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
             draggedItem = listManager.getItem(from).clone() as ListItem
+            itemsBefore = listManager.getItems()
         }
         val swapped = listManager.move(from, to, false, false, isDrag = true)
         if (swapped != null) {
@@ -99,15 +101,15 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
     internal fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
         Log.d(TAG, "onDragStart")
         reset()
-        if (viewHolder.adapterPosition == -1) {
+        if (viewHolder.absoluteAdapterPosition == -1) {
             return
         }
-        val item = listManager.getItem(viewHolder.adapterPosition)
+        val item = listManager.getItem(viewHolder.absoluteAdapterPosition)
         if (!item.isChild) {
             childViewHolders =
                 item.children.mapIndexedNotNull { index, _ ->
                     recyclerView.findViewHolderForAdapterPosition(
-                        viewHolder.adapterPosition + index + 1
+                        viewHolder.absoluteAdapterPosition + index + 1
                     )
                 }
             childViewHolders.forEach { animateFadeOut(it) }
@@ -119,6 +121,7 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
         positionTo = null
         newPosition = null
         draggedItem = null
+        itemsBefore = null
     }
 
     internal fun onDragEnd() {
@@ -126,13 +129,13 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
         if (positionFrom == positionTo) {
             return
         }
-        if (newPosition != null && draggedItem != null) {
+        if (newPosition != null && itemsBefore != null) {
             // The items have already been moved accordingly via move() calls
             listManager.finishMove(
                 positionFrom!!,
                 positionTo!!,
                 newPosition!!,
-                draggedItem!!,
+                itemsBefore!!,
                 updateIsChild = true,
                 updateChildren = true,
                 pushChange = true,

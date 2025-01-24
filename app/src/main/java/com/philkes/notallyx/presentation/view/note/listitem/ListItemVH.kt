@@ -10,6 +10,9 @@ import android.widget.TextView.VISIBLE
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import cn.leaqi.drawer.SwipeDrawer.DIRECTION_LEFT
+import cn.leaqi.drawer.SwipeDrawer.STATE_CLOSE
+import cn.leaqi.drawer.SwipeDrawer.STATE_OPEN
 import com.philkes.notallyx.data.imports.txt.extractListItems
 import com.philkes.notallyx.data.imports.txt.findListSyntaxRegex
 import com.philkes.notallyx.data.model.ListItem
@@ -18,7 +21,6 @@ import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
-import com.philkes.notallyx.presentation.view.misc.SwipeLayout.SwipeActionsListener
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
@@ -37,7 +39,7 @@ class ListItemVH(
             setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
             setOnNextAction {
-                val position = adapterPosition + 1
+                val position = absoluteAdapterPosition + 1
                 listManager.add(position)
             }
 
@@ -70,6 +72,13 @@ class ListItemVH(
                 }
             }
             false
+        }
+
+        binding.SwipeLayout.setOnDrawerChange { view, state, progress ->
+            when (state) {
+                STATE_OPEN -> listManager.changeIsChild(absoluteAdapterPosition, true)
+                STATE_CLOSE -> listManager.changeIsChild(absoluteAdapterPosition, false)
+            }
         }
     }
 
@@ -120,7 +129,7 @@ class ListItemVH(
     private fun updateDeleteButton(item: ListItem, position: Int) {
         binding.Delete.apply {
             visibility = if (item.checked) VISIBLE else INVISIBLE
-            setOnClickListener { listManager.delete(adapterPosition) }
+            setOnClickListener { listManager.delete(absoluteAdapterPosition) }
             contentDescription = "Delete$position"
         }
     }
@@ -138,7 +147,7 @@ class ListItemVH(
                     // TODO: when there are multiple checked items above it does not jump to the
                     // last
                     // unchecked item but always re-adds a new item
-                    listManager.delete(adapterPosition, false) != null
+                    listManager.delete(absoluteAdapterPosition, false) != null
                 } else {
                     false
                 }
@@ -153,7 +162,7 @@ class ListItemVH(
         if (checkBoxListener == null) {
             checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
                 buttonView!!.setOnCheckedChangeListener(null)
-                listManager.changeChecked(adapterPosition, isChecked)
+                listManager.changeChecked(absoluteAdapterPosition, isChecked)
                 buttonView.setOnCheckedChangeListener(checkBoxListener)
             }
         }
@@ -167,25 +176,13 @@ class ListItemVH(
 
     private fun updateSwipe(open: Boolean, canSwipe: Boolean) {
         binding.SwipeLayout.apply {
-            setOnActionsListener(null)
-            val swipeActionListener =
-                object : SwipeActionsListener {
-                    override fun onOpen(direction: Int, isContinuous: Boolean) {
-                        listManager.changeIsChild(adapterPosition, true)
-                    }
-
-                    override fun onClose() {
-                        listManager.changeIsChild(adapterPosition, false)
-                    }
-                }
-            isEnabledSwipe = canSwipe
+            intercept = canSwipe
             post {
                 if (open) {
-                    openLeft(false)
+                    openDrawer(DIRECTION_LEFT, false, false)
                 } else {
-                    close(false)
+                    closeDrawer(DIRECTION_LEFT, false, false)
                 }
-                setOnActionsListener(swipeActionListener)
             }
         }
     }
@@ -206,10 +203,10 @@ class ListItemVH(
                     if (text.trim().length > count) {
                         editText.setText(text.substring(0, start) + text.substring(start + count))
                     } else {
-                        listManager.delete(adapterPosition, pushChange = false)
+                        listManager.delete(absoluteAdapterPosition, pushChange = false)
                     }
                     items.forEachIndexed { idx, it ->
-                        listManager.add(adapterPosition + idx + 1, it, pushChange = true)
+                        listManager.add(absoluteAdapterPosition + idx + 1, it, pushChange = true)
                     }
                 }
         }

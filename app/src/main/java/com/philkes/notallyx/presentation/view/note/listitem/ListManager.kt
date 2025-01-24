@@ -10,6 +10,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.areAllChecked
 import com.philkes.notallyx.data.model.plus
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.cloneList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.deleteItem
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.filter
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.findById
@@ -145,7 +146,8 @@ class ListManager(
         endSearch?.invoke()
         val itemTo = items[positionTo]
         val itemFrom = items[positionFrom]
-        val itemBeforeMove = itemFrom.clone() as ListItem
+        //        val itemBeforeMove = itemFrom.clone() as ListItem
+        val itemsBeforeMove = getItems()
         // Disallow move unchecked item under any checked item (if auto-sort enabled)
         if (isAutoSortByCheckedEnabled() && itemTo.checked || itemTo.isChildOf(itemFrom)) {
             return null
@@ -153,8 +155,7 @@ class ListManager(
         val checkChildPosition = if (positionTo < positionFrom) positionTo - 1 else positionTo
         val forceIsChild =
             when {
-                isDrag ->
-                    if (itemFrom.isChild && checkChildPosition.isBeforeChildItem) true else null
+                isDrag -> null
                 positionTo == 0 && itemFrom.isChild -> false
                 itemFrom.isChild -> true // if child is moved parent could change
                 updateChildren && checkChildPosition.isBeforeChildItemOfOtherParent -> true
@@ -173,7 +174,7 @@ class ListManager(
             positionFrom,
             positionTo,
             newPosition,
-            itemBeforeMove,
+            itemsBeforeMove,
             updateIsChild = false,
             updateChildren = false,
             pushChange,
@@ -185,7 +186,7 @@ class ListManager(
         positionFrom: Int,
         positionTo: Int,
         newPosition: Int,
-        itemBeforeMove: ListItem,
+        itemsBeforeMove: List<ListItem>,
         updateIsChild: Boolean,
         updateChildren: Boolean,
         pushChange: Boolean,
@@ -197,31 +198,22 @@ class ListManager(
                 items.setIsChild(newPosition, false)
             }
         }
+        val item = items[newPosition]
         if (updateChildren) {
-            val item = items[newPosition]
             val forceValue = item.isChild
             items.forceItemIsChild(item, forceValue, resetBefore = true)
             items.updateItemAt(items.findById(item.id)!!.first, item)
+        } else if (item.isChild && newPosition > 0) {
+            items.removeChildFromParent(item)
+            items.updateChildInParent(newPosition, item)
         }
         if (pushChange) {
-            changeHistory.push(
-                ListMoveChange(positionFrom, positionTo, newPosition, itemBeforeMove, this)
-            )
+            changeHistory.push(ListMoveChange(positionFrom, itemsBeforeMove, getItems(), this))
         }
     }
 
-    fun undoMove(positionAfter: Int, positionFrom: Int, itemBeforeMove: ListItem) {
-        val actualPositionTo =
-            if (positionAfter < positionFrom) {
-                positionFrom + itemBeforeMove.children.size
-            } else {
-                positionFrom
-            }
-        val positionBefore =
-            move(positionAfter, actualPositionTo, pushChange = false, updateChildren = false)!!
-        if (items[positionBefore].isChild != itemBeforeMove.isChild) {
-            items.setIsChild(positionBefore, itemBeforeMove.isChild)
-        }
+    fun setItems(items: List<ListItem>) {
+        this.items.init(items)
     }
 
     fun changeText(
@@ -248,22 +240,19 @@ class ListManager(
     }
 
     fun changeChecked(position: Int, checked: Boolean, pushChange: Boolean = true) {
+        val before = getItems()
         val item = items[position]
         if (item.checked == checked) {
             return
         }
         if (item.isChild) {
-            changeCheckedForChild(checked, item, pushChange, position)
+            changeCheckedForChild(checked, item, pushChange, position, before)
             return
         }
         items.setCheckedWithChildren(position, checked)
         if (pushChange) {
-            changeHistory.push(ListCheckedChange(checked, item.id, this))
+            changeHistory.push(ListCheckedChange(before, getItems(), this))
         }
-    }
-
-    fun changeCheckedById(id: Int, checked: Boolean, pushChange: Boolean = true) {
-        changeChecked(items.findById(id)!!.first, checked, pushChange)
     }
 
     private fun changeCheckedForChild(
@@ -271,6 +260,7 @@ class ListManager(
         item: ListItem,
         pushChange: Boolean,
         position: Int,
+        before: List<ListItem>,
     ) {
         var actualPosition = position
         val (parentPosition, parent) = items.findParent(item)!!
@@ -287,7 +277,7 @@ class ListManager(
             items.setChecked(parentPosition, true, recalcChildrenPositions = true)
         }
         if (pushChange) {
-            changeHistory.push(ListCheckedChange(checked, item.id, this))
+            changeHistory.push(ListCheckedChange(before, getItems(), this))
         }
     }
 
@@ -368,6 +358,8 @@ class ListManager(
     internal fun getItem(position: Int): ListItem {
         return items[position]
     }
+
+    internal fun getItems(): List<ListItem> = items.cloneList()
 
     internal fun defaultNewItem(position: Int) =
         ListItem(

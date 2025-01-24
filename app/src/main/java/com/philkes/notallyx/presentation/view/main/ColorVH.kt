@@ -10,7 +10,7 @@ class ColorVH(private val binding: RecyclerColorBinding, listener: ItemListener)
     RecyclerView.ViewHolder(binding.root) {
 
     init {
-        binding.CardView.setOnClickListener { listener.onClick(adapterPosition) }
+        binding.CardView.setOnClickListener { listener.onClick(absoluteAdapterPosition) }
     }
 
     fun bind(color: Color) {

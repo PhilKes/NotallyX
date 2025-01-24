@@ -71,15 +71,15 @@
     <string name="date_format">Formato data</string>
     <string name="delete">Elimina</string>
     <string name="delete_all">Elimina tutto</string>
-    <string name="delete_all_notes">Eliminare tutte le note?</string>
-    <string name="delete_audio_recording_forever">Eliminare la registrazione audio definitivamente?</string>
+    <string name="delete_all_notes">Eliminare tutte le note\?</string>
+    <string name="delete_audio_recording_forever">Eliminare la registrazione audio definitivamente\?</string>
     <string name="delete_checked_items">Elimina gli elementi spuntati</string>
-    <string name="delete_file">Eliminare il file \’%1$s\’?</string>
+    <string name="delete_file">Eliminare il file \’%1$s\’\?</string>
     <string name="delete_forever">Elimina definitivamente</string>
-    <string name="delete_image_forever">Eliminare l’immagine definitivamente?</string>
-    <string name="delete_label">Eliminare etichetta?</string>
-    <string name="delete_note_forever">Eliminare nota definitivamente?</string>
-    <string name="delete_selected_notes">Eliminare le note selezionate?</string>
+    <string name="delete_image_forever">Eliminare l’immagine definitivamente\?</string>
+    <string name="delete_label">Eliminare etichetta\?</string>
+    <string name="delete_note_forever">Eliminare nota definitivamente\?</string>
+    <string name="delete_selected_notes">Eliminare le note selezionate\?</string>
     <string name="deleted">Cestino</string>
     <plurals name="deleted_selected_notes">
         <item quantity="one">Eliminata %1$d nota</item>
@@ -98,7 +98,7 @@
     <string name="edit">Modifica</string>
     <string name="edit_label">Modifica etichetta</string>
     <string name="edit_link">Modifica link</string>
-    <string name="empty_labels">Non ci sono etichette. Vuoi crearne una?</string>
+    <string name="empty_labels">Non ci sono etichette. Vuoi crearne una\?</string>
     <string name="empty_list">Lista vuota</string>
     <string name="empty_note">Nota vuota</string>
     <string name="enable_lock_description">Questo inoltre crittograferà il database</string>
@@ -115,7 +115,7 @@
     <string name="filter">Filtra</string>
     <string name="follow_system">Predefinito di Sistema</string>
     <string name="google_keep">Google Keep</string>
-    <string name="google_keep_help">Per importare le note da Google Keep devi scaricare il tuo file ZIP di Google Takeout. Seleziona solo i dati "Keep". Clicca su Aiuto per ulteriori informazioni.\n\nSe hai già un file ZIP di Takeout, clicca Importa e selezionalo.</string>
+    <string name="google_keep_help">Per importare le note da Google Keep devi scaricare il tuo file ZIP di Google Takeout. Seleziona solo i dati \"Keep\". Clicca su Aiuto per ulteriori informazioni.\n\nSe hai già un file ZIP di Takeout, clicca Importa e selezionalo.</string>
     <string name="grid">Griglia</string>
     <string name="help">Aiuto</string>
     <string name="image_format_not_supported">Formato immagine non supportato</string>
@@ -200,7 +200,7 @@
     </plurals>
     <string name="resume">Riprendi</string>
     <string name="save">Salva</string>
-    <string name="save_recording">Salvare la registrazione?</string>
+    <string name="save_recording">Salvare la registrazione\?</string>
     <string name="save_to_device">Salva sul dispositivo</string>
     <string name="saved_to_device">Salvata sul dispositivo</string>
     <string name="saved_to_notally">Salvata su NotallyX</string>
