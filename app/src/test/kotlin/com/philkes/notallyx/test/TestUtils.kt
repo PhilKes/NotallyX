@@ -105,11 +105,9 @@ fun ListItem.assertChildren(vararg childrenBodies: String) {
     }
 }
 
-fun ListMoveChange.assert(from: Int, to: Int, after: Int, itemBeforeMove: String) {
+fun ListMoveChange.assert(from: Int, itemsBeforeMove: List<ListItem>) {
     assertEquals("from", from, position)
-    assertEquals("to", to, positionTo)
-    assertEquals("after", after, positionAfter)
-    assertEquals("itemBeforeMove", itemBeforeMove, this.itemBeforeMove.toString())
+    assertEquals("itemsBeforeMove", itemsBeforeMove, this.itemsBefore)
 }
 
 fun ListCheckedChange.assert(newValue: Boolean, itemId: Int) {

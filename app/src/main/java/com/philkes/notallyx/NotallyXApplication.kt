@@ -42,6 +42,9 @@ class NotallyXApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        if (isTestRunner()) return
+
         preferences = NotallyXPreferences.getInstance(this)
         preferences.theme.observeForever { theme ->
             when (theme) {
@@ -148,6 +151,12 @@ class NotallyXApplication : Application() {
         } catch (e: Exception) {
             // TODO: Happens when ErrorActivity is launched
             null
+        }
+    }
+
+    companion object {
+        private fun isTestRunner(): Boolean {
+            return Build.FINGERPRINT.equals("robolectric", ignoreCase = true)
         }
     }
 }

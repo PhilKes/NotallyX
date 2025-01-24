@@ -62,6 +62,8 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
     }
 
     fun init(items: Collection<ListItem>) {
+        beginBatchedUpdates()
+        super.clear()
         val initializedItems = items.deepCopy()
         initList(initializedItems)
         if (callback is ListItemSortedByCheckedCallback) {
@@ -72,6 +74,7 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
         } else {
             super.addAll(initializedItems.toTypedArray(), false)
         }
+        endBatchedUpdates()
     }
 
     fun init(vararg items: ListItem) {
@@ -104,7 +107,7 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
         }
     }
 
-    private fun removeChildFromParent(item: ListItem) {
+    fun removeChildFromParent(item: ListItem) {
         findParent(item)?.let { (_, parent) ->
             val childIndex = parent.children.indexOfFirst { child -> child.id == item.id }
             parent.children.removeAt(childIndex)
@@ -156,7 +159,7 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
         }
     }
 
-    private fun updateChildInParent(position: Int, item: ListItem) {
+    fun updateChildInParent(position: Int, item: ListItem) {
         val childIndex: Int?
         val parentInfo = findParent(item)
         val parent: ListItem?

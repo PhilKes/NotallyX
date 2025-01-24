@@ -10,6 +10,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.areAllChecked
 import com.philkes.notallyx.data.model.plus
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.cloneList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.deleteItem
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.filter
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.findById
@@ -145,7 +146,8 @@ class ListManager(
         endSearch?.invoke()
         val itemTo = items[positionTo]
         val itemFrom = items[positionFrom]
-        val itemBeforeMove = itemFrom.clone() as ListItem
+        //        val itemBeforeMove = itemFrom.clone() as ListItem
+        val itemsBeforeMove = getItems()
         // Disallow move unchecked item under any checked item (if auto-sort enabled)
         if (isAutoSortByCheckedEnabled() && itemTo.checked || itemTo.isChildOf(itemFrom)) {
             return null
@@ -173,7 +175,7 @@ class ListManager(
             positionFrom,
             positionTo,
             newPosition,
-            itemBeforeMove,
+            itemsBeforeMove,
             updateIsChild = false,
             updateChildren = false,
             pushChange,
@@ -185,7 +187,7 @@ class ListManager(
         positionFrom: Int,
         positionTo: Int,
         newPosition: Int,
-        itemBeforeMove: ListItem,
+        itemsBeforeMove: List<ListItem>,
         updateIsChild: Boolean,
         updateChildren: Boolean,
         pushChange: Boolean,
@@ -197,51 +199,22 @@ class ListManager(
                 items.setIsChild(newPosition, false)
             }
         }
+        val item = items[newPosition]
         if (updateChildren) {
-            val item = items[newPosition]
             val forceValue = item.isChild
             items.forceItemIsChild(item, forceValue, resetBefore = true)
             items.updateItemAt(items.findById(item.id)!!.first, item)
+        } else if (item.isChild && newPosition > 0) {
+            items.removeChildFromParent(item)
+            items.updateChildInParent(newPosition, item)
         }
         if (pushChange) {
-            changeHistory.push(
-                ListMoveChange(positionFrom, positionTo, newPosition, itemBeforeMove, this)
-            )
+            changeHistory.push(ListMoveChange(positionFrom, itemsBeforeMove, getItems(), this))
         }
     }
 
-    fun undoMove(positionAfter: Int, positionFrom: Int, itemBeforeMove: ListItem) {
-        val isMoveUp = positionAfter < positionFrom
-        val actualPositionTo =
-            if (isMoveUp) {
-                positionFrom + itemBeforeMove.children.size
-            } else {
-                positionFrom
-            }
-        val isChildBefore = items[positionAfter].isChild
-        if (isChildBefore != itemBeforeMove.isChild) {
-            items.setIsChild(positionAfter, itemBeforeMove.isChild, forceNotify = false)
-        }
-        val positionBefore =
-            move(positionAfter, actualPositionTo, pushChange = false, updateChildren = false)!!
-        itemBeforeMove.children.forEachIndexed { idx, child ->
-            val actualPositionBef =
-                if (isMoveUp) {
-                    positionAfter
-                } else {
-                    positionAfter + idx + 1
-                }
-            val acutalPositionAft =
-                if (isMoveUp) {
-                    positionBefore
-                } else {
-                    actualPositionTo + idx + 1
-                }
-            move(actualPositionBef, acutalPositionAft, pushChange = false, updateChildren = false)
-            //            if(items[actualPositionTo+idx +1].isChild != child.isChild){
-            //                items.setIsChild(actualPositionTo+idx +1, child.isChild)
-            //            }
-        }
+    fun setItems(items: List<ListItem>) {
+        this.items.init(items)
     }
 
     fun changeText(
@@ -388,6 +361,8 @@ class ListManager(
     internal fun getItem(position: Int): ListItem {
         return items[position]
     }
+
+    internal fun getItems(): List<ListItem> = items.cloneList()
 
     internal fun defaultNewItem(position: Int) =
         ListItem(

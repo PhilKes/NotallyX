@@ -5,20 +5,21 @@ import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 
 class ListMoveChange(
     positionFrom: Int,
-    internal val positionTo: Int,
-    internal var positionAfter: Int,
-    internal val itemBeforeMove: ListItem,
+    internal var itemsBefore: List<ListItem>,
+    internal var itemsAfter: List<ListItem>,
     internal val listManager: ListManager,
 ) : ListChange(positionFrom) {
+
     override fun redo() {
-        positionAfter = listManager.move(position, positionTo, pushChange = false)!!
+        // Moves are much more complex, therefore simply paste entire List like it was before
+        listManager.setItems(itemsAfter)
     }
 
     override fun undo() {
-        listManager.undoMove(positionAfter, position, itemBeforeMove)
+        listManager.setItems(itemsBefore)
     }
 
     override fun toString(): String {
-        return "MoveChange from: $position to: $positionTo after: $positionAfter itemBeforeMove: $itemBeforeMove"
+        return "MoveChange"
     }
 }
