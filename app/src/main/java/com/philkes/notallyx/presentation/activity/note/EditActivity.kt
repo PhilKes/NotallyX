@@ -139,8 +139,9 @@ abstract class EditActivity(private val type: Type) :
             val persistedId = savedInstanceState?.getLong("id")
             val selectedId = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0L)
             val id = persistedId ?: selectedId
-            notallyModel.setState(id)
-
+            if (persistedId == null) {
+                notallyModel.setState(id)
+            }
             if (notallyModel.isNewNote && intent.action == Intent.ACTION_SEND) {
                 handleSharedNote()
             } else if (notallyModel.isNewNote) {
