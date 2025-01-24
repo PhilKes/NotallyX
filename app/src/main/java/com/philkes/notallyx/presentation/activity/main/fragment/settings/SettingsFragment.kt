@@ -492,7 +492,7 @@ class SettingsFragment : Fragment() {
             PeriodicBackup.BACKUP_MAX_MIN,
             PeriodicBackup.BACKUP_MAX_MAX,
             requireContext(),
-            enabled = value.periodInDays > 0,
+            enabled = periodicBackupsEnabled,
         ) { newValue: Int ->
             model.savePreference(preference, preference.value.copy(maxBackups = newValue))
         }
