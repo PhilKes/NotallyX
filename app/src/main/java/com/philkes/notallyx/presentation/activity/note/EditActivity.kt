@@ -106,7 +106,7 @@ abstract class EditActivity(private val type: Type) :
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
             if (notallyModel.isEmpty()) {
-                notallyModel.deleteBaseNote()
+                notallyModel.deleteBaseNote(checkAutoSave = false)
             } else if (notallyModel.isModified()) {
                 saveNote()
             }
