@@ -121,7 +121,7 @@ class NotallyXApplication : Application() {
         backupFolder: String,
         periodInDays: Long,
     ) {
-        val workManager = WorkManager.getInstance(this)
+        val workManager = getWorkManagerSafe() ?: return
         workManager.getWorkInfosForUniqueWorkLiveData(AUTO_BACKUP_WORK_NAME).observeOnce { workInfos
             ->
             if (backupFolder == EMPTY_PATH || periodInDays < 1) {
@@ -139,6 +139,15 @@ class NotallyXApplication : Application() {
             ) {
                 workManager.updateAutoBackup(workInfos, periodInDays)
             }
+        }
+    }
+
+    private fun getWorkManagerSafe(): WorkManager? {
+        return try {
+            WorkManager.getInstance(this)
+        } catch (e: Exception) {
+            // TODO: Happens when ErrorActivity is launched
+            null
         }
     }
 }
