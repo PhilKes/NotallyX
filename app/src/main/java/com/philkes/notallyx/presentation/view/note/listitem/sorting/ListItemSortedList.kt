@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.view.note.listitem.sorting
 
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.deepCopy
 
 class ListItemSortedList(private val callback: Callback<ListItem>) :
     SortedList<ListItem>(ListItem::class.java, callback) {
@@ -61,7 +62,7 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
     }
 
     fun init(items: Collection<ListItem>) {
-        val initializedItems = items.toList()
+        val initializedItems = items.deepCopy()
         initList(initializedItems)
         if (callback is ListItemSortedByCheckedCallback) {
             val (children, parents) = initializedItems.partition { it.isChild }
@@ -117,6 +118,7 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
     }
 
     private fun initChildren(list: List<ListItem>) {
+        list.forEach { it.children.clear() }
         var parent: ListItem? = null
         list.forEach { item ->
             if (item.isChild && parent != null) {

@@ -203,3 +203,5 @@ fun List<ListItem>.toText() = buildString {
         appendLine("$childIndentation$check ${item.body}")
     }
 }
+
+fun Collection<ListItem>.deepCopy() = map { it.copy(children = mutableListOf()) }

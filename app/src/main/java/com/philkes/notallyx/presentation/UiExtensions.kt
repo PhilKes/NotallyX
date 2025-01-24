@@ -264,8 +264,7 @@ fun Int.dp(context: Context): Int =
  * Change is added to the ChangeHistory.
  *
  * @param positionGetter Function to determine the current position of the EditText in the list
- *   (e.g. the current adapterPosition when using RecyclerViewer.Adapter)
- * @param updateModel Function to update the model. Is called on any text changes and on undo/redo.
+ *   (e.g. the current absoluteAdapterPosition when using RecyclerViewer.Adapter)
  * @param onTextChanged optional text change handler. Returns whether or not the original change
  *   should be ignored or not.
  */

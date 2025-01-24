@@ -9,10 +9,12 @@ class LabelVH(private val binding: RecyclerLabelBinding, listener: LabelListener
 
     init {
         binding.apply {
-            LabelText.setOnClickListener { listener.onClick(adapterPosition) }
-            EditButton.setOnClickListener { listener.onEdit(adapterPosition) }
-            DeleteButton.setOnClickListener { listener.onDelete(adapterPosition) }
-            VisibilityButton.setOnClickListener { listener.onToggleVisibility(adapterPosition) }
+            LabelText.setOnClickListener { listener.onClick(absoluteAdapterPosition) }
+            EditButton.setOnClickListener { listener.onEdit(absoluteAdapterPosition) }
+            DeleteButton.setOnClickListener { listener.onDelete(absoluteAdapterPosition) }
+            VisibilityButton.setOnClickListener {
+                listener.onToggleVisibility(absoluteAdapterPosition)
+            }
         }
     }
 

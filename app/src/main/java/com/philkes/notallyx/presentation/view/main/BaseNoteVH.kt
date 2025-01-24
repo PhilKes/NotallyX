@@ -73,10 +73,10 @@ class BaseNoteVH(
             Title.maxLines = preferences.maxTitleLines
             Note.maxLines = preferences.maxLines
 
-            root.setOnClickListener { listener.onClick(adapterPosition) }
+            root.setOnClickListener { listener.onClick(absoluteAdapterPosition) }
 
             root.setOnLongClickListener {
-                listener.onLongClick(adapterPosition)
+                listener.onLongClick(absoluteAdapterPosition)
                 return@setOnLongClickListener true
             }
         }

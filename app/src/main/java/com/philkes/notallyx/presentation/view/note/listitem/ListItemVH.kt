@@ -39,7 +39,7 @@ class ListItemVH(
             setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
             setOnNextAction {
-                val position = adapterPosition + 1
+                val position = absoluteAdapterPosition + 1
                 listManager.add(position)
             }
 
@@ -76,8 +76,8 @@ class ListItemVH(
 
         binding.SwipeLayout.setOnDrawerChange { view, state, progress ->
             when (state) {
-                STATE_OPEN -> listManager.changeIsChild(adapterPosition, true)
-                STATE_CLOSE -> listManager.changeIsChild(adapterPosition, false)
+                STATE_OPEN -> listManager.changeIsChild(absoluteAdapterPosition, true)
+                STATE_CLOSE -> listManager.changeIsChild(absoluteAdapterPosition, false)
             }
         }
     }
@@ -129,7 +129,7 @@ class ListItemVH(
     private fun updateDeleteButton(item: ListItem, position: Int) {
         binding.Delete.apply {
             visibility = if (item.checked) VISIBLE else INVISIBLE
-            setOnClickListener { listManager.delete(adapterPosition) }
+            setOnClickListener { listManager.delete(absoluteAdapterPosition) }
             contentDescription = "Delete$position"
         }
     }
@@ -147,7 +147,7 @@ class ListItemVH(
                     // TODO: when there are multiple checked items above it does not jump to the
                     // last
                     // unchecked item but always re-adds a new item
-                    listManager.delete(adapterPosition, false) != null
+                    listManager.delete(absoluteAdapterPosition, false) != null
                 } else {
                     false
                 }
@@ -162,7 +162,7 @@ class ListItemVH(
         if (checkBoxListener == null) {
             checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
                 buttonView!!.setOnCheckedChangeListener(null)
-                listManager.changeChecked(adapterPosition, isChecked)
+                listManager.changeChecked(absoluteAdapterPosition, isChecked)
                 buttonView.setOnCheckedChangeListener(checkBoxListener)
             }
         }
@@ -203,10 +203,10 @@ class ListItemVH(
                     if (text.trim().length > count) {
                         editText.setText(text.substring(0, start) + text.substring(start + count))
                     } else {
-                        listManager.delete(adapterPosition, pushChange = false)
+                        listManager.delete(absoluteAdapterPosition, pushChange = false)
                     }
                     items.forEachIndexed { idx, it ->
-                        listManager.add(adapterPosition + idx + 1, it, pushChange = true)
+                        listManager.add(absoluteAdapterPosition + idx + 1, it, pushChange = true)
                     }
                 }
         }

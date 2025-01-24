@@ -15,8 +15,8 @@ class PreviewFileVH(
 
     init {
         binding.FileName.apply {
-            setOnClickListener { onClick(adapterPosition) }
-            setOnLongClickListener { onLongClick(adapterPosition) }
+            setOnClickListener { onClick(absoluteAdapterPosition) }
+            setOnLongClickListener { onLongClick(absoluteAdapterPosition) }
         }
     }
 
