@@ -16,11 +16,13 @@ import android.view.View
 import android.view.View.GONE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.VISIBLE
+import android.view.inputmethod.InputMethodManager
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
@@ -92,16 +94,16 @@ abstract class EditActivity(private val type: Type) :
     private lateinit var attachFilesActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var pinMenuItem: MenuItem
-
     protected var search = Search()
 
     internal val notallyModel: NotallyModel by viewModels()
-    internal lateinit var changeHistory: ChangeHistory
 
+    internal lateinit var changeHistory: ChangeHistory
     protected var undo: View? = null
     protected var redo: View? = null
 
     protected var colorInt: Int = -1
+    protected var inputMethodManager: InputMethodManager? = null
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
@@ -130,6 +132,8 @@ abstract class EditActivity(private val type: Type) :
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        inputMethodManager =
+            ContextCompat.getSystemService(baseContext, InputMethodManager::class.java)
         notallyModel.type = type
         initialiseBinding()
         setContentView(binding.root)
@@ -152,7 +156,7 @@ abstract class EditActivity(private val type: Type) :
 
             setupToolbars()
             setupListeners()
-            setStateFromModel()
+            setStateFromModel(savedInstanceState)
 
             configureUI()
             binding.ScrollView.apply {
@@ -482,7 +486,7 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
-    open fun setStateFromModel() {
+    open fun setStateFromModel(savedInstanceState: Bundle?) {
         val (date, datePrefixResId) =
             when (preferences.notesSorting.value.sortedBy) {
                 NotesSortBy.CREATION_DATE -> Pair(notallyModel.timestamp, R.string.creation_date)

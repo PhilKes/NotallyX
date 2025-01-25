@@ -53,6 +53,20 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         notesAdapter = null
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        val layoutManager = binding?.RecyclerView?.layoutManager as? LinearLayoutManager
+        if (layoutManager != null) {
+            val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
+            if (firstVisiblePosition != RecyclerView.NO_POSITION) {
+                val firstVisibleView = layoutManager.findViewByPosition(firstVisiblePosition)
+                val offset = firstVisibleView?.top ?: 0
+                outState.putInt(EXTRA_SCROLL_POS, firstVisiblePosition)
+                outState.putInt(EXTRA_SCROLL_OFFSET, offset)
+            }
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding?.ImageView?.setImageResource(getBackground())
 
@@ -61,6 +75,17 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         setupObserver()
 
         setupActivityResultLaunchers()
+
+        savedInstanceState?.let { bundle ->
+            val scrollPosition = bundle.getInt(EXTRA_SCROLL_POS, -1)
+            val scrollOffset = bundle.getInt(EXTRA_SCROLL_OFFSET, 0)
+            if (scrollPosition > -1) {
+                binding?.RecyclerView?.post {
+                    val layoutManager = binding?.RecyclerView?.layoutManager as? LinearLayoutManager
+                    layoutManager?.scrollToPositionWithOffset(scrollPosition, scrollOffset)
+                }
+            }
+        }
     }
 
     private fun setupActivityResultLaunchers() {
@@ -235,5 +260,10 @@ abstract class NotallyFragment : Fragment(), ItemListener {
 
     open fun prepareNewNoteIntent(intent: Intent): Intent {
         return intent
+    }
+
+    companion object {
+        private const val EXTRA_SCROLL_POS = "notallyx.intent.extra.SCROLL_POS"
+        private const val EXTRA_SCROLL_OFFSET = "notallyx.intent.extra.SCROLL_OFFSET"
     }
 }

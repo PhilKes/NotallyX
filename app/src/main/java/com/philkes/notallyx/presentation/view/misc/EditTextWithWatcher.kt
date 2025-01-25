@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.AttributeSet
+import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.AppCompatEditText
 import com.philkes.notallyx.presentation.clone
 
@@ -54,5 +55,17 @@ open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
 
     fun changeText(callback: (text: Editable) -> Unit): Pair<Editable, Editable> {
         return applyWithoutTextWatcher { callback(super.getText()!!) }
+    }
+
+    fun focusAndSelect(
+        start: Int = selectionStart,
+        end: Int = selectionEnd,
+        inputMethodManager: InputMethodManager? = null,
+    ) {
+        requestFocus()
+        if (start > -1) {
+            setSelection(start, if (end < 0) start else end)
+        }
+        inputMethodManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
     }
 }
