@@ -78,6 +78,14 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         setupActivityResultLaunchers()
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.apply {
+            putInt(EXTRA_SELECTION_START, binding.EnterBody.selectionStart)
+            putInt(EXTRA_SELECTION_END, binding.EnterBody.selectionEnd)
+        }
+    }
+
     private fun setupActivityResultLaunchers() {
         pickNoteNewActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -146,9 +154,16 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         }
     }
 
-    override fun setStateFromModel() {
-        super.setStateFromModel()
+    override fun setStateFromModel(savedInstanceState: Bundle?) {
+        super.setStateFromModel(savedInstanceState)
         updateEditText()
+        savedInstanceState?.let {
+            val selectionStart = it.getInt(EXTRA_SELECTION_START, -1)
+            val selectionEnd = it.getInt(EXTRA_SELECTION_END, -1)
+            if (selectionStart > -1) {
+                binding.EnterBody.focusAndSelect(selectionStart, selectionEnd)
+            }
+        }
     }
 
     private fun updateEditText() {
@@ -446,5 +461,10 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         val noteType = Type.valueOf(this.getStringExtra(EXTRA_PICKED_NOTE_TYPE)!!)
         val noteUrl = noteId.createNoteUrl(noteType)
         return Triple(noteTitle, noteUrl, emptyTitle)
+    }
+
+    companion object {
+        private const val EXTRA_SELECTION_START = "notallyx.intent.extra.EXTRA_SELECTION_START"
+        private const val EXTRA_SELECTION_END = "notallyx.intent.extra.EXTRA_SELECTION_END"
     }
 }

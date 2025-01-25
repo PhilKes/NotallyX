@@ -117,13 +117,10 @@ class ListItemVH(
 
     fun focusEditText(
         selectionStart: Int = binding.EditText.text!!.length,
-        inputMethodManager: InputMethodManager,
+        selectionEnd: Int = selectionStart,
+        inputMethodManager: InputMethodManager?,
     ) {
-        binding.EditText.apply {
-            requestFocus()
-            setSelection(selectionStart)
-            inputMethodManager.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-        }
+        binding.EditText.focusAndSelect(selectionStart, selectionEnd, inputMethodManager)
     }
 
     private fun updateDeleteButton(item: ListItem, position: Int) {
@@ -211,5 +208,9 @@ class ListItemVH(
                 }
         }
         return containsLines
+    }
+
+    fun getSelection(): Pair<Int, Int> {
+        return Pair(binding.EditText.selectionStart, binding.EditText.selectionEnd)
     }
 }

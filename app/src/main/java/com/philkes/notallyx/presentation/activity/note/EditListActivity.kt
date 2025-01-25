@@ -1,8 +1,6 @@
 package com.philkes.notallyx.presentation.activity.note
 
 import android.os.Bundle
-import android.view.inputmethod.InputMethodManager
-import androidx.core.content.ContextCompat
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.addIconButton
@@ -10,6 +8,7 @@ import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.note.action.MoreListActions
 import com.philkes.notallyx.presentation.view.note.action.MoreListBottomSheet
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
@@ -25,7 +24,6 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     private var adapter: ListItemAdapter? = null
     private lateinit var items: ListItemSortedList
-
     private lateinit var listManager: ListManager
 
     override fun finish() {
@@ -35,6 +33,21 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     override fun onSaveInstanceState(outState: Bundle) {
         notallyModel.setItems(items.toMutableList())
+        binding.RecyclerView.focusedChild?.let { focusedChild ->
+            val viewHolder = binding.RecyclerView.findContainingViewHolder(focusedChild)
+            if (viewHolder is ListItemVH) {
+                val itemPos = binding.RecyclerView.getChildAdapterPosition(focusedChild)
+                if (itemPos > -1) {
+                    val (selectionStart, selectionEnd) = viewHolder.getSelection()
+                    outState.apply {
+                        putInt(EXTRA_ITEM_POS, itemPos)
+                        putInt(EXTRA_SELECTION_START, selectionStart)
+                        putInt(EXTRA_SELECTION_END, selectionEnd)
+                    }
+                }
+            }
+        }
+
         super.onSaveInstanceState(outState)
     }
 
@@ -117,15 +130,15 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         binding.AddItem.setOnClickListener { listManager.add() }
     }
 
-    override fun setStateFromModel() {
-        super.setStateFromModel()
+    override fun setStateFromModel(savedInstanceState: Bundle?) {
+        super.setStateFromModel(savedInstanceState)
         val elevation = resources.displayMetrics.density * 2
         listManager =
             ListManager(
                 binding.RecyclerView,
                 changeHistory,
                 preferences,
-                ContextCompat.getSystemService(baseContext, InputMethodManager::class.java),
+                inputMethodManager,
                 {
                     if (isInSearchMode()) {
                         endSearch()
@@ -158,10 +171,36 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         binding.RecyclerView.adapter = adapter
         listManager.adapter = adapter!!
         listManager.initList(items)
+        savedInstanceState?.let {
+            val itemPos = it.getInt(EXTRA_ITEM_POS, -1)
+            if (itemPos > -1) {
+                binding.RecyclerView.apply {
+                    post {
+                        scrollToPosition(itemPos)
+                        val viewHolder = findViewHolderForLayoutPosition(itemPos)
+                        if (viewHolder is ListItemVH) {
+                            val selectionStart = it.getInt(EXTRA_SELECTION_START, -1)
+                            val selectionEnd = it.getInt(EXTRA_SELECTION_END, -1)
+                            viewHolder.focusEditText(
+                                selectionStart,
+                                selectionEnd,
+                                inputMethodManager,
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
     override fun setColor() {
         super.setColor()
         adapter?.setBackgroundColor(colorInt)
+    }
+
+    companion object {
+        private const val EXTRA_ITEM_POS = "notallyx.intent.extra.ITEM_POS"
+        private const val EXTRA_SELECTION_START = "notallyx.intent.extra.EXTRA_SELECTION_START"
+        private const val EXTRA_SELECTION_END = "notallyx.intent.extra.EXTRA_SELECTION_END"
     }
 }
