@@ -60,6 +60,11 @@
     </fragment>
 
     <fragment
+      android:id="@+id/Reminders"
+      android:name="com.philkes.notallyx.presentation.activity.main.fragment.RemindersFragment"
+      android:label="@string/reminders" />
+
+    <fragment
         android:id="@+id/Settings"
         android:name="com.philkes.notallyx.presentation.activity.main.fragment.settings.SettingsFragment"
         android:label="@string/settings" />

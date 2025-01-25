@@ -60,6 +60,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.chip.Chip
@@ -781,4 +784,11 @@ private fun getOutlinedDrawable(context: Context): MaterialShapeDrawable {
         strokeWidth = context.resources.displayMetrics.density
         strokeColor = ContextCompat.getColorStateList(context, R.color.chip_stroke)
     }
+}
+
+fun RecyclerView.initListView(context: Context) {
+    setHasFixedSize(true)
+    layoutManager = LinearLayoutManager(context)
+    addItemDecoration(DividerItemDecoration(context, RecyclerView.VERTICAL))
+    setPadding(0, 0, 0, 0)
 }

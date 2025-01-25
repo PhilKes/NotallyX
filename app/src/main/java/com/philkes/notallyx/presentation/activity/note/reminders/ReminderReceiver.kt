@@ -16,7 +16,7 @@ import com.philkes.notallyx.data.model.Reminder
 import com.philkes.notallyx.utils.canScheduleAlarms
 import com.philkes.notallyx.utils.cancelReminder
 import com.philkes.notallyx.utils.createChannelIfNotExists
-import com.philkes.notallyx.utils.getOpenNoteIntent
+import com.philkes.notallyx.utils.getOpenNotePendingIntent
 import com.philkes.notallyx.utils.scheduleReminder
 import com.philkes.notallyx.utils.truncate
 import java.util.Date
@@ -84,7 +84,7 @@ class ReminderReceiver : BroadcastReceiver() {
                         .addAction(
                             R.drawable.visibility,
                             context.getString(R.string.open_note),
-                            context.getOpenNoteIntent(note),
+                            context.getOpenNotePendingIntent(note),
                         )
                         .build()
                 note.reminders

@@ -18,7 +18,7 @@ import androidx.lifecycle.viewModelScope
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
-import com.philkes.notallyx.data.dao.NoteReminder
+import com.philkes.notallyx.data.dao.NoteIdReminder
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
@@ -261,7 +261,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     suspend fun deleteBaseNote(checkAutoSave: Boolean = true) {
-        app.cancelNoteReminders(listOf(NoteReminder(id, reminders.value)))
+        app.cancelNoteReminders(listOf(NoteIdReminder(id, reminders.value)))
         withContext(Dispatchers.IO) { baseNoteDao.delete(id) }
         WidgetProvider.sendBroadcast(app, longArrayOf(id))
         val attachments = ArrayList(images.value + files.value + audios.value)

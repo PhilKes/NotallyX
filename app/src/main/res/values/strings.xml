@@ -7,6 +7,7 @@
     <string name="add_reminder">Add Reminder</string>
     <string name="adding_files">Adding files</string>
     <string name="adding_images">Adding images</string>
+    <string name="all">All</string>
     <string name="app_name" translatable="false">NotallyX</string>
     <string name="appearance">Appearance</string>
     <string name="archive">Archive</string>
@@ -119,6 +120,7 @@
     <string name="edit_label">Edit label</string>
     <string name="edit_link">Edit Link</string>
     <string name="edit_reminders">Edit Reminders</string>
+    <string name="elapsed">Elapsed</string>
     <string name="empty_labels">No labels yet. Create one\?</string>
     <string name="empty_list">Empty list</string>
     <string name="empty_note">Empty note</string>
@@ -290,6 +292,7 @@
     <string name="unlock">Unlock via Biometric/PIN</string>
     <string name="unlock_with_biometrics_not_setup">You have previously enabled biometric lock but Biometrics/PIN are not setup for your device anymore.\n\nIf you wish to disable biometric lock press Disable, otherwise setup Biometrics/PIN for your device</string>
     <string name="unpin">Unpin</string>
+    <string name="upcoming">Upcoming</string>
     <string name="updated_link">Updated Link</string>
     <string name="view">View</string>
     <string name="view_file">View file</string>

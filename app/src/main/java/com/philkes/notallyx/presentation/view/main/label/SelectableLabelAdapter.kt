@@ -1,4 +1,4 @@
-package com.philkes.notallyx.presentation.view.main
+package com.philkes.notallyx.presentation.view.main.label
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
