@@ -17,8 +17,16 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.LabelsInBaseNote
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Reminder
+import com.philkes.notallyx.data.model.Type
 
-data class NoteReminder(val id: Long, val reminders: List<Reminder>)
+data class NoteIdReminder(val id: Long, val reminders: List<Reminder>)
+
+data class NoteReminder(
+    val id: Long,
+    val title: String,
+    val type: Type,
+    val reminders: List<Reminder>,
+)
 
 @Dao
 interface BaseNoteDao {
@@ -63,8 +71,13 @@ interface BaseNoteDao {
 
     @Query("SELECT audios FROM BaseNote") fun getAllAudios(): List<String>
 
-    @Query("SELECT id, reminders FROM BaseNote WHERE reminders IS NOT NULL")
-    suspend fun getAllReminders(): List<NoteReminder>
+    @Query("SELECT id, reminders FROM BaseNote WHERE reminders IS NOT NULL AND reminders != '[]'")
+    suspend fun getAllReminders(): List<NoteIdReminder>
+
+    @Query(
+        "SELECT id, title, type, reminders FROM BaseNote WHERE reminders IS NOT NULL AND reminders != '[]'"
+    )
+    fun getAllRemindersAsync(): LiveData<List<NoteReminder>>
 
     @Query("SELECT id FROM BaseNote WHERE folder = 'DELETED'")
     suspend fun getDeletedNoteIds(): LongArray

@@ -8,7 +8,7 @@ import android.content.Intent
 import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
-import com.philkes.notallyx.data.dao.NoteReminder
+import com.philkes.notallyx.data.dao.NoteIdReminder
 import com.philkes.notallyx.data.model.Reminder
 import com.philkes.notallyx.data.model.nextRepetition
 import com.philkes.notallyx.data.model.toText
@@ -37,13 +37,13 @@ fun Context.scheduleReminder(noteId: Long, reminder: Reminder, forceRepetition: 
     }
 }
 
-fun Context.scheduleNoteReminders(noteReminders: List<NoteReminder>) {
+fun Context.scheduleNoteReminders(noteReminders: List<NoteIdReminder>) {
     noteReminders.forEach { (noteId, reminders) ->
         reminders.forEach { reminder -> scheduleReminder(noteId, reminder) }
     }
 }
 
-fun Context.cancelNoteReminders(noteReminders: List<NoteReminder>) {
+fun Context.cancelNoteReminders(noteReminders: List<NoteIdReminder>) {
     noteReminders.forEach { (noteId, reminders) ->
         reminders.forEach { reminder -> cancelReminder(noteId, reminder.id) }
     }

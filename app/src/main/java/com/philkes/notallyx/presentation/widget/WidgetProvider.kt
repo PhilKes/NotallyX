@@ -22,7 +22,7 @@ import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.embedIntentExtras
-import com.philkes.notallyx.utils.getOpenNoteIntent
+import com.philkes.notallyx.utils.getOpenNotePendingIntent
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -190,13 +190,14 @@ class WidgetProvider : AppWidgetProvider() {
                         setOnClickFillInIntent(R.id.Empty, getSelectNoteIntent(id))
                         setPendingIntentTemplate(
                             R.id.ListView,
-                            noteType?.let { context.getOpenNoteIntent(noteId, it) },
+                            noteType?.let { context.getOpenNotePendingIntent(noteId, it) },
                         )
                     }
                 } else {
                     RemoteViews(context.packageName, R.layout.widget_locked).apply {
                         noteType?.let {
-                            val lockedPendingIntent = context.getOpenNoteIntent(noteId, noteType)
+                            val lockedPendingIntent =
+                                context.getOpenNotePendingIntent(noteId, noteType)
                             setOnClickPendingIntent(R.id.Layout, lockedPendingIntent)
                             setOnClickPendingIntent(R.id.Text, lockedPendingIntent)
                         }

@@ -1,4 +1,4 @@
-package com.philkes.notallyx.presentation.view.main
+package com.philkes.notallyx.presentation.view.main.label
 
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.databinding.RecyclerSelectableLabelBinding

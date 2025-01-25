@@ -287,21 +287,29 @@ fun Intent.embedIntentExtras() {
     data = Uri.parse(string)
 }
 
-fun Context.getOpenNoteIntent(note: BaseNote) = getOpenNoteIntent(note.id, note.type)
+fun Context.getOpenNotePendingIntent(note: BaseNote) = getOpenNotePendingIntent(note.id, note.type)
 
-fun Context.getOpenNoteIntent(noteId: Long, noteType: Type): PendingIntent {
-    val intent =
-        when (noteType) {
-            Type.NOTE -> Intent(this, EditNoteActivity::class.java)
-            Type.LIST -> Intent(this, EditListActivity::class.java)
-        }.apply {
-            putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
+fun Context.getOpenNoteIntent(
+    noteId: Long,
+    noteType: Type,
+    addPendingFlags: Boolean = false,
+): Intent {
+    return when (noteType) {
+        Type.NOTE -> Intent(this, EditNoteActivity::class.java)
+        Type.LIST -> Intent(this, EditListActivity::class.java)
+    }.apply {
+        putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
+        if (addPendingFlags) {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
         }
+    }
+}
+
+fun Context.getOpenNotePendingIntent(noteId: Long, noteType: Type): PendingIntent {
     return PendingIntent.getActivity(
         this,
         0,
-        intent,
+        getOpenNoteIntent(noteId, noteType, addPendingFlags = true),
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
     )
 }

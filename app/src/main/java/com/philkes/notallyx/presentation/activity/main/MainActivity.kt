@@ -160,7 +160,10 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             add(2, R.id.Archived, CATEGORY_SYSTEM + 2, R.string.archived)
                 .setCheckable(true)
                 .setIcon(R.drawable.archive)
-            add(3, R.id.Settings, CATEGORY_SYSTEM + 3, R.string.settings)
+            add(3, R.id.Reminders, CATEGORY_SYSTEM + 3, R.string.reminders)
+                .setCheckable(true)
+                .setIcon(R.drawable.notifications)
+            add(3, R.id.Settings, CATEGORY_SYSTEM + 4, R.string.settings)
                 .setCheckable(true)
                 .setIcon(R.drawable.settings)
         }

@@ -11,9 +11,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Label
@@ -21,6 +18,7 @@ import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.initListView
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.main.label.LabelAdapter
@@ -45,12 +43,8 @@ class LabelsFragment : Fragment(), LabelListener {
         labelAdapter = LabelAdapter(this)
 
         binding?.RecyclerView?.apply {
-            setHasFixedSize(true)
+            initListView(requireContext())
             adapter = labelAdapter
-            layoutManager = LinearLayoutManager(requireContext())
-            val itemDecoration = DividerItemDecoration(requireContext(), RecyclerView.VERTICAL)
-            addItemDecoration(itemDecoration)
-            setPadding(0, 0, 0, 0)
             binding?.ImageView?.setImageResource(R.drawable.label)
         }
 

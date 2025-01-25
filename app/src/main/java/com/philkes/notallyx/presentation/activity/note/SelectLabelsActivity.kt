@@ -15,7 +15,7 @@ import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
-import com.philkes.notallyx.presentation.view.main.SelectableLabelAdapter
+import com.philkes.notallyx.presentation.view.main.label.SelectableLabelAdapter
 import com.philkes.notallyx.presentation.viewmodel.LabelModel
 
 class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {

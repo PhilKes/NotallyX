@@ -26,7 +26,7 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.data.model.hasFutureNotification
+import com.philkes.notallyx.data.model.hasUpcomingNotification
 import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.bindLabels
@@ -158,7 +158,7 @@ class BaseNoteVH(
         }
         setColor(baseNote.color)
 
-        binding.RemindersView.isVisible = baseNote.reminders.any { it.hasFutureNotification() }
+        binding.RemindersView.isVisible = baseNote.reminders.any { it.hasUpcomingNotification() }
     }
 
     private fun bindNote(body: String, spans: List<SpanRepresentation>, isTitleEmpty: Boolean) {

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:id="@+id/Layout"
+  android:layout_width="match_parent"
+  android:layout_height="wrap_content"
+  android:baselineAligned="false"
+  android:orientation="horizontal"
+  android:layout_marginBottom="4dp"
+  android:layout_marginTop="4dp"
+  android:padding="8dp"
+  android:weightSum="1">
+
+  <LinearLayout
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:orientation="vertical">
+    <TextView
+      android:id="@+id/NoteTitle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_gravity="center_vertical"
+      android:maxLines="1"
+      android:clickable="false"
+      android:textAppearance="?attr/textAppearanceBodyLarge" />
+    <TextView
+      android:id="@+id/NextNotification"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:layout_gravity="center_vertical"
+      android:maxLines="1"
+      android:clickable="false"
+      android:textAppearance="?attr/textAppearanceBodySmall" />
+
+  </LinearLayout>
+
+  <TextView
+    android:id="@+id/Reminders"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical|end"
+    android:gravity="end"
+    android:drawablePadding="4dp"
+    android:maxLines="1"
+    android:clickable="false"
+    android:textAppearance="?attr/textAppearanceBodyLarge"
+    app:drawableStartCompat="@drawable/notifications" />
+
+  <TextView
+    android:id="@+id/OpenNote"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center_vertical|end"
+    android:layout_marginStart="8dp"
+    android:padding="8dp"
+    android:gravity="end"
+    android:textAppearance="?attr/textAppearanceBodyLarge"
+    app:drawableStartCompat="@drawable/text_file" />
+
+</LinearLayout>

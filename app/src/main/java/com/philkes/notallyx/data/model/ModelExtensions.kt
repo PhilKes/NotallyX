@@ -4,7 +4,7 @@ import android.content.Context
 import android.text.Html
 import androidx.core.text.toHtml
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.dao.NoteReminder
+import com.philkes.notallyx.data.dao.NoteIdReminder
 import com.philkes.notallyx.presentation.applySpans
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -121,7 +121,7 @@ fun BaseNote.toHtml(showDateCreated: Boolean) = buildString {
     append("</body></html>")
 }
 
-fun List<BaseNote>.toNoteReminders() = map { NoteReminder(it.id, it.reminders) }
+fun List<BaseNote>.toNoteIdReminders() = map { NoteIdReminder(it.id, it.reminders) }
 
 fun BaseNote.attachmentsDifferFrom(other: BaseNote): Boolean {
     return files.size != other.files.size ||
@@ -170,12 +170,12 @@ fun RepetitionTimeUnit.toCalendarField(): Int {
     }
 }
 
-fun Reminder.nextRepetition(from: Date = Date()): Date? {
-    if (repetition == null) {
-        return null
-    }
+fun Reminder.nextNotification(from: Date = Date()): Date? {
     if (from.before(dateTime)) {
         return dateTime
+    }
+    if (repetition == null) {
+        return null
     }
     val timeDifferenceMillis: Long = from.time - dateTime.time
     val intervalsPassed = timeDifferenceMillis / repetition!!.toMillis()
@@ -185,7 +185,14 @@ fun Reminder.nextRepetition(from: Date = Date()): Date? {
     return reminderStart.time
 }
 
-fun Reminder.hasFutureNotification() = !(dateTime.before(Date()) && repetition == null)
+fun Reminder.nextRepetition(from: Date = Date()): Date? {
+    if (repetition == null) {
+        return null
+    }
+    return nextNotification(from)
+}
+
+fun Reminder.hasUpcomingNotification() = !(dateTime.before(Date()) && repetition == null)
 
 fun Repetition.toMillis(): Long {
     return Calendar.getInstance()
@@ -194,6 +201,14 @@ fun Repetition.toMillis(): Long {
             add(unit.toCalendarField(), value)
         }
         .timeInMillis
+}
+
+fun Collection<Reminder>.hasAnyUpcomingNotifications(): Boolean {
+    return any { it.hasUpcomingNotification() }
+}
+
+fun Collection<Reminder>.findNextNotificationDate(): Date? {
+    return mapNotNull { it.nextNotification() }.minByOrNull { it }
 }
 
 fun Date.toCalendar() = Calendar.getInstance().apply { timeInMillis = this@toCalendar.time }

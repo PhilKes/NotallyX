@@ -14,8 +14,6 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
-import androidx.recyclerview.widget.DividerItemDecoration
-import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Reminder
@@ -31,16 +29,17 @@ import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.checkAlarmPermission
 import com.philkes.notallyx.presentation.checkNotificationPermission
+import com.philkes.notallyx.presentation.initListView
 import com.philkes.notallyx.presentation.showAndFocus
-import com.philkes.notallyx.presentation.view.main.ReminderAdapter
-import com.philkes.notallyx.presentation.view.main.ReminderListener
+import com.philkes.notallyx.presentation.view.main.reminder.ReminderAdapter
+import com.philkes.notallyx.presentation.view.main.reminder.ReminderListener
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.utils.canScheduleAlarms
 import com.philkes.notallyx.utils.now
 import java.util.Calendar
 import kotlinx.coroutines.launch
 
-class RemindersActivity : LockedActivity<ActivityRemindersBinding>() {
+class RemindersActivity : LockedActivity<ActivityRemindersBinding>(), ReminderListener {
 
     private lateinit var alarmPermissionActivityResultLauncher: ActivityResultLauncher<Intent>
     private val model: NotallyModel by viewModels()
@@ -102,25 +101,11 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>() {
     }
 
     private fun setupRecyclerView() {
-        reminderAdapter =
-            ReminderAdapter(
-                object : ReminderListener {
-                    override fun delete(reminder: Reminder) {
-                        confirmDeletion(reminder)
-                    }
-
-                    override fun edit(reminder: Reminder) {
-                        showDatePickerDialog(reminder)
-                    }
-                }
-            )
-
+        reminderAdapter = ReminderAdapter(this)
         binding.RecyclerView.apply {
-            setHasFixedSize(true)
+            initListView(this@RemindersActivity)
             adapter = reminderAdapter
-            addItemDecoration(DividerItemDecoration(this@RemindersActivity, RecyclerView.VERTICAL))
         }
-
         model.reminders.observe(this) { reminders ->
             reminderAdapter.submitList(reminders)
             if (reminders.isEmpty()) {
@@ -324,6 +309,14 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>() {
             }
             .addCancelButton()
             .show()
+    }
+
+    override fun delete(reminder: Reminder) {
+        confirmDeletion(reminder)
+    }
+
+    override fun edit(reminder: Reminder) {
+        showDatePickerDialog(reminder)
     }
 
     companion object {
