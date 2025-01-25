@@ -185,6 +185,8 @@ fun Reminder.nextRepetition(from: Date = Date()): Date? {
     return reminderStart.time
 }
 
+fun Reminder.hasFutureNotification() = !(dateTime.before(Date()) && repetition == null)
+
 fun Repetition.toMillis(): Long {
     return Calendar.getInstance()
         .apply {
