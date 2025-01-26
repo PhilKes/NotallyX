@@ -7,6 +7,7 @@
     <string name="add_reminder">Ajouter un rappel</string>
     <string name="adding_files">Ajout des fichiers</string>
     <string name="adding_images">Ajout des images</string>
+    <string name="all">Tous</string>
     <string name="appearance">Apparence</string>
     <string name="archive">Archiver</string>
     <string name="archived">Éléments archivés</string>
@@ -114,6 +115,7 @@
     <string name="edit_label">Modifier l\'étiquette</string>
     <string name="edit_link">Éditer le lien</string>
     <string name="edit_reminders">Éditer les rappels</string>
+    <string name="elapsed">Passé</string>
     <string name="empty_labels">Il n\'existe pas encore d\'étiquettes. En créer une \?</string>
     <string name="empty_list">Liste vide</string>
     <string name="empty_note">Note vide</string>
@@ -284,6 +286,7 @@
     <string name="unlock">Déverrouiller par biométrie/code PIN</string>
     <string name="unlock_with_biometrics_not_setup">Vous avez précédemment activé le verrouillage biométrique, mais les données biométriques/le code PIN ne sont plus configurés sur votre appareil.\n\nSi vous souhaitez désactiver le verrouillage biométrique, appuyez sur Désactiver, sinon configurez les données biométriques/le code PIN pour votre appareil</string>
     <string name="unpin">Détacher</string>
+    <string name="upcoming">À venir</string>
     <string name="updated_link">Lien mis à jour</string>
     <string name="view">Vue</string>
     <string name="view_file">Voir le fichier</string>
