@@ -187,7 +187,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
         return jsonObject.toString(4)
     }
 
-    fun import(context: Context, uri: Uri) = context.importPreferences(uri, preferences.edit())
+    fun import(context: Context, uri: Uri) =
+        context.importPreferences(uri, preferences.edit()).apply { reload() }
 
     fun reset() {
         preferences.edit().clear().apply()
