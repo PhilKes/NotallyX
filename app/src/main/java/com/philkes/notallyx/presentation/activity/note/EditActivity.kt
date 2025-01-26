@@ -50,6 +50,7 @@ import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.isLightColor
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setLightStatusAndNavBar
 import com.philkes.notallyx.presentation.setupProgressDialog
@@ -529,7 +530,7 @@ abstract class EditActivity(private val type: Type) :
             if (shouldShowRequestPermissionRationale(permission)) {
                 MaterialAlertDialogBuilder(this)
                     .setMessage(R.string.please_grant_notally_audio)
-                    .setNegativeButton(R.string.cancel, null)
+                    .setCancelButton()
                     .setPositiveButton(R.string.continue_) { _, _ ->
                         requestPermissions(arrayOf(permission), REQUEST_AUDIO_PERMISSION)
                     }
@@ -548,7 +549,7 @@ abstract class EditActivity(private val type: Type) :
     private fun handleRejection() {
         MaterialAlertDialogBuilder(this)
             .setMessage(R.string.to_record_audio)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setPositiveButton(R.string.settings) { _, _ ->
                 val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
                 intent.data = Uri.parse("package:${packageName}")
@@ -648,7 +649,7 @@ abstract class EditActivity(private val type: Type) :
                     super.finish()
                 }
             }
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .show()
     }
 
@@ -728,7 +729,7 @@ abstract class EditActivity(private val type: Type) :
             }) { fileAttachment ->
                 MaterialAlertDialogBuilder(this)
                     .setMessage(getString(R.string.delete_file, fileAttachment.originalName))
-                    .setNegativeButton(R.string.cancel, null)
+                    .setCancelButton()
                     .setPositiveButton(R.string.delete) { _, _ ->
                         notallyModel.deleteFiles(arrayListOf(fileAttachment))
                     }
@@ -779,7 +780,7 @@ abstract class EditActivity(private val type: Type) :
         MaterialAlertDialogBuilder(this)
             .setTitle(title)
             .setView(recyclerView)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setCancelable(false)
             .show()
     }

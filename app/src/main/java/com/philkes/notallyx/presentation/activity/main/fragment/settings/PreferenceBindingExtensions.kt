@@ -18,8 +18,9 @@ import com.philkes.notallyx.databinding.DialogPreferenceBooleanBinding
 import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
-import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.checkedTag
+import com.philkes.notallyx.presentation.setCancelButton
+import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
@@ -58,7 +59,7 @@ inline fun <reified T> PreferenceBinding.setup(
                 val newValue = enumEntries[which]
                 onSave(newValue)
             }
-            .addCancelButton()
+            .setCancelButton()
             .show()
     }
 }
@@ -118,7 +119,7 @@ fun PreferenceBinding.setup(
                     }
                 }
             }
-            .addCancelButton()
+            .setCancelButton()
             .show()
     }
 }
@@ -175,7 +176,7 @@ fun PreferenceBinding.setup(
                     NotesSort(newSortBy, newSortDirection),
                 )
             }
-            .addCancelButton()
+            .setCancelButton()
             .show()
     }
 }
@@ -217,7 +218,7 @@ fun PreferenceBinding.setup(
                 val applyToNoteView = layout.ApplyToNoteView.isChecked
                 onSave(dateFormat, applyToNoteView)
             }
-            .addCancelButton()
+            .setCancelButton()
             .show()
     }
 }
@@ -252,7 +253,7 @@ fun PreferenceBinding.setup(
                 }
             }
         val dialog =
-            MaterialAlertDialogBuilder(context).setView(layout.root).addCancelButton().show()
+            MaterialAlertDialogBuilder(context).setView(layout.root).setCancelButton().show()
         layout.apply {
             EnabledButton.setOnClickListener {
                 dialog.cancel()
@@ -298,7 +299,7 @@ fun PreferenceBinding.setupPeriodicBackup(
                 }
             }
         val dialog =
-            MaterialAlertDialogBuilder(context).setView(layout.root).addCancelButton().show()
+            MaterialAlertDialogBuilder(context).setView(layout.root).setCancelButton().show()
         layout.apply {
             EnabledButton.setOnClickListener {
                 dialog.cancel()
@@ -350,12 +351,12 @@ fun PreferenceBinding.setupBackupPassword(
                 val updatedPassword = layout.InputText.text.toString()
                 onSave(updatedPassword)
             }
-            .addCancelButton()
+            .setCancelButton()
             .setNeutralButton(R.string.clear) { dialog, _ ->
                 dialog.cancel()
                 onSave(PASSWORD_EMPTY)
             }
-            .show()
+            .showAndFocus(allowFullSize = true)
     }
 }
 

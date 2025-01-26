@@ -8,6 +8,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.setCancelButton
 
 class DeletedFragment : NotallyFragment() {
 
@@ -24,7 +25,7 @@ class DeletedFragment : NotallyFragment() {
         MaterialAlertDialogBuilder(requireContext())
             .setMessage(R.string.delete_all_notes)
             .setPositiveButton(R.string.delete) { _, _ -> model.deleteAllTrashedBaseNotes() }
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .show()
     }
 

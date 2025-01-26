@@ -26,10 +26,10 @@ import com.philkes.notallyx.databinding.DialogReminderCustomRepetitionBinding
 import com.philkes.notallyx.databinding.DialogReminderRepetitionBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
-import com.philkes.notallyx.presentation.addCancelButton
 import com.philkes.notallyx.presentation.checkAlarmPermission
 import com.philkes.notallyx.presentation.checkNotificationPermission
 import com.philkes.notallyx.presentation.initListView
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.view.main.reminder.ReminderAdapter
 import com.philkes.notallyx.presentation.view.main.reminder.ReminderListener
@@ -279,7 +279,7 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>(), ReminderLi
                         onRepetitionSelected,
                     )
                 }
-                .showAndFocus(dialogView.Value)
+                .showAndFocus(dialogView.Value, allowFullSize = true)
         val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         dialogView.Value.doAfterTextChanged { text ->
             positiveButton.isEnabled = text.hasValueBiggerZero()
@@ -307,7 +307,7 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>(), ReminderLi
             .setPositiveButton(R.string.delete) { _, _ ->
                 lifecycleScope.launch { model.removeReminder(reminder) }
             }
-            .addCancelButton()
+            .setCancelButton()
             .show()
     }
 

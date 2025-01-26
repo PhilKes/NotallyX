@@ -13,6 +13,7 @@ import com.philkes.notallyx.databinding.ActivityLabelBinding
 import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.main.label.SelectableLabelAdapter
@@ -59,7 +60,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
         MaterialAlertDialogBuilder(this)
             .setTitle(R.string.add_label)
             .setView(binding.root)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setPositiveButton(R.string.save) { dialog, _ ->
                 val value = binding.EditText.text.toString().trim()
                 if (value.isNotEmpty()) {
@@ -71,7 +72,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
                     }
                 }
             }
-            .showAndFocus(binding.EditText)
+            .showAndFocus(binding.EditText, allowFullSize = true)
     }
 
     private fun setupRecyclerView() {

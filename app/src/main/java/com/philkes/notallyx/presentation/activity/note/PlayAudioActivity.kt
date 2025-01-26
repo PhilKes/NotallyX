@@ -17,6 +17,7 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.ActivityPlayAudioBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.utils.audio.AudioPlayService
 import com.philkes.notallyx.utils.audio.LocalBinder
 import com.philkes.notallyx.utils.getExternalAudioDirectory
@@ -128,7 +129,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
     private fun delete() {
         MaterialAlertDialogBuilder(this)
             .setMessage(R.string.delete_audio_recording_forever)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setPositiveButton(R.string.delete) { _, _ ->
                 val intent = Intent()
                 intent.putExtra(EXTRA_AUDIO, audio)

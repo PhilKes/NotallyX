@@ -21,6 +21,7 @@ import com.philkes.notallyx.databinding.ActivityViewImageBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.view.note.image.ImageAdapter
 import com.philkes.notallyx.utils.getExternalImagesDirectory
 import com.philkes.notallyx.utils.getUriForFile
@@ -218,7 +219,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
     private fun delete(position: Int, adapter: ImageAdapter) {
         MaterialAlertDialogBuilder(this)
             .setMessage(R.string.delete_image_forever)
-            .setNegativeButton(R.string.cancel, null)
+            .setCancelButton()
             .setPositiveButton(R.string.delete) { _, _ ->
                 val image = adapter.items.removeAt(position)
                 deletedImages.add(image)

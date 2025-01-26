@@ -13,7 +13,6 @@ import android.text.style.URLSpan
 import android.util.AttributeSet
 import android.view.ActionMode
 import android.view.LayoutInflater
-import android.view.WindowManager
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.content.ContextCompat
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -23,6 +22,7 @@ import com.philkes.notallyx.databinding.DialogTextInput2Binding
 import com.philkes.notallyx.presentation.clone
 import com.philkes.notallyx.presentation.createTextWatcherWithHistory
 import com.philkes.notallyx.presentation.removeSelectionFromSpans
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextState
@@ -349,34 +349,32 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
                 }
             }
 
-        val dialog =
-            MaterialAlertDialogBuilder(context)
-                .setView(layout.root)
-                .setTitle(R.string.edit_link)
-                .setPositiveButton(R.string.save) { _, _ ->
-                    val displayTextAfter = layout.InputText1.text.toString()
-                    val urlAfter = layout.InputText2.text.toString()
-                    onSuccess.invoke(urlAfter, displayTextAfter)
-                    onClose?.invoke()
+        MaterialAlertDialogBuilder(context)
+            .setView(layout.root)
+            .setTitle(R.string.edit_link)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val displayTextAfter = layout.InputText1.text.toString()
+                val urlAfter = layout.InputText2.text.toString()
+                onSuccess.invoke(urlAfter, displayTextAfter)
+                onClose?.invoke()
+            }
+            .setCancelButton { dialog, _ ->
+                dialog.cancel()
+                onClose?.invoke()
+            }
+            .apply {
+                if (!isNoteUrl) {
+                    setNeutralButton(R.string.clear) { dialog, _ ->
+                        dialog.cancel()
+                        onSuccess.invoke(null, displayTextBefore)
+                        onClose?.invoke()
+                    }
                 }
-                .setBackgroundInsetEnd(0)
-                .setBackgroundInsetStart(0)
-                .setNegativeButton(R.string.cancel) { dialog, _ ->
-                    dialog.cancel()
-                    onClose?.invoke()
-                }
-                .setNeutralButton(R.string.clear) { dialog, _ ->
-                    dialog.cancel()
-                    onSuccess.invoke(null, displayTextBefore)
-                    onClose?.invoke()
-                }
-                .showAndFocus(
-                    if (isNoteUrl) layout.InputText1 else layout.InputText2,
-                    isNewUnnamedLink,
-                )
-        dialog.window?.setLayout(
-            WindowManager.LayoutParams.MATCH_PARENT,
-            WindowManager.LayoutParams.WRAP_CONTENT,
-        )
+            }
+            .showAndFocus(
+                viewToFocus = if (isNoteUrl) layout.InputText1 else layout.InputText2,
+                selectAll = isNewUnnamedLink,
+                allowFullSize = true,
+            )
     }
 }
