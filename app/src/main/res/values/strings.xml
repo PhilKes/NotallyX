@@ -28,6 +28,7 @@
     <string name="auto_backup_period">Auto backup period</string>
     <string name="auto_backups_folder">Backups Folder</string>
     <string name="auto_backups_folder_hint">Folder in which all auto backups will be stored in.</string>
+    <string name="auto_backups_folder_rechoose">You need to re-choose your Backups Folder so that NotallyX has permission to write to it.\nYou can also press cancel to skip importing Backups Folder value</string>
     <string name="auto_backups_folder_set">Set up a Backups Folder above first</string>
     <string name="auto_sort_by_checked">Autosort by checked items</string>
     <string name="back">Back</string>
