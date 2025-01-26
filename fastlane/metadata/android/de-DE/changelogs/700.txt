@@ -1,0 +1,9 @@
+* Erinnerungen mit Benachrichtigungen erstellen
+
+* Automat. Backup beim Speichern von Notizen
+
+* Gesamte UI in der Farbe der Notiz einfärben
+
+* Benachrichtigung senden, wenn automat. Backup fehlschlägt
+
+* Viele Fehler/Probleme bei Listenelementen behoben

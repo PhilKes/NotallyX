@@ -4,6 +4,7 @@ NotallyX ist eine minimalistische Notiz-App mit einfachen Design und nützlichen
 
 • Erstelle Notizen mit Unterstützung für alle Fettdruck, Kursivschrift, Monospace, etc.
 • Erstelle Listen und ordnen sie mit Unteraufgaben
+• Füge Erinnerungen mit Benachrichtigungen zu wichtigen Notizen hinzu
 • Ergänze deine Notizen mit beliebigen Dateien sowie Vorschauen für Bilder
 • Sortiere Notizen nach Titel, Datum der letzten Änderung oder Erstellungsdatum
 • Ordne die Notizen entweder in einer Listen- oder Gitteransicht an
@@ -26,24 +27,24 @@ NotallyX ist eine minimalistische Notiz-App mit einfachen Design und nützlichen
 • Einstellbare Schriftgröße
 • Automatisches Speichern und automatische Backups
 • Füge Notizen und Listen per Widgets zum Home-Screen hinzu
+• Importiert deine Notizen von anderen Apps wie z.B. Evernote, Google Notizen oder einfache Textdateien
+
 
 <b>Datenschutz</b>
 
 Es gibt keine Werbung, Tracker oder Analytics jeglicher Art. Alle Notizen werden vollständig auf deinem Gerät gespeichert und verlassen es nie.
 
-<b>Berechtigungen</b>
+<b>Optionale Berechtigungen</b>
 
-• Benachrichtigungen anzeigen
+• Benachrichtigungen anzeigen: Falls ein Backup fehlschlägt oder eine Notiz-Erinnerung geschickt wird.
 
-Wird verwendet, um eine Benachrichtigung anzuzeigen, falls das Löschen von Bildern oder das Importieren von Backups Zeit in Anspruch nimmt.
+• Exakten Alarm einstellen: Um für Notiz-Erinnerungen Benachrichtigungen zu exakten Zeitpunkten einzustellen.
 
-• Verhindern, dass das Telefon in den Ruhemodus wechselt, beim Start ausführen
+• Verhindern, dass das Telefon in den Ruhemodus wechselt, beim Start ausführen: Bei automat. Backups, um sicherzustellen, dass Backups weiterhin erstellt werden, auch wenn das Telefon neu gestartet wird.
 
-Wird von der automatischen Backup-Funktion verwendet, um sicherzustellen, dass Backups weiterhin erstellt werden, auch wenn dein Telefon neu gestartet wird.
+• Audios aufnehmen: Wenn ein Audio-Notiz aufgenommen wird.
 
-• Audios aufnehmen
-
-Wird verwendet wenn Audio-Notizen aufgenommen werden sollen
+• Biometrie verwenden: Falls die Biometrische/PIN Sperre Option aktiviert ist, um die App zu entsperren.
 
 <b>Hinweis</b>
 

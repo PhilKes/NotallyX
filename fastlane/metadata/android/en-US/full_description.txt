@@ -4,6 +4,7 @@ NotallyX is a minimalistic note taking app with a simple design and powerful fea
 
 • Create rich text notes with support for bold, italics, mono space and strike-through
 • Create task lists and order them with subtasks
+• Set **reminders** with notifications for important notes
 • Complement your notes with any type of file such as pictures, PDFs, etc.
 • Sort notes by title, last modified date, creation date
 • Display the notes either in a List or Grid
@@ -26,24 +27,23 @@ NotallyX is a minimalistic note taking app with a simple design and powerful fea
 • Adjustable text size
 • Auto save and auto-backups (optionally password-protected)
 • Add notes and lists to your home screen with widgets
+• Import from other Notes apps such as Evernote, Google Keep or plain text files
 
 <b>Privacy</b>
 
 There are no ads, trackers or analytics of any kind. All your notes are stored completely on and never leave your device.
 
-<b>Permissions</b>
+<b>Optional Permissions</b>
 
-• show notifications, run foreground service
+• Show Notifications, Run Foreground Service: To display a notification if a backup fails or if reminders are triggered
 
-Used to display a notification if deleting images or importing backups takes time
+• Schedule exact Alarms: To schedule reminder notifications at exact date-times
 
-• prevent phone from sleeping, run at startup
+• Prevent Phone from Sleeping, Run at Startup: Used by the auto backup feature to ensure backups keep happening even if your phone is restarted
 
-Used by the auto backup feature to ensure backups keep happening even if your phone is restarted
+• Record audio: when recording an audio note
 
-• record audio
-
-Used when recording an audio note
+• Use Biometrics: if Biometric/PIN app lock setting is enabled, to unlock the app
 
 <b>Note</b>
 
