@@ -193,6 +193,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
     fun reset() {
         preferences.edit().clear().apply()
         encryptedPreferences.edit().clear().apply()
+        backupsFolder.refresh()
         reload()
     }
 

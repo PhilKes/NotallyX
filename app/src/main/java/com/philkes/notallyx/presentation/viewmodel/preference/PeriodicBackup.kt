@@ -24,7 +24,7 @@ class PeriodicBackupsPreference(sharedPreferences: SharedPreferences) :
     }
 }
 
-data class PeriodicBackup(val periodInDays: Int = BACKUP_PERIOD_DAYS_MIN, val maxBackups: Int = 3) {
+data class PeriodicBackup(val periodInDays: Int = 0, val maxBackups: Int = 3) {
     companion object {
 
         const val BACKUP_PERIOD_DAYS_MIN = 1
