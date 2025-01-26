@@ -4,10 +4,12 @@ import android.Manifest
 import android.app.Application
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.content.Intent.ACTION_OPEN_DOCUMENT_TREE
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.DocumentsContract
 import android.provider.Settings
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
@@ -169,7 +171,9 @@ class SettingsFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        if (model.importPreferences(requireContext(), uri)) {
+                        if (
+                            model.importPreferences(requireContext(), uri, ::askForUriPermissions)
+                        ) {
                             showToast(R.string.import_settings_success)
                         } else {
                             showToast(R.string.import_settings_failure)
@@ -758,5 +762,15 @@ class SettingsFragment : Fragment() {
         val uri = Uri.parse(link)
         val intent = Intent(Intent.ACTION_VIEW, uri).wrapWithChooser(requireContext())
         startActivity(intent)
+    }
+
+    private fun askForUriPermissions(uri: Uri) {
+        chooseBackupFolderActivityResultLauncher.launch(
+            Intent(ACTION_OPEN_DOCUMENT_TREE).apply {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    putExtra(DocumentsContract.EXTRA_INITIAL_URI, uri)
+                }
+            }
+        )
     }
 }

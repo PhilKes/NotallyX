@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
@@ -12,6 +13,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
@@ -36,6 +38,7 @@ import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.SearchResult
 import com.philkes.notallyx.data.model.toNoteIdReminders
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
@@ -190,13 +193,17 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun setupBackupsFolder(uri: Uri) {
-        val value = preferences.backupsFolder.value
-        val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
-        app.contentResolver.takePersistableUriPermission(uri, flags)
-        if (value != EMPTY_PATH) {
-            clearPersistedUriPermissions(value)
+        val oldBackupsFolder = preferences.backupsFolder.value
+        val newBackupsFolder = uri.toString()
+        if (newBackupsFolder != oldBackupsFolder) {
+            val flags =
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            app.contentResolver.takePersistableUriPermission(uri, flags)
+            if (oldBackupsFolder != EMPTY_PATH) {
+                clearPersistedUriPermissions(oldBackupsFolder)
+            }
+            savePreference(preferences.backupsFolder, newBackupsFolder)
         }
-        savePreference(preferences.backupsFolder, uri.toString())
     }
 
     fun enableDataInPublic() {
@@ -502,14 +509,46 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun resetPreferences() {
+        val backupsFolder = preferences.backupsFolder.value
         preferences.reset()
         refreshDataInPublicFolder()
+        if (backupsFolder != EMPTY_PATH) {
+            clearPersistedUriPermissions(backupsFolder)
+        }
     }
 
-    fun importPreferences(context: Context, uri: Uri): Boolean {
+    fun importPreferences(
+        context: Context,
+        uri: Uri,
+        askForUriPermissions: (uri: Uri) -> Unit,
+    ): Boolean {
+        val oldBackupsFolder = preferences.backupsFolder.value
         val success = preferences.import(context, uri)
         refreshDataInPublicFolder()
+        val backupFolder = preferences.backupsFolder.getFreshValue()
+        if (oldBackupsFolder != backupFolder) {
+            refreshBackupsFolder(context, backupFolder, askForUriPermissions)
+        }
         return success
+    }
+
+    private fun refreshBackupsFolder(
+        context: Context,
+        backupFolder: String,
+        askForUriPermissions: (uri: Uri) -> Unit,
+    ) {
+        try {
+            val backupFolderUri = backupFolder.toUri()
+            MaterialAlertDialogBuilder(context)
+                .setMessage(R.string.auto_backups_folder_rechoose)
+                .setCancelButton()
+                .setPositiveButton(R.string.choose_folder) { _, _ ->
+                    askForUriPermissions(backupFolderUri)
+                }
+                .show()
+        } catch (e: Exception) {
+            disableBackups()
+        }
     }
 
     private fun refreshDataInPublicFolder() {
