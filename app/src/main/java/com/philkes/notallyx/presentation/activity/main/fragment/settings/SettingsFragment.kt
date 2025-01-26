@@ -439,7 +439,7 @@ class SettingsFragment : Fragment() {
                         }
                     }
                     .setNeutralButton(R.string.cancel) { dialog, _ -> dialog.cancel() }
-                    .showAndFocus(fullWidth = true)
+                    .showAndFocus(allowFullSize = true)
             }
             .setCancelButton()
             .show()

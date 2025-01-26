@@ -356,7 +356,7 @@ fun PreferenceBinding.setupBackupPassword(
                 dialog.cancel()
                 onSave(PASSWORD_EMPTY)
             }
-            .showAndFocus(fullWidth = true)
+            .showAndFocus(allowFullSize = true)
     }
 }
 

@@ -279,7 +279,7 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>(), ReminderLi
                         onRepetitionSelected,
                     )
                 }
-                .showAndFocus(dialogView.Value, fullWidth = true)
+                .showAndFocus(dialogView.Value, allowFullSize = true)
         val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
         dialogView.Value.doAfterTextChanged { text ->
             positiveButton.isEnabled = text.hasValueBiggerZero()

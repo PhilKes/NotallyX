@@ -18,8 +18,8 @@ import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.add
-import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.initListView
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.main.label.LabelAdapter
@@ -131,7 +131,7 @@ class LabelsFragment : Fragment(), LabelListener {
                     }
                 }
             }
-            .showAndFocus(dialogBinding.EditText)
+            .showAndFocus(dialogBinding.EditText, allowFullSize = true)
     }
 
     private fun confirmDeletion(value: String) {
@@ -168,6 +168,6 @@ class LabelsFragment : Fragment(), LabelListener {
                     }
                 }
             }
-            .showAndFocus(dialogBinding.EditText)
+            .showAndFocus(dialogBinding.EditText, allowFullSize = true)
     }
 }

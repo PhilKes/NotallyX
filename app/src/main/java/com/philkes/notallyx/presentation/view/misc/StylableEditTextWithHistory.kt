@@ -374,7 +374,7 @@ class StylableEditTextWithHistory(context: Context, attrs: AttributeSet) :
             .showAndFocus(
                 viewToFocus = if (isNoteUrl) layout.InputText1 else layout.InputText2,
                 selectAll = isNewUnnamedLink,
-                fullWidth = true,
+                allowFullSize = true,
             )
     }
 }

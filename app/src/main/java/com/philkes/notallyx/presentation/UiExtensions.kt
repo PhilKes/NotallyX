@@ -528,9 +528,9 @@ fun Activity.showColorSelectDialog(
 fun MaterialAlertDialogBuilder.showAndFocus(
     viewToFocus: View? = null,
     selectAll: Boolean = false,
-    fullWidth: Boolean = false,
+    allowFullSize: Boolean = false,
 ): AlertDialog {
-    if (fullWidth) {
+    if (allowFullSize) {
         setBackgroundInsetEnd(0)
         setBackgroundInsetStart(0)
         setBackgroundInsetBottom(0)
@@ -544,7 +544,7 @@ fun MaterialAlertDialogBuilder.showAndFocus(
             }
             window?.setSoftInputMode(SOFT_INPUT_STATE_VISIBLE)
         }
-        if (fullWidth) {
+        if (allowFullSize) {
             window?.setLayout(
                 WindowManager.LayoutParams.MATCH_PARENT,
                 WindowManager.LayoutParams.WRAP_CONTENT,

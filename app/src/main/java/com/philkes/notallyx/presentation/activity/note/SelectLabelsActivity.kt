@@ -72,7 +72,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
                     }
                 }
             }
-            .showAndFocus(binding.EditText)
+            .showAndFocus(binding.EditText, allowFullSize = true)
     }
 
     private fun setupRecyclerView() {
