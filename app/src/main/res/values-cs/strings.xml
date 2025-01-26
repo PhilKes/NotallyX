@@ -7,6 +7,7 @@
     <string name="add_reminder">Přidat upomínku</string>
     <string name="adding_files">Přidávání souborů</string>
     <string name="adding_images">Přidávání obrázků</string>
+    <string name="all">Všechny</string>
     <string name="appearance">Vzhled</string>
     <string name="archive">Archivovat</string>
     <string name="archived">Archivované</string>
@@ -27,7 +28,7 @@
     <string name="auto_backup_period">Frekvence automatického zálohování</string>
     <string name="auto_backups_folder">Adresář pro zálohy</string>
     <string name="auto_backups_folder_hint">Adresář pro uložení automatických záloh.</string>
-    <string name="auto_backups_folder_set">Nejprve nastavte adresář záloh výše</string>
+    <string name="auto_backups_folder_set">Nejprve nastavte adresář pro zálohy</string>
     <string name="auto_sort_by_checked">Automatické třídění podle vybraných položek</string>
     <string name="back">Zpět</string>
     <string name="backup">Zálohování</string>
@@ -85,7 +86,7 @@
     <string name="data_in_public_message">Pokud tuto možnost povolíte, interní databáze aplikace bude přesunuta do veřejné složky aplikace (Android/media/com.philkes.notallyx). V kombinaci s aplikacemi pro synchronizaci souborů to může být použito k synchronizaci dat NotallyX mezi více zařízeními.</string>
     <string name="date">Datum</string>
     <string name="date_format">Formát data</string>
-    <string name="date_format_apply_in_note_view">Použít také v zobrazení poznámky</string>
+    <string name="date_format_apply_in_note_view">Použít také v poznámkách</string>
     <string name="date_format_hint">Nastaví vybraný formát data v přehledu poznámek</string>
     <string name="days">Dny</string>
     <string name="delete">Smazat</string>
@@ -109,7 +110,7 @@
     <string name="deleting_files">Odstraňování souborů</string>
     <string name="deleting_images">Odstraňování obrázků</string>
     <string name="descending">Sestupně</string>
-    <string name="disable">Zakázat</string>
+    <string name="disable">Zakázáno</string>
     <string name="disable_data_in_public">Přesunout data zpět do interní složky</string>
     <string name="disable_lock_description">Toto rovněž dešifruje databázi</string>
     <string name="disable_lock_title">Vypnout zámek pomocí biometrických údajů/PIN</string>
@@ -121,6 +122,7 @@
     <string name="edit_label">Upravit štítek</string>
     <string name="edit_link">Upravit odkaz</string>
     <string name="edit_reminders">Upravit upomínky</string>
+    <string name="elapsed">Uplynulé</string>
     <string name="empty_labels">Žádné štítky. Vytvořit nový\?</string>
     <string name="empty_list">Prázdný seznam</string>
     <string name="empty_note">Prázdná poznámka</string>
@@ -153,8 +155,8 @@
     <string name="import_action">Importovat</string>
     <string name="import_backup">Importovat zálohu</string>
     <string name="import_backup_password_hint">Pokud vaše záloha není chráněna heslem, jednoduše stiskněte tlačítko Importovat, jinak zadejte správné heslo.</string>
-    <string name="import_other">Import poznámek z jiné aplikace</string>
-    <string name="import_settings">Import nastavení</string>
+    <string name="import_other">Importovat poznámky z jiné aplikace</string>
+    <string name="import_settings">Importovat nastavení</string>
     <string name="import_settings_failure">Nepodařilo se importovat nastavení, vybrali jste správný soubor\?</string>
     <string name="import_settings_message">Chcete-li importovat nastavení, vyberte prosím platný soubor JSON s nastavením NotallyX</string>
     <string name="import_settings_success">Import nastavení proběhl úspěšně</string>
@@ -194,7 +196,7 @@
     <string name="make_list">Vytvořit seznam</string>
     <string name="max_backups">Počet uchovávaných záloh</string>
     <string name="max_items_to_display">Max. počet položek v seznamu</string>
-    <string name="max_labels_to_display">Max. počet štítků v navigaci</string>
+    <string name="max_labels_to_display">Max. počet štítků v přehledu</string>
     <string name="max_lines_to_display">Max. počet položek v poznámce</string>
     <string name="max_lines_to_display_title">Max. počet řádků v názvu poznámky</string>
     <string name="medium">Střední</string>
@@ -232,7 +234,7 @@
     <string name="previous">Předchozí</string>
     <string name="rate">Ohodnotit aplikaci</string>
     <string name="ready_to_record">Připraveno k záznamu</string>
-    <string name="record_audio">Spustit záznam</string>
+    <string name="record_audio">Spustit zvukový záznam</string>
     <string name="recording">Nahrávání…</string>
     <string name="redo">Znovu</string>
     <string name="reminder_no_repetition">Bez opakování</string>
@@ -296,6 +298,7 @@
     <string name="unlock">Odemknout pomocí biometrických údajů/PIN</string>
     <string name="unlock_with_biometrics_not_setup">Dříve jste biometrický zámek zapnuli, ale biometrické údaje/PIN již nejsou pro vaše zařízení nastaveny.\n\nPokud chcete biometrický zámek vypnout, stiskněte tlačítko Zakázat, jinak nastavte biometrické údaje/PIN pro vaše zařízení.</string>
     <string name="unpin">Odepnout</string>
+    <string name="upcoming">Nadcházející</string>
     <string name="updated_link">Upravit odkaz</string>
     <string name="view">Rozložení</string>
     <string name="view_file">Zobrazit soubor</string>
