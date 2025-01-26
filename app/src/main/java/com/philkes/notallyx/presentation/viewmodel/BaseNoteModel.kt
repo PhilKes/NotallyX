@@ -503,20 +503,20 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun resetPreferences() {
         preferences.reset()
-        refreshDataOnExternalStorage()
+        refreshDataInPublicFolder()
     }
 
     fun importPreferences(context: Context, uri: Uri): Boolean {
         val success = preferences.import(context, uri)
-        refreshDataOnExternalStorage()
+        refreshDataInPublicFolder()
         return success
     }
 
-    private fun refreshDataOnExternalStorage() {
-        val dataOnExternalStorageBefore = preferences.dataInPublicFolder.value
-        val dataOnExternalStorageAfter = preferences.dataInPublicFolder.getFreshValue()
-        if (dataOnExternalStorageBefore != dataOnExternalStorageAfter) {
-            if (dataOnExternalStorageAfter) {
+    private fun refreshDataInPublicFolder() {
+        val dataInPublicFolderBefore = preferences.dataInPublicFolder.value
+        val dataInPublicFolderAfter = preferences.dataInPublicFolder.getFreshValue()
+        if (dataInPublicFolderBefore != dataInPublicFolderAfter) {
+            if (dataInPublicFolderAfter) {
                 enableDataInPublic()
             } else {
                 disableDataInPublic()
