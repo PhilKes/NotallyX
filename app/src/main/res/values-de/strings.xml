@@ -27,6 +27,7 @@
     <string name="auto_backup_period">Intervall für autom. Backups</string>
     <string name="auto_backups_folder">Backups Ordner</string>
     <string name="auto_backups_folder_hint">Ordner in dem alle autom. Backups erstellt werden</string>
+    <string name="auto_backups_folder_rechoose">Der Backups Ordner muss erneut ausgewählt werden, damit NotallyX Schreibrechte dafür erhält.\nÜber Abbrechen kann der Import dieser Einstellung übersprungen werden.</string>
     <string name="auto_backups_folder_set">Stelle erst ein Backups Ordner ein</string>
     <string name="auto_sort_by_checked">Nach abgehakten Elementen sortieren</string>
     <string name="back">Zurück</string>
@@ -75,7 +76,7 @@
     <string name="copied_link">Link kopiert</string>
     <string name="copy">Kopieren</string>
     <string name="create_github_issue">Github Issue erstellen</string>
-    <string name="creation_date">Erstellt am</string>
+    <string name="creation_date">Erstellt</string>
     <string name="custom">Benutzerdefiniert</string>
     <string name="daily">Täglich</string>
     <string name="dark">Dunkel</string>
@@ -128,6 +129,7 @@
     <string name="enabled">Aktiviert</string>
     <string name="error_while_renaming_file">Datei umbennen fehlgeschlagen</string>
     <string name="error_while_renaming_image">Fehler beim Umbenennen des Bildes</string>
+    <string name="evernote">Evernote</string>
     <string name="evernote_help">Um deine Notizen von Evernote zu importierten, exportiere dein Evernote Notebook als ENEX. Klicke Hilfe für mehr Infos.\n\nFalls du schon ein ENEX Datei hast, klicke Import und wähle es aus.</string>
     <string name="every">Alle</string>
     <string name="export">Exportieren</string>
@@ -195,7 +197,7 @@
     <string name="max_lines_to_display_title">Maximal angezeigte Zeilen im Titel</string>
     <string name="medium">Mittel</string>
     <string name="minutes">Minuten</string>
-    <string name="modified_date">Zuletzt geändert am</string>
+    <string name="modified_date">Geändert</string>
     <string name="monospace">Monospace</string>
     <string name="monthly">Monatlich</string>
     <string name="months">Monate</string>
