@@ -28,6 +28,7 @@
     <string name="auto_backup_period">Frekvence automatického zálohování</string>
     <string name="auto_backups_folder">Adresář pro zálohy</string>
     <string name="auto_backups_folder_hint">Adresář pro uložení automatických záloh.</string>
+    <string name="auto_backups_folder_rechoose">Vyberte znovu Adresář pro zálohy a udělte tak znovu NotallyX oprávnění do něj zapisovat.\nPro přeskočení můžete stisknout tlačítko Zrušit</string>
     <string name="auto_backups_folder_set">Nejprve nastavte adresář pro zálohy</string>
     <string name="auto_sort_by_checked">Automatické třídění podle vybraných položek</string>
     <string name="back">Zpět</string>
@@ -129,7 +130,7 @@
     <string name="empty_reminders">Žádné upomínky. Vytvořit novou\?</string>
     <string name="enable_lock_description">Toto rovněž zašifruje databázi</string>
     <string name="enable_lock_title">Vypnout zámek pomocí biometrických údajů/PIN</string>
-    <string name="enabled">Povoleno</string>
+    <string name="enabled">Povolit</string>
     <string name="error_while_renaming_file">Chyba při přejmenování souboru</string>
     <string name="error_while_renaming_image">Chyba při přejmenování obrázku</string>
     <string name="evernote">Evernote</string>
