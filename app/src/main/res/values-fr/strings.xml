@@ -26,6 +26,7 @@
     <string name="auto_backup_on_save_hint">En activant cette option, une sauvegarde (\"NotallyX_AutoBackup.zip\") est automatiquement créée dans le \"Dossier des sauvegardes\" configuré, à chaque fois qu\'une note est enregistrée.\nAttention, cela pourrait affecter les performances.</string>
     <string name="auto_backups_folder">Dossier des sauvegardes</string>
     <string name="auto_backups_folder_hint">Dossier dans lequel toutes les sauvegardes automatiques seront stockées.</string>
+    <string name="auto_backups_folder_rechoose">Vous devez re-sélectionner votre dossier de sauvegarde afin que NotallyX ait l\'autorisation d\'y écrire.\nVous pouvez également appuyer sur Annuler pour ignorer l\'importation du chemin du dossier de sauvegarde.</string>
     <string name="auto_backups_folder_set">Configurer d\'abord le Dossier des sauvegardes</string>
     <string name="back">Retour</string>
     <string name="backup">Sauvegarde</string>
@@ -62,7 +63,7 @@
     <string name="choose_another_folder">Choisir un autre dossier</string>
     <string name="choose_folder">Choisir un dossier</string>
     <string name="choose_other_app">Choisissez l\'application depuis laquelle importer</string>
-    <string name="clear">Supprimer</string>
+    <string name="clear">Effacer</string>
     <string name="clear_data">Supprimer les données</string>
     <string name="clear_data_message">Toutes les notes, images, fichiers et audios seront supprimés définitivement</string>
     <string name="clear_formatting">Supprimer le formatage</string>
