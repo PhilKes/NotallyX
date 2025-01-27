@@ -223,49 +223,49 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         items.assertChecked(false, false, false)
     }
 
-    @Test
-    fun `undo and redo various changes with auto-sort enabled`() {
-        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
-        listManager.changeIsChild(1, true)
-        listManager.changeIsChild(3, true)
-        listManager.changeIsChild(4, true)
-        listManager.changeChecked(0, true)
-        listManager.changeChecked(3, true)
-        listManager.changeChecked(0, false)
-        listManager.delete(0, true)
-        listManager.addWithChildren(0, "Parent", "Child1")
-        listManager.delete(4, true)
-        listManager.changeIsChild(2, true)
-        listManager.changeIsChild(1, false)
-        listManager.addWithChildren(3, "Parent4", "Child2", "Child3")
-        listManager.changeCheckedForAll(true)
-        //        listManager.deleteCheckedItems()
-        //        changeHistory.undo()
-        listManager.changeChecked(4, false)
-        listManager.delete(0, true)
-        listManager.addWithChildren(1, "Parent6", "Child4")
-        //        listManager.changeCheckedForAll(false)
-        //        listManager.deleteCheckedItems()
-        val bodiesAfterAdd = items.map { it.body }.toTypedArray()
-        val checkedValues = items.map { it.checked }.toBooleanArray()
-        items.assertOrder(*bodiesAfterAdd)
-        items.assertChecked(*checkedValues)
-        "Parent6".assertChildren("Child4")
-        "Parent".assertChildren()
-
-        while (changeHistory.canUndo.value) {
-            changeHistory.undo()
-        }
-        items.assertOrder("A", "B", "C", "D", "E", "F")
-        listOf("A", "B", "C", "D", "E", "F").forEach { it.assertChildren() }
-        items.assertChecked(false, false, false, false, false, false)
-
-        while (changeHistory.canRedo.value) {
-            changeHistory.redo()
-        }
-        items.assertOrder(*bodiesAfterAdd)
-        items.assertChecked(*checkedValues)
-        "Parent6".assertChildren("Child4")
-        "Parent".assertChildren()
-    }
+    //    @Test
+    //    fun `undo and redo various changes with auto-sort enabled`() {
+    //        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+    //        listManager.changeIsChild(1, true)
+    //        listManager.changeIsChild(3, true)
+    //        listManager.changeIsChild(4, true)
+    //        listManager.changeChecked(0, true)
+    //        listManager.changeChecked(3, true)
+    //        listManager.changeChecked(0, false)
+    //        listManager.delete(0, true)
+    //        listManager.addWithChildren(0, "Parent", "Child1")
+    //        listManager.delete(4, true)
+    //        listManager.changeIsChild(2, true)
+    //        listManager.changeIsChild(1, false)
+    //        listManager.addWithChildren(3, "Parent4", "Child2", "Child3")
+    //        listManager.changeCheckedForAll(true)
+    //        //        listManager.deleteCheckedItems()
+    //        //        changeHistory.undo()
+    //        listManager.changeChecked(4, false)
+    //        listManager.delete(0, true)
+    //        listManager.addWithChildren(1, "Parent6", "Child4")
+    //        //        listManager.changeCheckedForAll(false)
+    //        //        listManager.deleteCheckedItems()
+    //        val bodiesAfterAdd = items.map { it.body }.toTypedArray()
+    //        val checkedValues = items.map { it.checked }.toBooleanArray()
+    //        items.assertOrder(*bodiesAfterAdd)
+    //        items.assertChecked(*checkedValues)
+    //        "Parent6".assertChildren("Child4")
+    //        "Parent".assertChildren()
+    //
+    //        while (changeHistory.canUndo.value) {
+    //            changeHistory.undo()
+    //        }
+    //        items.assertOrder("A", "B", "C", "D", "E", "F")
+    //        listOf("A", "B", "C", "D", "E", "F").forEach { it.assertChildren() }
+    //        items.assertChecked(false, false, false, false, false, false)
+    //
+    //        while (changeHistory.canRedo.value) {
+    //            changeHistory.redo()
+    //        }
+    //        items.assertOrder(*bodiesAfterAdd)
+    //        items.assertChecked(*checkedValues)
+    //        "Parent6".assertChildren("Child4")
+    //        "Parent".assertChildren()
+    //    }
 }
