@@ -108,7 +108,7 @@ class BaseNoteVH(
 
         when (baseNote.type) {
             Type.NOTE -> bindNote(baseNote.body, baseNote.spans, baseNote.title.isEmpty())
-            Type.LIST -> bindList(baseNote.items)
+            Type.LIST -> bindList(baseNote.items, baseNote.title.isEmpty())
         }
         val (date, datePrefixResId) =
             when (sortBy) {
@@ -175,14 +175,15 @@ class BaseNoteVH(
         }
     }
 
-    private fun bindList(items: List<ListItem>) {
+    private fun bindList(items: List<ListItem>, isTitleEmpty: Boolean) {
         binding.apply {
             Note.visibility = GONE
             if (items.isEmpty()) {
                 LinearLayout.visibility = GONE
             } else {
                 LinearLayout.visibility = VISIBLE
-                val filteredList = items.take(preferences.maxItems)
+                val forceShowFirstItem = preferences.maxItems < 1 && isTitleEmpty
+                val filteredList = items.take(if (forceShowFirstItem) 1 else preferences.maxItems)
                 LinearLayout.children.forEachIndexed { index, view ->
                     if (view.id != R.id.ItemsRemaining) {
                         if (index < filteredList.size) {
@@ -195,6 +196,9 @@ class BaseNoteVH(
                                     updateLayoutParams<LinearLayout.LayoutParams> {
                                         marginStart = 20.dp(context)
                                     }
+                                }
+                                if (index == filteredList.lastIndex) {
+                                    updatePadding(bottom = 0)
                                 }
                             }
                         } else view.visibility = GONE
