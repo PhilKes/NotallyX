@@ -209,12 +209,12 @@ class ListManager(
             items.updateChildInParent(newPosition, item)
         }
         if (pushChange) {
-            changeHistory.push(ListMoveChange(positionFrom, itemsBeforeMove, getItems(), this))
+            changeHistory.push(ListMoveChange(itemsBeforeMove, getItems(), this))
         }
     }
 
-    fun setItems(items: List<ListItem>, resetIds: Boolean) {
-        this.items.init(items, resetIds)
+    fun setItems(items: List<ListItem>) {
+        this.items.setItems(items)
     }
 
     fun changeText(
@@ -433,7 +433,7 @@ class ListManager(
     fun startDrag(position: Int) {
         items[position].apply {
             isDragged = true
-            children.forEach { it.isDragged = false }
+            children.forEach { it.isDragged = true }
         }
     }
 

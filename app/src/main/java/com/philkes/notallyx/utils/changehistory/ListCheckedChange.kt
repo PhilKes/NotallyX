@@ -10,7 +10,9 @@ class ListCheckedChange(
 ) : ValueChange<List<ListItem>>(new, old) {
 
     override fun update(value: List<ListItem>, isUndo: Boolean) {
-        listManager.setItems(if (isUndo) oldValue else newValue, false)
+        // Since checked Changes can be quite complex (with auto-sort) simply use snapshots
+        // before/after
+        listManager.setItems(if (isUndo) oldValue else newValue)
     }
 
     override fun toString(): String {

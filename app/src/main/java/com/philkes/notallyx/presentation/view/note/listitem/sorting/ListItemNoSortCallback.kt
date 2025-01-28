@@ -1,12 +1,11 @@
 package com.philkes.notallyx.presentation.view.note.listitem.sorting
 
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SortedListAdapterCallback
 import com.philkes.notallyx.data.model.ListItem
 
 /** Sort algorithm that only sorts by [ListItem.order] */
 class ListItemNoSortCallback(adapter: RecyclerView.Adapter<*>?) :
-    SortedListAdapterCallback<ListItem>(adapter) {
+    SortedListCustomNotifyCallback<ListItem>(adapter) {
 
     override fun compare(item1: ListItem?, item2: ListItem?): Int {
         return when {
