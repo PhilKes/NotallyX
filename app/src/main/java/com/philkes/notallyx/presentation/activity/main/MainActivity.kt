@@ -56,6 +56,12 @@ import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoi
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.utils.backup.exportNotes
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_DEFAULT
+import com.philkes.notallyx.utils.backup.exportPdfFile
+import com.philkes.notallyx.utils.backup.exportPlainTextFile
+import com.philkes.notallyx.utils.getExportedPath
+import com.philkes.notallyx.utils.getUriForFile
+import com.philkes.notallyx.utils.nameWithoutExtension
 import com.philkes.notallyx.utils.shareNote
 import com.philkes.notallyx.utils.showColorSelectDialog
 import kotlinx.coroutines.Dispatchers
@@ -68,7 +74,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private lateinit var configuration: AppBarConfiguration
     private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
-
+    private var displayedLabel: String? = null
     private val actionModeCancelCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -98,8 +104,12 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
         val fragmentIdToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_OPEN, -1)
         if (fragmentIdToLoad != -1) {
-            val bundle = Bundle()
-            navController.navigate(fragmentIdToLoad, bundle)
+            navController.navigate(fragmentIdToLoad, Bundle())
+        } else if (savedInstanceState == null) {
+            val startView = preferences.startView.value
+            if (startView != START_VIEW_DEFAULT) {
+                navigateToLabel(startView)
+            }
         }
     }
 
@@ -177,11 +187,11 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 .mapIndexed { index, label ->
                     add(1, R.id.DisplayLabel, CATEGORY_CONTAINER + index + 2, label)
                         .setCheckable(true)
+                        .setChecked(displayedLabel == label)
                         .setVisible(index < maxLabelsToDisplay)
                         .setIcon(R.drawable.label)
                         .setOnMenuItemClickListener {
-                            val bundle = Bundle().apply { putString(EXTRA_DISPLAYED_LABEL, label) }
-                            navController.navigate(R.id.DisplayLabel, bundle)
+                            navigateToLabel(label)
                             false
                         }
                 }
@@ -204,6 +214,11 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             baseModel.preferences.labelsHiddenInNavigation.value,
             maxLabelsToDisplay,
         )
+    }
+
+    private fun navigateToLabel(label: String) {
+        val bundle = Bundle().apply { putString(EXTRA_DISPLAYED_LABEL, label) }
+        navController.navigate(R.id.DisplayLabel, bundle)
     }
 
     private fun hideLabelsInNavigation(hiddenLabels: Set<String>, maxLabelsToDisplay: Int) {
@@ -385,8 +400,11 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             }
         )
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
+        navController.addOnDestinationChangedListener { _, destination, bundle ->
             fragmentIdToLoad = destination.id
+            if (destination.id == R.id.DisplayLabel) {
+                bundle?.getString(EXTRA_DISPLAYED_LABEL)?.let { displayedLabel = it }
+            }
             binding.NavigationView.setCheckedItem(destination.id)
             if (destination.id != R.id.Search) {
                 binding.EnterSearchKeyword.apply {

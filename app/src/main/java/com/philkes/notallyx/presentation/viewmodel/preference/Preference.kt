@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.core.content.edit
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
 import com.philkes.notallyx.R
@@ -64,6 +65,14 @@ abstract class BasePreference<T>(
 
     fun <C> merge(other: BasePreference<C>): MediatorLiveData<Pair<T, C>> {
         return getData().merge(other.getData())
+    }
+
+    fun <C> merge(other: LiveData<C>): MediatorLiveData<Pair<T, C?>> {
+        return getData().merge(other)
+    }
+
+    fun <C> merge(other: NotNullLiveData<C>): MediatorLiveData<Pair<T, C>> {
+        return getData().merge(other)
     }
 
     fun observeForever(observer: Observer<T>) {
