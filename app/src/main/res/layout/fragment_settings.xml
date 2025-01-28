@@ -39,10 +39,6 @@
             android:id="@+id/CheckedListItemSorting"
             layout="@layout/preference" />
 
-        <include
-          android:id="@+id/MaxLabels"
-          layout="@layout/preference_seekbar" />
-
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -65,6 +61,10 @@
         <include
             android:id="@+id/MaxLines"
             layout="@layout/preference_seekbar" />
+
+        <include
+          android:id="@+id/MaxLabels"
+          layout="@layout/preference_seekbar" />
 
         <include
           android:id="@+id/LabelsHiddenInOverview"

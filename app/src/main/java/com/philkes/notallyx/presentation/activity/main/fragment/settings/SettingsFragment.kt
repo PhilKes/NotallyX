@@ -297,6 +297,9 @@ class SettingsFragment : Fragment() {
             MaxLines.setup(maxLines, requireContext()) { newValue ->
                 model.savePreference(maxLines, newValue)
             }
+            MaxLabels.setup(maxLabels, requireContext()) { newValue ->
+                model.savePreference(maxLabels, newValue)
+            }
             labelsHiddenInOverview.observe(viewLifecycleOwner) { value ->
                 binding.LabelsHiddenInOverview.setup(
                     labelsHiddenInOverview,
