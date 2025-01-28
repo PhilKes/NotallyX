@@ -41,9 +41,9 @@ class NotallyXPreferences private constructor(private val context: Context) {
     val listItemSorting =
         createEnumPreference(
             preferences,
-            "checkedListItemSorting",
+            "listItemSorting",
             ListItemSort.NO_AUTO_SORT,
-            R.string.checked_list_item_sorting,
+            R.string.list_item_auto_sort,
         )
 
     val maxItems =

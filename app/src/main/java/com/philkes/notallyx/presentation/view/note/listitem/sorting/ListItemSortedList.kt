@@ -179,13 +179,12 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
 
     /** @return position of the found item and its difference to index */
     private fun findLastIsNotChild(index: Int): Int? {
-        var position = index
-        while (this[position].isChild) {
-            if (position < 0) {
-                return null
+        if (index < 0) return null
+        for (i in index downTo 0) {
+            if (!this[i].isChild) {
+                return i
             }
-            position--
         }
-        return position
+        return null
     }
 }
