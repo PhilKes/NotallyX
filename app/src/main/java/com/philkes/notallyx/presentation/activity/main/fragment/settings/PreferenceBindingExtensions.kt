@@ -34,6 +34,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_DEFAULT
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_UNLABELED
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortPreference
@@ -444,27 +445,34 @@ fun PreferenceBinding.setupStartView(
     Title.setText(preference.titleResId!!)
 
     val notesText = "${context.getText(R.string.notes)} (${context.getText(R.string.text_default)})"
+    val unlabeledText = context.getText(R.string.unlabeled).toString()
     val textValue =
-        if (value == START_VIEW_DEFAULT) {
-            notesText
-        } else value
+        when (value) {
+            START_VIEW_DEFAULT -> notesText
+            START_VIEW_UNLABELED -> unlabeledText
+            else -> value
+        }
     Value.text = textValue
 
     root.setOnClickListener {
         val layout = DialogSelectionBoxBinding.inflate(layoutInflater, null, false)
         layout.Message.setText(R.string.start_view_hint)
-        val values = (listOf(notesText) + (labels ?: listOf())).toTypedArray()
+        val values =
+            mutableListOf(notesText to START_VIEW_DEFAULT, unlabeledText to START_VIEW_UNLABELED)
+                .apply { labels?.forEach { add(it to it) } }
+        var selected = -1
         layout.SelectionBox.apply {
-            setSimpleItems(values)
+            setSimpleItems(values.map { it.first }.toTypedArray())
             select(textValue)
+            setOnItemClickListener { _, _, position, _ -> selected = position }
         }
         MaterialAlertDialogBuilder(context)
             .setTitle(preference.titleResId)
             .setView(layout.root)
             .setPositiveButton(R.string.save) { dialog, _ ->
                 dialog.cancel()
-                val newValue = layout.SelectionBox.text.toString()
-                onSave(if (newValue == values.first()) START_VIEW_DEFAULT else newValue)
+                val newValue = values[selected].second
+                onSave(newValue)
             }
             .setCancelButton()
             .showAndFocus(allowFullSize = true)

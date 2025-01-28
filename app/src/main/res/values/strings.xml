@@ -300,6 +300,7 @@
     <string name="undo">Undo</string>
     <string name="unknown_error">Unknown error</string>
     <string name="unknown_name">Unknown name</string>
+    <string name="unlabeled">Unlabeled</string>
     <string name="unlock">Unlock via Biometric/PIN</string>
     <string name="unlock_with_biometrics_not_setup">You have previously enabled biometric lock but Biometrics/PIN are not setup for your device anymore.\n\nIf you wish to disable biometric lock press Disable, otherwise setup Biometrics/PIN for your device</string>
     <string name="unpin">Unpin</string>

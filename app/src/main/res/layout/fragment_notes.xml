@@ -1,22 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ImageView
-        android:id="@+id/ImageView"
-        android:layout_width="96dp"
-        android:layout_height="96dp"
-        android:layout_centerInParent="true"
-        android:contentDescription="Background"
-        app:tint="?attr/colorPrimary" />
+    <com.google.android.material.textfield.TextInputLayout
+      android:id="@+id/EnterSearchKeywordLayout"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingStart="8dp"
+      android:paddingEnd="8dp"
+      android:paddingBottom="8dp"
+      app:layout_constraintTop_toTopOf="parent"
+      style="@style/RoundedTextInput"
+      >
+        <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/EnterSearchKeyword"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@null"
+          app:boxStrokeWidth="0dp"
+          android:hint="@string/search"
+          android:inputType="textFilter"
+          android:paddingTop="10dp"
+          android:paddingBottom="10dp"
+          android:textAppearance="?attr/textAppearanceBodyLarge" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.chip.ChipGroup
+      android:id="@+id/ChipGroup"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      app:layout_constraintTop_toBottomOf="@id/EnterSearchKeywordLayout"
+      android:background="?attr/colorSurface"
+      android:paddingStart="12dp"
+      android:paddingEnd="12dp"
+      android:visibility="gone"
+      app:selectionRequired="true"
+      app:singleSelection="true">
+
+        <com.google.android.material.chip.Chip
+          android:id="@+id/Notes"
+          style="@style/FilterChip"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/notes" />
+
+        <com.google.android.material.chip.Chip
+          android:id="@+id/Deleted"
+          style="@style/FilterChip"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/deleted" />
+
+        <com.google.android.material.chip.Chip
+          android:id="@+id/Archived"
+          style="@style/FilterChip"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/archived" />
+
+    </com.google.android.material.chip.ChipGroup>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/ChipGroup"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/ChipGroup"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:clipToPadding="false"
         android:paddingStart="4dp"
         android:paddingTop="8dp"
@@ -28,40 +79,15 @@
         app:fastScrollVerticalThumbDrawable="@drawable/scroll_thumb"
       />
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/ChipGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="?attr/colorSurface"
-        android:paddingStart="16dp"
-        android:paddingTop="12dp"
-        android:paddingEnd="16dp"
-        android:paddingBottom="12dp"
-        android:visibility="gone"
-        app:selectionRequired="true"
-        app:singleSelection="true">
+    <ImageView
+      android:id="@+id/ImageView"
+      android:layout_width="96dp"
+      android:layout_height="96dp"
+      app:layout_constraintTop_toTopOf="parent"
+      app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintEnd_toEndOf="parent"
+      android:contentDescription="Background"
+      app:tint="?attr/colorPrimary" />
 
-        <com.google.android.material.chip.Chip
-            android:id="@+id/Notes"
-            style="@style/FilterChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/notes" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/Deleted"
-            style="@style/FilterChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/deleted" />
-
-        <com.google.android.material.chip.Chip
-            android:id="@+id/Archived"
-            style="@style/FilterChip"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/archived" />
-
-    </com.google.android.material.chip.ChipGroup>
-
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

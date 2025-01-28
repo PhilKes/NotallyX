@@ -360,6 +360,11 @@ fun Activity.showKeyboard(view: View) {
         ?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
 }
 
+fun Activity.hideKeyboard(view: View) {
+    ContextCompat.getSystemService(this, InputMethodManager::class.java)
+        ?.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
 fun MutableLiveData<out Progress>.setupProgressDialog(activity: Activity, titleId: Int) {
     setupProgressDialog(activity, activity.layoutInflater, activity as LifecycleOwner, titleId)
 }
