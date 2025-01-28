@@ -42,7 +42,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
         createEnumPreference(
             preferences,
             "listItemSorting",
-            ListItemSort.NO_AUTO_SORT,
+            ListItemSort.AUTO_SORT_BY_CHECKED,
             R.string.list_item_auto_sort,
         )
 

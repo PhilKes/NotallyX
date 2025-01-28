@@ -24,6 +24,8 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
             item1 == null && item2 != null -> -1
             item1 != null && item2 == null -> 1
             item1!!.id == item2!!.id -> if (item1.checked) -1 else 1
+            item1.isDragged && !item2.isDragged || !item1.isDragged && item2.isDragged ->
+                item1.order!!.compareTo(item2.order!!)
             item1.isChild && item2.isChild -> {
                 val parent1 = items.findParent(item1)!!.second
                 val parent2 = items.findParent(item2)!!.second

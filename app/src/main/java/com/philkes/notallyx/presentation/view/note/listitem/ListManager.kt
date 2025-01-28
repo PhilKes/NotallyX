@@ -15,6 +15,7 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.deleteItem
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.filter
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.findById
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.findParent
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.isNotEmpty
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.lastIndex
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.moveItemRange
@@ -212,8 +213,8 @@ class ListManager(
         }
     }
 
-    fun setItems(items: List<ListItem>) {
-        this.items.init(items)
+    fun setItems(items: List<ListItem>, resetIds: Boolean) {
+        this.items.init(items, resetIds)
     }
 
     fun changeText(
@@ -427,6 +428,21 @@ class ListManager(
 
     private fun ListItem.isChildOf(otherPosition: Int): Boolean {
         return isChildOf(items[otherPosition])
+    }
+
+    fun startDrag(position: Int) {
+        items[position].apply {
+            isDragged = true
+            children.forEach { it.isDragged = false }
+        }
+    }
+
+    fun endDrag(position: Int, children: Int) {
+        (position..position + children).forEach {
+            if (it in items.indices) {
+                items[it].isDragged = false
+            }
+        }
     }
 
     companion object {
