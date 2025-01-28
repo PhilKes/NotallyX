@@ -1,10 +1,11 @@
 package com.philkes.notallyx.presentation.view.note.listitem.sorting
 
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.deepCopy
 
-class ListItemSortedList(private val callback: Callback<ListItem>) :
+class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<ListItem>) :
     SortedList<ListItem>(ListItem::class.java, callback) {
 
     override fun updateItemAt(index: Int, item: ListItem?) {
@@ -63,18 +64,59 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
 
     fun init(items: Collection<ListItem>, resetIds: Boolean = true) {
         beginBatchedUpdates()
-        super.clear()
         val initializedItems = items.deepCopy()
         initList(initializedItems, resetIds)
+        internalSetItems(initializedItems)
+        endBatchedUpdates()
+    }
+
+    fun setItems(items: List<ListItem>) {
+        val old = cloneList()
+        val new = items.deepCopy()
+        // Use DiffUtil instead of SortedList internal notifies, since they are more efficient
+        val diffResult =
+            DiffUtil.calculateDiff(
+                object : DiffUtil.Callback() {
+                    override fun getOldListSize(): Int {
+                        return old.size
+                    }
+
+                    override fun getNewListSize(): Int {
+                        return new.size
+                    }
+
+                    override fun areItemsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int,
+                    ): Boolean {
+                        return old[oldItemPosition].id == items[newItemPosition].id
+                    }
+
+                    override fun areContentsTheSame(
+                        oldItemPosition: Int,
+                        newItemPosition: Int,
+                    ): Boolean {
+                        return old[oldItemPosition] == items[newItemPosition]
+                    }
+                },
+                true,
+            )
+        callback.setNotifyEnabled(false)
+        internalSetItems(items)
+        callback.setNotifyEnabled(true)
+        diffResult.dispatchUpdatesTo(callback)
+    }
+
+    private fun internalSetItems(items: Collection<ListItem>) {
+        super.clear()
         if (callback is ListItemSortedByCheckedCallback) {
-            val (children, parents) = initializedItems.partition { it.isChild }
+            val (children, parents) = items.partition { it.isChild }
             // Need to use replaceAll for auto-sorting checked items
             super.replaceAll(parents.toTypedArray(), false)
             super.addAll(children.toTypedArray(), false)
         } else {
-            super.addAll(initializedItems.toTypedArray(), false)
+            super.addAll(items.toTypedArray(), false)
         }
-        endBatchedUpdates()
     }
 
     private fun separateChildrenFromParent(item: ListItem) {
