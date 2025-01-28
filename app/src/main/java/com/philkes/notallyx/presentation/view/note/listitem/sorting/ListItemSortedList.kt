@@ -61,11 +61,11 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
         return removedItem
     }
 
-    fun init(items: Collection<ListItem>) {
+    fun init(items: Collection<ListItem>, resetIds: Boolean = true) {
         beginBatchedUpdates()
         super.clear()
         val initializedItems = items.deepCopy()
-        initList(initializedItems)
+        initList(initializedItems, resetIds)
         if (callback is ListItemSortedByCheckedCallback) {
             val (children, parents) = initializedItems.partition { it.isChild }
             // Need to use replaceAll for auto-sorting checked items
@@ -75,10 +75,6 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
             super.addAll(initializedItems.toTypedArray(), false)
         }
         endBatchedUpdates()
-    }
-
-    fun init(vararg items: ListItem) {
-        init(items.toList())
     }
 
     private fun separateChildrenFromParent(item: ListItem) {
@@ -114,8 +110,10 @@ class ListItemSortedList(private val callback: Callback<ListItem>) :
         }
     }
 
-    private fun initList(list: List<ListItem>) {
-        list.forEachIndexed { index, item -> item.id = index }
+    private fun initList(list: List<ListItem>, resetIds: Boolean) {
+        if (resetIds) {
+            list.forEachIndexed { index, item -> item.id = index }
+        }
         initOrders(list)
         initChildren(list)
     }

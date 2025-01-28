@@ -12,11 +12,11 @@ class ListMoveChange(
 
     override fun redo() {
         // Moves are much more complex, therefore simply paste entire List like it was before
-        listManager.setItems(itemsAfter)
+        listManager.setItems(itemsAfter, false)
     }
 
     override fun undo() {
-        listManager.setItems(itemsBefore)
+        listManager.setItems(itemsBefore, false)
     }
 
     override fun toString(): String {
