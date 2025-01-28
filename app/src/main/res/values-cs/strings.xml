@@ -30,7 +30,7 @@
     <string name="auto_backups_folder_hint">Adresář pro uložení automatických záloh.</string>
     <string name="auto_backups_folder_rechoose">Vyberte znovu Adresář pro zálohy a udělte tak znovu NotallyX oprávnění do něj zapisovat.\nPro přeskočení můžete stisknout tlačítko Zrušit</string>
     <string name="auto_backups_folder_set">Nejprve nastavte adresář pro zálohy</string>
-    <string name="auto_sort_by_checked">Automatické třídění podle vybraných položek</string>
+    <string name="auto_sort_by_checked">Seřadit zaškrtnuté položky na konec</string>
     <string name="back">Zpět</string>
     <string name="backup">Zálohování</string>
     <string name="backup_password">Heslo záloh</string>
@@ -65,7 +65,6 @@
     <string name="change_color">Změnit barvu</string>
     <string name="change_note">Změnit poznámku</string>
     <string name="check_all_items">Vybrat  všechny položky</string>
-    <string name="checked_list_item_sorting">Automaticky třídit seznam</string>
     <string name="choose_another_folder">Vybrat jinou složku</string>
     <string name="choose_folder">Vybrat složku</string>
     <string name="choose_other_app">Vybrat aplikaci pro import</string>
@@ -192,6 +191,7 @@
     <string name="link">Odkaz</string>
     <string name="link_note">Připojit poznámku</string>
     <string name="list">Seznam</string>
+    <string name="list_item_auto_sort">Seřadit položky seznamu</string>
     <string name="locked">Uzamčeno</string>
     <string name="make_feature_request">Navrhnout novou funkci</string>
     <string name="make_list">Vytvořit seznam</string>
