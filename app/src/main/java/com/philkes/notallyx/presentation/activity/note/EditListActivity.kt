@@ -166,7 +166,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)
         }
-        items.init(notallyModel.items)
+        items.init(notallyModel.items, true)
         adapter?.setList(items)
         binding.RecyclerView.adapter = adapter
         listManager.adapter = adapter!!

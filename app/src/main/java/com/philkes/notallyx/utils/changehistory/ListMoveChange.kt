@@ -4,19 +4,14 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 
 class ListMoveChange(
-    positionFrom: Int,
-    internal var itemsBefore: List<ListItem>,
-    internal var itemsAfter: List<ListItem>,
+    old: List<ListItem>,
+    new: List<ListItem>,
     internal val listManager: ListManager,
-) : ListChange(positionFrom) {
+) : ValueChange<List<ListItem>>(new, old) {
 
-    override fun redo() {
-        // Moves are much more complex, therefore simply paste entire List like it was before
-        listManager.setItems(itemsAfter)
-    }
-
-    override fun undo() {
-        listManager.setItems(itemsBefore)
+    override fun update(value: List<ListItem>, isUndo: Boolean) {
+        // Since move Changes can be quite complex simply use snapshots before/after
+        listManager.setItems(if (isUndo) oldValue else newValue)
     }
 
     override fun toString(): String {

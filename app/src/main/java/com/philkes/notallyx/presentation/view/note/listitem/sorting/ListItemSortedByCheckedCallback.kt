@@ -1,7 +1,6 @@
 package com.philkes.notallyx.presentation.view.note.listitem.sorting
 
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SortedListAdapterCallback
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.containsId
 
@@ -10,7 +9,7 @@ import com.philkes.notallyx.data.model.containsId
  * sorted below their parents.
  */
 class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
-    SortedListAdapterCallback<ListItem>(adapter) {
+    SortedListCustomNotifyCallback<ListItem>(adapter) {
 
     internal lateinit var items: ListItemSortedList
 
@@ -24,11 +23,13 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
             item1 == null && item2 != null -> -1
             item1 != null && item2 == null -> 1
             item1!!.id == item2!!.id -> if (item1.checked) -1 else 1
+            item1.isDragged && !item2.isDragged || !item1.isDragged && item2.isDragged ->
+                item1.order!!.compareTo(item2.order!!)
             item1.isChild && item2.isChild -> {
                 val parent1 = items.findParent(item1)!!.second
                 val parent2 = items.findParent(item2)!!.second
                 return when {
-                    parent1.id == parent2.id -> item1.order!!.compareTo(item2.order!!)
+                    parent1.id == parent2.id -> compareChecked(item1, item2)
                     else -> compare(parent1, parent2)
                 }
             }
@@ -78,12 +79,10 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
     }
 
     override fun areContentsTheSame(oldItem: ListItem?, newItem: ListItem?): Boolean {
-        val b = oldItem == newItem
-        return b
+        return oldItem?.equals(newItem) ?: false
     }
 
     override fun areItemsTheSame(item1: ListItem?, item2: ListItem?): Boolean {
-        val b = item1?.id == item2?.id
-        return b
+        return item1?.id == item2?.id
     }
 }

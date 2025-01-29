@@ -35,9 +35,9 @@
             android:id="@+id/NotesSortOrder"
             layout="@layout/preference" />
 
-<!--        <include-->
-<!--            android:id="@+id/CheckedListItemSorting"-->
-<!--            layout="@layout/preference" />-->
+        <include
+            android:id="@+id/CheckedListItemSorting"
+            layout="@layout/preference" />
 
         <include
           android:id="@+id/MaxLabels"

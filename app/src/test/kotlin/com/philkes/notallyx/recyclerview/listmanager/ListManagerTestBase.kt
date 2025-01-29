@@ -72,12 +72,14 @@ open class ListManagerTestBase {
             sortCallback.setList(items)
         }
         items.init(
-            createListItem("A", id = 0, order = 0),
-            createListItem("B", id = 1, order = 1),
-            createListItem("C", id = 2, order = 2),
-            createListItem("D", id = 3, order = 3),
-            createListItem("E", id = 4, order = 4),
-            createListItem("F", id = 5, order = 5),
+            listOf(
+                createListItem("A", id = 0, order = 0),
+                createListItem("B", id = 1, order = 1),
+                createListItem("C", id = 2, order = 2),
+                createListItem("D", id = 3, order = 3),
+                createListItem("E", id = 4, order = 4),
+                createListItem("F", id = 5, order = 5),
+            )
         )
         listManager.initList(items)
         listItemDragCallback = ListItemDragCallback(1.0f, listManager)

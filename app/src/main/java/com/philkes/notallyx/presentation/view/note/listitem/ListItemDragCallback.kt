@@ -15,9 +15,9 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
     private var lastIsCurrentlyActive = false
     private var childViewHolders: List<ViewHolder> = mutableListOf()
 
-    private var draggedItem: ListItem? = null
     private var itemsBefore: List<ListItem>? = null
     private var positionFrom: Int? = null
+    private var children: Int? = null
     private var positionTo: Int? = null
     private var newPosition: Int? = null
 
@@ -41,13 +41,15 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
 
     internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
-            draggedItem = listManager.getItem(from).clone() as ListItem
             itemsBefore = listManager.getItems()
         }
-        val swapped = listManager.move(from, to, false, false, isDrag = true)
+        val swapped =
+            listManager.move(from, to, pushChange = false, updateChildren = false, isDrag = true)
         if (swapped != null) {
             if (positionFrom == null) {
                 positionFrom = from
+                children = listManager.getItem(from).children.size
+                listManager.startDrag(from)
             }
             positionTo = to
             newPosition = swapped
@@ -118,14 +120,17 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
 
     internal fun reset() {
         positionFrom = null
+        children = null
         positionTo = null
         newPosition = null
-        draggedItem = null
         itemsBefore = null
     }
 
     internal fun onDragEnd() {
         Log.d(TAG, "onDragEnd: from: $positionFrom to: $positionTo")
+        if (positionFrom != null && children != null) {
+            listManager.endDrag(positionFrom!!, children!!)
+        }
         if (positionFrom == positionTo) {
             return
         }

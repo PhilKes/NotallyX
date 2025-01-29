@@ -259,10 +259,13 @@ class SettingsFragment : Fragment() {
                 model,
             )
         }
-        // TODO: Hide for now until checked auto-sort is working reliably
-        //            listItemSorting.observe(viewLifecycleOwner) { value ->
-        //                binding.CheckedListItemSorting.setup(ListItemSorting, value)
-        //            }
+
+        listItemSorting.observe(viewLifecycleOwner) { value ->
+            binding.CheckedListItemSorting.setup(listItemSorting, value, requireContext()) {
+                newValue ->
+                model.savePreference(listItemSorting, newValue)
+            }
+        }
 
         binding.MaxLabels.setup(maxLabels, requireContext()) { newValue ->
             model.savePreference(maxLabels, newValue)
