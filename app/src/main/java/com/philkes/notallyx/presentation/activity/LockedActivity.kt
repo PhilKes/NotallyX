@@ -33,7 +33,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
     protected lateinit var binding: T
     protected lateinit var preferences: NotallyXPreferences
-    protected val baseModel: BaseNoteModel by viewModels()
+    val baseModel: BaseNoteModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
