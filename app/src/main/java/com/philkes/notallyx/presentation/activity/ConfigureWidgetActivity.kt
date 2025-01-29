@@ -32,7 +32,7 @@ class ConfigureWidgetActivity : PickNoteActivity() {
             preferences.updateWidget(id, baseNote.id, baseNote.type)
 
             val manager = AppWidgetManager.getInstance(this)
-            WidgetProvider.updateWidget(this, manager, id, baseNote.id, baseNote.type)
+            WidgetProvider.updateWidget(application, manager, id, baseNote.id, baseNote.type)
 
             val success = Intent()
             success.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)

@@ -675,7 +675,7 @@ fun Drawable.withTint(@ColorInt color: Int): Drawable {
 }
 
 @ColorInt
-private fun Context.getContrastFontColor(@ColorInt backgroundColor: Int): Int {
+fun Context.getContrastFontColor(@ColorInt backgroundColor: Int): Int {
     return if (backgroundColor.isLightColor()) ContextCompat.getColor(this, R.color.TextDark)
     else ContextCompat.getColor(this, R.color.TextLight)
 }

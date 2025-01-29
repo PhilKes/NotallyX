@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/LinearLayout"
+  android:layout_height="wrap_content"
+  android:layout_width="match_parent">
+<CheckBox
     android:id="@+id/CheckBox"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginStart="26dp"
     android:layout_marginEnd="16dp"
-    android:paddingStart="8dp"
+    android:paddingStart="4dp"
     android:paddingTop="8dp"
     android:paddingEnd="0dp"
     android:paddingBottom="8dp"
+    android:textAlignment="textStart"
     android:textAppearance="?attr/textAppearanceBodyMedium"
     android:theme="@style/AppTheme" />
+</LinearLayout>
