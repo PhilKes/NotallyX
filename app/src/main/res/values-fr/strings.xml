@@ -28,6 +28,7 @@
     <string name="auto_backups_folder_hint">Dossier dans lequel toutes les sauvegardes automatiques seront stockées.</string>
     <string name="auto_backups_folder_rechoose">Vous devez re-sélectionner votre dossier de sauvegarde afin que NotallyX ait l\'autorisation d\'y écrire.\nVous pouvez également appuyer sur Annuler pour ignorer l\'importation du chemin du dossier de sauvegarde.</string>
     <string name="auto_backups_folder_set">Configurer d\'abord le Dossier des sauvegardes</string>
+    <string name="auto_sort_by_checked">Trier les éléments cochés à la fin</string>
     <string name="back">Retour</string>
     <string name="backup">Sauvegarde</string>
     <string name="backup_password">Mot de passe des sauvegardes</string>
@@ -184,6 +185,7 @@
     <string name="link">Lien</string>
     <string name="link_note">Lier une note</string>
     <string name="list">Liste</string>
+    <string name="list_item_auto_sort">Tri des éléments des listes</string>
     <string name="locked">Verrouillé</string>
     <string name="make_feature_request">Suggérer une amélioration</string>
     <string name="make_list">Créer une liste</string>
@@ -204,6 +206,7 @@
         <item quantity="other">…et %1$d fichiers</item>
     </plurals>
     <string name="next">Suivant</string>
+    <string name="no_auto_sort">Aucun tri automatique</string>
     <string name="none">Aucune </string>
     <string name="note">Note</string>
     <string name="notes">Notes</string>
