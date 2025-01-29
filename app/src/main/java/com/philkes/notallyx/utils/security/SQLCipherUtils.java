@@ -193,7 +193,7 @@ public class SQLCipherUtils {
 
         if (originalFile.exists()) {
             File newFile = File.createTempFile("sqlcipherutils", "tmp",
-                    ctxt.getCacheDir());
+                    originalFile.getParentFile());
             SQLiteDatabase db =
                     SQLiteDatabase.openDatabase(originalFile.getAbsolutePath(),
                             "", null, SQLiteDatabase.OPEN_READWRITE);
@@ -269,7 +269,7 @@ public class SQLCipherUtils {
         if (originalFile.exists()) {
             File newFile =
                     File.createTempFile("sqlcipherutils", "tmp",
-                            ctxt.getCacheDir());
+                        originalFile.getParentFile());
             decrypt(ctxt, originalFile, newFile, passphrase);
             originalFile.delete();
             newFile.renameTo(originalFile);

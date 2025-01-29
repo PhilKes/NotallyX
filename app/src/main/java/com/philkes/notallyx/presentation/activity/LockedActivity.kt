@@ -23,7 +23,6 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
-import com.philkes.notallyx.utils.security.disableBiometricLock
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 
 abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
@@ -84,7 +83,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
                         .setMessage(R.string.unlock_with_biometrics_not_setup)
                         .setPositiveButton(R.string.disable) { _, _ ->
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                disableBiometricLock(baseModel)
+                                baseModel.disableBiometricLock()
                             }
                             show()
                         }
@@ -104,7 +103,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
                 BIOMETRIC_ERROR_HW_NOT_PRESENT -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        disableBiometricLock(baseModel)
+                        baseModel.disableBiometricLock()
                         showToast(R.string.biometrics_disable_success)
                     }
                     show()

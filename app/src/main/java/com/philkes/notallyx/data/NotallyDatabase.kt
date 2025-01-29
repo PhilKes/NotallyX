@@ -26,6 +26,7 @@ import com.philkes.notallyx.utils.getExternalMediaDirectory
 import com.philkes.notallyx.utils.security.SQLCipherUtils
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import java.io.File
+import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
 @TypeConverters(Converters::class)
@@ -43,7 +44,7 @@ abstract class NotallyDatabase : RoomDatabase() {
     }
 
     private var biometricLockObserver: Observer<BiometricLock>? = null
-    private var externalDataFolderObserver: Observer<Boolean>? = null
+    private var dataInPublicFolderObserver: Observer<Boolean>? = null
 
     companion object {
 
@@ -75,7 +76,7 @@ abstract class NotallyDatabase : RoomDatabase() {
             return context.getDatabasePath(DATABASE_NAME)
         }
 
-        fun getCurrentDatabaseName(context: ContextWrapper): String {
+        private fun getCurrentDatabaseName(context: ContextWrapper): String {
             return if (NotallyXPreferences.getInstance(context).dataInPublicFolder.value) {
                 getExternalDatabaseFile(context).absolutePath
             } else {
@@ -116,9 +117,10 @@ abstract class NotallyDatabase : RoomDatabase() {
                         Migration7,
                     )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                SQLiteDatabase.loadLibs(context)
                 if (preferences.biometricLock.value == BiometricLock.ENABLED) {
                     if (
-                        SQLCipherUtils.getDatabaseState(context, getCurrentDatabaseName(context)) ==
+                        SQLCipherUtils.getDatabaseState(getCurrentDatabaseFile(context)) ==
                             SQLCipherUtils.State.ENCRYPTED
                     ) {
                         initializeDecryption(preferences, instanceBuilder)
@@ -127,7 +129,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                     }
                 } else {
                     if (
-                        SQLCipherUtils.getDatabaseState(context, getCurrentDatabaseName(context)) ==
+                        SQLCipherUtils.getDatabaseState(getCurrentDatabaseFile(context)) ==
                             SQLCipherUtils.State.ENCRYPTED
                     ) {
                         preferences.biometricLock.save(BiometricLock.ENABLED)
@@ -150,18 +152,18 @@ abstract class NotallyDatabase : RoomDatabase() {
                         instance.biometricLockObserver!!
                     )
 
-                    instance.externalDataFolderObserver = Observer {
-                        NotallyDatabase.instance?.value?.externalDataFolderObserver?.let {
+                    instance.dataInPublicFolderObserver = Observer {
+                        NotallyDatabase.instance?.value?.dataInPublicFolderObserver?.let {
                             preferences.dataInPublicFolder.removeObserver(it)
                         }
                         val newInstance = createInstance(context, preferences, true)
                         NotallyDatabase.instance?.postValue(newInstance)
                         preferences.dataInPublicFolder.observeForeverSkipFirst(
-                            newInstance.externalDataFolderObserver!!
+                            newInstance.dataInPublicFolderObserver!!
                         )
                     }
                     preferences.dataInPublicFolder.observeForeverSkipFirst(
-                        instance.externalDataFolderObserver!!
+                        instance.dataInPublicFolderObserver!!
                     )
                 }
                 return instance
