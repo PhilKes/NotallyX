@@ -11,7 +11,6 @@ import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
 import com.philkes.notallyx.utils.changehistory.ListAddChange
 import com.philkes.notallyx.utils.changehistory.ListDeleteChange
 import com.philkes.notallyx.utils.changehistory.ListIsChildChange
-import com.philkes.notallyx.utils.changehistory.ListMoveChange
 import io.mockk.every
 import io.mockk.mockkStatic
 import org.junit.Assert.assertEquals
@@ -104,10 +103,10 @@ fun ListItem.assertChildren(vararg childrenBodies: String) {
     }
 }
 
-fun ListMoveChange.assert(from: Int, itemsBeforeMove: List<ListItem>) {
-    assertEquals("from", from, position)
-    assertEquals("itemsBeforeMove", itemsBeforeMove, this.itemsBefore)
-}
+// fun ListMoveChange.assert(from: Int, itemsBeforeMove: List<ListItem>) {
+//    assertEquals("from", from, position)
+//    assertEquals("itemsBeforeMove", itemsBeforeMove, this.itemsBefore)
+// }
 
 // fun ListCheckedChange.assert(newValue: Boolean, itemId: Int) {
 //    assertEquals("checked", newValue, this.newValue)

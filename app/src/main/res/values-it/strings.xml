@@ -18,7 +18,7 @@
     <string name="audio_recordings">Registrazioni audio</string>
     <string name="auto_backup">Backup automatico</string>
     <string name="auto_backup_period">Frequenza dei backup automatici</string>
-    <string name="auto_sort_by_checked">Ordina per elementi spuntati</string>
+    <string name="auto_sort_by_checked">Ordina gli elementi selezionati fino alla fine</string>
     <string name="backup">Backup</string>
     <string name="backup_password">Password del backup</string>
     <string name="backup_password_hint">Impostandola, tutti i prossimi ZIP di backup verranno crittografati e protetti da password</string>
@@ -48,7 +48,6 @@
     <string name="change_color">Cambia colore</string>
     <string name="change_note">Cambia nota</string>
     <string name="check_all_items">Spunta tutti gli elementi</string>
-    <string name="checked_list_item_sorting">Ordinamento automatico Lista</string>
     <string name="choose_another_folder">Scegli un’altra cartella</string>
     <string name="choose_folder">Scegli cartella</string>
     <string name="choose_other_app">Scegli da quale app importare</string>
@@ -151,6 +150,7 @@
     <string name="link">Link</string>
     <string name="link_note">Collega nota</string>
     <string name="list">Lista</string>
+    <string name="list_item_auto_sort">Ordinamento degli elementi de Lista</string>
     <string name="locked">Bloccato</string>
     <string name="make_feature_request">Richiedi una funzionalità</string>
     <string name="make_list">Nuova lista</string>
