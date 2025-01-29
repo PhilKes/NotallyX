@@ -1,13 +1,12 @@
 package com.philkes.notallyx.utils.security
 
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.annotation.RequiresApi
-import com.philkes.notallyx.data.NotallyDatabase.Companion.DATABASE_NAME
-import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
-import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
+import com.philkes.notallyx.data.NotallyDatabase
 import java.io.File
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -19,17 +18,19 @@ private const val ENCRYPTION_KEY_NAME = "notallyx_database_encryption_key"
 
 private const val ANDROID_KEYSTORE = "AndroidKeyStore"
 
-fun encryptDatabase(context: Context, passphrase: ByteArray) {
-    val state = SQLCipherUtils.getDatabaseState(context, DATABASE_NAME)
+fun encryptDatabase(context: ContextWrapper, passphrase: ByteArray) {
+    val dbFile = NotallyDatabase.getCurrentDatabaseFile(context)
+    val state = SQLCipherUtils.getDatabaseState(dbFile)
     if (state == SQLCipherUtils.State.UNENCRYPTED) {
-        SQLCipherUtils.encrypt(context, DATABASE_NAME, passphrase)
+        SQLCipherUtils.encrypt(context, dbFile, passphrase)
     }
 }
 
-fun decryptDatabase(context: Context, passphrase: ByteArray) {
-    val state = SQLCipherUtils.getDatabaseState(context, DATABASE_NAME)
+fun decryptDatabase(context: ContextWrapper, passphrase: ByteArray) {
+    val dbFile = NotallyDatabase.getCurrentDatabaseFile(context)
+    val state = SQLCipherUtils.getDatabaseState(dbFile)
     if (state == SQLCipherUtils.State.ENCRYPTED) {
-        SQLCipherUtils.decrypt(context, DATABASE_NAME, passphrase)
+        SQLCipherUtils.decrypt(context, dbFile, passphrase)
     }
 }
 
@@ -37,11 +38,11 @@ fun decryptDatabase(
     context: Context,
     passphrase: ByteArray,
     decryptedFile: File,
-    databaseName: String,
+    databaseFile: File,
 ) {
-    val state = SQLCipherUtils.getDatabaseState(context, databaseName)
+    val state = SQLCipherUtils.getDatabaseState(databaseFile)
     if (state == SQLCipherUtils.State.ENCRYPTED) {
-        SQLCipherUtils.decrypt(context, databaseName, decryptedFile, passphrase)
+        SQLCipherUtils.decrypt(context, databaseFile, decryptedFile, passphrase)
     }
 }
 
@@ -108,15 +109,4 @@ fun getCipher(): Cipher {
             "/" +
             KeyProperties.ENCRYPTION_PADDING_PKCS7
     )
-}
-
-@RequiresApi(Build.VERSION_CODES.M)
-fun Context.disableBiometricLock(model: BaseNoteModel, cipher: Cipher? = null) {
-    val encryptedPassphrase = model.preferences.databaseEncryptionKey.value
-    val passphrase =
-        cipher?.doFinal(encryptedPassphrase)
-            ?: model.preferences.fallbackDatabaseEncryptionKey.value!!
-    model.closeDatabase()
-    decryptDatabase(this, passphrase)
-    model.savePreference(model.preferences.biometricLock, BiometricLock.DISABLED)
 }

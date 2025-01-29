@@ -39,7 +39,6 @@ import com.philkes.notallyx.presentation.showDialog
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.TextWithIconAdapter
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
-import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -55,8 +54,6 @@ import com.philkes.notallyx.utils.getLastExceptionLog
 import com.philkes.notallyx.utils.getLogFile
 import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.reportBug
-import com.philkes.notallyx.utils.security.disableBiometricLock
-import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.util.Date
@@ -713,14 +710,7 @@ class SettingsFragment : Fragment() {
             R.string.enable_lock_description,
             onSuccess = { cipher ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    model.savePreference(model.preferences.iv, cipher.iv)
-                    val passphrase = model.preferences.databaseEncryptionKey.init(cipher)
-                    encryptDatabase(requireContext(), passphrase)
-                    model.savePreference(
-                        model.preferences.fallbackDatabaseEncryptionKey,
-                        passphrase,
-                    )
-                    model.savePreference(model.preferences.biometricLock, BiometricLock.ENABLED)
+                    model.enableBiometricLock(cipher)
                 }
                 val app = (activity?.application as NotallyXApplication)
                 app.locked.value = false
@@ -740,7 +730,7 @@ class SettingsFragment : Fragment() {
             model.preferences.iv.value!!,
             onSuccess = { cipher ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    requireContext().disableBiometricLock(model, cipher)
+                    model.disableBiometricLock(cipher)
                 }
                 showToast(R.string.biometrics_disable_success)
             },

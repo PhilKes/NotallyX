@@ -398,7 +398,7 @@ fun ContextWrapper.copyDatabase(): Pair<NotallyDatabase, File> {
             this,
             passphrase,
             decryptedFile,
-            NotallyDatabase.getCurrentDatabaseName(this),
+            NotallyDatabase.getExternalDatabaseFile(this),
         )
         Pair(database, decryptedFile)
     } else {
