@@ -1,6 +1,6 @@
 package com.philkes.notallyx.presentation.widget
 
-import android.content.Intent
+import android.content.res.ColorStateList
 import android.graphics.Paint
 import android.os.Build
 import android.util.TypedValue
@@ -11,9 +11,13 @@ import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
-import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getSelectNoteIntent
+import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.extractWidgetColors
+import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getWidgetCheckedChangeIntent
+import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getWidgetOpenNoteIntent
+import com.philkes.notallyx.presentation.widget.WidgetProvider.Companion.getWidgetSelectNoteIntent
 
 class WidgetFactory(
     private val app: NotallyXApplication,
@@ -75,10 +79,12 @@ class WidgetFactory(
                 setViewVisibility(R.id.Note, View.VISIBLE)
             } else setViewVisibility(R.id.Note, View.GONE)
 
-            val intent = Intent(WidgetProvider.ACTION_OPEN_NOTE)
-            setOnClickFillInIntent(R.id.LinearLayout, intent)
+            setOnClickFillInIntent(R.id.ChangeNote, getWidgetSelectNoteIntent(widgetId))
+            setOnClickFillInIntent(R.id.LinearLayout, getWidgetOpenNoteIntent(note.type, note.id))
 
-            setOnClickFillInIntent(R.id.ChangeNote, getSelectNoteIntent(widgetId))
+            val (_, controlsColor) = app.extractWidgetColors(note.color, preferences)
+            setTextViewsTextColor(listOf(R.id.Title, R.id.Note), controlsColor)
+            setImageViewColor(R.id.ChangeNote, controlsColor)
         }
     }
 
@@ -90,11 +96,14 @@ class WidgetFactory(
                 preferences.textSize.value.displayTitleSize,
             )
             setTextViewText(R.id.Title, list.title)
+            setOnClickFillInIntent(R.id.ChangeNote, getWidgetSelectNoteIntent(widgetId))
+            val openNoteWidgetIntent = getWidgetOpenNoteIntent(list.type, list.id)
+            setOnClickFillInIntent(R.id.LinearLayout, openNoteWidgetIntent)
+            setOnClickFillInIntent(R.id.Title, openNoteWidgetIntent)
 
-            val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
-            setOnClickFillInIntent(R.id.LinearLayout, intent)
-
-            setOnClickFillInIntent(R.id.ChangeNote, getSelectNoteIntent(widgetId))
+            val (_, controlsColor) = app.extractWidgetColors(list.color, preferences)
+            setTextViewsTextColor(listOf(R.id.Title), controlsColor)
+            setImageViewColor(R.id.ChangeNote, controlsColor)
         }
     }
 
@@ -102,55 +111,66 @@ class WidgetFactory(
         val item = list.items[index]
         val view =
             if (item.isChild) {
-                // Since RemoteViews.view.setViewLayoutMargin is only available with API Level >= 31
-                // use other layout that uses marginStart to indent child
                 RemoteViews(app.packageName, R.layout.widget_list_child_item)
             } else {
                 RemoteViews(app.packageName, R.layout.widget_list_item)
             }
         return view.apply {
-            setTextViewTextSize(
-                R.id.CheckBox,
-                TypedValue.COMPLEX_UNIT_SP,
-                preferences.textSize.value.displayBodySize,
-            )
-            setTextViewText(R.id.CheckBox, item.body)
-            setInt(
-                R.id.CheckBox,
-                "setPaintFlags",
-                if (item.checked) {
-                    Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
-                } else {
-                    Paint.ANTI_ALIAS_FLAG
-                },
-            )
+            val (_, controlsColor) = app.extractWidgetColors(list.color, preferences)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                setListItemTextView(item, R.id.CheckBox, controlsColor)
                 setCompoundButtonChecked(R.id.CheckBox, item.checked)
-                val intent = Intent(WidgetProvider.ACTION_CHECKED_CHANGED)
-                intent.putExtra(WidgetProvider.EXTRA_POSITION, index)
-                val response = RemoteViews.RemoteResponse.fromFillInIntent(intent)
-                setOnCheckedChangeResponse(R.id.CheckBox, response)
+                val checkIntent = getWidgetCheckedChangeIntent(list.id, index)
+                setOnCheckedChangeResponse(
+                    R.id.CheckBox,
+                    RemoteViews.RemoteResponse.fromFillInIntent(checkIntent),
+                )
+                setColorStateList(
+                    R.id.CheckBox,
+                    "setButtonTintList",
+                    ColorStateList.valueOf(controlsColor),
+                )
             } else {
-                val intent = Intent(WidgetProvider.ACTION_OPEN_LIST)
-                if (item.checked) {
-                    setTextViewCompoundDrawablesRelative(
-                        R.id.CheckBox,
-                        R.drawable.checkbox_fill,
-                        0,
-                        0,
-                        0,
-                    )
-                } else
-                    setTextViewCompoundDrawablesRelative(
-                        R.id.CheckBox,
-                        R.drawable.checkbox_outline,
-                        0,
-                        0,
-                        0,
-                    )
-                setOnClickFillInIntent(R.id.CheckBox, intent)
+                setListItemTextView(item, R.id.CheckBoxText, controlsColor)
+                setImageViewResource(
+                    R.id.CheckBox,
+                    if (item.checked) R.drawable.checkbox_fill else R.drawable.checkbox_outline,
+                )
+                setOnClickFillInIntent(
+                    R.id.LinearLayout,
+                    getWidgetCheckedChangeIntent(list.id, index),
+                )
+                setImageViewColor(R.id.CheckBox, controlsColor)
             }
+            setTextViewsTextColor(listOf(R.id.Title), controlsColor)
         }
+    }
+
+    private fun RemoteViews.setListItemTextView(item: ListItem, textViewId: Int, fontColor: Int) {
+        setTextViewTextSize(
+            textViewId,
+            TypedValue.COMPLEX_UNIT_SP,
+            preferences.textSize.value.displayBodySize,
+        )
+        setTextViewText(textViewId, item.body)
+        setInt(
+            textViewId,
+            "setPaintFlags",
+            if (item.checked) {
+                Paint.STRIKE_THRU_TEXT_FLAG or Paint.ANTI_ALIAS_FLAG
+            } else {
+                Paint.ANTI_ALIAS_FLAG
+            },
+        )
+        setInt(textViewId, "setTextColor", fontColor)
+    }
+
+    private fun RemoteViews.setTextViewsTextColor(viewIds: List<Int>, color: Int) {
+        viewIds.forEach { viewId -> setInt(viewId, "setTextColor", color) }
+    }
+
+    private fun RemoteViews.setImageViewColor(viewId: Int, color: Int) {
+        setInt(viewId, "setColorFilter", color)
     }
 
     override fun getViewTypeCount() = 3

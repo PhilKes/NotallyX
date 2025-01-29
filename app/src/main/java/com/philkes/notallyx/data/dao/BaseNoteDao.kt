@@ -74,6 +74,8 @@ interface BaseNoteDao {
     @Query("SELECT id, reminders FROM BaseNote WHERE reminders IS NOT NULL AND reminders != '[]'")
     suspend fun getAllReminders(): List<NoteIdReminder>
 
+    @Query("SELECT color FROM BaseNote WHERE id = :id ") fun getColorOfNote(id: Long): Color
+
     @Query(
         "SELECT id, title, type, reminders FROM BaseNote WHERE reminders IS NOT NULL AND reminders != '[]'"
     )

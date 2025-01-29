@@ -13,6 +13,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.hardware.biometrics.BiometricManager
 import android.net.Uri
 import android.os.Build
@@ -309,9 +310,14 @@ fun Context.getOpenNotePendingIntent(noteId: Long, noteType: Type): PendingInten
     return PendingIntent.getActivity(
         this,
         0,
-        getOpenNoteIntent(noteId, noteType, addPendingFlags = true),
-        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+        getOpenNoteIntent(noteId, noteType, addPendingFlags = false),
+        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
     )
+}
+
+fun Context.isSystemInDarkMode(): Boolean {
+    val currentNightMode = resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK
+    return currentNightMode == Configuration.UI_MODE_NIGHT_YES
 }
 
 fun ContentResolver.determineMimeTypeAndExtension(uri: Uri, proposedMimeType: String?) =
