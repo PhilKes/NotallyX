@@ -24,14 +24,14 @@
             android:textAppearance="?attr/textAppearanceBodyLarge"
             android:textColor="?android:textColorPrimary" />
 
-        <TextView
+        <ImageView
             android:id="@+id/ChangeNote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
             android:layout_marginStart="8dp"
             android:contentDescription="ChangeNote"
-            android:drawableLeft="@drawable/document_scanner" />
+          android:src="@drawable/document_scanner" />
 
     </LinearLayout>
 

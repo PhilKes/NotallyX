@@ -5,14 +5,17 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.widget.RemoteViews
+import androidx.core.content.ContextCompat
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.findChildrenPositions
 import com.philkes.notallyx.data.model.findParentPosition
@@ -20,21 +23,25 @@ import com.philkes.notallyx.presentation.activity.ConfigureWidgetActivity
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
+import com.philkes.notallyx.presentation.activity.note.ViewImageActivity.Companion.EXTRA_POSITION
+import com.philkes.notallyx.presentation.extractColor
+import com.philkes.notallyx.presentation.getContrastFontColor
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.utils.embedIntentExtras
 import com.philkes.notallyx.utils.getOpenNotePendingIntent
+import com.philkes.notallyx.utils.isSystemInDarkMode
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class WidgetProvider : AppWidgetProvider() {
 
-    @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-
         when (intent.action) {
             ACTION_NOTES_MODIFIED -> {
                 val noteIds = intent.getLongArrayExtra(EXTRA_MODIFIED_NOTES)
@@ -53,10 +60,10 @@ class WidgetProvider : AppWidgetProvider() {
     private fun checkChanged(intent: Intent, context: Context) {
         val noteId = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0)
         val position = intent.getIntExtra(EXTRA_POSITION, 0)
-        val checked =
+        var checked =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 intent.getBooleanExtra(RemoteViews.EXTRA_CHECKED, false)
-            } else false
+            } else null
         val database =
             NotallyDatabase.getDatabase(
                     context.applicationContext as Application,
@@ -70,11 +77,14 @@ class WidgetProvider : AppWidgetProvider() {
                     val baseNoteDao = database.getBaseNoteDao()
                     val note = baseNoteDao.get(noteId)!!
                     val item = note.items[position]
+                    if (checked == null) {
+                        checked = !item.checked
+                    }
                     if (item.isChild) {
-                        changeChildChecked(note, position, checked, baseNoteDao, noteId)
+                        changeChildChecked(note, position, checked!!, baseNoteDao, noteId)
                     } else {
                         val childrenPositions = note.items.findChildrenPositions(position)
-                        baseNoteDao.updateChecked(noteId, childrenPositions + position, checked)
+                        baseNoteDao.updateChecked(noteId, childrenPositions + position, checked!!)
                     }
                 } finally {
                     updateWidgets(context, longArrayOf(noteId))
@@ -132,18 +142,9 @@ class WidgetProvider : AppWidgetProvider() {
 
         appWidgetIds.forEach { id ->
             val noteId = preferences.getWidgetData(id)
-            val noteType = preferences.getWidgetNoteType(id)
-            updateWidget(context, appWidgetManager, id, noteId, noteType)
+            val noteType = preferences.getWidgetNoteType(id) ?: return
+            updateWidget(app, appWidgetManager, id, noteId, noteType)
         }
-    }
-
-    private fun Context.getOpenNoteIntent(noteId: Long): PendingIntent {
-        val intent = Intent(this, WidgetProvider::class.java)
-        intent.putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
-        intent.embedIntentExtras()
-        val flags =
-            PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT or Intent.FILL_IN_ACTION
-        return PendingIntent.getBroadcast(this, 0, intent, flags)
     }
 
     companion object {
@@ -157,7 +158,7 @@ class WidgetProvider : AppWidgetProvider() {
 
             updatableWidgets.forEach { (id, noteId) ->
                 updateWidget(
-                    context,
+                    app,
                     manager,
                     id,
                     noteId,
@@ -168,7 +169,7 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         fun updateWidget(
-            context: Context,
+            context: ContextWrapper,
             manager: AppWidgetManager,
             id: Int,
             noteId: Long,
@@ -182,18 +183,49 @@ class WidgetProvider : AppWidgetProvider() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
             intent.embedIntentExtras()
 
-            val view =
-                if (!locked) {
-                    RemoteViews(context.packageName, R.layout.widget).apply {
-                        setRemoteAdapter(R.id.ListView, intent)
-                        setEmptyView(R.id.ListView, R.id.Empty)
-                        setOnClickFillInIntent(R.id.Empty, getSelectNoteIntent(id))
-                        setPendingIntentTemplate(
-                            R.id.ListView,
-                            noteType?.let { context.getOpenNotePendingIntent(noteId, it) },
-                        )
+            if (!locked) {
+                val database = NotallyDatabase.getDatabase(context).value
+                MainScope().launch {
+                    withContext(Dispatchers.IO) {
+                        val color = database.getBaseNoteDao().getColorOfNote(noteId)
+                        val preferences = NotallyXPreferences.getInstance(context)
+                        val (backgroundColor, _) = context.extractWidgetColors(color, preferences)
+                        val view =
+                            RemoteViews(context.packageName, R.layout.widget).apply {
+                                setRemoteAdapter(R.id.ListView, intent)
+                                setEmptyView(R.id.ListView, R.id.Empty)
+                                setOnClickPendingIntent(
+                                    R.id.Empty,
+                                    Intent(context, WidgetProvider::class.java)
+                                        .apply {
+                                            action = ACTION_SELECT_NOTE
+                                            data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                                        }
+                                        .asPendingIntent(context),
+                                )
+                                setPendingIntentTemplate(
+                                    R.id.ListView,
+                                    Intent(context, WidgetProvider::class.java)
+                                        .asPendingIntent(context),
+                                )
+
+                                noteType?.let {
+                                    setOnClickPendingIntent(
+                                        R.id.Layout,
+                                        Intent(context, WidgetProvider::class.java)
+                                            .setOpenNoteIntent(noteType, noteId)
+                                            .asPendingIntent(context),
+                                    )
+                                }
+
+                                setInt(R.id.Layout, "setBackgroundColor", backgroundColor)
+                            }
+                        manager.updateAppWidget(id, view)
+                        manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
                     }
-                } else {
+                }
+            } else {
+                val view =
                     RemoteViews(context.packageName, R.layout.widget_locked).apply {
                         noteType?.let {
                             val lockedPendingIntent =
@@ -209,11 +241,59 @@ class WidgetProvider : AppWidgetProvider() {
                             0,
                         )
                     }
-                }
-            manager.updateAppWidget(id, view)
-            if (!locked) {
-                manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
+                manager.updateAppWidget(id, view)
             }
+        }
+
+        fun getWidgetOpenNoteIntent(noteType: Type, noteId: Long): Intent {
+            return Intent().setOpenNoteIntent(noteType, noteId)
+        }
+
+        fun getWidgetCheckedChangeIntent(listNoteId: Long, position: Int): Intent {
+            return Intent().apply {
+                action = ACTION_CHECKED_CHANGED
+                putExtra(EXTRA_POSITION, position)
+                putExtra(EXTRA_SELECTED_BASE_NOTE, listNoteId)
+                data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+            }
+        }
+
+        private fun Intent.setOpenNoteIntent(noteType: Type, noteId: Long) = apply {
+            action =
+                when (noteType) {
+                    Type.LIST -> ACTION_OPEN_LIST
+                    Type.NOTE -> ACTION_OPEN_NOTE
+                }
+            putExtra(EXTRA_SELECTED_BASE_NOTE, noteId)
+            data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+        }
+
+        private fun Intent.asPendingIntent(context: Context): PendingIntent =
+            PendingIntent.getBroadcast(
+                context,
+                0,
+                this,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
+            )
+
+        fun Context.extractWidgetColors(
+            color: Color,
+            preferences: NotallyXPreferences,
+        ): Pair<Int, Int> {
+            val backgroundColor =
+                if (color == Color.DEFAULT) {
+                    val id =
+                        when (preferences.theme.value) {
+                            Theme.DARK -> R.color.md_theme_surface_dark
+                            Theme.LIGHT -> R.color.md_theme_surface
+                            Theme.FOLLOW_SYSTEM -> {
+                                if (isSystemInDarkMode()) R.color.md_theme_surface_dark
+                                else R.color.md_theme_surface
+                            }
+                        }
+                    ContextCompat.getColor(this, id)
+                } else extractColor(color)
+            return Pair(backgroundColor, getContrastFontColor(backgroundColor))
         }
 
         private fun openActivity(context: Context, originalIntent: Intent, clazz: Class<*>) {
@@ -237,19 +317,18 @@ class WidgetProvider : AppWidgetProvider() {
             return intent
         }
 
-        fun sendBroadcast(context: Context, ids: LongArray) {
-            val intent = Intent(context, WidgetProvider::class.java)
-            intent.action = ACTION_NOTES_MODIFIED
-            intent.putExtra(EXTRA_MODIFIED_NOTES, ids)
-            context.sendBroadcast(intent)
-        }
+        fun sendBroadcast(context: Context, ids: LongArray) =
+            Intent(context, WidgetProvider::class.java).apply {
+                action = ACTION_NOTES_MODIFIED
+                putExtra(EXTRA_MODIFIED_NOTES, ids)
+                context.sendBroadcast(this)
+            }
 
-        fun getSelectNoteIntent(id: Int): Intent {
-            return Intent(ACTION_SELECT_NOTE).apply {
+        fun getWidgetSelectNoteIntent(id: Int) =
+            Intent(ACTION_SELECT_NOTE).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
                 data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
             }
-        }
 
         private const val EXTRA_MODIFIED_NOTES = "com.philkes.notallyx.EXTRA_MODIFIED_NOTES"
         private const val ACTION_NOTES_MODIFIED = "com.philkes.notallyx.ACTION_NOTE_MODIFIED"

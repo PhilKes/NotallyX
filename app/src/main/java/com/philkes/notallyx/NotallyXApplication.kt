@@ -46,7 +46,7 @@ class NotallyXApplication : Application() {
         if (isTestRunner()) return
 
         preferences = NotallyXPreferences.getInstance(this)
-        preferences.theme.observeForever { theme ->
+        preferences.theme.observeForeverWithPrevious { (oldTheme, theme) ->
             when (theme) {
                 Theme.DARK ->
                     AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
@@ -58,6 +58,9 @@ class NotallyXApplication : Application() {
                     AppCompatDelegate.setDefaultNightMode(
                         AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
                     )
+            }
+            if (oldTheme != null) {
+                WidgetProvider.updateWidgets(this)
             }
         }
 
