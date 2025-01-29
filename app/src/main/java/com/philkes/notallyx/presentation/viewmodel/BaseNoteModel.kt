@@ -4,7 +4,9 @@ import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.AndroidViewModel
@@ -43,6 +45,7 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
+import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.utils.ActionMode
@@ -63,7 +66,10 @@ import com.philkes.notallyx.utils.getBackupDir
 import com.philkes.notallyx.utils.getExternalImagesDirectory
 import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.scheduleNoteReminders
+import com.philkes.notallyx.utils.security.decryptDatabase
+import com.philkes.notallyx.utils.security.encryptDatabase
 import java.util.concurrent.atomic.AtomicInteger
+import javax.crypto.Cipher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -233,6 +239,25 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
             savePreference(preferences.dataInPublicFolder, false)
         }
+    }
+
+    fun enableBiometricLock(cipher: Cipher) {
+        savePreference(preferences.iv, cipher.iv)
+        val passphrase = preferences.databaseEncryptionKey.init(cipher)
+        encryptDatabase(app, passphrase)
+        savePreference(preferences.fallbackDatabaseEncryptionKey, passphrase)
+        savePreference(preferences.biometricLock, BiometricLock.ENABLED)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    fun disableBiometricLock(cipher: Cipher? = null) {
+        val encryptedPassphrase = preferences.databaseEncryptionKey.value
+        val passphrase =
+            cipher?.doFinal(encryptedPassphrase)
+                ?: preferences.fallbackDatabaseEncryptionKey.value!!
+        closeDatabase()
+        decryptDatabase(app, passphrase)
+        savePreference(preferences.biometricLock, BiometricLock.DISABLED)
     }
 
     fun <T> savePreference(preference: BasePreference<T>, value: T) {
@@ -511,7 +536,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun resetPreferences() {
         val backupsFolder = preferences.backupsFolder.value
         preferences.reset()
-        refreshDataInPublicFolder()
+        refreshDataInPublicFolder(false)
         if (backupsFolder != EMPTY_PATH) {
             clearPersistedUriPermissions(backupsFolder)
         }
@@ -523,8 +548,12 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         askForUriPermissions: (uri: Uri) -> Unit,
     ): Boolean {
         val oldBackupsFolder = preferences.backupsFolder.value
+        val dataInPublicFolderBefore = preferences.dataInPublicFolder.value
         val success = preferences.import(context, uri)
-        refreshDataInPublicFolder()
+        val dataInPublicFolder = preferences.dataInPublicFolder.getFreshValue()
+        if (dataInPublicFolderBefore != dataInPublicFolder) {
+            refreshDataInPublicFolder(dataInPublicFolder)
+        }
         val backupFolder = preferences.backupsFolder.getFreshValue()
         if (oldBackupsFolder != backupFolder) {
             refreshBackupsFolder(context, backupFolder, askForUriPermissions)
@@ -551,17 +580,12 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun refreshDataInPublicFolder() {
-        val dataInPublicFolderBefore = preferences.dataInPublicFolder.value
-        val dataInPublicFolderAfter = preferences.dataInPublicFolder.getFreshValue()
-        if (dataInPublicFolderBefore != dataInPublicFolderAfter) {
-            if (dataInPublicFolderAfter) {
-                enableDataInPublic()
-            } else {
-                disableDataInPublic()
-            }
+    private fun refreshDataInPublicFolder(dataInPublicFolder: Boolean) {
+        if (dataInPublicFolder) {
+            enableDataInPublic()
+        } else {
+            disableDataInPublic()
         }
-        preferences.dataInPublicFolder.refresh()
     }
 
     companion object {
