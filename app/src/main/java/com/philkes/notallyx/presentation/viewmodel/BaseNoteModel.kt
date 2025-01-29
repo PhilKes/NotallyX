@@ -215,7 +215,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun enableDataInPublic() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
+                val database = NotallyDatabase.getFreshDatabase(app)
                 database.checkpoint()
                 NotallyDatabase.getInternalDatabaseFile(app)
                     .copyTo(NotallyDatabase.getExternalDatabaseFile(app), overwrite = true)
@@ -227,7 +227,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun disableDataInPublic() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
+                val database = NotallyDatabase.getFreshDatabase(app)
                 database.checkpoint()
                 NotallyDatabase.getExternalDatabaseFile(app)
                     .copyTo(NotallyDatabase.getInternalDatabaseFile(app), overwrite = true)
@@ -535,8 +535,15 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun resetPreferences() {
         val backupsFolder = preferences.backupsFolder.value
+        if (preferences.biometricLock.value == BiometricLock.ENABLED) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                disableBiometricLock()
+            }
+        }
         preferences.reset()
-        refreshDataInPublicFolder(false)
+        if (preferences.dataInPublicFolder.value) {
+            refreshDataInPublicFolder(false)
+        }
         if (backupsFolder != EMPTY_PATH) {
             clearPersistedUriPermissions(backupsFolder)
         }

@@ -97,6 +97,10 @@ abstract class NotallyDatabase : RoomDatabase() {
                 }
         }
 
+        fun getFreshDatabase(context: ContextWrapper): NotallyDatabase {
+            return createInstance(context, NotallyXPreferences.getInstance(context), false)
+        }
+
         private fun createInstance(
             context: ContextWrapper,
             preferences: NotallyXPreferences,
