@@ -316,7 +316,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         withContext(Dispatchers.IO) { baseNoteDao.updateAudios(id, audios.value) }
     }
 
-    private fun getBaseNote(): BaseNote {
+    fun getBaseNote(): BaseNote {
         val spans = getFilteredSpans(body)
         val body = this.body.toString()
         val nonEmptyItems = this.items.filter { item -> item.body.isNotEmpty() }

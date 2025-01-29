@@ -25,12 +25,15 @@ open class ActionBottomSheet(
     @ColorInt private val color: Int? = null,
 ) : BottomSheetDialogFragment() {
 
+    lateinit var layout: LinearLayout
+    lateinit var inflater: LayoutInflater
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
-        val view =
+        layout =
             LinearLayout(context).apply {
                 layoutParams =
                     LinearLayout.LayoutParams(
@@ -40,7 +43,7 @@ open class ActionBottomSheet(
                 orientation = LinearLayout.VERTICAL
                 setPadding(8.dp(context), 18.dp(context), 8.dp(context), 8.dp(context))
             }
-
+        this.inflater = inflater
         actions.forEach { action ->
             if (action.showDividerAbove) {
                 val divider =
@@ -56,10 +59,10 @@ open class ActionBottomSheet(
                             )
                         )
                     }
-                view.addView(divider)
+                layout.addView(divider)
             }
             val textView =
-                BottomSheetActionBinding.inflate(inflater, view, false).root.apply {
+                BottomSheetActionBinding.inflate(inflater, layout, false).root.apply {
                     text = getString(action.labelResId)
                     setCompoundDrawablesWithIntrinsicBounds(
                         ContextCompat.getDrawable(context, action.drawableResId),
@@ -68,20 +71,21 @@ open class ActionBottomSheet(
                         null,
                     )
                     setOnClickListener {
-                        action.callback()
-                        hide()
+                        if (action.callback(this@ActionBottomSheet)) {
+                            hide()
+                        }
                     }
                 }
-            view.addView(textView)
+            layout.addView(textView)
             color?.let {
-                view.apply {
+                layout.apply {
                     setBackgroundColor(it)
                     setControlsContrastColorForAllViews(it, overwriteBackground = false)
                 }
             }
         }
 
-        return view
+        return layout
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -95,7 +99,7 @@ open class ActionBottomSheet(
         return dialog
     }
 
-    private fun BottomSheetDialogFragment.hide() {
+    fun hide() {
         (dialog as? BottomSheetDialog)?.behavior?.state = STATE_HIDDEN
     }
 }
@@ -104,5 +108,10 @@ data class Action(
     val labelResId: Int,
     val drawableResId: Int,
     val showDividerAbove: Boolean = false,
-    val callback: () -> Unit,
+    /**
+     * On click callback.
+     *
+     * @returns whether or not the BottomSheet should be hidden
+     */
+    val callback: (actionBottomSheet: ActionBottomSheet) -> Boolean,
 )
