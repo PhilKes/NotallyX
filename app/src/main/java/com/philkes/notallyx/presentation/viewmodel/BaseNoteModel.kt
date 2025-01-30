@@ -358,7 +358,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun exportSelectedNotesToFolder(folderUri: Uri) {
+    fun exportNotesToFolder(folderUri: Uri, notes: Collection<BaseNote>) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             app.log(TAG, throwable = throwable)
             actionMode.close(true)
@@ -366,7 +366,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             app.showToast(R.string.something_went_wrong)
         }
         viewModelScope.launch(exceptionHandler) {
-            val notes = actionMode.selectedNotes.values
             val counter = AtomicInteger(0)
             for (note in notes) {
                 exportProgress.postValue(Progress(total = notes.size))
@@ -401,6 +400,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             exportProgress.postValue(Progress(inProgress = false))
             app.showToast(R.string.saved_to_device)
         }
+    }
+
+    fun exportSelectedNotesToFolder(folderUri: Uri) {
+        exportNotesToFolder(folderUri, actionMode.selectedNotes.values)
     }
 
     fun pinBaseNotes(pinned: Boolean) {
