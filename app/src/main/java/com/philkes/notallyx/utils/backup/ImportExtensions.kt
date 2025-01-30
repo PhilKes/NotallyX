@@ -23,6 +23,7 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.parseToColorString
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel.FileType
@@ -224,7 +225,8 @@ private fun Cursor.toLabel(): Label {
 private fun Cursor.toBaseNote(): BaseNote {
     val typeTmp = getString(getColumnIndexOrThrow("type"))
     val folderTmp = getString(getColumnIndexOrThrow("folder"))
-    val color = getString(getColumnIndexOrThrow("color"))
+    val color =
+        getString(getColumnIndexOrThrow("color"))?.parseToColorString() ?: BaseNote.COLOR_DEFAULT
     val title = getString(getColumnIndexOrThrow("title"))
     val pinnedTmp = getInt(getColumnIndexOrThrow("pinned"))
     val timestamp = getLong(getColumnIndexOrThrow("timestamp"))

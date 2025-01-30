@@ -6,14 +6,17 @@ import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.databinding.RecyclerColorBinding
 import com.philkes.notallyx.presentation.view.misc.ItemListener
 
-class ColorAdapter(private val colors: List<String>, private val listener: ItemListener) :
-    RecyclerView.Adapter<ColorVH>() {
+class ColorAdapter(
+    private val colors: List<String>,
+    private val selectedColor: String?,
+    private val listener: ItemListener,
+) : RecyclerView.Adapter<ColorVH>() {
 
     override fun getItemCount() = colors.size
 
     override fun onBindViewHolder(holder: ColorVH, position: Int) {
         val color = colors[position]
-        holder.bind(color)
+        holder.bind(color, color == selectedColor)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorVH {

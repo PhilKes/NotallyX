@@ -6,7 +6,6 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.core.view.children
 import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
@@ -83,21 +82,10 @@ class BaseNoteVH(
     }
 
     fun updateCheck(checked: Boolean, color: String) {
-        if (binding.root.isChecked != checked) {
-            if (checked) {
-                binding.root.apply {
-                    strokeColor = context.getColorFromAttr(androidx.appcompat.R.attr.colorPrimary)
-                    strokeWidth = 3.dp(context)
-                }
-            } else {
-                binding.root.apply {
-                    strokeColor =
-                        if (color == BaseNote.COLOR_DEFAULT)
-                            ContextCompat.getColor(context, R.color.chip_stroke)
-                        else 0
-                    strokeWidth = 1.dp(context)
-                }
-            }
+        if (checked) {
+            binding.root.strokeWidth = 3.dp
+        } else {
+            binding.root.strokeWidth = if (color == BaseNote.COLOR_DEFAULT) 1.dp else 0
         }
         binding.root.isChecked = checked
     }
@@ -126,8 +114,7 @@ class BaseNoteVH(
             isVisible = baseNote.title.isNotEmpty()
             updatePadding(
                 bottom =
-                    if (baseNote.hasNoContents() || shouldOnlyDisplayTitle(baseNote)) 0
-                    else 8.dp(context)
+                    if (baseNote.hasNoContents() || shouldOnlyDisplayTitle(baseNote)) 0 else 8.dp
             )
             setCompoundDrawablesWithIntrinsicBounds(
                 if (baseNote.type == Type.LIST && preferences.maxItems < 1)
@@ -193,7 +180,7 @@ class BaseNoteVH(
                                 visibility = VISIBLE
                                 if (item.isChild) {
                                     updateLayoutParams<LinearLayout.LayoutParams> {
-                                        marginStart = 20.dp(context)
+                                        marginStart = 20.dp
                                     }
                                 }
                                 if (index == filteredList.lastIndex) {
@@ -217,12 +204,9 @@ class BaseNoteVH(
     private fun setColor(color: String) {
         binding.root.apply {
             if (color == BaseNote.COLOR_DEFAULT) {
-                val stroke = ContextCompat.getColorStateList(context, R.color.chip_stroke)
-                setStrokeColor(stroke)
                 setCardBackgroundColor(0)
                 setControlsContrastColorForAllViews(context.getColorFromAttr(R.attr.colorSurface))
             } else {
-                strokeColor = 0
                 val colorInt = context.extractColor(color)
                 setCardBackgroundColor(colorInt)
                 setControlsContrastColorForAllViews(colorInt)

@@ -41,7 +41,7 @@ open class ActionBottomSheet(
                         LinearLayout.LayoutParams.MATCH_PARENT,
                     )
                 orientation = LinearLayout.VERTICAL
-                setPadding(8.dp(context), 18.dp(context), 8.dp(context), 8.dp(context))
+                setPadding(8.dp, 18.dp, 8.dp, 8.dp)
             }
         this.inflater = inflater
         actions.forEach { action ->
@@ -50,9 +50,7 @@ open class ActionBottomSheet(
                     View(context).apply {
                         layoutParams =
                             LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 1)
-                                .apply {
-                                    setMargins(8.dp(context), 0, 8.dp(context), 8.dp(context))
-                                }
+                                .apply { setMargins(8.dp, 0, 8.dp, 8.dp) }
                         setBackgroundColor(
                             context.getColorFromAttr(
                                 com.google.android.material.R.attr.colorOnSurfaceVariant

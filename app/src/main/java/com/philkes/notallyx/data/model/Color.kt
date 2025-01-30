@@ -34,3 +34,16 @@ fun Color.toColorString() =
         Color.BLOSSOM -> "#F5E2DC"
         Color.CLAY -> "#E9E3D3"
     }
+
+fun String.parseToColorString() =
+    try {
+        android.graphics.Color.parseColor(this)
+        this
+    } catch (_: Exception) {
+        try {
+            val colorEnum = Color.valueOf(this)
+            colorEnum.toColorString()
+        } catch (e: Exception) {
+            BaseNote.COLOR_DEFAULT
+        }
+    }

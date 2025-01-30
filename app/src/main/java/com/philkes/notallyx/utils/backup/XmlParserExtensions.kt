@@ -6,6 +6,7 @@ import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.parseToColorString
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -74,7 +75,7 @@ private fun XmlPullParser.parseBaseNote(rootTag: String, folder: Folder): BaseNo
     while (next() != XmlPullParser.END_DOCUMENT) {
         if (eventType == XmlPullParser.START_TAG) {
             when (name) {
-                "color" -> color = nextText()
+                "color" -> color = nextText().parseToColorString()
                 "title" -> title = nextText()
                 "body" -> body = nextText()
                 "date-created" -> timestamp = nextText().toLong()
