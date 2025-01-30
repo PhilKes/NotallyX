@@ -217,13 +217,6 @@
           android:text="@string/send_feedback" />
 
         <TextView
-          android:id="@+id/CreateIssue"
-          style="@style/Preference"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:text="@string/create_github_issue" />
-
-        <TextView
             android:id="@+id/SourceCode"
             style="@style/Preference"
             android:layout_width="match_parent"

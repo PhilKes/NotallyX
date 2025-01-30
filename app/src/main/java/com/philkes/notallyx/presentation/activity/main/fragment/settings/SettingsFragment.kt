@@ -591,34 +591,14 @@ class SettingsFragment : Fragment() {
     private fun setupAbout(binding: FragmentSettingsBinding) {
         binding.apply {
             SendFeedback.setOnClickListener {
-                val intent =
-                    Intent(Intent.ACTION_SEND)
-                        .apply {
-                            selector = Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
-                            putExtra(Intent.EXTRA_EMAIL, arrayOf("notallyx@yahoo.com"))
-                            putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
-                            val app = requireContext().applicationContext as Application
-                            val log = app.getLogFile()
-                            if (log.exists()) {
-                                val uri = app.getUriForFile(log)
-                                putExtra(Intent.EXTRA_STREAM, uri)
-                            }
-                        }
-                        .wrapWithChooser(requireContext())
-                try {
-                    startActivity(intent)
-                } catch (exception: ActivityNotFoundException) {
-                    showToast(R.string.install_an_email)
-                }
-            }
-            CreateIssue.setOnClickListener {
                 val options =
                     arrayOf(
                         getString(R.string.report_bug),
                         getString(R.string.make_feature_request),
+                        getString(R.string.send_feedback),
                     )
                 MaterialAlertDialogBuilder(requireContext())
-                    .setTitle(R.string.create_github_issue)
+                    .setTitle(R.string.send_feedback)
                     .setItems(options) { _, which ->
                         when (which) {
                             0 -> {
@@ -627,7 +607,7 @@ class SettingsFragment : Fragment() {
                                 reportBug(logs)
                             }
 
-                            else ->
+                            1 ->
                                 requireContext().catchNoBrowserInstalled {
                                     startActivity(
                                         Intent(
@@ -639,6 +619,32 @@ class SettingsFragment : Fragment() {
                                             .wrapWithChooser(requireContext())
                                     )
                                 }
+                            2 -> {
+                                val intent =
+                                    Intent(Intent.ACTION_SEND)
+                                        .apply {
+                                            selector =
+                                                Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:"))
+                                            putExtra(
+                                                Intent.EXTRA_EMAIL,
+                                                arrayOf("notallyx@yahoo.com"),
+                                            )
+                                            putExtra(Intent.EXTRA_SUBJECT, "NotallyX [Feedback]")
+                                            val app =
+                                                requireContext().applicationContext as Application
+                                            val log = app.getLogFile()
+                                            if (log.exists()) {
+                                                val uri = app.getUriForFile(log)
+                                                putExtra(Intent.EXTRA_STREAM, uri)
+                                            }
+                                        }
+                                        .wrapWithChooser(requireContext())
+                                try {
+                                    startActivity(intent)
+                                } catch (exception: ActivityNotFoundException) {
+                                    showToast(R.string.install_an_email)
+                                }
+                            }
                         }
                     }
                     .setCancelButton()

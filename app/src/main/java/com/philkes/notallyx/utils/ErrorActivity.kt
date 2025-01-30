@@ -15,9 +15,7 @@ class ErrorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(
-            cat.ereza.customactivityoncrash.R.layout.customactivityoncrash_default_error_activity
-        )
+        setContentView(R.layout.activity_error)
         findViewById<ImageView>(
                 cat.ereza.customactivityoncrash.R.id.customactivityoncrash_error_activity_image
             )
@@ -49,7 +47,7 @@ class ErrorActivity : AppCompatActivity() {
                     .customactivityoncrash_error_activity_more_info_button
             )
             .apply {
-                setText(R.string.report_bug)
+                setText(R.string.report_crash)
                 setOnClickListener {
                     reportBug(CustomActivityOnCrash.getStackTraceFromIntent(intent))
                 }
