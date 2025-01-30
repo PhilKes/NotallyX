@@ -1,12 +1,12 @@
 package com.philkes.notallyx.data.imports.google
 
-import com.philkes.notallyx.data.model.Color
+import com.philkes.notallyx.data.model.BaseNote
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class GoogleKeepNote(
     val attachments: List<GoogleKeepAttachment> = listOf(),
-    val color: String = Color.DEFAULT.name,
+    val color: String = BaseNote.COLOR_DEFAULT,
     val isTrashed: Boolean = false,
     val isArchived: Boolean = false,
     val isPinned: Boolean = false,

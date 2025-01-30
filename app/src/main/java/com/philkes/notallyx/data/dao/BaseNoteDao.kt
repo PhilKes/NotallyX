@@ -11,7 +11,6 @@ import androidx.room.Update
 import androidx.sqlite.db.SupportSQLiteQuery
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.LabelsInBaseNote
@@ -74,7 +73,7 @@ interface BaseNoteDao {
     @Query("SELECT id, reminders FROM BaseNote WHERE reminders IS NOT NULL AND reminders != '[]'")
     suspend fun getAllReminders(): List<NoteIdReminder>
 
-    @Query("SELECT color FROM BaseNote WHERE id = :id ") fun getColorOfNote(id: Long): Color
+    @Query("SELECT color FROM BaseNote WHERE id = :id ") fun getColorOfNote(id: Long): String
 
     @Query(
         "SELECT id, title, type, reminders FROM BaseNote WHERE reminders IS NOT NULL AND reminders != '[]'"
@@ -97,7 +96,7 @@ interface BaseNoteDao {
     suspend fun move(ids: LongArray, folder: Folder)
 
     @Query("UPDATE BaseNote SET color = :color WHERE id IN (:ids)")
-    suspend fun updateColor(ids: LongArray, color: Color)
+    suspend fun updateColor(ids: LongArray, color: String)
 
     @Query("UPDATE BaseNote SET pinned = :pinned WHERE id IN (:ids)")
     suspend fun updatePinned(ids: LongArray, pinned: Boolean)

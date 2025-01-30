@@ -4,12 +4,15 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
+/** Format: `#RRGGBB` or `#AARRGGBB` or [BaseNote.COLOR_DEFAULT] */
+typealias ColorString = String
+
 @Entity(indices = [Index(value = ["id", "folder", "pinned", "timestamp", "labels"])])
 data class BaseNote(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val type: Type,
     val folder: Folder,
-    val color: Color,
+    val color: ColorString,
     val title: String,
     val pinned: Boolean,
     val timestamp: Long,
@@ -22,7 +25,12 @@ data class BaseNote(
     val files: List<FileAttachment>,
     val audios: List<Audio>,
     val reminders: List<Reminder>,
-) : Item
+) : Item {
+
+    companion object {
+        const val COLOR_DEFAULT = "DEFAULT"
+    }
+}
 
 fun BaseNote.deepCopy(): BaseNote {
     return copy(

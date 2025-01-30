@@ -21,7 +21,6 @@ import com.bumptech.glide.request.RequestListener
 import com.bumptech.glide.request.target.Target
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.SpanRepresentation
@@ -83,7 +82,7 @@ class BaseNoteVH(
         }
     }
 
-    fun updateCheck(checked: Boolean, color: Color) {
+    fun updateCheck(checked: Boolean, color: String) {
         if (binding.root.isChecked != checked) {
             if (checked) {
                 binding.root.apply {
@@ -93,7 +92,7 @@ class BaseNoteVH(
             } else {
                 binding.root.apply {
                     strokeColor =
-                        if (color == Color.DEFAULT)
+                        if (color == BaseNote.COLOR_DEFAULT)
                             ContextCompat.getColor(context, R.color.chip_stroke)
                         else 0
                     strokeWidth = 1.dp(context)
@@ -215,9 +214,9 @@ class BaseNoteVH(
         }
     }
 
-    private fun setColor(color: Color) {
+    private fun setColor(color: String) {
         binding.root.apply {
-            if (color == Color.DEFAULT) {
+            if (color == BaseNote.COLOR_DEFAULT) {
                 val stroke = ContextCompat.getColorStateList(context, R.color.chip_stroke)
                 setStrokeColor(stroke)
                 setCardBackgroundColor(0)

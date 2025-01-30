@@ -1,7 +1,6 @@
 package com.philkes.notallyx.utils.backup
 
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.ListItem
@@ -61,7 +60,7 @@ private fun XmlPullParser.parseBaseNoteList(
 }
 
 private fun XmlPullParser.parseBaseNote(rootTag: String, folder: Folder): BaseNote {
-    var color = Color.DEFAULT
+    var color = BaseNote.COLOR_DEFAULT
 
     var body = String()
     var title = String()
@@ -75,7 +74,7 @@ private fun XmlPullParser.parseBaseNote(rootTag: String, folder: Folder): BaseNo
     while (next() != XmlPullParser.END_DOCUMENT) {
         if (eventType == XmlPullParser.START_TAG) {
             when (name) {
-                "color" -> color = Color.valueOf(nextText())
+                "color" -> color = nextText()
                 "title" -> title = nextText()
                 "body" -> body = nextText()
                 "date-created" -> timestamp = nextText().toLong()

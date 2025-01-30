@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.Color
+import com.philkes.notallyx.data.model.toColorString
 import com.philkes.notallyx.databinding.RecyclerColorBinding
 import com.philkes.notallyx.presentation.view.misc.ItemListener
 
@@ -15,7 +16,7 @@ class ColorAdapter(private val listener: ItemListener) : RecyclerView.Adapter<Co
 
     override fun onBindViewHolder(holder: ColorVH, position: Int) {
         val color = colors[position]
-        holder.bind(color)
+        holder.bind(color.toColorString())
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ColorVH {

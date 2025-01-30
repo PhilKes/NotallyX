@@ -29,7 +29,6 @@ import com.philkes.notallyx.data.imports.NotesImporter
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Content
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
@@ -425,7 +424,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         executeAsync { baseNoteDao.updatePinned(id, pinned) }
     }
 
-    fun colorBaseNote(color: Color) {
+    fun colorBaseNote(color: String) {
         val ids = actionMode.selectedIds.toLongArray()
         actionMode.close(true)
         executeAsync { baseNoteDao.updateColor(ids, color) }

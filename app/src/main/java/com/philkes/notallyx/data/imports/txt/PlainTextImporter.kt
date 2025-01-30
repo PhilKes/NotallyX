@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import com.philkes.notallyx.data.imports.ExternalImporter
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
@@ -53,7 +52,7 @@ class PlainTextImporter : ExternalImporter {
                             id = 0L, // Auto-generated
                             type = if (listItems.isEmpty()) Type.NOTE else Type.LIST,
                             folder = Folder.NOTES,
-                            color = Color.DEFAULT,
+                            color = BaseNote.COLOR_DEFAULT,
                             title = fileNameWithoutExtension,
                             pinned = false,
                             timestamp = timestamp,
