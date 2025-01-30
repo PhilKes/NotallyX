@@ -2,7 +2,6 @@ package com.philkes.notallyx.data.imports.google
 
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -222,7 +221,7 @@ class GoogleKeepImporterTest {
             id: Long = 0L,
             type: Type = Type.NOTE,
             folder: Folder = Folder.NOTES,
-            color: Color = Color.DEFAULT,
+            color: String = BaseNote.COLOR_DEFAULT,
             title: String = "Note",
             pinned: Boolean = false,
             timestamp: Long = System.currentTimeMillis(),
