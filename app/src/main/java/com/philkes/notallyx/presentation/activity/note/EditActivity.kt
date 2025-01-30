@@ -67,11 +67,13 @@ import com.philkes.notallyx.presentation.view.note.action.MoreNoteBottomSheet
 import com.philkes.notallyx.presentation.view.note.audio.AudioAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewFileAdapter
 import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
+import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
+import com.philkes.notallyx.utils.backup.exportNotes
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.log
@@ -93,6 +95,8 @@ abstract class EditActivity(private val type: Type) :
     private lateinit var selectLabelsActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var playAudioActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var attachFilesActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
+    private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var pinMenuItem: MenuItem
     protected var search = Search()
@@ -256,6 +260,21 @@ abstract class EditActivity(private val type: Type) :
                     }
                 }
             }
+
+        exportFileActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri -> baseModel.exportSelectedFileToUri(uri) }
+                }
+            }
+        exportNotesActivityResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                if (result.resultCode == RESULT_OK) {
+                    result.data?.data?.let { uri ->
+                        baseModel.exportNotesToFolder(uri, listOf(notallyModel.getBaseNote()))
+                    }
+                }
+            }
     }
 
     override fun onRequestPermissionsResult(
@@ -294,26 +313,6 @@ abstract class EditActivity(private val type: Type) :
             pinMenuItem =
                 add(R.string.pin, R.drawable.pin, MenuItem.SHOW_AS_ACTION_ALWAYS) { pin() }
             bindPinned()
-
-            when (notallyModel.folder) {
-                Folder.NOTES -> {
-                    add(R.string.delete, R.drawable.delete, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                        delete()
-                    }
-                }
-
-                Folder.DELETED -> {
-                    add(R.string.restore, R.drawable.restore, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                        restore()
-                    }
-                }
-
-                Folder.ARCHIVED -> {
-                    add(R.string.unarchive, R.drawable.unarchive, MenuItem.SHOW_AS_ACTION_ALWAYS) {
-                        restore()
-                    }
-                }
-            }
         }
 
         search.results.mergeSkipFirst(search.resultPos).observe(this) { (amount, pos) ->
@@ -462,20 +461,38 @@ abstract class EditActivity(private val type: Type) :
         when (notallyModel.folder) {
             Folder.NOTES ->
                 listOf(
-                    Action(R.string.archive, R.drawable.archive, callback = ::archive),
-                    Action(R.string.delete, R.drawable.delete, callback = ::delete),
+                    Action(R.string.archive, R.drawable.archive) { _ ->
+                        archive()
+                        true
+                    },
+                    Action(R.string.delete, R.drawable.delete) { _ ->
+                        delete()
+                        true
+                    },
                 )
 
             Folder.DELETED ->
                 listOf(
-                    Action(R.string.delete_forever, R.drawable.delete, callback = ::deleteForever),
-                    Action(R.string.restore, R.drawable.restore, callback = ::restore),
+                    Action(R.string.delete_forever, R.drawable.delete) { _ ->
+                        deleteForever()
+                        true
+                    },
+                    Action(R.string.restore, R.drawable.restore) { _ ->
+                        restore()
+                        true
+                    },
                 )
 
             Folder.ARCHIVED ->
                 listOf(
-                    Action(R.string.delete, R.drawable.delete, callback = ::delete),
-                    Action(R.string.unarchive, R.drawable.unarchive, callback = ::restore),
+                    Action(R.string.delete, R.drawable.delete) { _ ->
+                        delete()
+                        true
+                    },
+                    Action(R.string.unarchive, R.drawable.unarchive) { _ ->
+                        restore()
+                        true
+                    },
                 )
         }
 
@@ -614,6 +631,15 @@ abstract class EditActivity(private val type: Type) :
                 Type.LIST -> notallyModel.items.toMutableList().toText()
             }
         this.shareNote(notallyModel.title, body)
+    }
+
+    override fun export(mimeType: ExportMimeType) {
+        exportNotes(
+            mimeType,
+            listOf(notallyModel.getBaseNote()),
+            exportFileActivityResultLauncher,
+            exportNotesActivityResultLauncher,
+        )
     }
 
     private fun delete() {

@@ -13,13 +13,20 @@ class AddBottomSheet(callbacks: AddActions, @ColorInt color: Int?) :
 
         fun createActions(callbacks: AddActions) =
             listOf(
-                Action(R.string.add_images, R.drawable.add_images) { callbacks.addImages() },
-                Action(R.string.attach_file, R.drawable.text_file) { callbacks.attachFiles() },
+                Action(R.string.add_images, R.drawable.add_images) { _ ->
+                    callbacks.addImages()
+                    true
+                },
+                Action(R.string.attach_file, R.drawable.text_file) { _ ->
+                    callbacks.attachFiles()
+                    true
+                },
             ) +
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
                     listOf(
-                        Action(R.string.record_audio, R.drawable.record_audio) {
+                        Action(R.string.record_audio, R.drawable.record_audio) { _ ->
                             callbacks.recordAudio()
+                            true
                         }
                     )
                 else listOf()

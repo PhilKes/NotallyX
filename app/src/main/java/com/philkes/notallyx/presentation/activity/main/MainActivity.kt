@@ -1,9 +1,7 @@
 package com.philkes.notallyx.presentation.activity.main
 
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.print.PdfPrintListener
 import android.transition.TransitionManager
 import android.view.Menu
 import android.view.Menu.CATEGORY_CONTAINER
@@ -13,14 +11,12 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.widget.doAfterTextChanged
-import androidx.documentfile.provider.DocumentFile
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -55,20 +51,13 @@ import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showColorSelectDialog
-import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
-import com.philkes.notallyx.utils.backup.exportPdfFile
-import com.philkes.notallyx.utils.backup.exportPlainTextFile
-import com.philkes.notallyx.utils.getExportedPath
-import com.philkes.notallyx.utils.getUriForFile
-import com.philkes.notallyx.utils.nameWithoutExtension
+import com.philkes.notallyx.utils.backup.exportNotes
 import com.philkes.notallyx.utils.shareNote
-import com.philkes.notallyx.utils.wrapWithChooser
-import java.io.File
 import kotlinx.coroutines.launch
 
 class MainActivity : LockedActivity<ActivityMainBinding>() {
@@ -358,86 +347,12 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     }
 
     private fun exportSelectedNotes(mimeType: ExportMimeType) {
-        if (baseModel.actionMode.count.value == 1) {
-            val baseNote = baseModel.actionMode.getFirstNote()
-            when (mimeType) {
-                ExportMimeType.PDF -> {
-                    exportPdfFile(
-                        application,
-                        baseNote,
-                        DocumentFile.fromFile(application.getExportedPath()),
-                        pdfPrintListener =
-                            object : PdfPrintListener {
-
-                                override fun onSuccess(file: DocumentFile) {
-                                    showFileOptionsDialog(file, ExportMimeType.PDF.mimeType)
-                                }
-
-                                override fun onFailure(message: CharSequence?) {
-                                    Toast.makeText(
-                                            this@MainActivity,
-                                            R.string.something_went_wrong,
-                                            Toast.LENGTH_SHORT,
-                                        )
-                                        .show()
-                                }
-                            },
-                    )
-                }
-                ExportMimeType.TXT,
-                ExportMimeType.JSON,
-                ExportMimeType.HTML ->
-                    lifecycleScope.launch {
-                        exportPlainTextFile(
-                                application,
-                                baseNote,
-                                mimeType,
-                                DocumentFile.fromFile(application.getExportedPath()),
-                            )
-                            ?.let { showFileOptionsDialog(it, mimeType.mimeType) }
-                    }
-            }
-        } else {
-            lifecycleScope.launch {
-                val intent =
-                    Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
-                        .apply { addCategory(Intent.CATEGORY_DEFAULT) }
-                        .wrapWithChooser(this@MainActivity)
-                baseModel.selectedExportMimeType = mimeType
-                exportNotesActivityResultLauncher.launch(intent)
-            }
-        }
-    }
-
-    private fun showFileOptionsDialog(file: DocumentFile, mimeType: String) {
-        MenuDialog(this)
-            .add(R.string.view_file) { viewFile(getUriForFile(File(file.uri.path!!)), mimeType) }
-            .add(R.string.save_to_device) { saveFileToDevice(file, mimeType) }
-            .show()
-    }
-
-    private fun viewFile(uri: Uri, mimeType: String) {
-        val intent =
-            Intent(Intent.ACTION_VIEW)
-                .apply {
-                    setDataAndType(uri, mimeType)
-                    flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-                }
-                .wrapWithChooser(this@MainActivity)
-        startActivity(intent)
-    }
-
-    private fun saveFileToDevice(file: DocumentFile, mimeType: String) {
-        val intent =
-            Intent(Intent.ACTION_CREATE_DOCUMENT)
-                .apply {
-                    type = mimeType
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension!!)
-                }
-                .wrapWithChooser(this@MainActivity)
-        baseModel.selectedExportFile = file
-        exportFileActivityResultLauncher.launch(intent)
+        exportNotes(
+            mimeType,
+            baseModel.actionMode.selectedNotes.values,
+            exportFileActivityResultLauncher,
+            exportNotesActivityResultLauncher,
+        )
     }
 
     private fun setupNavigation() {

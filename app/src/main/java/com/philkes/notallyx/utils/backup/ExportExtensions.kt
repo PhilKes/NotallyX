@@ -13,11 +13,14 @@ import android.os.Build
 import android.print.PdfPrintListener
 import android.print.printPdf
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.lifecycleScope
 import androidx.work.Data
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ListenableWorker.Result
@@ -33,7 +36,9 @@ import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.toHtml
 import com.philkes.notallyx.data.model.toJson
 import com.philkes.notallyx.data.model.toTxt
+import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.MainActivity
+import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.BackupFile
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
@@ -51,12 +56,15 @@ import com.philkes.notallyx.utils.getExportedPath
 import com.philkes.notallyx.utils.getExternalAudioDirectory
 import com.philkes.notallyx.utils.getExternalFilesDirectory
 import com.philkes.notallyx.utils.getExternalImagesDirectory
+import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.listZipFiles
 import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.logToFile
+import com.philkes.notallyx.utils.nameWithoutExtension
 import com.philkes.notallyx.utils.removeTrailingParentheses
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
+import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import java.io.FileInputStream
 import java.io.IOException
@@ -69,6 +77,7 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.exception.ZipException
@@ -489,7 +498,7 @@ private fun ZipParameters.copy(fileNameInZip: String? = this.fileNameInZip): Zip
 }
 
 fun exportPdfFile(
-    app: Application,
+    app: Context,
     note: BaseNote,
     folder: DocumentFile,
     fileName: String = note.title,
@@ -539,7 +548,7 @@ fun exportPdfFile(
 }
 
 suspend fun exportPlainTextFile(
-    app: Application,
+    app: Context,
     note: BaseNote,
     exportType: ExportMimeType,
     folder: DocumentFile,
@@ -654,4 +663,106 @@ private fun Context.postErrorNotification(e: Throwable) {
                 .build()
         manager.notify(NOTIFICATION_ID, notification)
     }
+}
+
+fun LockedActivity<*>.exportNotes(
+    mimeType: ExportMimeType,
+    notes: Collection<BaseNote>,
+    saveFileResultLauncher: ActivityResultLauncher<Intent>,
+    exportToFolderResultLauncher: ActivityResultLauncher<Intent>,
+) {
+    baseModel.selectedExportMimeType = mimeType
+    if (notes.size == 1) {
+        val baseNote = notes.first()
+        when (mimeType) {
+            ExportMimeType.PDF -> {
+                exportPdfFile(
+                    this,
+                    baseNote,
+                    DocumentFile.fromFile(getExportedPath()),
+                    pdfPrintListener =
+                        object : PdfPrintListener {
+
+                            override fun onSuccess(file: DocumentFile) {
+                                showFileOptionsDialog(
+                                    file,
+                                    ExportMimeType.PDF.mimeType,
+                                    saveFileResultLauncher,
+                                )
+                            }
+
+                            override fun onFailure(message: CharSequence?) {
+                                Toast.makeText(
+                                        this@exportNotes,
+                                        R.string.something_went_wrong,
+                                        Toast.LENGTH_SHORT,
+                                    )
+                                    .show()
+                            }
+                        },
+                )
+            }
+            ExportMimeType.TXT,
+            ExportMimeType.JSON,
+            ExportMimeType.HTML ->
+                lifecycleScope.launch {
+                    exportPlainTextFile(
+                            this@exportNotes,
+                            baseNote,
+                            mimeType,
+                            DocumentFile.fromFile(getExportedPath()),
+                        )
+                        ?.let {
+                            showFileOptionsDialog(it, mimeType.mimeType, saveFileResultLauncher)
+                        }
+                }
+        }
+    } else {
+        lifecycleScope.launch {
+            val intent =
+                Intent(Intent.ACTION_OPEN_DOCUMENT_TREE)
+                    .apply { addCategory(Intent.CATEGORY_DEFAULT) }
+                    .wrapWithChooser(this@exportNotes)
+            exportToFolderResultLauncher.launch(intent)
+        }
+    }
+}
+
+private fun LockedActivity<*>.showFileOptionsDialog(
+    file: DocumentFile,
+    mimeType: String,
+    resultLauncher: ActivityResultLauncher<Intent>,
+) {
+    MenuDialog(this)
+        .add(R.string.view_file) { viewFile(getUriForFile(File(file.uri.path!!)), mimeType) }
+        .add(R.string.save_to_device) { saveFileToDevice(file, mimeType, resultLauncher) }
+        .show()
+}
+
+private fun LockedActivity<*>.viewFile(uri: Uri, mimeType: String) {
+    val intent =
+        Intent(Intent.ACTION_VIEW)
+            .apply {
+                setDataAndType(uri, mimeType)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            .wrapWithChooser(this)
+    startActivity(intent)
+}
+
+private fun LockedActivity<*>.saveFileToDevice(
+    file: DocumentFile,
+    mimeType: String,
+    resultLauncher: ActivityResultLauncher<Intent>,
+) {
+    val intent =
+        Intent(Intent.ACTION_CREATE_DOCUMENT)
+            .apply {
+                type = mimeType
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension!!)
+            }
+            .wrapWithChooser(this)
+    baseModel.selectedExportFile = file
+    resultLauncher.launch(intent)
 }
