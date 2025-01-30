@@ -77,6 +77,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.ColorString
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
@@ -533,49 +534,7 @@ fun Activity.showColorSelectDialog(
                         return
                     }
                     dialog.dismiss()
-                    val selectedColor = this@showColorSelectDialog.extractColor(oldColor)
-                    val binding = DialogColorPickerBinding.inflate(layoutInflater)
-                    val dialog =
-                        MaterialAlertDialogBuilder(this@showColorSelectDialog)
-                            .setView(binding.root)
-                            .setPositiveButton(R.string.save) { _, _ ->
-                                val updateColor = binding.ColorPicker.colorEnvelope.toColorString()
-                                if (updateColor == oldColor) {
-                                    callback(oldColor, null)
-                                } else {
-                                    callback(updateColor, oldColor)
-                                }
-                            }
-                            .setNegativeButton(R.string.back) { _, _ ->
-                                this@showColorSelectDialog.showColorSelectDialog(
-                                    actualColors,
-                                    setNavigationbarLight,
-                                    callback,
-                                )
-                            }
-                            .show()
-                    val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                    binding.apply {
-                        BrightnessSlideBar.setSelectorDrawableRes(
-                            com.skydoves.colorpickerview.R.drawable.colorpickerview_wheel
-                        )
-                        ColorPicker.apply {
-                            setInitialColor(selectedColor)
-                            attachBrightnessSlider(BrightnessSlideBar)
-                            setColorListener(
-                                ColorEnvelopeListener { color, fromUser ->
-                                    TileView.setPaintColor(color.color)
-                                    val colorString = color.toColorString()
-                                    val isSaveEnabled =
-                                        colorString == oldColor || colorString !in actualColors
-                                    positiveButton.isEnabled = isSaveEnabled
-                                    ColorExistsText.visibility =
-                                        if (isSaveEnabled) View.INVISIBLE else View.VISIBLE
-                                }
-                            )
-                        }
-                        Restore.setOnClickListener { ColorPicker.selectByHsvColor(selectedColor) }
-                    }
+                    showEditColorDialog(actualColors, oldColor, setNavigationbarLight, callback)
                 }
             },
         )
@@ -586,6 +545,69 @@ fun Activity.showColorSelectDialog(
             setNavigationbarLight?.let { window?.apply { setLightStatusAndNavBar(it, root) } }
         }
         dialog.show()
+    }
+}
+
+private fun Activity.showEditColorDialog(
+    colors: List<String>,
+    oldColor: String,
+    setNavigationbarLight: Boolean?,
+    callback: (selectedColor: String, oldColor: String?) -> Unit,
+) {
+    val selectedColor = extractColor(oldColor)
+    val binding = DialogColorPickerBinding.inflate(layoutInflater)
+    val dialog =
+        MaterialAlertDialogBuilder(this)
+            .setView(binding.root)
+            .setPositiveButton(R.string.save) { _, _ ->
+                val updateColor = binding.ColorPicker.colorEnvelope.toColorString()
+                if (updateColor == oldColor) {
+                    callback(oldColor, null)
+                } else {
+                    callback(updateColor, oldColor)
+                }
+            }
+            .setNegativeButton(R.string.back) { _, _ ->
+                showColorSelectDialog(colors, setNavigationbarLight, callback)
+            }
+            .show()
+    val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
+    binding.apply {
+        BrightnessSlideBar.setSelectorDrawableRes(
+            com.skydoves.colorpickerview.R.drawable.colorpickerview_wheel
+        )
+        ColorPicker.apply {
+            setInitialColor(selectedColor)
+            attachBrightnessSlider(BrightnessSlideBar)
+            setColorListener(
+                ColorEnvelopeListener { color, fromUser ->
+                    TileView.setPaintColor(color.color)
+                    val colorString = color.toColorString()
+                    val isSaveEnabled = colorString == oldColor || colorString !in colors
+                    positiveButton.isEnabled = isSaveEnabled
+                    ColorExistsText.visibility = if (isSaveEnabled) View.INVISIBLE else View.VISIBLE
+                }
+            )
+        }
+        Restore.setOnClickListener { ColorPicker.selectByHsvColor(selectedColor) }
+
+        ExistingColors.apply {
+            val colors1 = Color.allColorStrings()
+            val colorAdapter =
+                ColorAdapter(
+                    colors1,
+                    object : ItemListener {
+                        override fun onClick(position: Int) {
+                            ColorPicker.selectByHsvColor(
+                                this@showEditColorDialog.extractColor(colors1[position])
+                            )
+                        }
+
+                        override fun onLongClick(position: Int) {}
+                    },
+                )
+            adapter = colorAdapter
+        }
     }
 }
 

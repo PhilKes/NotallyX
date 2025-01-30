@@ -12,7 +12,11 @@ enum class Color {
     DUSK,
     FLOWER,
     BLOSSOM,
-    CLAY,
+    CLAY;
+
+    companion object {
+        fun allColorStrings() = entries.map { it.toColorString() }.toList()
+    }
 }
 
 fun Color.toColorString() =
