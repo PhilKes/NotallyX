@@ -242,6 +242,7 @@
     <string name="repetition_custom">Custom Repetition</string>
     <string name="repetition_value_hint">Value</string>
     <string name="report_bug">Report an issue/bug</string>
+    <string name="report_crash">Report bug with crash logs</string>
     <string name="reset_settings">Reset Settings</string>
     <string name="reset_settings_message">All Settings will be reset to their default value</string>
     <string name="reset_settings_success">Successfully reset all settings</string>
