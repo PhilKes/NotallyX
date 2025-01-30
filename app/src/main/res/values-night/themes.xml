@@ -1,7 +1,7 @@
 <resources>
     <style name="AppTheme" parent="Theme.Material3.Dark.NoActionBar">
         <item name="colorPrimary">@color/md_theme_primary</item>
-        <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
+        <item name="colorOnPrimary">@color/md_theme_scrim</item>
         <item name="colorPrimaryContainer">@color/md_theme_primaryContainer</item>
         <item name="colorOnPrimaryContainer">@color/md_theme_onPrimaryContainer</item>
         <item name="colorSecondary">@color/md_theme_secondary</item>
@@ -16,11 +16,11 @@
         <item name="colorOnError">@color/md_theme_onError</item>
         <item name="colorErrorContainer">@color/md_theme_errorContainer</item>
         <item name="colorOnErrorContainer">@color/md_theme_onErrorContainer</item>
-        <item name="android:colorBackground">@color/md_theme_background</item>
+        <item name="android:colorBackground">@color/md_theme_scrim</item>
         <item name="colorOnBackground">@color/md_theme_onBackground</item>
-        <item name="colorSurface">@color/md_theme_surface</item>
+        <item name="colorSurface">@color/md_theme_scrim</item>
         <item name="colorOnSurface">@color/md_theme_onSurface</item>
-        <item name="colorSurfaceVariant">@color/md_theme_surfaceVariant</item>
+        <item name="colorSurfaceVariant">@color/md_theme_scrim</item>
         <item name="colorOnSurfaceVariant">@color/md_theme_onSurfaceVariant</item>
         <item name="colorOutline">@color/md_theme_outline</item>
         <item name="colorOutlineVariant">@color/md_theme_outlineVariant</item>
@@ -41,13 +41,21 @@
         <item name="colorOnTertiaryFixedVariant">@color/md_theme_onTertiaryFixedVariant</item>
         <item name="colorSurfaceDim">@color/md_theme_surfaceDim</item>
         <item name="colorSurfaceBright">@color/md_theme_surfaceBright</item>
-        <item name="colorSurfaceContainerLowest">@color/md_theme_surfaceContainerLowest</item>
-        <item name="colorSurfaceContainerLow">@color/md_theme_surfaceContainerLow</item>
+        <item name="colorSurfaceContainerLowest">@color/md_theme_scrim</item>
+        <item name="colorSurfaceContainerLow">@color/md_theme_scrim</item>
         <item name="colorSurfaceContainer">@color/md_theme_surfaceContainer</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_surfaceContainerHigh</item>
         <item name="colorSurfaceContainerHighest">@color/md_theme_surfaceContainerHighest</item>
 
         <item name="android:statusBarColor">?attr/colorSurface</item>
         <item name="android:navigationBarColor">?attr/colorSurface</item>
+
+        <item name="elevationOverlayEnabled">false</item>
+        <item name="materialAlertDialogTheme">@style/Dialog.Dark</item>
+        <item name="popupMenuBackground">@color/md_theme_surfaceContainerLow</item>
+    </style>
+
+    <style name="Dialog.Dark" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="android:background">@color/md_theme_surfaceContainerLow</item>
     </style>
 </resources>
