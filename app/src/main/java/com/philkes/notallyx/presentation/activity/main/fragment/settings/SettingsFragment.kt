@@ -685,6 +685,7 @@ class SettingsFragment : Fragment() {
                     .setCancelButton()
                     .show()
             }
+            Donate.setOnClickListener { openLink("https://ko-fi.com/philkes") }
 
             try {
                 val pInfo =
