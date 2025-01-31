@@ -8,7 +8,6 @@ import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.createListItem
 import com.philkes.notallyx.test.find
 import com.philkes.notallyx.test.printList
-import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
 import com.philkes.notallyx.utils.changehistory.ListAddChange
 import com.philkes.notallyx.utils.changehistory.ListDeleteChange
 import org.junit.Assert.assertEquals
@@ -169,7 +168,6 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         listManager.deleteCheckedItems()
 
         items.assertOrder("B", "E", "F")
-        (changeHistory.lookUp() as DeleteCheckedChange).assert(deletedItems)
     }
 
     @Test
@@ -182,7 +180,6 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         listManager.deleteCheckedItems()
 
         items.assertOrder("B", "E", "F")
-        (changeHistory.lookUp() as DeleteCheckedChange).assert(deletedItems)
     }
 
     // endregion

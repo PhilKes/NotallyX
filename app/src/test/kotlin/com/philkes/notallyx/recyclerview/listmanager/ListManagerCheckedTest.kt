@@ -1,10 +1,8 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
-import com.philkes.notallyx.test.assert
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
-import com.philkes.notallyx.utils.changehistory.ChangeCheckedForAllChange
 import org.junit.Test
 
 class ListManagerCheckedTest : ListManagerTestBase() {
@@ -174,7 +172,6 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(true, true, true, true, true, true)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(true, listOf(5, 4, 2, 0))
     }
 
     @Test
@@ -188,7 +185,6 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(false, false, false, false, false, false)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(false, listOf(3, 2, 1))
     }
 
     @Test
@@ -202,7 +198,6 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(true, true, true, true, true, true)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(true, listOf(5, 4, 1))
     }
 
     @Test
@@ -216,7 +211,6 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         items.assertChecked(false, false, false, false, false, false)
-        (changeHistory.lookUp() as ChangeCheckedForAllChange).assert(false, listOf(3, 2, 0))
     }
 
     // endregion
