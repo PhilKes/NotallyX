@@ -1,21 +1,20 @@
 package com.philkes.notallyx.utils.changehistory
 
+import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 
 class ChangeCheckedForAllChange(
-    internal val checked: Boolean,
-    internal val changedIds: Collection<Int>,
+    old: List<ListItem>,
+    new: List<ListItem>,
     private val listManager: ListManager,
-) : Change {
-    override fun redo() {
-        listManager.checkByIds(checked, changedIds, true)
-    }
+) : ValueChange<List<ListItem>>(new, old) {
 
-    override fun undo() {
-        listManager.checkByIds(!checked, changedIds, true)
+    override fun update(value: List<ListItem>, isUndo: Boolean) {
+        // Since delete checked Changes can be quite complex simply use snapshots before/after
+        listManager.setItems(if (isUndo) oldValue else newValue)
     }
 
     override fun toString(): String {
-        return "ChangeCheckedForAllChange checked: $checked changedIds: ${changedIds.joinToString(",")}"
+        return "ChangeCheckedForAllChange"
     }
 }
