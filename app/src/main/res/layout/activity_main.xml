@@ -20,25 +20,6 @@
             app:navigationContentDescription="ToolbarNavigation"
             app:contentInsetEnd="16dp">
 
-            <com.google.android.material.textfield.TextInputLayout
-              android:id="@+id/EnterSearchKeywordLayout"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              style="@style/RoundedTextInput"
-              >
-                <com.google.android.material.textfield.TextInputEditText
-                  android:id="@+id/EnterSearchKeyword"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:background="@null"
-                  app:boxStrokeWidth="0dp"
-                  android:hint="@string/search"
-                  android:inputType="textFilter"
-                  android:paddingTop="10dp"
-                  android:paddingBottom="10dp"
-                  android:textAppearance="?attr/textAppearanceBodyLarge" />
-            </com.google.android.material.textfield.TextInputLayout>
-
         </com.google.android.material.appbar.MaterialToolbar>
 
         <com.google.android.material.appbar.MaterialToolbar

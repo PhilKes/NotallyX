@@ -279,11 +279,14 @@
     <string name="sort_direction">Sort Direction</string>
     <string name="source_code">Source Code</string>
     <string name="start">Start</string>
+    <string name="start_view">Start View</string>
+    <string name="start_view_hint">Select which View/Label should be shown when the app is started.\nDefaults to the main Notes View</string>
     <string name="stop">Stop</string>
     <string name="strikethrough">Strikethrough</string>
     <string name="take_note">Take note</string>
     <string name="tap_for_more_options">Tap for more options</string>
     <string name="tap_to_set_up">Tap to set up</string>
+    <string name="text_default">Default</string>
     <string name="text_size">Text size</string>
     <string name="theme">Theme</string>
     <string name="title">Title</string>
@@ -297,6 +300,7 @@
     <string name="undo">Undo</string>
     <string name="unknown_error">Unknown error</string>
     <string name="unknown_name">Unknown name</string>
+    <string name="unlabeled">Unlabeled</string>
     <string name="unlock">Unlock via Biometric/PIN</string>
     <string name="unlock_with_biometrics_not_setup">You have previously enabled biometric lock but Biometrics/PIN are not setup for your device anymore.\n\nIf you wish to disable biometric lock press Disable, otherwise setup Biometrics/PIN for your device</string>
     <string name="unpin">Unpin</string>

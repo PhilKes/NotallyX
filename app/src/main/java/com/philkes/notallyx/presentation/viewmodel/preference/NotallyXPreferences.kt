@@ -38,6 +38,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
 
     val notesView = createEnumPreference(preferences, "view", NotesView.LIST, R.string.view)
     val notesSorting = NotesSortPreference(preferences)
+    val startView =
+        StringPreference("startView", preferences, START_VIEW_DEFAULT, R.string.start_view)
     val listItemSorting =
         createEnumPreference(
             preferences,
@@ -87,7 +89,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
             "maxLabelsInNavigation",
             preferences,
             5,
-            1,
+            0,
             20,
             R.string.max_labels_to_display,
         )
@@ -197,6 +199,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
         dataInPublicFolder.refresh()
         theme.refresh()
         reload()
+        startView.refresh()
     }
 
     private fun reload() {
@@ -222,6 +225,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
     companion object {
         private const val TAG = "NotallyXPreferences"
         const val EMPTY_PATH = "emptyPath"
+        const val START_VIEW_DEFAULT = ""
+        const val START_VIEW_UNLABELED = "com.philkes.notallyx.startview.UNLABELED"
 
         @Volatile private var instance: NotallyXPreferences? = null
 

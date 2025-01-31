@@ -37,6 +37,7 @@ import android.view.WindowManager
 import android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
+import android.widget.Button
 import android.widget.CompoundButton
 import android.widget.EditText
 import android.widget.ImageButton
@@ -60,6 +61,7 @@ import androidx.core.view.setPadding
 import androidx.core.view.updatePadding
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -75,6 +77,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.RelativeCornerSize
 import com.google.android.material.shape.RoundedCornerTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
@@ -357,6 +360,11 @@ fun Activity.showKeyboard(view: View) {
         ?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
 }
 
+fun Activity.hideKeyboard(view: View) {
+    ContextCompat.getSystemService(this, InputMethodManager::class.java)
+        ?.hideSoftInputFromWindow(view.windowToken, 0)
+}
+
 fun MutableLiveData<out Progress>.setupProgressDialog(activity: Activity, titleId: Int) {
     setupProgressDialog(activity, activity.layoutInflater, activity as LifecycleOwner, titleId)
 }
@@ -392,6 +400,13 @@ fun MutableLiveData<ImportProgress>.setupImportProgressDialog(fragment: Fragment
 
 fun <T, C> NotNullLiveData<T>.merge(liveData: NotNullLiveData<C>): MediatorLiveData<Pair<T, C>> {
     return MediatorLiveData<Pair<T, C>>().apply {
+        addSource(this@merge) { value1 -> value = Pair(value1, liveData.value) }
+        addSource(liveData) { value2 -> value = Pair(this@merge.value, value2) }
+    }
+}
+
+fun <T, C> NotNullLiveData<T>.merge(liveData: LiveData<C>): MediatorLiveData<Pair<T, C?>> {
+    return MediatorLiveData<Pair<T, C?>>().apply {
         addSource(this@merge) { value1 -> value = Pair(value1, liveData.value) }
         addSource(liveData) { value2 -> value = Pair(this@merge.value, value2) }
     }
@@ -501,6 +516,7 @@ fun MaterialAlertDialogBuilder.showAndFocus(
     viewToFocus: View? = null,
     selectAll: Boolean = false,
     allowFullSize: Boolean = false,
+    applyToPositiveButton: ((positiveButton: Button) -> Unit)? = null,
 ): AlertDialog {
     if (allowFullSize) {
         setBackgroundInsetEnd(0)
@@ -523,6 +539,9 @@ fun MaterialAlertDialogBuilder.showAndFocus(
             )
         }
         show()
+        applyToPositiveButton?.let {
+            getButton(AlertDialog.BUTTON_POSITIVE)?.let { positiveButton -> it(positiveButton) }
+        }
     }
 }
 
@@ -775,4 +794,8 @@ fun RecyclerView.initListView(context: Context) {
     layoutManager = LinearLayoutManager(context)
     addItemDecoration(DividerItemDecoration(context, RecyclerView.VERTICAL))
     setPadding(0, 0, 0, 0)
+}
+
+fun MaterialAutoCompleteTextView.select(value: CharSequence) {
+    setText(value, false)
 }

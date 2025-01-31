@@ -15,10 +15,12 @@ import com.philkes.notallyx.databinding.ChoiceItemBinding
 import com.philkes.notallyx.databinding.DialogDateFormatBinding
 import com.philkes.notallyx.databinding.DialogNotesSortBinding
 import com.philkes.notallyx.databinding.DialogPreferenceBooleanBinding
+import com.philkes.notallyx.databinding.DialogSelectionBoxBinding
 import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
 import com.philkes.notallyx.databinding.PreferenceSeekbarBinding
 import com.philkes.notallyx.presentation.checkedTag
+import com.philkes.notallyx.presentation.select
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
@@ -31,6 +33,8 @@ import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.IntPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_DEFAULT
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_UNLABELED
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortPreference
@@ -427,5 +431,50 @@ fun PreferenceSeekbarBinding.setup(
 ) {
     setup(value, preference.titleResId!!, preference.min, preference.max, context) { newValue ->
         onChange(newValue)
+    }
+}
+
+fun PreferenceBinding.setupStartView(
+    preference: StringPreference,
+    value: String,
+    labels: List<String>?,
+    context: Context,
+    layoutInflater: LayoutInflater,
+    onSave: (value: String) -> Unit,
+) {
+    Title.setText(preference.titleResId!!)
+
+    val notesText = "${context.getText(R.string.notes)} (${context.getText(R.string.text_default)})"
+    val unlabeledText = context.getText(R.string.unlabeled).toString()
+    val textValue =
+        when (value) {
+            START_VIEW_DEFAULT -> notesText
+            START_VIEW_UNLABELED -> unlabeledText
+            else -> value
+        }
+    Value.text = textValue
+
+    root.setOnClickListener {
+        val layout = DialogSelectionBoxBinding.inflate(layoutInflater, null, false)
+        layout.Message.setText(R.string.start_view_hint)
+        val values =
+            mutableListOf(notesText to START_VIEW_DEFAULT, unlabeledText to START_VIEW_UNLABELED)
+                .apply { labels?.forEach { add(it to it) } }
+        var selected = -1
+        layout.SelectionBox.apply {
+            setSimpleItems(values.map { it.first }.toTypedArray())
+            select(textValue)
+            setOnItemClickListener { _, _, position, _ -> selected = position }
+        }
+        MaterialAlertDialogBuilder(context)
+            .setTitle(preference.titleResId)
+            .setView(layout.root)
+            .setPositiveButton(R.string.save) { dialog, _ ->
+                dialog.cancel()
+                val newValue = values[selected].second
+                onSave(newValue)
+            }
+            .setCancelButton()
+            .showAndFocus(allowFullSize = true)
     }
 }

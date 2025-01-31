@@ -10,13 +10,12 @@ import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import android.view.inputmethod.InputMethodManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
-import androidx.core.widget.doAfterTextChanged
+import androidx.core.view.children
+import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -42,7 +41,6 @@ import com.philkes.notallyx.databinding.ActivityMainBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
-import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_FOLDER
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
@@ -54,7 +52,11 @@ import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
+import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel.Companion.CURRENT_LABEL_EMPTY
+import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel.Companion.CURRENT_LABEL_NONE
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_DEFAULT
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_UNLABELED
 import com.philkes.notallyx.utils.backup.exportNotes
 import com.philkes.notallyx.utils.shareNote
 import com.philkes.notallyx.utils.showColorSelectDialog
@@ -68,7 +70,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private lateinit var configuration: AppBarConfiguration
     private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
-
+    //    private var displayedLabel: String? = null
     private val actionModeCancelCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -91,15 +93,19 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         setupMenu()
         setupActionMode()
         setupNavigation()
-        setupSearch()
 
         setupActivityResultLaunchers()
         onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
 
         val fragmentIdToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_OPEN, -1)
         if (fragmentIdToLoad != -1) {
-            val bundle = Bundle()
-            navController.navigate(fragmentIdToLoad, bundle)
+            navController.navigate(fragmentIdToLoad, Bundle())
+        } else if (savedInstanceState == null) {
+            when (val startView = preferences.startView.value) {
+                START_VIEW_DEFAULT -> {}
+                START_VIEW_UNLABELED -> navController.navigate(R.id.Unlabeled, Bundle())
+                else -> navigateToLabel(startView)
+            }
         }
     }
 
@@ -135,6 +141,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private fun setupMenu() {
         binding.NavigationView.menu.apply {
             add(0, R.id.Notes, 0, R.string.notes).setCheckable(true).setIcon(R.drawable.home)
+
+            addStaticLabelsMenuItems()
             NotallyDatabase.getDatabase(application).observe(this@MainActivity) { database ->
                 labelsLiveData?.removeObservers(this@MainActivity)
                 labelsLiveData =
@@ -167,21 +175,29 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
     }
 
-    private fun Menu.setupLabelsMenuItems(labels: List<String>, maxLabelsToDisplay: Int) {
-        removeGroup(1)
-        add(1, R.id.Labels, CATEGORY_CONTAINER + 1, R.string.labels)
+    private fun Menu.addStaticLabelsMenuItems() {
+        add(1, R.id.Unlabeled, CATEGORY_CONTAINER + 1, R.string.unlabeled)
+            .setCheckable(true)
+            .setChecked(baseModel.currentLabel == CURRENT_LABEL_NONE)
+            .setIcon(R.drawable.label_off)
+        add(1, R.id.Labels, CATEGORY_CONTAINER + 2, R.string.labels)
             .setCheckable(true)
             .setIcon(R.drawable.label_more)
+    }
+
+    private fun Menu.setupLabelsMenuItems(labels: List<String>, maxLabelsToDisplay: Int) {
+        removeGroup(1)
+        addStaticLabelsMenuItems()
         labelsMenuItems =
             labels
                 .mapIndexed { index, label ->
-                    add(1, R.id.DisplayLabel, CATEGORY_CONTAINER + index + 2, label)
+                    add(1, R.id.DisplayLabel, CATEGORY_CONTAINER + index + 3, label)
                         .setCheckable(true)
+                        .setChecked(baseModel.currentLabel == label)
                         .setVisible(index < maxLabelsToDisplay)
                         .setIcon(R.drawable.label)
                         .setOnMenuItemClickListener {
-                            val bundle = Bundle().apply { putString(EXTRA_DISPLAYED_LABEL, label) }
-                            navController.navigate(R.id.DisplayLabel, bundle)
+                            navigateToLabel(label)
                             false
                         }
                 }
@@ -204,6 +220,11 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             baseModel.preferences.labelsHiddenInNavigation.value,
             maxLabelsToDisplay,
         )
+    }
+
+    private fun navigateToLabel(label: String) {
+        val bundle = Bundle().apply { putString(EXTRA_DISPLAYED_LABEL, label) }
+        navController.navigate(R.id.DisplayLabel, bundle)
     }
 
     private fun hideLabelsInNavigation(hiddenLabels: Set<String>, maxLabelsToDisplay: Int) {
@@ -385,21 +406,41 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             }
         )
 
-        navController.addOnDestinationChangedListener { _, destination, _ ->
+        navController.addOnDestinationChangedListener { _, destination, bundle ->
             fragmentIdToLoad = destination.id
-            binding.NavigationView.setCheckedItem(destination.id)
-            if (destination.id != R.id.Search) {
-                binding.EnterSearchKeyword.apply {
-                    setText("")
-                    clearFocus()
+            when (fragmentIdToLoad) {
+                R.id.DisplayLabel ->
+                    bundle?.getString(EXTRA_DISPLAYED_LABEL)?.let {
+                        baseModel.currentLabel = it
+                        binding.NavigationView.menu.children
+                            .find { menuItem -> menuItem.title == it }
+                            ?.let { menuItem -> menuItem.isChecked = true }
+                    }
+                R.id.Unlabeled -> {
+                    baseModel.currentLabel = CURRENT_LABEL_NONE
+                    binding.NavigationView.setCheckedItem(destination.id)
                 }
-                when (destination.id) {
-                    R.id.Notes,
-                    R.id.Deleted,
-                    R.id.Archived -> binding.EnterSearchKeywordLayout.visibility = VISIBLE
-                    else -> binding.EnterSearchKeywordLayout.visibility = GONE
+                else -> {
+                    baseModel.currentLabel = CURRENT_LABEL_EMPTY
+                    binding.NavigationView.setCheckedItem(destination.id)
                 }
             }
+            // TODO?
+            //            if (destination.id != R.id.Search) {
+            //                binding.EnterSearchKeyword.apply {
+            //                    setText("")
+            //                    clearFocus()
+            //                }
+            //                when (destination.id) {
+            //                    R.id.Notes,
+            //                    R.id.Deleted,
+            //                    R.id.Archived,
+            //                    R.id.DisplayLabel,
+            //                    R.id.Unlabeled -> binding.EnterSearchKeywordLayout.visibility =
+            // VISIBLE
+            //                    else -> binding.EnterSearchKeywordLayout.visibility = GONE
+            //                }
+            //            }
             handleDestinationChange(destination)
         }
     }
@@ -407,7 +448,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private fun handleDestinationChange(destination: NavDestination) {
         when (destination.id) {
             R.id.Notes,
-            R.id.DisplayLabel -> {
+            R.id.DisplayLabel,
+            R.id.Unlabeled -> {
                 binding.TakeNote.show()
                 binding.MakeList.show()
             }
@@ -417,20 +459,21 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             }
         }
 
-        val inputManager = ContextCompat.getSystemService(this, InputMethodManager::class.java)
-        if (destination.id == R.id.Search) {
-            binding.EnterSearchKeyword.apply {
-                //                setText("")
-                visibility = View.VISIBLE
-                requestFocus()
-                inputManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-            }
-        } else {
-            binding.EnterSearchKeyword.apply {
-                //                visibility = View.GONE
-                inputManager?.hideSoftInputFromWindow(this.windowToken, 0)
-            }
-        }
+        //        val inputManager = ContextCompat.getSystemService(this,
+        // InputMethodManager::class.java)
+        //        if (destination.id == R.id.Search) {
+        //            binding.EnterSearchKeyword.apply {
+        //                //                setText("")
+        //                visibility = View.VISIBLE
+        //                requestFocus()
+        //                inputManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
+        //            }
+        //        } else {
+        //            binding.EnterSearchKeyword.apply {
+        //                //                visibility = View.GONE
+        //                inputManager?.hideSoftInputFromWindow(this.windowToken, 0)
+        //            }
+        //        }
     }
 
     private fun navigateWithAnimation(id: Int) {
@@ -445,34 +488,6 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             popUpTo(navController.graph.startDestination) { inclusive = false }
         }
         navController.navigate(id, null, options)
-    }
-
-    private fun setupSearch() {
-        binding.EnterSearchKeyword.apply {
-            setText(baseModel.keyword)
-            doAfterTextChanged { text ->
-                baseModel.keyword = requireNotNull(text).trim().toString()
-                if (
-                    baseModel.keyword.isNotEmpty() &&
-                        navController.currentDestination?.id != R.id.Search
-                ) {
-                    val bundle =
-                        Bundle().apply {
-                            putSerializable(EXTRA_INITIAL_FOLDER, baseModel.folder.value)
-                        }
-                    navController.navigate(R.id.Search, bundle)
-                }
-            }
-            setOnFocusChangeListener { v, hasFocus ->
-                if (hasFocus && navController.currentDestination?.id != R.id.Search) {
-                    val bundle =
-                        Bundle().apply {
-                            putSerializable(EXTRA_INITIAL_FOLDER, baseModel.folder.value)
-                        }
-                    navController.navigate(R.id.Search, bundle)
-                }
-            }
-        }
     }
 
     private fun setupActivityResultLaunchers() {

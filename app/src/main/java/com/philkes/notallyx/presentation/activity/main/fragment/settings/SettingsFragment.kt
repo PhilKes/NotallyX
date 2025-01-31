@@ -283,6 +283,18 @@ class SettingsFragment : Fragment() {
         binding.MaxLabels.setup(maxLabels, requireContext()) { newValue ->
             model.savePreference(maxLabels, newValue)
         }
+
+        startView.merge(model.labels).observe(viewLifecycleOwner) { (startViewValue, labelsValue) ->
+            binding.StartView.setupStartView(
+                startView,
+                startViewValue,
+                labelsValue,
+                requireContext(),
+                layoutInflater,
+            ) { newValue ->
+                model.savePreference(startView, newValue)
+            }
+        }
     }
 
     private fun NotallyXPreferences.setupContentDensity(binding: FragmentSettingsBinding) {
@@ -296,6 +308,9 @@ class SettingsFragment : Fragment() {
 
             MaxLines.setup(maxLines, requireContext()) { newValue ->
                 model.savePreference(maxLines, newValue)
+            }
+            MaxLabels.setup(maxLabels, requireContext()) { newValue ->
+                model.savePreference(maxLabels, newValue)
             }
             labelsHiddenInOverview.observe(viewLifecycleOwner) { value ->
                 binding.LabelsHiddenInOverview.setup(

@@ -21,14 +21,15 @@ class SearchResult(
         value = emptyList()
     }
 
-    fun fetch(keyword: String, folder: Folder) {
+    fun fetch(keyword: String, folder: Folder, label: String?) {
         job?.cancel()
         liveData?.removeObserver(observer)
         job =
             scope.launch {
-                liveData =
-                    if (keyword.isNotEmpty()) baseNoteDao.getBaseNotesByKeyword(keyword, folder)
-                    else baseNoteDao.getFrom(folder)
+                liveData = baseNoteDao.getBaseNotesByKeyword(keyword, folder, label)
+                //                    if (keyword.isNotEmpty())
+                // baseNoteDao.getBaseNotesByKeyword(keyword, folder, label)
+                //                    else baseNoteDao.getFrom(folder)
                 liveData?.observeForever(observer)
             }
     }
