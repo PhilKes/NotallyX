@@ -283,6 +283,7 @@ class ListManager(
     }
 
     fun changeCheckedForAll(checked: Boolean, pushChange: Boolean = true) {
+        val itemsBefore = getItems()
         val parentIds = mutableListOf<Int>()
         val changedIds = mutableListOf<Int>()
         items
@@ -300,7 +301,7 @@ class ListManager(
             changeChecked(position, checked, pushChange = false)
         }
         if (pushChange) {
-            changeHistory.push(ChangeCheckedForAllChange(checked, changedIds, this))
+            changeHistory.push(ChangeCheckedForAllChange(itemsBefore, getItems(), this))
         }
     }
 
@@ -330,6 +331,7 @@ class ListManager(
 
     fun deleteCheckedItems(pushChange: Boolean = true) {
         endSearch?.invoke()
+        val itemsBefore = getItems()
         val itemsToDelete =
             items.filter { it.checked }.map { it.clone() as ListItem }.sortedBy { it.isChild }
         items.beginBatchedUpdates()
@@ -346,7 +348,7 @@ class ListManager(
             }
         items.endBatchedUpdates()
         if (pushChange) {
-            changeHistory.push(DeleteCheckedChange(deletedItems, this))
+            changeHistory.push(DeleteCheckedChange(itemsBefore, getItems(), this))
         }
     }
 
