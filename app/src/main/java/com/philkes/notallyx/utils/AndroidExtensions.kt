@@ -261,7 +261,7 @@ fun Context.createReportBugIntent(
     return Intent(
             Intent.ACTION_VIEW,
             Uri.parse(
-                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${title?.let { "&title=$it" }}${body?.let { "&what-happened=$it" }}&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let { "&logs=$stackTrace" } ?: ""}"
+                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${title?.let { "&title=$it" } ?: ""}${body?.let { "&what-happened=$it" } ?: ""}&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let { "&logs=$stackTrace" } ?: ""}"
                     .take(2000)
             ),
         )
