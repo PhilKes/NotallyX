@@ -194,12 +194,13 @@ class NotallyXPreferences private constructor(private val context: Context) {
         preferences.edit().clear().apply()
         encryptedPreferences.edit().clear().apply()
         backupsFolder.refresh()
+        dataInPublicFolder.refresh()
+        theme.refresh()
         reload()
     }
 
     private fun reload() {
         setOf(
-                theme,
                 textSize,
                 dateFormat,
                 applyDateFormatInNoteView,

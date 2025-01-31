@@ -76,6 +76,15 @@ abstract class NotallyDatabase : RoomDatabase() {
             return context.getDatabasePath(DATABASE_NAME)
         }
 
+        fun getInternalDatabaseFiles(context: ContextWrapper): List<File> {
+            val directory = context.getDatabasePath(DATABASE_NAME).parentFile
+            return listOf(
+                File(directory, DATABASE_NAME),
+                File(directory, "$DATABASE_NAME-shm"),
+                File(directory, "$DATABASE_NAME-wal"),
+            )
+        }
+
         private fun getCurrentDatabaseName(context: ContextWrapper): String {
             return if (NotallyXPreferences.getInstance(context).dataInPublicFolder.value) {
                 getExternalDatabaseFile(context).absolutePath
