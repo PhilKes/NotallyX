@@ -55,4 +55,15 @@
     android:gravity="center"
     android:visibility="invisible"
     />
+  <androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/ExistingColors"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:clipToPadding="false"
+    android:paddingStart="4dp"
+    android:paddingEnd="4dp"
+    android:paddingBottom="4dp"
+    android:scrollIndicators="top"
+    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+    app:spanCount="6" />
 </LinearLayout>
