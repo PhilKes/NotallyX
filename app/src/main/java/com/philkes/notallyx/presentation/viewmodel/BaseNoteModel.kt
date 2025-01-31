@@ -100,11 +100,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     val folder = NotNullLiveData(Folder.NOTES)
 
+    var currentLabel: String? = CURRENT_LABEL_EMPTY
+
     var keyword = String()
         set(value) {
             if (field != value || searchResults?.value?.isEmpty() == true) {
                 field = value
-                searchResults!!.fetch(keyword, folder.value)
+                searchResults!!.fetch(keyword, folder.value, currentLabel)
             }
         }
 
@@ -127,7 +129,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     init {
         NotallyDatabase.getDatabase(app).observeForever(::init)
-        folder.observeForever { newFolder -> searchResults!!.fetch(keyword, newFolder) }
+        folder.observeForever { newFolder ->
+            searchResults!!.fetch(keyword, newFolder, currentLabel)
+        }
     }
 
     private fun init(database: NotallyDatabase) {
@@ -188,6 +192,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             labelCache[label] = Content(baseNoteDao.getBaseNotesByLabel(label), ::transform)
         }
         return requireNotNull(labelCache[label])
+    }
+
+    fun getNotesWithoutLabel(): Content {
+        return Content(baseNoteDao.getBaseNotesWithoutLabel(Folder.NOTES), ::transform)
     }
 
     private fun transform(list: List<BaseNote>) = transform(list, pinned, others)
@@ -626,7 +634,13 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 }
             }
         } else
-            finishImportPreferences(oldBackupsFolder, themeBefore, context, askForUriPermissions) {
+            finishImportPreferences(
+                oldBackupsFolder,
+                themeBefore,
+                oldStartView,
+                context,
+                askForUriPermissions,
+            ) {
                 if (success) {
                     onSuccess()
                 } else onFailure()
@@ -695,6 +709,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     companion object {
         private const val TAG = "BaseNoteModel"
+
+        const val CURRENT_LABEL_EMPTY = ""
+        val CURRENT_LABEL_NONE: String? = null
 
         fun transform(list: List<BaseNote>, pinned: Header, others: Header): List<Item> {
             if (list.isEmpty()) {

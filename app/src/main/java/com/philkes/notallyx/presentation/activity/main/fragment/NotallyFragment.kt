@@ -9,9 +9,11 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.LiveData
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.StaggeredGridLayoutManager
@@ -23,6 +25,8 @@ import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.activity.main.MainActivity
+import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_FOLDER
+import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_LABEL
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_FOLDER_FROM
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_FOLDER_TO
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_NOTE_ID
@@ -30,7 +34,9 @@ import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EX
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.hideKeyboard
 import com.philkes.notallyx.presentation.movedToResId
+import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.view.main.BaseNoteAdapter
 import com.philkes.notallyx.presentation.view.main.BaseNoteVHPreferences
 import com.philkes.notallyx.presentation.view.misc.ItemListener
@@ -73,6 +79,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
         setupAdapter()
         setupRecyclerView()
         setupObserver()
+        setupSearch()
 
         setupActivityResultLaunchers()
 
@@ -165,6 +172,50 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                     if (item is BaseNote) {
                         handleNoteSelection(item.id, position, item)
                     }
+                }
+            }
+        }
+    }
+
+    private fun setupSearch() {
+        binding?.EnterSearchKeyword?.apply {
+            setText(model.keyword)
+            val navController = findNavController()
+            navController.addOnDestinationChangedListener { controller, destination, arguments ->
+                if (destination.id == R.id.Search) {
+                    //                setText("")
+                    visibility = View.VISIBLE
+                    requestFocus()
+                    activity?.showKeyboard(this)
+                } else {
+                    //                visibility = View.GONE
+                    setText("")
+                    clearFocus()
+                    activity?.hideKeyboard(this)
+                }
+            }
+            doAfterTextChanged { text ->
+                model.keyword = requireNotNull(text).trim().toString()
+                if (
+                    model.keyword.isNotEmpty() &&
+                        navController.currentDestination?.id != R.id.Search
+                ) {
+                    val bundle =
+                        Bundle().apply {
+                            putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value)
+                            putSerializable(EXTRA_INITIAL_LABEL, model.currentLabel)
+                        }
+                    navController.navigate(R.id.Search, bundle)
+                }
+            }
+            setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus && navController.currentDestination?.id != R.id.Search) {
+                    val bundle =
+                        Bundle().apply {
+                            putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value)
+                            putSerializable(EXTRA_INITIAL_LABEL, model.currentLabel)
+                        }
+                    navController.navigate(R.id.Search, bundle)
                 }
             }
         }

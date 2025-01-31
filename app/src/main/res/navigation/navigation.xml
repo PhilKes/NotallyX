@@ -6,7 +6,7 @@
     <fragment
         android:id="@+id/Notes"
         android:name="com.philkes.notallyx.presentation.activity.main.fragment.NotesFragment"
-        android:label="@string/app_name">
+        android:label="@string/notes">
 
         <action
             android:id="@+id/NotesToSearch"
@@ -81,5 +81,10 @@
         android:id="@+id/DisplayLabel"
         android:name="com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment"
         android:label="{notallyx.intent.extra.DISPLAYED_LABEL}" />
+
+    <fragment
+        android:id="@+id/Unlabeled"
+        android:name="com.philkes.notallyx.presentation.activity.main.fragment.UnlabeledFragment"
+        android:label="@string/unlabeled" />
 
 </navigation>

@@ -172,6 +172,11 @@ interface BaseNoteDao {
     )
     fun getBaseNotesByLabel(label: String, folder: Folder): LiveData<List<BaseNote>>
 
+    @Query(
+        "SELECT * FROM BaseNote WHERE folder = :folder AND labels == '[]' ORDER BY pinned DESC, timestamp DESC"
+    )
+    fun getBaseNotesWithoutLabel(folder: Folder): LiveData<List<BaseNote>>
+
     suspend fun getListOfBaseNotesByLabel(label: String): List<BaseNote> {
         val result = getListOfBaseNotesByLabelImpl(label)
         return result.filter { baseNote -> baseNote.labels.contains(label) }
@@ -180,15 +185,41 @@ interface BaseNoteDao {
     @Query("SELECT * FROM BaseNote WHERE labels LIKE '%' || :label || '%'")
     suspend fun getListOfBaseNotesByLabelImpl(label: String): List<BaseNote>
 
-    fun getBaseNotesByKeyword(keyword: String, folder: Folder): LiveData<List<BaseNote>> {
-        val result = getBaseNotesByKeywordImpl(keyword, folder)
+    fun getBaseNotesByKeyword(
+        keyword: String,
+        folder: Folder,
+        label: String?,
+    ): LiveData<List<BaseNote>> {
+        val result =
+            when (label) {
+                null -> getBaseNotesByKeywordUnlabeledImpl(keyword, folder)
+                "" -> getBaseNotesByKeywordImpl(keyword, folder)
+                else -> getBaseNotesByKeywordImpl(keyword, folder, label)
+            }
         return result.map { list -> list.filter { baseNote -> matchesKeyword(baseNote, keyword) } }
     }
+
+    @Query(
+        "SELECT * FROM BaseNote WHERE folder = :folder AND labels LIKE '%' || :label || '%' AND (title LIKE '%' || :keyword || '%' OR body LIKE '%' || :keyword || '%' OR items LIKE '%' || :keyword || '%') ORDER BY pinned DESC, timestamp DESC"
+    )
+    fun getBaseNotesByKeywordImpl(
+        keyword: String,
+        folder: Folder,
+        label: String,
+    ): LiveData<List<BaseNote>>
 
     @Query(
         "SELECT * FROM BaseNote WHERE folder = :folder AND (title LIKE '%' || :keyword || '%' OR body LIKE '%' || :keyword || '%' OR items LIKE '%' || :keyword || '%' OR labels LIKE '%' || :keyword || '%') ORDER BY pinned DESC, timestamp DESC"
     )
     fun getBaseNotesByKeywordImpl(keyword: String, folder: Folder): LiveData<List<BaseNote>>
+
+    @Query(
+        "SELECT * FROM BaseNote WHERE folder = :folder AND labels == '[]' AND (title LIKE '%' || :keyword || '%' OR body LIKE '%' || :keyword || '%' OR items LIKE '%' || :keyword || '%') ORDER BY pinned DESC, timestamp DESC"
+    )
+    fun getBaseNotesByKeywordUnlabeledImpl(
+        keyword: String,
+        folder: Folder,
+    ): LiveData<List<BaseNote>>
 
     private fun matchesKeyword(baseNote: BaseNote, keyword: String): Boolean {
         if (baseNote.title.contains(keyword, true)) {
