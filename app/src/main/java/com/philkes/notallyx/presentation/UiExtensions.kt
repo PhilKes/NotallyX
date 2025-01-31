@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -65,6 +66,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -76,14 +78,12 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
+import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
-import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.LabelBinding
-import com.philkes.notallyx.presentation.view.main.ColorAdapter
-import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
@@ -236,8 +236,8 @@ fun ViewGroup.addIconButton(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.MATCH_PARENT,
                     )
-                    .apply { setMargins(marginStart.dp(context), marginTop, 0, marginBottom) }
-            setPadding(8.dp(context))
+                    .apply { setMargins(marginStart.dp, marginTop, 0, marginBottom) }
+            setPadding(8.dp)
         }
     addView(view)
     return view
@@ -255,13 +255,11 @@ fun TextView.displayFormattedTimestamp(
     } else visibility = View.GONE
 }
 
-fun Int.dp(context: Context): Int =
-    TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            this.toFloat(),
-            context.resources.displayMetrics,
-        )
-        .toInt()
+val Int.dp: Int
+    get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
+
+val Float.dp: Int
+    get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
 
 /**
  * Creates a TextWatcher for an EditText that is part of a list. Everytime the text is changed, a
@@ -499,32 +497,6 @@ private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
     }
 }
 
-fun Activity.showColorSelectDialog(
-    setNavigationbarLight: Boolean?,
-    callback: (selectedColor: Color) -> Unit,
-) {
-    val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.change_color).create()
-    val colorAdapter =
-        ColorAdapter(
-            object : ItemListener {
-                override fun onClick(position: Int) {
-                    dialog.dismiss()
-                    callback(Color.entries[position])
-                }
-
-                override fun onLongClick(position: Int) {}
-            }
-        )
-    DialogColorBinding.inflate(layoutInflater).apply {
-        RecyclerView.adapter = colorAdapter
-        dialog.setView(root)
-        dialog.setOnShowListener {
-            setNavigationbarLight?.let { window?.apply { setLightStatusAndNavBar(it, root) } }
-        }
-        dialog.show()
-    }
-}
-
 fun MaterialAlertDialogBuilder.showAndFocus(
     viewToFocus: View? = null,
     selectAll: Boolean = false,
@@ -601,6 +573,15 @@ fun View.setControlsColorForAllViews(
                 backgroundColor,
                 overwriteBackground,
             ) // Recursive call for nested layouts
+        }
+        if (this is MaterialCardView) {
+            checkedIconTint = ColorStateList.valueOf(controlsColor)
+            val colorStateList =
+                ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(controlsColor, controlsColor.withAlpha(0.3f)),
+                )
+            setStrokeColor(colorStateList)
         }
     } else {
         val controlsStateList =
@@ -730,28 +711,16 @@ fun ViewGroup.addFastScroll(context: Context) {
     FastScrollerBuilder(this)
         .useMd2Style()
         .setTrackDrawable(ContextCompat.getDrawable(context, R.drawable.scroll_track)!!)
-        .setPadding(0, 0, 2.dp(context), 0)
+        .setPadding(0, 0, 2.dp, 0)
         .build()
 }
 
 @ColorInt
-fun Context.extractColor(color: Color): Int {
-    val id =
-        when (color) {
-            Color.DEFAULT -> return getColorFromAttr(R.attr.colorSurface)
-            Color.CORAL -> R.color.Coral
-            Color.ORANGE -> R.color.Orange
-            Color.SAND -> R.color.Sand
-            Color.STORM -> R.color.Storm
-            Color.FOG -> R.color.Fog
-            Color.SAGE -> R.color.Sage
-            Color.MINT -> R.color.Mint
-            Color.DUSK -> R.color.Dusk
-            Color.FLOWER -> R.color.Flower
-            Color.BLOSSOM -> R.color.Blossom
-            Color.CLAY -> R.color.Clay
-        }
-    return ContextCompat.getColor(this, id)
+fun Context.extractColor(color: String): Int {
+    return when (color) {
+        BaseNote.COLOR_DEFAULT -> return getColorFromAttr(R.attr.colorSurface)
+        else -> android.graphics.Color.parseColor(color)
+    }
 }
 
 fun Window.setLightStatusAndNavBar(value: Boolean, view: View = decorView) {
@@ -772,7 +741,7 @@ fun ChipGroup.bindLabels(
         apply {
             visibility = View.VISIBLE
             removeAllViews()
-            updatePadding(top = if (paddingTop) 8.dp(context) else 0)
+            updatePadding(top = if (paddingTop) 8.dp else 0)
         }
         val inflater = LayoutInflater.from(context)
         val labelSize = textSize.displayBodySize

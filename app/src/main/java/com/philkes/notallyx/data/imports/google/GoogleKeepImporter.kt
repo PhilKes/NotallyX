@@ -11,7 +11,6 @@ import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.imports.parseBodyAndSpansFromHtml
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -150,7 +149,7 @@ class GoogleKeepImporter : ExternalImporter {
                     googleKeepNote.isArchived -> Folder.ARCHIVED
                     else -> Folder.NOTES
                 },
-            color = Color.DEFAULT, // Ignoring color mapping
+            color = BaseNote.COLOR_DEFAULT, // Ignoring color mapping
             title = googleKeepNote.title,
             pinned = googleKeepNote.isPinned,
             timestamp = googleKeepNote.createdTimestampUsec / 1000,

@@ -29,7 +29,6 @@ import com.philkes.notallyx.data.imports.NotesImporter
 import com.philkes.notallyx.data.model.Attachment
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Content
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
@@ -90,6 +89,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     lateinit var selectedExportMimeType: ExportMimeType
 
     lateinit var labels: LiveData<List<String>>
+    //    lateinit var colors: LiveData<List<String>>
     lateinit var reminders: LiveData<List<NoteReminder>>
     private var allNotes: LiveData<List<BaseNote>>? = null
     private var allNotesObserver: Observer<List<BaseNote>>? = null
@@ -136,6 +136,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         commonDao = database.getCommonDao()
 
         labels = labelDao.getAll()
+        //        colors = baseNoteDao.getAllColorsAsync()
         reminders = baseNoteDao.getAllRemindersAsync()
 
         allNotes?.removeObserver(allNotesObserver!!)
@@ -425,10 +426,14 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         executeAsync { baseNoteDao.updatePinned(id, pinned) }
     }
 
-    fun colorBaseNote(color: Color) {
+    fun colorBaseNote(color: String) {
         val ids = actionMode.selectedIds.toLongArray()
         actionMode.close(true)
         executeAsync { baseNoteDao.updateColor(ids, color) }
+    }
+
+    fun changeColor(oldColor: String, newColor: String) {
+        executeAsync { baseNoteDao.updateColor(oldColor, newColor) }
     }
 
     fun moveBaseNotes(folder: Folder): LongArray {

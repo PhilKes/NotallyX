@@ -67,7 +67,7 @@ fun BaseNote.toJson(): String {
     val jsonObject =
         JSONObject()
             .put("type", type.name)
-            .put("color", color.name)
+            .put("color", color)
             .put("title", title)
             .put("pinned", pinned)
             .put("date-created", timestamp)

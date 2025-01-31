@@ -21,7 +21,7 @@ fun MaterialAlertDialogBuilder.setMultiChoiceTriStateItems(
     val recyclerView =
         RecyclerView(context).apply {
             layoutManager = LinearLayoutManager(context)
-            setPadding(0, 8.dp(context), 0, 0)
+            setPadding(0, 8.dp, 0, 0)
             this.adapter = adapter
         }
     setView(recyclerView)

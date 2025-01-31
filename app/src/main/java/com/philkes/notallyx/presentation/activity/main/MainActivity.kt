@@ -50,7 +50,6 @@ import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.setCancelButton
-import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
@@ -58,7 +57,10 @@ import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.utils.backup.exportNotes
 import com.philkes.notallyx.utils.shareNote
+import com.philkes.notallyx.utils.showColorSelectDialog
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : LockedActivity<ActivityMainBinding>() {
 
@@ -563,7 +565,38 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             showAsAction: Int = MenuItem.SHOW_AS_ACTION_IF_ROOM
         ): MenuItem {
             return add(R.string.change_color, R.drawable.change_color, showAsAction) {
-                showColorSelectDialog(null) { selectedColor -> model.colorBaseNote(selectedColor) }
+                lifecycleScope.launch {
+                    val colors =
+                        withContext(Dispatchers.IO) {
+                            NotallyDatabase.getDatabase(
+                                    this@MainActivity,
+                                    observePreferences = false,
+                                )
+                                .value
+                                .getBaseNoteDao()
+                                .getAllColors()
+                        }
+                    // Show color as selected only if all selected notes have the same color
+                    val currentColor =
+                        model.actionMode.selectedNotes.values
+                            .map { it.color }
+                            .distinct()
+                            .takeIf { it.size == 1 }
+                            ?.firstOrNull()
+                    showColorSelectDialog(
+                        colors,
+                        currentColor,
+                        null,
+                        { selectedColor, oldColor ->
+                            if (oldColor != null) {
+                                model.changeColor(oldColor, selectedColor)
+                            }
+                            model.colorBaseNote(selectedColor)
+                        },
+                    ) { colorToDelete, newColor ->
+                        model.changeColor(colorToDelete, newColor)
+                    }
+                }
             }
         }
 

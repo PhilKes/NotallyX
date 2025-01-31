@@ -15,7 +15,6 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.findChildrenPositions
 import com.philkes.notallyx.data.model.findParentPosition
@@ -277,11 +276,11 @@ class WidgetProvider : AppWidgetProvider() {
             )
 
         fun Context.extractWidgetColors(
-            color: Color,
+            color: String,
             preferences: NotallyXPreferences,
         ): Pair<Int, Int> {
             val backgroundColor =
-                if (color == Color.DEFAULT) {
+                if (color == BaseNote.COLOR_DEFAULT) {
                     val id =
                         when (preferences.theme.value) {
                             Theme.DARK -> R.color.md_theme_surface_dark

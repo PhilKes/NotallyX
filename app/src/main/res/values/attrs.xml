@@ -6,6 +6,7 @@
     <attr name="secondaryFabBackground" format="reference" />
     <attr name="colorPrimaryInverse" format="reference" />
     <attr name="colorSurface" format="reference" />
+    <attr name="colorOnSurface" format="reference" />
     <attr name="colorSurfaceInverse" format="reference" />
     <attr name="textColor" format="reference" />
 </resources>
