@@ -6,8 +6,6 @@ import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableString
-import com.philkes.notallyx.utils.changehistory.ChangeCheckedForAllChange
-import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
 import com.philkes.notallyx.utils.changehistory.ListAddChange
 import com.philkes.notallyx.utils.changehistory.ListDeleteChange
 import com.philkes.notallyx.utils.changehistory.ListIsChildChange
@@ -128,14 +126,14 @@ fun ListDeleteChange.assert(order: Int, deletedItem: ListItem?) {
     assertEquals("deletedItem", deletedItem, this.deletedItem)
 }
 
-fun ChangeCheckedForAllChange.assert(checked: Boolean, changedPositions: Collection<Int>) {
-    assertEquals("checked", checked, this.checked)
-    assertEquals("changedIds", changedPositions, this.changedIds)
-}
+// fun ChangeCheckedForAllChange.assert(checked: Boolean, changedPositions: Collection<Int>) {
+//    assertEquals("checked", checked, this.checked)
+//    assertEquals("changedIds", changedPositions, this.changedIds)
+// }
 
-fun DeleteCheckedChange.assert(itemsBeforeDelete: List<ListItem>) {
-    assertEquals("itemsBeforeDelete", itemsBeforeDelete, this.deletedItems)
-}
+// fun DeleteCheckedChange.assert(itemsBeforeDelete: List<ListItem>) {
+//    assertEquals("itemsBeforeDelete", itemsBeforeDelete, this.deletedItems)
+// }
 
 object MockitoHelper {
     fun <T> anyObject(): T {
