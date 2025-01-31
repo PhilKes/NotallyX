@@ -94,6 +94,21 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupActivityResultLaunchers()
+        savedInstanceState?.getBoolean(EXTRA_SHOW_IMPORT_BACKUPS_FOLDER, false)?.let {
+            if (it) {
+                model.refreshBackupsFolder(
+                    requireContext(),
+                    askForUriPermissions = ::askForUriPermissions,
+                )
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (model.showRefreshBackupsFolderAfterThemeChange) {
+            outState.putBoolean(EXTRA_SHOW_IMPORT_BACKUPS_FOLDER, true)
+        }
     }
 
     private fun setupActivityResultLaunchers() {
@@ -772,5 +787,10 @@ class SettingsFragment : Fragment() {
                 }
             }
         )
+    }
+
+    companion object {
+        const val EXTRA_SHOW_IMPORT_BACKUPS_FOLDER =
+            "notallyx.intent.extra.SHOW_IMPORT_BACKUPS_FOLDER"
     }
 }

@@ -120,6 +120,8 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     val actionMode = ActionMode()
 
+    internal var showRefreshBackupsFolderAfterThemeChange = false
+
     init {
         NotallyDatabase.getDatabase(app).observeForever(::init)
         folder.observeForever { newFolder -> searchResults!!.fetch(keyword, newFolder) }
@@ -210,6 +212,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
             savePreference(preferences.backupsFolder, newBackupsFolder)
         }
+        showRefreshBackupsFolderAfterThemeChange = false
     }
 
     fun enableDataInPublic() {
@@ -559,33 +562,42 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     ): Boolean {
         val oldBackupsFolder = preferences.backupsFolder.value
         val dataInPublicFolderBefore = preferences.dataInPublicFolder.value
+        val themeBefore = preferences.theme.value
+
         val success = preferences.import(context, uri)
+
         val dataInPublicFolder = preferences.dataInPublicFolder.getFreshValue()
         if (dataInPublicFolderBefore != dataInPublicFolder) {
             refreshDataInPublicFolder(dataInPublicFolder)
         }
         val backupFolder = preferences.backupsFolder.getFreshValue()
         if (oldBackupsFolder != backupFolder) {
-            refreshBackupsFolder(context, backupFolder, askForUriPermissions)
+            showRefreshBackupsFolderAfterThemeChange = true
+            if (themeBefore == preferences.theme.getFreshValue()) {
+                refreshBackupsFolder(context, backupFolder, askForUriPermissions)
+            }
+        } else {
+            showRefreshBackupsFolderAfterThemeChange = false
         }
         return success
     }
 
-    private fun refreshBackupsFolder(
+    fun refreshBackupsFolder(
         context: Context,
-        backupFolder: String,
+        backupFolder: String = preferences.backupsFolder.value,
         askForUriPermissions: (uri: Uri) -> Unit,
     ) {
         try {
             val backupFolderUri = backupFolder.toUri()
             MaterialAlertDialogBuilder(context)
                 .setMessage(R.string.auto_backups_folder_rechoose)
-                .setCancelButton()
+                .setCancelButton { _, _ -> showRefreshBackupsFolderAfterThemeChange = false }
                 .setPositiveButton(R.string.choose_folder) { _, _ ->
                     askForUriPermissions(backupFolderUri)
                 }
                 .show()
         } catch (e: Exception) {
+            showRefreshBackupsFolderAfterThemeChange = false
             disableBackups()
         }
     }
