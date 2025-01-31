@@ -38,6 +38,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
 
     val notesView = createEnumPreference(preferences, "view", NotesView.LIST, R.string.view)
     val notesSorting = NotesSortPreference(preferences)
+    val startView =
+        StringPreference("startView", preferences, START_VIEW_DEFAULT, R.string.start_view)
     val listItemSorting =
         createEnumPreference(
             preferences,
@@ -197,6 +199,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
         dataInPublicFolder.refresh()
         theme.refresh()
         reload()
+        startView.refresh()
     }
 
     private fun reload() {
@@ -222,6 +225,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
     companion object {
         private const val TAG = "NotallyXPreferences"
         const val EMPTY_PATH = "emptyPath"
+        const val START_VIEW_DEFAULT = ""
 
         @Volatile private var instance: NotallyXPreferences? = null
 

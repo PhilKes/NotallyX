@@ -47,6 +47,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_DEFAULT
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
@@ -473,6 +474,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             app.cancelNoteReminders(noteReminders)
             deleteBaseNotes(ids)
             withContext(Dispatchers.IO) { labelDao.deleteAll() }
+            savePreference(preferences.startView, START_VIEW_DEFAULT)
             app.showToast(R.string.cleared_data)
         }
     }
@@ -529,6 +531,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         if (labelsHidden.contains(value)) {
             labelsHidden.remove(value)
             savePreference(labelsHiddenPreference, labelsHidden)
+        }
+        if (preferences.startView.value == value) {
+            savePreference(preferences.startView, START_VIEW_DEFAULT)
         }
     }
 
@@ -600,6 +605,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val oldBackupsFolder = preferences.backupsFolder.value
         val dataInPublicFolderBefore = preferences.dataInPublicFolder.value
         val themeBefore = preferences.theme.value
+        val oldStartView = preferences.startView.value
 
         val success = preferences.import(context, uri)
 
@@ -610,6 +616,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 finishImportPreferences(
                     oldBackupsFolder,
                     themeBefore,
+                    oldStartView,
                     context,
                     askForUriPermissions,
                 ) {
@@ -629,6 +636,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     private fun finishImportPreferences(
         oldBackupsFolder: String,
         themeBefore: Theme,
+        oldStartView: String,
         context: Context,
         askForUriPermissions: (uri: Uri) -> Unit,
         callback: () -> Unit,
@@ -641,6 +649,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
         } else {
             showRefreshBackupsFolderAfterThemeChange = false
+        }
+        val startView = preferences.startView.getFreshValue()
+        if (oldStartView != startView) {
+            refreshStartView(startView)
         }
         preferences.theme.refresh()
         callback()
@@ -672,6 +684,12 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             enableDataInPublic(callback)
         } else {
             disableDataInPublic(callback)
+        }
+    }
+
+    private fun refreshStartView(startView: String) {
+        if (startView == START_VIEW_DEFAULT || labels.value?.contains(startView) == true) {
+            savePreference(preferences.startView, startView)
         }
     }
 
