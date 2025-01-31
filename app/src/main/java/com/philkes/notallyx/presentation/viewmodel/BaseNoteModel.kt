@@ -48,6 +48,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.BasePreference
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
+import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.MIME_TYPE_JSON
@@ -68,6 +69,7 @@ import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.scheduleNoteReminders
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
+import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.Cipher
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -119,6 +121,8 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val deletionProgress = MutableLiveData<Progress>()
 
     val actionMode = ActionMode()
+
+    internal var showRefreshBackupsFolderAfterThemeChange = false
 
     init {
         NotallyDatabase.getDatabase(app).observeForever(::init)
@@ -210,34 +214,42 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             }
             savePreference(preferences.backupsFolder, newBackupsFolder)
         }
+        showRefreshBackupsFolderAfterThemeChange = false
     }
 
-    fun enableDataInPublic() {
+    fun enableDataInPublic(callback: (() -> Unit)? = null) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val database = NotallyDatabase.getFreshDatabase(app)
+                val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
                 database.checkpoint()
-                NotallyDatabase.getInternalDatabaseFile(app)
-                    .copyTo(NotallyDatabase.getExternalDatabaseFile(app), overwrite = true)
+                val directory = NotallyDatabase.getExternalDatabaseFile(app).parentFile
+                NotallyDatabase.getInternalDatabaseFiles(app).forEach {
+                    it.copyTo(File(directory, it.name), overwrite = true)
+                }
+                //                database.close()
             }
             savePreference(preferences.dataInPublicFolder, true)
+            callback?.invoke()
         }
     }
 
-    fun disableDataInPublic() {
+    fun disableDataInPublic(callback: (() -> Unit)? = null) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val database = NotallyDatabase.getFreshDatabase(app)
+                val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
                 database.checkpoint()
-                NotallyDatabase.getExternalDatabaseFile(app)
-                    .copyTo(NotallyDatabase.getInternalDatabaseFile(app), overwrite = true)
-                NotallyDatabase.getExternalDatabaseFiles(app).forEach {
+                val directory = NotallyDatabase.getInternalDatabaseFile(app).parentFile
+                val oldFiles = NotallyDatabase.getExternalDatabaseFiles(app)
+                oldFiles.forEach { it.copyTo(File(directory, it.name), overwrite = true) }
+                //                database.close()
+                oldFiles.forEach {
                     if (it.exists()) {
                         it.delete()
                     }
                 }
             }
             savePreference(preferences.dataInPublicFolder, false)
+            callback?.invoke()
         }
     }
 
@@ -250,7 +262,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun disableBiometricLock(cipher: Cipher? = null) {
+    fun disableBiometricLock(cipher: Cipher? = null, callback: (() -> Unit)? = null) {
         val encryptedPassphrase = preferences.databaseEncryptionKey.value
         val passphrase =
             cipher?.doFinal(encryptedPassphrase)
@@ -258,6 +270,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         closeDatabase()
         decryptDatabase(app, passphrase)
         savePreference(preferences.biometricLock, BiometricLock.DISABLED)
+        callback?.invoke()
     }
 
     fun <T> savePreference(preference: BasePreference<T>, value: T) {
@@ -324,7 +337,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun importFromOtherApp(uri: Uri, importSource: ImportSource) {
-        val database = NotallyDatabase.getDatabase(app).value
+        val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
 
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             Toast.makeText(
@@ -536,65 +549,124 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(Dispatchers.IO) { function() }
     }
 
-    fun resetPreferences() {
+    fun resetPreferences(callback: (restartRequired: Boolean) -> Unit) {
         val backupsFolder = preferences.backupsFolder.value
+        val publicFolder = preferences.dataInPublicFolder.value
+        val isThemeDefault = preferences.theme.value == Theme.FOLLOW_SYSTEM
+        val finishCallback = { callback(!isThemeDefault) }
         if (preferences.biometricLock.value == BiometricLock.ENABLED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                disableBiometricLock()
-            }
-        }
+                disableBiometricLock {
+                    finishResetPreferencesAfterBiometric(
+                        publicFolder,
+                        backupsFolder,
+                        finishCallback,
+                    )
+                }
+            } else finishResetPreferencesAfterBiometric(publicFolder, backupsFolder, finishCallback)
+        } else finishResetPreferencesAfterBiometric(publicFolder, backupsFolder, finishCallback)
+    }
+
+    private fun finishResetPreferencesAfterBiometric(
+        publicFolder: Boolean,
+        backupsFolder: String,
+        callback: (() -> Unit),
+    ) {
+        if (publicFolder) {
+            refreshDataInPublicFolder(false) { finishResetPreferences(backupsFolder, callback) }
+        } else finishResetPreferences(backupsFolder, callback)
+    }
+
+    private fun finishResetPreferences(backupsFolder: String, callback: () -> Unit) {
         preferences.reset()
-        if (preferences.dataInPublicFolder.value) {
-            refreshDataInPublicFolder(false)
-        }
         if (backupsFolder != EMPTY_PATH) {
             clearPersistedUriPermissions(backupsFolder)
         }
+        callback()
     }
 
     fun importPreferences(
         context: Context,
         uri: Uri,
         askForUriPermissions: (uri: Uri) -> Unit,
-    ): Boolean {
+        onSuccess: () -> Unit,
+        onFailure: () -> Unit,
+    ) {
         val oldBackupsFolder = preferences.backupsFolder.value
         val dataInPublicFolderBefore = preferences.dataInPublicFolder.value
+        val themeBefore = preferences.theme.value
+
         val success = preferences.import(context, uri)
+
         val dataInPublicFolder = preferences.dataInPublicFolder.getFreshValue()
         if (dataInPublicFolderBefore != dataInPublicFolder) {
-            refreshDataInPublicFolder(dataInPublicFolder)
-        }
-        val backupFolder = preferences.backupsFolder.getFreshValue()
-        if (oldBackupsFolder != backupFolder) {
-            refreshBackupsFolder(context, backupFolder, askForUriPermissions)
-        }
-        return success
+            refreshDataInPublicFolder(dataInPublicFolder) {
+                preferences.dataInPublicFolder.refresh()
+                finishImportPreferences(
+                    oldBackupsFolder,
+                    themeBefore,
+                    context,
+                    askForUriPermissions,
+                ) {
+                    if (success) {
+                        onSuccess()
+                    } else onFailure()
+                }
+            }
+        } else
+            finishImportPreferences(oldBackupsFolder, themeBefore, context, askForUriPermissions) {
+                if (success) {
+                    onSuccess()
+                } else onFailure()
+            }
     }
 
-    private fun refreshBackupsFolder(
+    private fun finishImportPreferences(
+        oldBackupsFolder: String,
+        themeBefore: Theme,
         context: Context,
-        backupFolder: String,
+        askForUriPermissions: (uri: Uri) -> Unit,
+        callback: () -> Unit,
+    ) {
+        val backupFolder = preferences.backupsFolder.getFreshValue()
+        if (oldBackupsFolder != backupFolder) {
+            showRefreshBackupsFolderAfterThemeChange = true
+            if (themeBefore == preferences.theme.getFreshValue()) {
+                refreshBackupsFolder(context, backupFolder, askForUriPermissions)
+            }
+        } else {
+            showRefreshBackupsFolderAfterThemeChange = false
+        }
+        preferences.theme.refresh()
+        callback()
+    }
+
+    fun refreshBackupsFolder(
+        context: Context,
+        backupFolder: String = preferences.backupsFolder.value,
         askForUriPermissions: (uri: Uri) -> Unit,
     ) {
         try {
             val backupFolderUri = backupFolder.toUri()
             MaterialAlertDialogBuilder(context)
                 .setMessage(R.string.auto_backups_folder_rechoose)
-                .setCancelButton()
+                .setCancelButton { _, _ -> showRefreshBackupsFolderAfterThemeChange = false }
+                .setOnDismissListener { showRefreshBackupsFolderAfterThemeChange = false }
                 .setPositiveButton(R.string.choose_folder) { _, _ ->
                     askForUriPermissions(backupFolderUri)
                 }
                 .show()
         } catch (e: Exception) {
+            showRefreshBackupsFolderAfterThemeChange = false
             disableBackups()
         }
     }
 
-    private fun refreshDataInPublicFolder(dataInPublicFolder: Boolean) {
+    private fun refreshDataInPublicFolder(dataInPublicFolder: Boolean, callback: () -> Unit) {
         if (dataInPublicFolder) {
-            enableDataInPublic()
+            enableDataInPublic(callback)
         } else {
-            disableDataInPublic()
+            disableDataInPublic(callback)
         }
     }
 

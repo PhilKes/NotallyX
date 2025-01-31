@@ -249,7 +249,7 @@ fun Context.catchNoBrowserInstalled(callback: () -> Unit) {
     try {
         callback()
     } catch (exception: ActivityNotFoundException) {
-        showToast(R.string.install_a_browser)
+        showToast(com.philkes.notallyx.R.string.install_a_browser)
     }
 }
 
@@ -261,7 +261,7 @@ fun Context.createReportBugIntent(
     return Intent(
             Intent.ACTION_VIEW,
             Uri.parse(
-                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${title?.let { "&title=$it" }}${body?.let { "&what-happened=$it" }}&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let { "&logs=$stackTrace" } ?: ""}"
+                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${title?.let { "&title=$it" } ?: ""}${body?.let { "&what-happened=$it" } ?: ""}&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let { "&logs=$stackTrace" } ?: ""}"
                     .take(2000)
             ),
         )
@@ -379,4 +379,13 @@ fun Uri.toReadablePath(): String {
     return path!!
         .replaceFirst("/tree/primary:", "Internal Storage/")
         .replaceFirst("/tree/.*:".toRegex(), "External Storage/")
+}
+
+fun Activity.resetApplication() {
+    val resetApplicationIntent = packageManager.getLaunchIntentForPackage(packageName)
+    resetApplicationIntent?.setFlags(
+        Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    )
+    startActivity(resetApplicationIntent)
+    overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
 }

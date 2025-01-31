@@ -94,6 +94,21 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupActivityResultLaunchers()
+        savedInstanceState?.getBoolean(EXTRA_SHOW_IMPORT_BACKUPS_FOLDER, false)?.let {
+            if (it) {
+                model.refreshBackupsFolder(
+                    requireContext(),
+                    askForUriPermissions = ::askForUriPermissions,
+                )
+            }
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (model.showRefreshBackupsFolderAfterThemeChange) {
+            outState.putBoolean(EXTRA_SHOW_IMPORT_BACKUPS_FOLDER, true)
+        }
     }
 
     private fun setupActivityResultLaunchers() {
@@ -168,11 +183,12 @@ class SettingsFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        if (
-                            model.importPreferences(requireContext(), uri, ::askForUriPermissions)
+                        model.importPreferences(
+                            requireContext(),
+                            uri,
+                            ::askForUriPermissions,
+                            { showToast(R.string.import_settings_success) },
                         ) {
-                            showToast(R.string.import_settings_success)
-                        } else {
                             showToast(R.string.import_settings_failure)
                         }
                     }
@@ -558,8 +574,7 @@ class SettingsFragment : Fragment() {
             }
             ResetSettings.setOnClickListener {
                 showDialog(R.string.reset_settings_message, R.string.reset_settings) { _, _ ->
-                    model.resetPreferences()
-                    showToast(R.string.reset_settings_success)
+                    model.resetPreferences { _ -> showToast(R.string.reset_settings_success) }
                 }
             }
             dataInPublicFolder.observe(viewLifecycleOwner) { value ->
@@ -772,5 +787,10 @@ class SettingsFragment : Fragment() {
                 }
             }
         )
+    }
+
+    companion object {
+        const val EXTRA_SHOW_IMPORT_BACKUPS_FOLDER =
+            "notallyx.intent.extra.SHOW_IMPORT_BACKUPS_FOLDER"
     }
 }

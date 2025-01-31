@@ -22,7 +22,7 @@ body:
  - type: input
    id: android-version
    attributes:
-    label: Android Version
+    label: Android Version (API Level)
     description: What Android version are you using?
  - type: textarea
    id: logs
