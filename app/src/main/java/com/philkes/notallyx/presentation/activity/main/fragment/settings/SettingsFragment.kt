@@ -183,11 +183,12 @@ class SettingsFragment : Fragment() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        if (
-                            model.importPreferences(requireContext(), uri, ::askForUriPermissions)
+                        model.importPreferences(
+                            requireContext(),
+                            uri,
+                            ::askForUriPermissions,
+                            { showToast(R.string.import_settings_success) },
                         ) {
-                            showToast(R.string.import_settings_success)
-                        } else {
                             showToast(R.string.import_settings_failure)
                         }
                     }
@@ -573,8 +574,7 @@ class SettingsFragment : Fragment() {
             }
             ResetSettings.setOnClickListener {
                 showDialog(R.string.reset_settings_message, R.string.reset_settings) { _, _ ->
-                    model.resetPreferences()
-                    showToast(R.string.reset_settings_success)
+                    model.resetPreferences { _ -> showToast(R.string.reset_settings_success) }
                 }
             }
             dataInPublicFolder.observe(viewLifecycleOwner) { value ->

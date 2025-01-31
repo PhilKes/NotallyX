@@ -3,7 +3,6 @@ package com.philkes.notallyx.presentation.activity.note
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.activity.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -17,11 +16,8 @@ import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.main.label.SelectableLabelAdapter
-import com.philkes.notallyx.presentation.viewmodel.LabelModel
 
 class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
-
-    private val model: LabelModel by viewModels()
 
     private lateinit var selectedLabels: ArrayList<String>
 
