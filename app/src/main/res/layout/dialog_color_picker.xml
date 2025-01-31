@@ -33,24 +33,54 @@
       android:layout_height="match_parent"
       android:layout_weight="1"
       android:layout_marginStart="8dp"/>
-
-    <com.skydoves.colorpickerview.AlphaTileView
-      android:id="@+id/TileView"
-      android:layout_width="24dp"
-      android:layout_height="match_parent"
-      android:layout_gravity="center"
-      android:layout_marginStart="8dp"
-      android:background="@android:color/white"
-      android:orientation="horizontal"
-      app:tileSize="20"/>
   </LinearLayout>
+
+    <RelativeLayout
+      android:id="@+id/rlSearch"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:gravity="center" >
+
+      <com.skydoves.colorpickerview.AlphaTileView
+        android:id="@+id/TileView"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginEnd="4dp"
+        android:layout_toStartOf="@id/ColorCode"
+        android:orientation="horizontal"
+        android:layout_centerVertical="true"
+        app:tileSize="20" />
+
+      <EditText
+        android:id="@+id/ColorCode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="FFFFFF"
+        android:maxLines="1"
+        android:maxLength="6"
+        android:ems="6"
+        android:minEms="3"
+        android:maxEms="6"
+        android:typeface="monospace"
+        android:digits="0123456789ABCDEFabcdef"
+        android:layout_toStartOf="@+id/CopyCode"
+        android:layout_centerVertical="true"/>
+
+      <ImageView
+        android:id="@+id/CopyCode"
+        android:layout_marginStart="2dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/content_copy" />
+    </RelativeLayout>
 
   <TextView
     android:id="@+id/ColorExistsText"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:textAppearance="@style/TextAppearance.Material3.BodySmall"
-    android:layout_marginTop="4dp"
     android:text="@string/color_exists"
     android:gravity="center"
     android:visibility="invisible"
@@ -60,6 +90,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:clipToPadding="false"
+    android:layout_marginTop="4dp"
     android:paddingStart="4dp"
     android:paddingEnd="4dp"
     android:paddingBottom="4dp"

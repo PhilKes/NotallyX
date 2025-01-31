@@ -55,7 +55,6 @@ import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setLightStatusAndNavBar
 import com.philkes.notallyx.presentation.setupProgressDialog
-import com.philkes.notallyx.presentation.showColorSelectDialog
 import com.philkes.notallyx.presentation.showKeyboard
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
@@ -81,6 +80,7 @@ import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.mergeSkipFirst
 import com.philkes.notallyx.utils.observeSkipFirst
 import com.philkes.notallyx.utils.shareNote
+import com.philkes.notallyx.utils.showColorSelectDialog
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import kotlinx.coroutines.Dispatchers
@@ -611,17 +611,32 @@ abstract class EditActivity(private val type: Type) :
         lifecycleScope.launch {
             val colors =
                 withContext(Dispatchers.IO) {
-                    NotallyDatabase.getDatabase(this@EditActivity, observePreferences = false)
-                        .value
-                        .getBaseNoteDao()
-                        .getAllColors()
+                        NotallyDatabase.getDatabase(this@EditActivity, observePreferences = false)
+                            .value
+                            .getBaseNoteDao()
+                            .getAllColors()
+                    }
+                    .toMutableList()
+            if (colors.none { it == notallyModel.color }) {
+                colors.add(notallyModel.color)
+            }
+            showColorSelectDialog(
+                colors,
+                notallyModel.color,
+                colorInt.isLightColor(),
+                { selectedColor, oldColor ->
+                    if (oldColor != null) {
+                        baseModel.changeColor(oldColor, selectedColor)
+                    }
+                    notallyModel.color = selectedColor
+                    setColor()
+                },
+            ) { colorToDelete, newColor ->
+                baseModel.changeColor(colorToDelete, newColor)
+                if (colorToDelete == notallyModel.color) {
+                    notallyModel.color = newColor
+                    setColor()
                 }
-            showColorSelectDialog(colors, colorInt.isLightColor()) { selectedColor, oldColor ->
-                if (oldColor != null) {
-                    baseModel.changeColor(oldColor, selectedColor)
-                }
-                notallyModel.color = selectedColor
-                setColor()
             }
         }
     }

@@ -6,7 +6,6 @@
     android:layout_marginStart="4dp"
     android:layout_marginEnd="4dp"
     android:layout_marginBottom="8dp"
-    app:checkedIconTint="?attr/colorPrimary"
     android:checkable="true"
     app:cardElevation="0dp">
 

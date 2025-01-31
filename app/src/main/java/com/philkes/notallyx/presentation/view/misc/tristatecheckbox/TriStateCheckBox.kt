@@ -49,7 +49,7 @@ constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
         ContextCompat.getDrawable(context, R.drawable.checkbox_partial)
 
     init {
-        compoundDrawablePadding = 4.dp(context)
+        compoundDrawablePadding = 4.dp
         buttonDrawable = getCurrentDrawable()
         setOnClickListener { toggleState() }
     }

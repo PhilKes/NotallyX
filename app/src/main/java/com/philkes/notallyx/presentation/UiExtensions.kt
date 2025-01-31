@@ -8,6 +8,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
+import android.content.res.Resources
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -65,6 +66,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.checkbox.MaterialCheckBox
 import com.google.android.material.chip.Chip
 import com.google.android.material.chip.ChipGroup
@@ -78,15 +80,10 @@ import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
-import com.philkes.notallyx.data.model.ColorString
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
-import com.philkes.notallyx.databinding.DialogColorBinding
-import com.philkes.notallyx.databinding.DialogColorPickerBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.LabelBinding
-import com.philkes.notallyx.presentation.view.main.ColorAdapter
-import com.philkes.notallyx.presentation.view.misc.ItemListener
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
@@ -97,8 +94,6 @@ import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
 import com.philkes.notallyx.utils.getUrl
-import com.skydoves.colorpickerview.ColorEnvelope
-import com.skydoves.colorpickerview.listeners.ColorEnvelopeListener
 import java.util.Date
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
 import org.ocpsoft.prettytime.PrettyTime
@@ -241,8 +236,8 @@ fun ViewGroup.addIconButton(
                         LinearLayout.LayoutParams.WRAP_CONTENT,
                         LinearLayout.LayoutParams.MATCH_PARENT,
                     )
-                    .apply { setMargins(marginStart.dp(context), marginTop, 0, marginBottom) }
-            setPadding(8.dp(context))
+                    .apply { setMargins(marginStart.dp, marginTop, 0, marginBottom) }
+            setPadding(8.dp)
         }
     addView(view)
     return view
@@ -260,13 +255,11 @@ fun TextView.displayFormattedTimestamp(
     } else visibility = View.GONE
 }
 
-fun Int.dp(context: Context): Int =
-    TypedValue.applyDimension(
-            TypedValue.COMPLEX_UNIT_DIP,
-            this.toFloat(),
-            context.resources.displayMetrics,
-        )
-        .toInt()
+val Int.dp: Int
+    get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
+
+val Float.dp: Int
+    get() = (this * Resources.getSystem().displayMetrics.density + 0.5f).toInt()
 
 /**
  * Creates a TextWatcher for an EditText that is part of a list. Everytime the text is changed, a
@@ -504,117 +497,6 @@ private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
     }
 }
 
-fun Activity.showColorSelectDialog(
-    colors: List<String>,
-    setNavigationbarLight: Boolean?,
-    callback: (selectedColor: String, oldColor: String?) -> Unit,
-) {
-    val actualColors =
-        colors.toMutableList().apply {
-            remove(BaseNote.COLOR_DEFAULT)
-            add(0, BaseNote.COLOR_DEFAULT)
-        }
-    val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.change_color).create()
-    // TODO:
-    //  - Option to delete color -> Merge into other color?
-    //  - Edit button for every color?
-    //  - in ColorPicker dialog show default colors from Color Enum
-    val colorAdapter =
-        ColorAdapter(
-            actualColors,
-            object : ItemListener {
-                override fun onClick(position: Int) {
-                    dialog.dismiss()
-                    callback(actualColors[position], null)
-                }
-
-                override fun onLongClick(position: Int) {
-                    val oldColor = actualColors[position]
-                    if (oldColor == BaseNote.COLOR_DEFAULT) {
-                        return
-                    }
-                    dialog.dismiss()
-                    showEditColorDialog(actualColors, oldColor, setNavigationbarLight, callback)
-                }
-            },
-        )
-    DialogColorBinding.inflate(layoutInflater).apply {
-        RecyclerView.adapter = colorAdapter
-        dialog.setView(root)
-        dialog.setOnShowListener {
-            setNavigationbarLight?.let { window?.apply { setLightStatusAndNavBar(it, root) } }
-        }
-        dialog.show()
-    }
-}
-
-private fun Activity.showEditColorDialog(
-    colors: List<String>,
-    oldColor: String,
-    setNavigationbarLight: Boolean?,
-    callback: (selectedColor: String, oldColor: String?) -> Unit,
-) {
-    val selectedColor = extractColor(oldColor)
-    val binding = DialogColorPickerBinding.inflate(layoutInflater)
-    val dialog =
-        MaterialAlertDialogBuilder(this)
-            .setView(binding.root)
-            .setPositiveButton(R.string.save) { _, _ ->
-                val updateColor = binding.ColorPicker.colorEnvelope.toColorString()
-                if (updateColor == oldColor) {
-                    callback(oldColor, null)
-                } else {
-                    callback(updateColor, oldColor)
-                }
-            }
-            .setNegativeButton(R.string.back) { _, _ ->
-                showColorSelectDialog(colors, setNavigationbarLight, callback)
-            }
-            .show()
-    val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-    binding.apply {
-        BrightnessSlideBar.setSelectorDrawableRes(
-            com.skydoves.colorpickerview.R.drawable.colorpickerview_wheel
-        )
-        ColorPicker.apply {
-            setInitialColor(selectedColor)
-            attachBrightnessSlider(BrightnessSlideBar)
-            setColorListener(
-                ColorEnvelopeListener { color, fromUser ->
-                    TileView.setPaintColor(color.color)
-                    val colorString = color.toColorString()
-                    val isSaveEnabled = colorString == oldColor || colorString !in colors
-                    positiveButton.isEnabled = isSaveEnabled
-                    ColorExistsText.visibility = if (isSaveEnabled) View.INVISIBLE else View.VISIBLE
-                }
-            )
-        }
-        Restore.setOnClickListener { ColorPicker.selectByHsvColor(selectedColor) }
-
-        ExistingColors.apply {
-            val colors1 = Color.allColorStrings()
-            val colorAdapter =
-                ColorAdapter(
-                    colors1,
-                    object : ItemListener {
-                        override fun onClick(position: Int) {
-                            ColorPicker.selectByHsvColor(
-                                this@showEditColorDialog.extractColor(colors1[position])
-                            )
-                        }
-
-                        override fun onLongClick(position: Int) {}
-                    },
-                )
-            adapter = colorAdapter
-        }
-    }
-}
-
-private fun ColorEnvelope.toColorString(): ColorString {
-    return "#$hexCode"
-}
-
 fun MaterialAlertDialogBuilder.showAndFocus(
     viewToFocus: View? = null,
     selectAll: Boolean = false,
@@ -691,6 +573,15 @@ fun View.setControlsColorForAllViews(
                 backgroundColor,
                 overwriteBackground,
             ) // Recursive call for nested layouts
+        }
+        if (this is MaterialCardView) {
+            checkedIconTint = ColorStateList.valueOf(controlsColor)
+            val colorStateList =
+                ColorStateList(
+                    arrayOf(intArrayOf(android.R.attr.state_checked), intArrayOf()),
+                    intArrayOf(controlsColor, controlsColor.withAlpha(0.3f)),
+                )
+            setStrokeColor(colorStateList)
         }
     } else {
         val controlsStateList =
@@ -820,7 +711,7 @@ fun ViewGroup.addFastScroll(context: Context) {
     FastScrollerBuilder(this)
         .useMd2Style()
         .setTrackDrawable(ContextCompat.getDrawable(context, R.drawable.scroll_track)!!)
-        .setPadding(0, 0, 2.dp(context), 0)
+        .setPadding(0, 0, 2.dp, 0)
         .build()
 }
 
@@ -850,7 +741,7 @@ fun ChipGroup.bindLabels(
         apply {
             visibility = View.VISIBLE
             removeAllViews()
-            updatePadding(top = if (paddingTop) 8.dp(context) else 0)
+            updatePadding(top = if (paddingTop) 8.dp else 0)
         }
         val inflater = LayoutInflater.from(context)
         val labelSize = textSize.displayBodySize

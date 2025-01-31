@@ -29,6 +29,7 @@ data class BaseNote(
 
     companion object {
         const val COLOR_DEFAULT = "DEFAULT"
+        const val COLOR_NEW = "NEW"
     }
 }
 
