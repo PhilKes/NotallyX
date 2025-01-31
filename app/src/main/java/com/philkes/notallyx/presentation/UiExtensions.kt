@@ -76,9 +76,11 @@ import com.google.android.material.shape.ShapeAppearanceModel
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
+import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
+import com.philkes.notallyx.data.model.toColorString
 import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.LabelBinding
@@ -501,7 +503,7 @@ private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
 
 fun Activity.showColorSelectDialog(
     setNavigationbarLight: Boolean?,
-    callback: (selectedColor: Color) -> Unit,
+    callback: (selectedColor: String) -> Unit,
 ) {
     val dialog = MaterialAlertDialogBuilder(this).setTitle(R.string.change_color).create()
     val colorAdapter =
@@ -509,7 +511,7 @@ fun Activity.showColorSelectDialog(
             object : ItemListener {
                 override fun onClick(position: Int) {
                     dialog.dismiss()
-                    callback(Color.entries[position])
+                    callback(Color.entries[position].toColorString())
                 }
 
                 override fun onLongClick(position: Int) {}
@@ -735,23 +737,11 @@ fun ViewGroup.addFastScroll(context: Context) {
 }
 
 @ColorInt
-fun Context.extractColor(color: Color): Int {
-    val id =
-        when (color) {
-            Color.DEFAULT -> return getColorFromAttr(R.attr.colorSurface)
-            Color.CORAL -> R.color.Coral
-            Color.ORANGE -> R.color.Orange
-            Color.SAND -> R.color.Sand
-            Color.STORM -> R.color.Storm
-            Color.FOG -> R.color.Fog
-            Color.SAGE -> R.color.Sage
-            Color.MINT -> R.color.Mint
-            Color.DUSK -> R.color.Dusk
-            Color.FLOWER -> R.color.Flower
-            Color.BLOSSOM -> R.color.Blossom
-            Color.CLAY -> R.color.Clay
-        }
-    return ContextCompat.getColor(this, id)
+fun Context.extractColor(color: String): Int {
+    return when (color) {
+        BaseNote.COLOR_DEFAULT -> return getColorFromAttr(R.attr.colorSurface)
+        else -> android.graphics.Color.parseColor(color)
+    }
 }
 
 fun Window.setLightStatusAndNavBar(value: Boolean, view: View = decorView) {
