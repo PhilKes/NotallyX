@@ -95,8 +95,15 @@ interface BaseNoteDao {
     @Query("UPDATE BaseNote SET folder = :folder WHERE id IN (:ids)")
     suspend fun move(ids: LongArray, folder: Folder)
 
+    @Query("SELECT DISTINCT color FROM BaseNote") fun getAllColorsAsync(): LiveData<List<String>>
+
+    @Query("SELECT DISTINCT color FROM BaseNote") suspend fun getAllColors(): List<String>
+
     @Query("UPDATE BaseNote SET color = :color WHERE id IN (:ids)")
     suspend fun updateColor(ids: LongArray, color: String)
+
+    @Query("UPDATE BaseNote SET color = :newColor WHERE color = :oldColor")
+    suspend fun updateColor(oldColor: String, newColor: String)
 
     @Query("UPDATE BaseNote SET pinned = :pinned WHERE id IN (:ids)")
     suspend fun updatePinned(ids: LongArray, pinned: Boolean)

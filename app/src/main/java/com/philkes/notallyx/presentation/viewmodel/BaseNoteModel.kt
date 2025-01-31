@@ -89,6 +89,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     lateinit var selectedExportMimeType: ExportMimeType
 
     lateinit var labels: LiveData<List<String>>
+    //    lateinit var colors: LiveData<List<String>>
     lateinit var reminders: LiveData<List<NoteReminder>>
     private var allNotes: LiveData<List<BaseNote>>? = null
     private var allNotesObserver: Observer<List<BaseNote>>? = null
@@ -135,6 +136,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         commonDao = database.getCommonDao()
 
         labels = labelDao.getAll()
+        //        colors = baseNoteDao.getAllColorsAsync()
         reminders = baseNoteDao.getAllRemindersAsync()
 
         allNotes?.removeObserver(allNotesObserver!!)
@@ -428,6 +430,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val ids = actionMode.selectedIds.toLongArray()
         actionMode.close(true)
         executeAsync { baseNoteDao.updateColor(ids, color) }
+    }
+
+    fun changeColor(oldColor: String, newColor: String) {
+        executeAsync { baseNoteDao.updateColor(oldColor, newColor) }
     }
 
     fun moveBaseNotes(folder: Folder): LongArray {

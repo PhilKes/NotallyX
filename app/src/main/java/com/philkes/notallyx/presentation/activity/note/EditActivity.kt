@@ -32,6 +32,7 @@ import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
@@ -84,6 +85,7 @@ import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 abstract class EditActivity(private val type: Type) :
     LockedActivity<ActivityEditBinding>(), AddActions, MoreActions {
@@ -606,9 +608,21 @@ abstract class EditActivity(private val type: Type) :
     }
 
     override fun changeColor() {
-        showColorSelectDialog(colorInt.isLightColor()) { selectedColor ->
-            notallyModel.color = selectedColor
-            setColor()
+        lifecycleScope.launch {
+            val colors =
+                withContext(Dispatchers.IO) {
+                    NotallyDatabase.getDatabase(this@EditActivity, observePreferences = false)
+                        .value
+                        .getBaseNoteDao()
+                        .getAllColors()
+                }
+            showColorSelectDialog(colors, colorInt.isLightColor()) { selectedColor, oldColor ->
+                if (oldColor != null) {
+                    baseModel.changeColor(oldColor, selectedColor)
+                }
+                notallyModel.color = selectedColor
+                setColor()
+            }
         }
     }
 

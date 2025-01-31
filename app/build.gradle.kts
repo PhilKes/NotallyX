@@ -157,6 +157,7 @@ dependencies {
     implementation("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
     implementation("com.github.bumptech.glide:glide:4.15.1")
     implementation("cn.Leaqi:SwipeDrawer:1.6")
+    implementation("com.github.skydoves:colorpickerview:2.3.0")
     implementation("com.google.android.material:material:1.12.0")
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")

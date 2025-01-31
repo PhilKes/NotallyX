@@ -71,6 +71,7 @@
     <string name="clear_data_message">All Notes, Images, Files, Audios will be permanently deleted</string>
     <string name="clear_formatting">Clear formatting</string>
     <string name="cleared_data">All Data has been cleared</string>
+    <string name="color_exists">This color already exists!</string>
     <string name="content_density">Content density</string>
     <string name="continue_">Continue</string>
     <string name="copied_link">Copied Link to Clipboard</string>
