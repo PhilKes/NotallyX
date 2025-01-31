@@ -24,9 +24,9 @@ class TextWithIconAdapter<T>(
             }
             val item = getItem(position)!!
             setCompoundDrawablesRelativeWithIntrinsicBounds(getIconResId(item), 0, 0, 0)
-            setPaddingRelative(30.dp(context), paddingTop, paddingEnd, paddingBottom)
+            setPaddingRelative(30.dp, paddingTop, paddingEnd, paddingBottom)
             text = getText(item)
-            compoundDrawablePadding = 10.dp(context)
+            compoundDrawablePadding = 10.dp
         }
     }
 }

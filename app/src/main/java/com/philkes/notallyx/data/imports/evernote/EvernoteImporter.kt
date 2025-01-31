@@ -14,7 +14,6 @@ import com.philkes.notallyx.data.imports.evernote.EvernoteImporter.Companion.par
 import com.philkes.notallyx.data.imports.parseBodyAndSpansFromHtml
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -143,7 +142,7 @@ fun EvernoteNote.mapToBaseNote(): BaseNote {
         type = if (tasks.isEmpty()) Type.NOTE else Type.LIST,
         folder = Folder.NOTES, // There is no archive in Evernote, also deleted notes are not
         // exported
-        color = Color.DEFAULT, // TODO: possible in Evernote?
+        color = BaseNote.COLOR_DEFAULT, // TODO: possible in Evernote?
         title = title,
         pinned = false, // not exported from Evernote
         timestamp = parseTimestamp(created),

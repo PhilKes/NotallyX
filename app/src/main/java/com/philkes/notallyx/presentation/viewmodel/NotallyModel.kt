@@ -21,7 +21,6 @@ import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.dao.NoteIdReminder
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -73,7 +72,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
     var id = 0L
     var folder = Folder.NOTES
-    var color = Color.DEFAULT
+    var color = BaseNote.COLOR_DEFAULT
 
     var title = String()
     var pinned = false

@@ -60,7 +60,8 @@
     <string name="cant_load_file">Can’t load file. It may have been moved or deleted</string>
     <string name="cant_load_image">Can’t load image. It may have been moved or deleted</string>
     <string name="cant_open_link">Can’t open link</string>
-    <string name="change_color">Change color</string>
+    <string name="change_color">Change Color</string>
+    <string name="change_color_message">Pick a color or create a new one.\nYou can also edit a Color by long pressing it.</string>
     <string name="change_note">Change Note</string>
     <string name="check_all_items">Check all items</string>
     <string name="choose_another_folder">Choose another folder</string>
@@ -71,6 +72,7 @@
     <string name="clear_data_message">All Notes, Images, Files, Audios will be permanently deleted</string>
     <string name="clear_formatting">Clear formatting</string>
     <string name="cleared_data">All Data has been cleared</string>
+    <string name="color_exists">This color already exists!</string>
     <string name="content_density">Content density</string>
     <string name="continue_">Continue</string>
     <string name="copied_link">Copied Link to Clipboard</string>
@@ -93,6 +95,7 @@
     <string name="delete_all_notes">Delete all notes\?</string>
     <string name="delete_audio_recording_forever">Delete audio recording forever\?</string>
     <string name="delete_checked_items">Delete checked items</string>
+    <string name="delete_color_message">What color should the notes have that currently use this color\?</string>
     <string name="delete_file">Delete file \'%1$s\'\?</string>
     <string name="delete_forever">Delete forever</string>
     <string name="delete_image_forever">Delete image forever\?</string>
@@ -118,6 +121,7 @@
     <string name="donate">Make a Donation</string>
     <string name="drag_handle">Drag Handle</string>
     <string name="edit">Edit</string>
+    <string name="edit_color">Edit Color</string>
     <string name="edit_label">Edit label</string>
     <string name="edit_link">Edit Link</string>
     <string name="edit_reminders">Edit Reminders</string>
@@ -209,6 +213,7 @@
         <item quantity="one">…%1$d more file</item>
         <item quantity="other">…%1$d more files</item>
     </plurals>
+    <string name="new_color">New Color</string>
     <string name="next">Next</string>
     <string name="no_auto_sort">No Autosort</string>
     <string name="none">None</string>

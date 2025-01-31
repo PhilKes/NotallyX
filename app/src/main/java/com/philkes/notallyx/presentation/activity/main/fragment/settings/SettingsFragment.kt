@@ -666,6 +666,7 @@ class SettingsFragment : Fragment() {
                     .show()
             }
             SourceCode.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
+            // TODO: add ColorPickerView
             Libraries.setOnClickListener {
                 val libraries =
                     arrayOf(
@@ -678,6 +679,7 @@ class SettingsFragment : Fragment() {
                         "SQLCipher",
                         "Zip4J",
                         "AndroidFastScroll",
+                        "ColorPickerView",
                     )
                 MaterialAlertDialogBuilder(requireContext())
                     .setTitle(R.string.libraries)
@@ -701,6 +703,7 @@ class SettingsFragment : Fragment() {
                             6 -> openLink("https://github.com/sqlcipher/sqlcipher")
                             7 -> openLink("https://github.com/srikanth-lingala/zip4j")
                             8 -> openLink("https://github.com/zhanghai/AndroidFastScroll")
+                            9 -> openLink("https://github.com/skydoves/ColorPickerView")
                         }
                     }
                     .setCancelButton()

@@ -5,16 +5,28 @@
     android:layout_height="wrap_content"
     android:paddingTop="8dp"
     android:paddingBottom="8dp"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
   >
+    <TextView
+      android:id="@+id/Message"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingStart="8dp"
+      android:paddingEnd="8dp"
+      android:layout_alignParentTop="true"
+      android:layout_centerHorizontal="true"
+      android:text="@string/change_color_message"
+      android:layout_marginBottom="4dp"
+      />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/Message"
+        android:layout_centerHorizontal="true"
         android:clipToPadding="false"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp"
-        android:paddingBottom="4dp"
         android:scrollIndicators="top"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="4" />

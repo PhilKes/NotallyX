@@ -326,7 +326,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
                     updateLayoutParams<LinearLayout.LayoutParams> {
                         marginEnd = 0
-                        marginStart = 10.dp(context)
+                        marginStart = 10.dp
                     }
                     setControlsContrastColorForAllViews(extractColor)
                     setBackgroundColor(0)
