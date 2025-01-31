@@ -22,11 +22,12 @@
       android:paddingTop="@dimen/customactivityoncrash_activity_vertical_margin">
 
       <ImageView
-        android:id="@+id/customactivityoncrash_error_activity_image"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
-        android:src="@drawable/customactivityoncrash_error_image" />
+        android:minWidth="100dp"
+        android:minHeight="100dp"
+        android:src="@drawable/error" />
 
       <TextView
         android:layout_width="wrap_content"
@@ -38,19 +39,19 @@
         android:textStyle="bold" />
 
       <Button
-        android:id="@+id/customactivityoncrash_error_activity_restart_button"
+        android:id="@+id/RestartButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
-        android:text="@string/customactivityoncrash_error_activity_close_app" />
+        android:text="@string/customactivityoncrash_error_activity_restart_app" />
 
       <com.google.android.material.button.MaterialButton
-        android:id="@+id/customactivityoncrash_error_activity_more_info_button"
+        android:id="@+id/ReportButton"
         style="@style/Widget.Material3.Button.OutlinedButton"
         app:strokeColor="?attr/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/customactivityoncrash_error_activity_error_details"
+        android:text="@string/report_crash"
         android:textColor="?colorPrimary" />
     </LinearLayout>
   </ScrollView>
