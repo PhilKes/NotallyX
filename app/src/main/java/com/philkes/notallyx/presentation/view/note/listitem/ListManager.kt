@@ -57,21 +57,22 @@ class ListManager(
 
     fun add(
         position: Int = items.size(),
-        item: ListItem = defaultNewItem(position),
+        item: ListItem = defaultNewItem(position.coerceAtMost(items.size())),
         pushChange: Boolean = true,
     ) {
+        val actualPosition = position.coerceAtMost(items.size())
         endSearch?.invoke()
         (item + item.children).forEach { setIdIfUnset(it) }
         val itemBeforeInsert = item.clone() as ListItem
 
         items.beginBatchedUpdates()
         for ((idx, newItem) in (item + item.children).withIndex()) {
-            addItem(position + idx, newItem)
+            addItem(actualPosition + idx, newItem)
         }
         items.endBatchedUpdates()
 
         if (pushChange) {
-            changeHistory.push(ListAddChange(position, item.id, itemBeforeInsert, this))
+            changeHistory.push(ListAddChange(actualPosition, item.id, itemBeforeInsert, this))
         }
         val positionAfterAdd = items.findById(item.id)!!.first
         recyclerView.post {
@@ -389,8 +390,17 @@ class ListManager(
 
     private fun addItem(position: Int, newItem: ListItem) {
         setIdIfUnset(newItem)
-        items.shiftItemOrders(position until items.size(), 1, true)
-        newItem.order = position
+        val order =
+            if (position > items.lastIndex) {
+                position
+            } else {
+                val item = getItem(position)
+                if (!item.checked) {
+                    item.order!!
+                } else getItem(position - 1).order!! + 1
+            }
+        items.shiftItemOrders(order until items.size(), 1, true)
+        newItem.order = order
         val forceIsChild =
             when {
                 position == 0 -> false

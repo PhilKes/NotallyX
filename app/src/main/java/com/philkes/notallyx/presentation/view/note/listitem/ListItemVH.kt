@@ -39,7 +39,7 @@ class ListItemVH(
             setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
             setOnNextAction {
-                val position = absoluteAdapterPosition + 1
+                val position = bindingAdapterPosition + 1
                 listManager.add(position)
             }
 
