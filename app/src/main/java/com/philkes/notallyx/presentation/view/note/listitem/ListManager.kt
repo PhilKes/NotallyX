@@ -150,7 +150,8 @@ class ListManager(
         //        val itemBeforeMove = itemFrom.clone() as ListItem
         val itemsBeforeMove = getItems()
         // Disallow move unchecked item under any checked item (if auto-sort enabled)
-        if (isAutoSortByCheckedEnabled() && itemTo.checked || itemTo.isChildOf(itemFrom)) {
+        val autoSortByCheckedEnabled = isAutoSortByCheckedEnabled()
+        if (autoSortByCheckedEnabled && itemTo.checked || itemTo.isChildOf(itemFrom)) {
             return null
         }
         val checkChildPosition = if (positionTo < positionFrom) positionTo - 1 else positionTo
@@ -169,7 +170,9 @@ class ListManager(
                 itemFrom.itemCount,
                 positionTo,
                 forceIsChild = forceIsChild,
-            ) ?: return null
+                shiftCheckedItemOrders = !autoSortByCheckedEnabled,
+            )
+        if (newPosition == null) return null
 
         finishMove(
             positionFrom,
@@ -386,7 +389,7 @@ class ListManager(
 
     private fun addItem(position: Int, newItem: ListItem) {
         setIdIfUnset(newItem)
-        items.shiftItemOrders(position until items.size(), 1)
+        items.shiftItemOrders(position until items.size(), 1, true)
         newItem.order = position
         val forceIsChild =
             when {
