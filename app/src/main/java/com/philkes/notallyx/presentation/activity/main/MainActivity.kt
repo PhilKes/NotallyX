@@ -8,21 +8,17 @@ import android.view.Menu.CATEGORY_CONTAINER
 import android.view.Menu.CATEGORY_SYSTEM
 import android.view.MenuItem
 import android.view.View
-import android.view.View.GONE
-import android.view.View.VISIBLE
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GravityCompat
 import androidx.core.view.children
-import androidx.core.view.forEach
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
-import androidx.navigation.NavDestination
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.navOptions
 import androidx.navigation.ui.AppBarConfiguration
@@ -70,7 +66,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     private lateinit var configuration: AppBarConfiguration
     private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
-    //    private var displayedLabel: String? = null
+
+    private var isStartViewFragment = false
     private val actionModeCancelCallback =
         object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -95,18 +92,46 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         setupNavigation()
 
         setupActivityResultLaunchers()
-        onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
 
         val fragmentIdToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_OPEN, -1)
         if (fragmentIdToLoad != -1) {
             navController.navigate(fragmentIdToLoad, Bundle())
         } else if (savedInstanceState == null) {
-            when (val startView = preferences.startView.value) {
-                START_VIEW_DEFAULT -> {}
-                START_VIEW_UNLABELED -> navController.navigate(R.id.Unlabeled, Bundle())
-                else -> navigateToLabel(startView)
+            navigateToStartView()
+        }
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (baseModel.actionMode.enabled.value) {
+                        return
+                    }
+                    if (!isStartViewFragment) {
+                        navigateToStartView()
+                    } else {
+                        finish()
+                    }
+                }
+            },
+        )
+        onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
+    }
+
+    private fun getStartViewNavigation(): Pair<Int, Bundle> {
+        return when (val startView = preferences.startView.value) {
+            START_VIEW_DEFAULT -> Pair(R.id.Notes, Bundle())
+            START_VIEW_UNLABELED -> Pair(R.id.Unlabeled, Bundle())
+            else -> {
+                val bundle = Bundle().apply { putString(EXTRA_DISPLAYED_LABEL, startView) }
+                Pair(R.id.DisplayLabel, bundle)
             }
         }
+    }
+
+    private fun navigateToStartView() {
+        val (id, bundle) = getStartViewNavigation()
+        navController.navigate(id, bundle)
     }
 
     private fun setupFAB() {
@@ -425,55 +450,28 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     binding.NavigationView.setCheckedItem(destination.id)
                 }
             }
-            // TODO?
-            //            if (destination.id != R.id.Search) {
-            //                binding.EnterSearchKeyword.apply {
-            //                    setText("")
-            //                    clearFocus()
-            //                }
-            //                when (destination.id) {
-            //                    R.id.Notes,
-            //                    R.id.Deleted,
-            //                    R.id.Archived,
-            //                    R.id.DisplayLabel,
-            //                    R.id.Unlabeled -> binding.EnterSearchKeywordLayout.visibility =
-            // VISIBLE
-            //                    else -> binding.EnterSearchKeywordLayout.visibility = GONE
-            //                }
-            //            }
-            handleDestinationChange(destination)
+            when (destination.id) {
+                R.id.Notes,
+                R.id.DisplayLabel,
+                R.id.Unlabeled -> {
+                    binding.TakeNote.show()
+                    binding.MakeList.show()
+                }
+
+                else -> {
+                    binding.TakeNote.hide()
+                    binding.MakeList.hide()
+                }
+            }
+            isStartViewFragment = isStartViewFragment(destination.id, bundle)
         }
     }
 
-    private fun handleDestinationChange(destination: NavDestination) {
-        when (destination.id) {
-            R.id.Notes,
-            R.id.DisplayLabel,
-            R.id.Unlabeled -> {
-                binding.TakeNote.show()
-                binding.MakeList.show()
-            }
-            else -> {
-                binding.TakeNote.hide()
-                binding.MakeList.hide()
-            }
-        }
-
-        //        val inputManager = ContextCompat.getSystemService(this,
-        // InputMethodManager::class.java)
-        //        if (destination.id == R.id.Search) {
-        //            binding.EnterSearchKeyword.apply {
-        //                //                setText("")
-        //                visibility = View.VISIBLE
-        //                requestFocus()
-        //                inputManager?.showSoftInput(this, InputMethodManager.SHOW_IMPLICIT)
-        //            }
-        //        } else {
-        //            binding.EnterSearchKeyword.apply {
-        //                //                visibility = View.GONE
-        //                inputManager?.hideSoftInputFromWindow(this.windowToken, 0)
-        //            }
-        //        }
+    private fun isStartViewFragment(id: Int, bundle: Bundle?): Boolean {
+        val (startViewId, startViewBundle) = getStartViewNavigation()
+        return startViewId == id &&
+            startViewBundle.getString(EXTRA_DISPLAYED_LABEL) ==
+                bundle?.getString(EXTRA_DISPLAYED_LABEL)
     }
 
     private fun navigateWithAnimation(id: Int) {

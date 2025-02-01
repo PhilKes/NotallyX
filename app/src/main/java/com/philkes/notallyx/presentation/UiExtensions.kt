@@ -516,6 +516,7 @@ fun MaterialAlertDialogBuilder.showAndFocus(
     viewToFocus: View? = null,
     selectAll: Boolean = false,
     allowFullSize: Boolean = false,
+    onShowListener: DialogInterface.OnShowListener? = null,
     applyToPositiveButton: ((positiveButton: Button) -> Unit)? = null,
 ): AlertDialog {
     if (allowFullSize) {
@@ -538,6 +539,7 @@ fun MaterialAlertDialogBuilder.showAndFocus(
                 WindowManager.LayoutParams.WRAP_CONTENT,
             )
         }
+        onShowListener?.let { setOnShowListener(it) }
         show()
         applyToPositiveButton?.let {
             getButton(AlertDialog.BUTTON_POSITIVE)?.let { positiveButton -> it(positiveButton) }
