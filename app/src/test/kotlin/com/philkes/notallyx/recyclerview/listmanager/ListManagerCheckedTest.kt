@@ -139,7 +139,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "B".assertIsNotChecked()
         "C".assertIsNotChecked()
         "A".assertChildren("B", "C")
-        items.assertOrder("Parent1", "Child1", "Child2", "A", "B", "C")
+        items.assertOrder("A", "B", "C", "Parent1", "Child1", "Child2")
     }
 
     @Test
