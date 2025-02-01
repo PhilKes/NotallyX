@@ -26,16 +26,19 @@ fun ListItemSortedList.moveItemRange(
     this.beginBatchedUpdates()
 
     val isMoveUp = fromIndex < toIndex
-    val insertPosition = if (isMoveUp) toIndex - itemCount + 1 else toIndex
+
+    val fromOrder = get(fromIndex).order!!
+    val toOrder = get(toIndex).order!!
+    val insertOrder = if (isMoveUp) toOrder - itemCount + 1 else toOrder
 
     if (isMoveUp) {
         this.shiftItemOrders(
-            fromIndex + itemCount until toIndex + 1,
+            fromOrder + itemCount until toOrder + 1,
             -itemCount,
             shiftCheckedItemOrders,
         )
     } else {
-        this.shiftItemOrders(toIndex until fromIndex, itemCount, shiftCheckedItemOrders)
+        this.shiftItemOrders(toOrder until fromOrder, itemCount, shiftCheckedItemOrders)
     }
 
     val itemsToMove =
@@ -43,7 +46,7 @@ fun ListItemSortedList.moveItemRange(
             .map { this[fromIndex + it] }
             .mapIndexed { index, item ->
                 val movedItem = item.clone() as ListItem
-                movedItem.order = insertPosition + index
+                movedItem.order = insertOrder + index
                 movedItem
             }
     itemsToMove.forEach { listItem ->
