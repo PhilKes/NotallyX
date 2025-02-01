@@ -17,7 +17,7 @@ fun MutableList<ListItem>.containsId(id: Int): Boolean {
 }
 
 fun Collection<ListItem>.toReadableString(): String {
-    return map { "$it uncheckedPos: ${it.order} id: ${it.id}" }.joinToString("\n")
+    return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
 }
 
 fun List<ListItem>.findChildrenPositions(parentPosition: Int): List<Int> {

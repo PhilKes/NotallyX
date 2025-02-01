@@ -18,6 +18,7 @@ fun ListItemSortedList.moveItemRange(
     fromIndex: Int,
     itemCount: Int,
     toIndex: Int,
+    shiftCheckedItemOrders: Boolean,
     forceIsChild: Boolean? = null,
 ): Int? {
     if (fromIndex == toIndex || itemCount <= 0) return null
@@ -28,9 +29,13 @@ fun ListItemSortedList.moveItemRange(
     val insertPosition = if (isMoveUp) toIndex - itemCount + 1 else toIndex
 
     if (isMoveUp) {
-        this.shiftItemOrders(fromIndex + itemCount until toIndex + 1, -itemCount)
+        this.shiftItemOrders(
+            fromIndex + itemCount until toIndex + 1,
+            -itemCount,
+            shiftCheckedItemOrders,
+        )
     } else {
-        this.shiftItemOrders(toIndex until fromIndex, itemCount)
+        this.shiftItemOrders(toIndex until fromIndex, itemCount, shiftCheckedItemOrders)
     }
 
     val itemsToMove =
@@ -69,15 +74,19 @@ fun ListItemSortedList.deleteItem(
     val item = this[position]
     val deletedItem = this[position].clone() as ListItem
     val children = childrenToDelete ?: item.children
-    this.shiftItemOrders(position + children.size until this.size(), -(children.size + 1))
+    this.shiftItemOrders(position + children.size until this.size(), -(children.size + 1), true)
     (item + children).indices.forEach { this.removeItemAt(position) }
     this.endBatchedUpdates()
     return deletedItem
 }
 
-fun ListItemSortedList.shiftItemOrders(positionRange: IntRange, valueToAdd: Int) {
+fun ListItemSortedList.shiftItemOrders(
+    positionRange: IntRange,
+    valueToAdd: Int,
+    shiftCheckedItemOrders: Boolean,
+) {
     this.forEach {
-        if (it.order!! in positionRange) {
+        if (it.order!! in positionRange && (shiftCheckedItemOrders || !it.checked)) {
             it.order = it.order!! + valueToAdd
         }
     }
