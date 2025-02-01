@@ -60,6 +60,7 @@
     <string name="cant_load_image">Bild kann nicht geladen werden. Es kann verschoben oder gelöscht worden sein</string>
     <string name="cant_open_link">Link konnte nicht geöffnet werden</string>
     <string name="change_color">Farbe ändern</string>
+    <string name="change_color_message">Wähle eine Farbe oder erstelle eine Neue.\nUm eine Farbe zu editieren halte sie gedrückt</string>
     <string name="change_note">Notiz ändern</string>
     <string name="check_all_items">Alle Elemente abhaken</string>
     <string name="choose_another_folder">Anderen Ordner wählen</string>
@@ -70,6 +71,7 @@
     <string name="clear_data_message">Alle Notizen, Bilder, Dateien und Sprachnotizen werden permanent gelöscht</string>
     <string name="clear_formatting">Normal</string>
     <string name="cleared_data">Alle Daten erfolgreich geläscht</string>
+    <string name="color_exists">Diese Farbe existiert bereits!</string>
     <string name="content_density">Notizvorschau</string>
     <string name="continue_">Weiter</string>
     <string name="copied_link">Link kopiert</string>
@@ -91,6 +93,7 @@
     <string name="delete_all_notes">Alle Notizen löschen\?</string>
     <string name="delete_audio_recording_forever">Aufnahme für immer löschen\?</string>
     <string name="delete_checked_items">Abgehakte Elemente löschen</string>
+    <string name="delete_color_message">Welche Farbe sollen die Notizen anstattdessen annehmen\?</string>
     <string name="delete_file">Datei \'%1$s\' löschen\?</string>
     <string name="delete_forever">Endgültig löschen</string>
     <string name="delete_image_forever">Bild endgültig löschen\?</string>
@@ -113,8 +116,10 @@
     <string name="disabled">Deaktiviert</string>
     <string name="discard">Verwerfen</string>
     <string name="display_text">Anzeigetext</string>
+    <string name="donate">Spende</string>
     <string name="drag_handle">Ziehgriff</string>
     <string name="edit">Bearbeiten</string>
+    <string name="edit_color">Farbe bearbeiten</string>
     <string name="edit_label">Label bearbeiten</string>
     <string name="edit_link">Link ändern</string>
     <string name="edit_reminders">Erinnerungen bearbeiten</string>
@@ -206,6 +211,7 @@
         <item quantity="one">…%1$d weitere Datei</item>
         <item quantity="other">…%1$d weitere Dateien</item>
     </plurals>
+    <string name="new_color">Neue Farbe</string>
     <string name="next">Nächste</string>
     <string name="no_auto_sort">Nicht automatisch sortieren</string>
     <string name="none">Keines</string>
@@ -239,6 +245,7 @@
     <string name="repetition_custom">Benutzer. Wiederholung</string>
     <string name="repetition_value_hint">Wert</string>
     <string name="report_bug">Fehler/Bug melden</string>
+    <string name="report_crash">Bug mit Crash logs melden</string>
     <string name="reset_settings">Einstellungen zurücksetzen</string>
     <string name="reset_settings_message">Alle Einstellungen werden auf ihre Default-Werte zurückgesetzt</string>
     <string name="reset_settings_success">Einstellungen erfolgreich zurückgesetzt</string>
@@ -270,11 +277,14 @@
     <string name="sort_direction">Reihenfolge</string>
     <string name="source_code">Source Code</string>
     <string name="start">Start</string>
+    <string name="start_view">Startansicht</string>
+    <string name="start_view_hint">Wähle aus welche Ansicht beim Start der App geöffnet werden soll</string>
     <string name="stop">Stop</string>
     <string name="strikethrough">Durchstreichen</string>
     <string name="take_note">Notiz erstellen</string>
     <string name="tap_for_more_options">Klick für mehr Optionen</string>
     <string name="tap_to_set_up">Zum Einrichten antippen</string>
+    <string name="text_default">Standard</string>
     <string name="text_size">Textgröße</string>
     <string name="theme">Design</string>
     <string name="title">Titel</string>
@@ -288,6 +298,7 @@
     <string name="undo">Wiederholen</string>
     <string name="unknown_error">Unbekannter Fehler</string>
     <string name="unknown_name">Unbekannter Name</string>
+    <string name="unlabeled">Ohne Label</string>
     <string name="unlock">Entsperre mittels Biometrie/PIN</string>
     <string name="unlock_with_biometrics_not_setup">Die biometrische Sperre ist aktiviert, allerdings ist für dein Gerät keine Biometrie/PIN mehr eingerichtet.\n\nUm die biometrische zu deaktivieren klicke Deaktivieren, ansonsten richte für dein Geräte Biometrie/PIN ein</string>
     <string name="unpin">Loslösen</string>
