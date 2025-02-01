@@ -297,7 +297,6 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
         listItemDragCallback.simulateDrag(0, items.lastIndex, "A".itemCount)
         items.printList("After move 0 to ${items.lastIndex}")
-        // TODO: test is faulty?
         items.assertOrder("D", "E", "F", "A", "B", "C")
         "A".assertChildren("B", "C")
         "D".assertChildren()
@@ -352,6 +351,17 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.assertOrder("D", "A", "B", "C", "E", "F")
         "D".assertIsParent()
         "C".assertChildren()
+    }
+
+    @Test
+    fun `endDrag unchecked below unchecked over checked`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeCheckedForAll(true, false)
+        listManager.changeChecked(1, false)
+        listManager.changeChecked(2, false)
+        listItemDragCallback.simulateDrag(0, 1, 1)
+
+        items.assertOrder("C", "B", "A", "D", "E", "F")
     }
 
     // endregion
