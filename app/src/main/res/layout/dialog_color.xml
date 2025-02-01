@@ -28,6 +28,7 @@
         android:layout_centerHorizontal="true"
         android:clipToPadding="false"
         android:scrollIndicators="top"
+        android:paddingBottom="8dp"
         app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:spanCount="4" />
 

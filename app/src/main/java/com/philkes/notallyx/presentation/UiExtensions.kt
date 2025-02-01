@@ -51,6 +51,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.DrawableCompat
@@ -59,6 +60,7 @@ import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
 import androidx.core.view.setPadding
 import androidx.core.view.updatePadding
+import androidx.core.widget.TextViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -800,4 +802,17 @@ fun RecyclerView.initListView(context: Context) {
 
 fun MaterialAutoCompleteTextView.select(value: CharSequence) {
     setText(value, false)
+}
+
+fun Context.createTextView(textResId: Int, padding: Int = 16.dp): TextView {
+    return AppCompatTextView(this).apply {
+        setText(textResId)
+        TextViewCompat.setTextAppearance(
+            this,
+            android.R.style.TextAppearance_Material_DialogWindowTitle,
+        )
+        updatePadding(padding, padding, padding, padding)
+        maxLines = Integer.MAX_VALUE
+        ellipsize = null
+    }
 }

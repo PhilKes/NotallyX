@@ -2,6 +2,8 @@ package com.philkes.notallyx.utils
 
 import android.app.Activity
 import android.view.View
+import androidx.core.view.isVisible
+import androidx.core.view.updatePadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -11,6 +13,8 @@ import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.ColorString
 import com.philkes.notallyx.databinding.DialogColorBinding
 import com.philkes.notallyx.databinding.DialogColorPickerBinding
+import com.philkes.notallyx.presentation.createTextView
+import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.setLightStatusAndNavBar
 import com.philkes.notallyx.presentation.showAndFocus
@@ -199,7 +203,7 @@ private fun Activity.showDeleteColorDialog(
 ) {
     val dialog =
         MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.delete_color_message)
+            .setCustomTitle(createTextView(R.string.delete_color_message))
             .setNeutralButton(R.string.back) { _, _ ->
                 showEditColorDialog(
                     colors,
@@ -227,9 +231,11 @@ private fun Activity.showDeleteColorDialog(
         )
     DialogColorBinding.inflate(layoutInflater).apply {
         RecyclerView.apply {
+            updatePadding(left = 2.dp, right = 2.dp)
             (layoutManager as? GridLayoutManager)?.let { it.spanCount = 6 }
             adapter = colorAdapter
         }
+        Message.isVisible = false
         dialog.setView(root)
         dialog.setOnShowListener {
             setNavigationbarLight?.let { window?.apply { setLightStatusAndNavBar(it, root) } }
