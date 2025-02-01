@@ -59,6 +59,7 @@
     <string name="cant_load_image">Impossible de charger l\'image. Elle a peut-être été déplacée ou supprimée.</string>
     <string name="cant_open_link">Ouverture du lien impossible</string>
     <string name="change_color">Changer la couleur</string>
+    <string name="change_color_message">Choisissez une couleur ou créez-en une nouvelle.\nVous pouvez également modifier une couleur en la maintenant appuyée.</string>
     <string name="change_note">Changer de note</string>
     <string name="check_all_items">Cocher tous les éléments</string>
     <string name="choose_another_folder">Choisir un autre dossier</string>
@@ -69,6 +70,7 @@
     <string name="clear_data_message">Toutes les notes, images, fichiers et audios seront supprimés définitivement</string>
     <string name="clear_formatting">Supprimer le formatage</string>
     <string name="cleared_data">Toutes les données ont été supprimées</string>
+    <string name="color_exists">Cette couleur existe déjà !</string>
     <string name="content_density">Densité d\'affichage</string>
     <string name="continue_">Continuer</string>
     <string name="copied_link">Lien copié dans le presse-papier</string>
@@ -90,6 +92,7 @@
     <string name="delete_all_notes">Supprimer toutes les notes \?</string>
     <string name="delete_audio_recording_forever">Supprimer définitivement l\'enregistrement \?</string>
     <string name="delete_checked_items">Supprimer les éléments cochés</string>
+    <string name="delete_color_message">Choisissez une couleur de remplacement pour les notes qui utilisaient la couleur supprimée</string>
     <string name="delete_file">Supprimer le fichier \'%1$s\'\?</string>
     <string name="delete_forever">Supprimer définitivement</string>
     <string name="delete_image_forever">Supprimer l\'image définitivement \?</string>
@@ -112,8 +115,10 @@
     <string name="disabled">Désactivé</string>
     <string name="discard">Supprimer</string>
     <string name="display_text">Texte à afficher</string>
+    <string name="donate">Faire un don</string>
     <string name="drag_handle">Poignée de glissement</string>
     <string name="edit">Modifier</string>
+    <string name="edit_color">Éditer la couleur</string>
     <string name="edit_label">Modifier l\'étiquette</string>
     <string name="edit_link">Éditer le lien</string>
     <string name="edit_reminders">Éditer les rappels</string>
@@ -205,6 +210,7 @@
         <item quantity="one">…et %1$d fichier </item>
         <item quantity="other">…et %1$d fichiers</item>
     </plurals>
+    <string name="new_color">Nouvelle couleur</string>
     <string name="next">Suivant</string>
     <string name="no_auto_sort">Aucun tri automatique</string>
     <string name="none">Aucune </string>
@@ -238,6 +244,7 @@
     <string name="repetition_custom">Répétition personnalisée</string>
     <string name="repetition_value_hint">Valeur</string>
     <string name="report_bug">Signaler un problème/un bug</string>
+    <string name="report_crash">Signaler un bug en joignant le rapport de plantage</string>
     <string name="reset_settings">Réinitialiser les paramètres</string>
     <string name="reset_settings_message">Tous les paramètres seront réinitialisés à leur valeur par défaut</string>
     <string name="reset_settings_success">Tous les paramètres ont été réinitialisés avec succès</string>
@@ -269,11 +276,14 @@
     <string name="sort_direction">Ordre de tri</string>
     <string name="source_code">Code source</string>
     <string name="start">Enregistrer</string>
+    <string name="start_view">Écran de démarrage</string>
+    <string name="start_view_hint">Sélectionnez la vue/l\'étiquette à afficher au démarrage de l\'application.\nPar défaut, l’écran des notes est affichée.</string>
     <string name="stop">Arrêter</string>
     <string name="strikethrough">Barré</string>
     <string name="take_note">Prendre des notes</string>
     <string name="tap_for_more_options">Toucher pour afficher plus d\'options</string>
     <string name="tap_to_set_up">Toucher pour régler</string>
+    <string name="text_default">Défaut</string>
     <string name="text_size">Taille du texte</string>
     <string name="theme">Thème</string>
     <string name="title">Titre</string>
@@ -287,6 +297,7 @@
     <string name="undo">Annuler</string>
     <string name="unknown_error">Erreur inconnue</string>
     <string name="unknown_name">Nom inconnu</string>
+    <string name="unlabeled">Sans étiquette</string>
     <string name="unlock">Déverrouiller par biométrie/code PIN</string>
     <string name="unlock_with_biometrics_not_setup">Vous avez précédemment activé le verrouillage biométrique, mais les données biométriques/le code PIN ne sont plus configurés sur votre appareil.\n\nSi vous souhaitez désactiver le verrouillage biométrique, appuyez sur Désactiver, sinon configurez les données biométriques/le code PIN pour votre appareil</string>
     <string name="unpin">Détacher</string>
