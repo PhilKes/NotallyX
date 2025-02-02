@@ -17,7 +17,6 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
 
     private var itemsBefore: List<ListItem>? = null
     private var positionFrom: Int? = null
-    private var children: Int? = null
     private var positionTo: Int? = null
     private var newPosition: Int? = null
 
@@ -48,7 +47,6 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
         if (swapped != null) {
             if (positionFrom == null) {
                 positionFrom = from
-                children = listManager.getItem(from).children.size
                 listManager.startDrag(from)
             }
             positionTo = to
@@ -120,7 +118,6 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
 
     internal fun reset() {
         positionFrom = null
-        children = null
         positionTo = null
         newPosition = null
         itemsBefore = null
@@ -128,8 +125,8 @@ class ListItemDragCallback(private val elevation: Float, private val listManager
 
     internal fun onDragEnd() {
         Log.d(TAG, "onDragEnd: from: $positionFrom to: $positionTo")
-        if (positionFrom != null && children != null) {
-            listManager.endDrag(positionFrom!!, children!!)
+        if (positionFrom != null) {
+            listManager.endDrag()
         }
         if (positionFrom == positionTo) {
             return

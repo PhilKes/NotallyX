@@ -109,7 +109,7 @@ open class ListManagerTestBase {
         assertFalse("checked", items.find { it.body == this }!!.checked)
     }
 
-    protected fun String.assertSortingPosition(expected: Int) {
+    protected fun String.assertOrder(expected: Int) {
         assertEquals("order", expected, items.find { it.body == this }!!.order)
     }
 

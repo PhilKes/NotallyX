@@ -364,6 +364,20 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.assertOrder("C", "B", "A", "D", "E", "F")
     }
 
+    @Test
+    fun `endDrag over and under order of a checked item`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeChecked(1, true)
+        listItemDragCallback.simulateDrag(1, 0, 1)
+        "C".assertOrder(0)
+        "A".assertOrder(1)
+        "B".assertOrder(2)
+        items.assertOrder("C", "A", "D", "E", "F", "B")
+        listManager.changeChecked(items.lastIndex, false)
+        listItemDragCallback.simulateDrag(0, 1, 1)
+        items.assertOrder("A", "C", "B", "D", "E", "F")
+    }
+
     // endregion
 
 }

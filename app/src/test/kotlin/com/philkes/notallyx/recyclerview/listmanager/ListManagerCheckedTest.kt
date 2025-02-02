@@ -3,6 +3,8 @@ package com.philkes.notallyx.recyclerview.listmanager
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
+import com.philkes.notallyx.test.printList
+import com.philkes.notallyx.test.simulateDrag
 import org.junit.Test
 
 class ListManagerCheckedTest : ListManagerTestBase() {
@@ -15,7 +17,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
-        "A".assertSortingPosition(0)
+        "A".assertOrder(0)
     }
 
     @Test
@@ -25,7 +27,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeChecked(0, checked = false, pushChange = true)
 
         "A".assertIsNotChecked()
-        "A".assertSortingPosition(0)
+        "A".assertOrder(0)
     }
 
     @Test
@@ -36,7 +38,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeChecked(0, checked = true, pushChange = true)
 
         "A".assertIsChecked()
-        "A".assertSortingPosition(0)
+        "A".assertOrder(0)
     }
 
     @Test
@@ -49,8 +51,8 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "A".assertIsChecked()
         "A".assertChildren("B")
         "B".assertIsChecked()
-        "A".assertSortingPosition(0)
-        "B".assertSortingPosition(1)
+        "A".assertOrder(0)
+        "B".assertOrder(1)
     }
 
     @Test
@@ -65,9 +67,9 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "B".assertIsChecked()
         "C".assertIsChecked()
         "A".assertChildren("B", "C")
-        "A".assertSortingPosition(0)
-        "B".assertSortingPosition(1)
-        "C".assertSortingPosition(2)
+        "A".assertOrder(0)
+        "B".assertOrder(1)
+        "C".assertOrder(2)
     }
 
     @Test
@@ -80,8 +82,8 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "A".assertIsChecked()
         "A".assertChildren("B")
         "B".assertIsChecked()
-        "A".assertSortingPosition(0)
-        "B".assertSortingPosition(1)
+        "A".assertOrder(0)
+        "B".assertOrder(1)
     }
 
     @Test
@@ -96,9 +98,9 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "B".assertIsChecked()
         "C".assertIsChecked()
         "A".assertChildren("B", "C")
-        "A".assertSortingPosition(0)
-        "B".assertSortingPosition(1)
-        "C".assertSortingPosition(2)
+        "A".assertOrder(0)
+        "B".assertOrder(1)
+        "C".assertOrder(2)
         "A".assertPosition(3)
         "B".assertPosition(4)
         "C".assertPosition(5)
@@ -117,9 +119,9 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "B".assertIsNotChecked()
         "C".assertIsNotChecked()
         "A".assertChildren("B", "C")
-        "A".assertSortingPosition(0)
-        "B".assertSortingPosition(1)
-        "C".assertSortingPosition(2)
+        "A".assertOrder(0)
+        "B".assertOrder(1)
+        "C".assertOrder(2)
         "A".assertPosition(0)
         "B".assertPosition(1)
         "C".assertPosition(2)
@@ -156,6 +158,23 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "C".assertIsNotChecked()
         "D".assertIsChecked()
         "B".assertChildren("C", "D")
+    }
+
+    @Test
+    fun `changeChecked after parent with child moved`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(4, true)
+        listManager.changeChecked(3, checked = true, pushChange = true)
+        listManager.changeChecked(4, checked = false, pushChange = true)
+        listItemDragCallback.simulateDrag(3, 1, 2)
+        items.printList("Before")
+        listManager.changeChecked(1, checked = true, pushChange = true)
+        items.printList("After")
+
+        items.assertOrder("A", "B", "C", "F", "D", "E")
+        "D".assertChildren("E")
+        "D".assertIsChecked()
+        "E".assertIsChecked()
     }
 
     // endregion
