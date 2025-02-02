@@ -378,6 +378,23 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.assertOrder("A", "C", "B", "D", "E", "F")
     }
 
+    @Test
+    fun `endDrag drag child to end of list`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(3, true)
+        listItemDragCallback.simulateDrag(3, items.lastIndex, 1)
+        items.assertOrder("A", "B", "C", "E", "F", "D")
+    }
+
+    @Test
+    fun `endDrag drag child one below`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(3, true)
+        listItemDragCallback.simulateDrag(3, 4, 1)
+        items.assertOrder("A", "B", "C", "E", "D", "F")
+        "E".assertChildren("D")
+    }
+
     // endregion
 
 }
