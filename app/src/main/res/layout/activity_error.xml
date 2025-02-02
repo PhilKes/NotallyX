@@ -34,7 +34,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
         android:gravity="center"
-        android:text="@string/customactivityoncrash_error_activity_error_occurred_explanation"
+        android:text="@string/crash_message"
         android:textSize="18sp"
         android:textStyle="bold" />
 
@@ -43,7 +43,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
-        android:text="@string/customactivityoncrash_error_activity_restart_app" />
+        android:text="@string/restart_app" />
 
       <com.google.android.material.button.MaterialButton
         android:id="@+id/ReportButton"

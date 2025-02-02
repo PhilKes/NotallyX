@@ -76,6 +76,7 @@
     <string name="continue_">Weiter</string>
     <string name="copied_link">Link kopiert</string>
     <string name="copy">Kopieren</string>
+    <string name="crash_message">Ein unerwarteter Fehler ist aufgetreten.\nEntschuldigung für die Unannehmlichkeiten.\n</string>
     <string name="create_github_issue">Github Issue erstellen</string>
     <string name="creation_date">Erstellt</string>
     <string name="custom">Benutzerdefiniert</string>
@@ -249,6 +250,7 @@
     <string name="reset_settings">Einstellungen zurücksetzen</string>
     <string name="reset_settings_message">Alle Einstellungen werden auf ihre Default-Werte zurückgesetzt</string>
     <string name="reset_settings_success">Einstellungen erfolgreich zurückgesetzt</string>
+    <string name="restart_app">App neustarten</string>
     <string name="restore">Wiederherstellen</string>
     <plurals name="restored_selected_notes">
         <item quantity="one">%1$d Notiz wiederhergestellt</item>

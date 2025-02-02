@@ -78,6 +78,7 @@
     <string name="copied_link">Copied Link to Clipboard</string>
     <string name="copy">Copy</string>
     <string name="count" translatable="false">%1$d / %2$d</string>
+    <string name="crash_message">An unexpected error occurred.\nSorry for the inconvenience.</string>
     <string name="create_github_issue">Create Github Issue</string>
     <string name="creation_date">Created</string>
     <string name="custom">Custom</string>
@@ -251,6 +252,7 @@
     <string name="reset_settings">Reset Settings</string>
     <string name="reset_settings_message">All Settings will be reset to their default value</string>
     <string name="reset_settings_success">Successfully reset all settings</string>
+    <string name="restart_app">Restart App</string>
     <string name="restore">Restore</string>
     <plurals name="restored_selected_notes">
         <item quantity="one">Restored %1$d note</item>
