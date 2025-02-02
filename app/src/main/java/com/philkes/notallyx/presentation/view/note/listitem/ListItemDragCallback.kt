@@ -41,13 +41,13 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
     internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
             itemsBefore = listManager.getItems()
+            listManager.startDrag(from)
         }
         val swapped =
             listManager.move(from, to, pushChange = false, updateChildren = false, isDrag = true)
         if (swapped != null) {
             if (positionFrom == null) {
                 positionFrom = from
-                listManager.startDrag(from)
             }
             positionTo = to
             newPosition = swapped
