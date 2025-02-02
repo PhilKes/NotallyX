@@ -19,7 +19,7 @@ android {
         applicationId = "com.philkes.notallyx"
         minSdk = 21
         targetSdk = 34
-        versionCode = 7006
+        versionCode = 7007
         versionName = "7.1.0"
         resourceConfigurations += listOf(
             "en", "ca", "cs", "da", "de", "el", "es", "fr", "hu", "in", "it", "ja", "my", "nb", "nl", "nn", "pl", "pt-rBR", "pt-rPT", "ro", "ru", "sk", "sv", "tl", "tr", "uk", "vi", "zh-rCN"
