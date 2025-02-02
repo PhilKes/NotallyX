@@ -63,7 +63,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
 
         "Test".assertPosition(0)
         "Test".assertIsChecked()
-        "Test".assertSortingPosition(0)
+        "Test".assertOrder(0)
         items.assertSize(7)
         (changeHistory.lookUp() as ListAddChange).assert(0, newItem)
     }
@@ -77,7 +77,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
 
         "Test".assertPosition(6)
         "Test".assertIsChecked()
-        "Test".assertSortingPosition(0)
+        "Test".assertOrder(0)
         items.assertSize(7)
         (changeHistory.lookUp() as ListAddChange).assert(0, newItem)
     }
@@ -99,9 +99,9 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         "Parent".assertPosition(6)
         "Child1".assertPosition(7)
         "Child2".assertPosition(8)
-        "Parent".assertSortingPosition(6)
-        "Child1".assertSortingPosition(7)
-        "Child2".assertSortingPosition(8)
+        "Parent".assertOrder(6)
+        "Child1".assertOrder(7)
+        "Child2".assertOrder(8)
         items.assertSize(9)
 
         (changeHistory.lookUp() as ListAddChange).assert(6, newItem)

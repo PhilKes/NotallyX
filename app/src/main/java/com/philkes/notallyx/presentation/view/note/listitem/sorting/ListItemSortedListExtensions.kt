@@ -89,7 +89,7 @@ fun ListItemSortedList.shiftItemOrders(
     shiftCheckedItemOrders: Boolean,
 ) {
     this.forEach {
-        if (it.order!! in positionRange && (shiftCheckedItemOrders || !it.checked)) {
+        if (it.order!! in positionRange) {
             it.order = it.order!! + valueToAdd
         }
     }

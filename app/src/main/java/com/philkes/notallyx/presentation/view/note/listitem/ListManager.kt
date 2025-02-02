@@ -15,7 +15,7 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.deleteItem
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.filter
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.findById
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.findParent
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.forEach
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.isNotEmpty
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.lastIndex
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.moveItemRange
@@ -452,12 +452,8 @@ class ListManager(
         }
     }
 
-    fun endDrag(position: Int, children: Int) {
-        (position..position + children).forEach {
-            if (it in items.indices) {
-                items[it].isDragged = false
-            }
-        }
+    fun endDrag() {
+        items.forEach { it.isDragged = false }
     }
 
     companion object {
