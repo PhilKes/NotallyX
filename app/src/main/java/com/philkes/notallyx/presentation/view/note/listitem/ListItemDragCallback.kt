@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView.ViewHolder
 import com.philkes.notallyx.data.model.ListItem
 
 /** ItemTouchHelper.Callback that allows dragging ListItem with its children. */
-class ListItemDragCallback(private val elevation: Float, private val listManager: ListManager) :
+class ListItemDragCallback(private val elevation: Float, internal val listManager: ListManager) :
     ItemTouchHelper.Callback() {
 
     private var lastState = ItemTouchHelper.ACTION_STATE_IDLE

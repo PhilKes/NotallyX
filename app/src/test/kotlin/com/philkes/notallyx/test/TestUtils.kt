@@ -38,6 +38,7 @@ fun mockAndroidLog() {
 fun ListItemDragCallback.simulateDrag(positionFrom: Int, positionTo: Int, itemCount: Int) {
     this.reset()
     var from = positionFrom
+    listManager.startDrag(from)
     if (positionFrom < positionTo) {
         for (i in positionFrom until positionTo) {
             val moved = this.move(from, i + 1)
