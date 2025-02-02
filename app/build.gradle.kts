@@ -1,5 +1,7 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.ncorti.ktfmt.gradle.tasks.KtfmtFormatTask
+import org.apache.commons.configuration2.PropertiesConfiguration
+import org.apache.commons.configuration2.io.FileHandler
 
 plugins {
     id("com.android.application")
@@ -19,8 +21,8 @@ android {
         applicationId = "com.philkes.notallyx"
         minSdk = 21
         targetSdk = 34
-        versionCode = 7007
-        versionName = "7.1.0"
+        versionCode = project.findProperty("app.versionCode").toString().toInt()
+        versionName = project.findProperty("app.versionName").toString()
         resourceConfigurations += listOf(
             "en", "ca", "cs", "da", "de", "el", "es", "fr", "hu", "in", "it", "ja", "my", "nb", "nl", "nn", "pl", "pt-rBR", "pt-rPT", "ro", "ru", "sk", "sv", "tl", "tr", "uk", "vi", "zh-rCN"
         )
@@ -130,12 +132,33 @@ tasks.register<Copy>("installLocalGitHooks") {
 
 tasks.preBuild.dependsOn(tasks.named("installLocalGitHooks"), tasks.exportTranslationsToExcel)
 
+tasks.register("generateChangelogs") {
+    doLast {
+        exec {
+            commandLine("bash", rootProject.file("generate-changelogs.sh").absolutePath)
+            standardOutput = System.out
+            errorOutput = System.err
+            isIgnoreExitValue = true
+        }
+        val config = PropertiesConfiguration()
+        val fileHandler = FileHandler(config).apply {
+            file = rootProject.file("gradle.properties")
+            load()
+        }
+        val currentVersionName = config.getProperty("app.versionName")
+        config.setProperty("app.lastVersionName", currentVersionName)
+        fileHandler.save()
+        println("Updated app.lastVersionName to $currentVersionName")
+    }
+}
+
 afterEvaluate {
     tasks.named("bundleRelease").configure {
         dependsOn(tasks.named("testReleaseUnitTest"))
     }
     tasks.named("assembleRelease").configure {
         dependsOn(tasks.named("testReleaseUnitTest"))
+        finalizedBy(tasks.named("generateChangelogs"))
     }
 }
 
