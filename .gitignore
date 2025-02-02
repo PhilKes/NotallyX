@@ -13,3 +13,4 @@ fastlane/*
 !fastlane/metadata
 Gemfile*
 *.sh
+!generate-changelogs.sh
