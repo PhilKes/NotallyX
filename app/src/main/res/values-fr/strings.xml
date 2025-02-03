@@ -75,6 +75,7 @@
     <string name="continue_">Continuer</string>
     <string name="copied_link">Lien copié dans le presse-papier</string>
     <string name="copy">Copier</string>
+    <string name="crash_message">Une erreur inattendue s\'est produite.\nDésolé pour le désagrément.</string>
     <string name="create_github_issue">Créer une issue Github</string>
     <string name="creation_date">Crée</string>
     <string name="custom">Personnalisé</string>
@@ -244,10 +245,11 @@
     <string name="repetition_custom">Répétition personnalisée</string>
     <string name="repetition_value_hint">Valeur</string>
     <string name="report_bug">Signaler un problème/un bug</string>
-    <string name="report_crash">Signaler un bug en joignant le rapport de plantage</string>
+    <string name="report_crash">Signaler un bug avec rapport de plantage</string>
     <string name="reset_settings">Réinitialiser les paramètres</string>
     <string name="reset_settings_message">Tous les paramètres seront réinitialisés à leur valeur par défaut</string>
     <string name="reset_settings_success">Tous les paramètres ont été réinitialisés avec succès</string>
+    <string name="restart_app">Redémarrer l\'application</string>
     <string name="restore">Restaurer</string>
     <plurals name="restored_selected_notes">
         <item quantity="one">%1$d note restaurée</item>
