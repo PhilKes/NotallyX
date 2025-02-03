@@ -48,6 +48,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_DEFAULT
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_UNLABELED
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
@@ -90,7 +91,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     lateinit var selectedExportMimeType: ExportMimeType
 
     lateinit var labels: LiveData<List<String>>
-    //    lateinit var colors: LiveData<List<String>>
     lateinit var reminders: LiveData<List<NoteReminder>>
     private var allNotes: LiveData<List<BaseNote>>? = null
     private var allNotesObserver: Observer<List<BaseNote>>? = null
@@ -277,14 +277,14 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val passphrase =
             cipher?.doFinal(encryptedPassphrase)
                 ?: preferences.fallbackDatabaseEncryptionKey.value!!
-        closeDatabase()
+        database.close()
         decryptDatabase(app, passphrase)
         savePreference(preferences.biometricLock, BiometricLock.DISABLED)
         callback?.invoke()
     }
 
     fun <T> savePreference(preference: BasePreference<T>, value: T) {
-        executeAsync { preference.save(value) }
+        viewModelScope.launch(Dispatchers.IO) { preference.save(value) }
     }
 
     /**
@@ -432,17 +432,17 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun pinBaseNotes(pinned: Boolean) {
         val id = actionMode.selectedIds.toLongArray()
         actionMode.close(true)
-        executeAsync { baseNoteDao.updatePinned(id, pinned) }
+        viewModelScope.launch(Dispatchers.IO) { baseNoteDao.updatePinned(id, pinned) }
     }
 
     fun colorBaseNote(color: String) {
         val ids = actionMode.selectedIds.toLongArray()
         actionMode.close(true)
-        executeAsync { baseNoteDao.updateColor(ids, color) }
+        viewModelScope.launch(Dispatchers.IO) { baseNoteDao.updateColor(ids, color) }
     }
 
     fun changeColor(oldColor: String, newColor: String) {
-        executeAsync { baseNoteDao.updateColor(oldColor, newColor) }
+        viewModelScope.launch(Dispatchers.IO) { baseNoteDao.updateColor(oldColor, newColor) }
     }
 
     fun moveBaseNotes(folder: Folder): LongArray {
@@ -453,7 +453,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     }
 
     fun moveBaseNotes(ids: LongArray, folder: Folder) {
-        executeAsync {
+        viewModelScope.launch(
+            Dispatchers.IO
+        ) { // Only reminders of notes in NOTES folder are active
             baseNoteDao.move(ids, folder)
             val notes = baseNoteDao.getByIds(ids).toNoteIdReminders()
             // Only reminders of notes in NOTES folder are active
@@ -466,7 +468,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun updateBaseNoteLabels(labels: List<String>, id: Long) {
         actionMode.close(true)
-        executeAsync { baseNoteDao.updateLabels(id, labels) }
+        viewModelScope.launch(Dispatchers.IO) { baseNoteDao.updateLabels(id, labels) }
     }
 
     fun deleteSelectedBaseNotes() {
@@ -533,7 +535,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     suspend fun getAllLabels() = withContext(Dispatchers.IO) { labelDao.getArrayOfAll() }
 
     fun deleteLabel(value: String) {
-        executeAsync { commonDao.deleteLabel(value) }
+        viewModelScope.launch(Dispatchers.IO) { commonDao.deleteLabel(value) }
         val labelsHiddenPreference = preferences.labelsHiddenInNavigation
         val labelsHidden = labelsHiddenPreference.value.toMutableSet()
         if (labelsHidden.contains(value)) {
@@ -557,14 +559,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             labelsHidden.add(newValue)
             savePreference(labelsHiddenPreference, labelsHidden)
         }
-    }
-
-    fun closeDatabase() {
-        database.close()
-    }
-
-    private fun executeAsync(function: suspend () -> Unit) {
-        viewModelScope.launch(Dispatchers.IO) { function() }
     }
 
     fun resetPreferences(callback: (restartRequired: Boolean) -> Unit) {
@@ -666,7 +660,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
         val startView = preferences.startView.getFreshValue()
         if (oldStartView != startView) {
-            refreshStartView(startView)
+            refreshStartView(startView, oldStartView)
         }
         preferences.theme.refresh()
         callback()
@@ -701,9 +695,18 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    private fun refreshStartView(startView: String) {
-        if (startView == START_VIEW_DEFAULT || labels.value?.contains(startView) == true) {
+    private fun refreshStartView(startView: String, oldStartView: String) {
+        if (startView in setOf(START_VIEW_DEFAULT, START_VIEW_UNLABELED)) {
             savePreference(preferences.startView, startView)
+        } else {
+            viewModelScope.launch {
+                val startViewLabelExists =
+                    withContext(Dispatchers.IO) { labelDao.exists(startView) }
+                savePreference(
+                    preferences.startView,
+                    if (startViewLabelExists) startView else oldStartView,
+                )
+            }
         }
     }
 

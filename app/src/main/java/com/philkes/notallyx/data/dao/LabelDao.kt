@@ -24,4 +24,7 @@ interface LabelDao {
     @Query("SELECT value FROM Label ORDER BY value") fun getAll(): LiveData<List<String>>
 
     @Query("SELECT value FROM Label ORDER BY value") suspend fun getArrayOfAll(): Array<String>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM Label WHERE value = :value)")
+    suspend fun exists(value: String): Boolean
 }
