@@ -44,6 +44,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.LongPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
 import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackup
+import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackup.Companion.BACKUP_MAX_MIN
 import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackup.Companion.BACKUP_PERIOD_DAYS_MIN
 import com.philkes.notallyx.presentation.viewmodel.preference.PeriodicBackupsPreference
 import com.philkes.notallyx.utils.MIME_TYPE_JSON
@@ -495,9 +496,17 @@ class SettingsFragment : Fragment() {
             enabled = backupFolder != EMPTY_PATH,
         ) { enabled ->
             if (enabled) {
+                val periodInDays =
+                    preference.value.periodInDays.let {
+                        if (it >= BACKUP_PERIOD_DAYS_MIN) it else BACKUP_PERIOD_DAYS_MIN
+                    }
+                val maxBackups =
+                    preference.value.maxBackups.let {
+                        if (it >= BACKUP_MAX_MIN) it else BACKUP_MAX_MIN
+                    }
                 model.savePreference(
                     preference,
-                    preference.value.copy(periodInDays = BACKUP_PERIOD_DAYS_MIN),
+                    preference.value.copy(periodInDays = periodInDays, maxBackups = maxBackups),
                 )
             } else {
                 model.savePreference(preference, preference.value.copy(periodInDays = 0))
