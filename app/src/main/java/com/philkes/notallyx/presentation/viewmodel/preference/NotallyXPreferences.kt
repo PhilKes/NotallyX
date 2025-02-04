@@ -218,6 +218,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 maxLabels,
                 periodicBackups,
                 backupPassword,
+                backupOnSave,
             )
             .forEach { it.refresh() }
     }
