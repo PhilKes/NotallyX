@@ -103,6 +103,14 @@ fun File.toRelativePathFrom(baseFolderName: String): String {
     return relativePath.trimStart(File.separatorChar)
 }
 
+fun File.recreateDir(): File {
+    if (exists()) {
+        deleteRecursively()
+    }
+    mkdirs()
+    return this
+}
+
 fun ContextWrapper.deleteAttachments(
     attachments: Collection<Attachment>,
     ids: LongArray? = null,
