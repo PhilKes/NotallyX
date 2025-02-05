@@ -9,6 +9,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.content.res.Resources
+import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.net.Uri
@@ -84,7 +85,6 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.BaseNote
-import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.databinding.DialogProgressBinding
@@ -631,15 +631,7 @@ fun View.setControlsColorForAllViews(
                 val highlight = controlsColor.withAlpha(0.4f)
                 setHintTextColor(highlight)
                 highlightColor = highlight
-                val selectHandleColor = controlsColor.withAlpha(0.8f)
-                textSelectHandleLeft?.withTint(selectHandleColor)?.let {
-                    setTextSelectHandleLeft(it)
-                }
-                textSelectHandleRight?.withTint(selectHandleColor)?.let {
-                    setTextSelectHandleRight(it)
-                }
-                textSelectHandle?.withTint(selectHandleColor)?.let { setTextSelectHandle(it) }
-                textCursorDrawable?.let { DrawableCompat.setTint(it, selectHandleColor) }
+                setSelectionHandleColor(controlsColor.withAlpha(0.8f))
             }
         }
         if (this is CompoundButton) {
@@ -658,6 +650,70 @@ fun View.setControlsColorForAllViews(
             backgroundTintList = ColorStateList.valueOf(controlsColor)
         }
     }
+}
+
+fun TextView.setSelectionHandleColor(@ColorInt color: Int) {
+    try {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            textSelectHandleLeft?.withTint(color)?.let { setTextSelectHandleLeft(it) }
+            textSelectHandleRight?.withTint(color)?.let { setTextSelectHandleRight(it) }
+            textSelectHandle?.withTint(color)?.let { setTextSelectHandle(it) }
+            textCursorDrawable?.let { DrawableCompat.setTint(it, color) }
+        } else {
+            setSelectHandleColor(color)
+        }
+    } catch (_: Exception) {}
+}
+
+/**
+ * This uses light-graylisted Android APIs. Verified that it works in devices running APIs 21
+ * and 28. Source: https://gist.github.com/carranca/7e3414622ad7fc6ef375c8cd8dc840c9
+ */
+private fun TextView.setSelectHandleColor(@ColorInt color: Int) {
+    // Retrieve a reference to this text field's android.widget.Editor
+    val editor = getEditor()
+
+    handles.forEach {
+        // Retrieve the field pointing to the drawable currently being used for the select handle
+        val resourceField = TextView::class.java.getDeclaredField(it.resourceFieldName)
+        resourceField.isAccessible = true
+
+        // Retrieve the drawable resource from that field
+        val drawableId = resourceField.getInt(this)
+        val drawable = ContextCompat.getDrawable(context, drawableId)
+
+        // Apply a filter on that drawable with the desired colour
+        drawable?.setColorFilter(color, PorterDuff.Mode.SRC_IN)
+
+        // Override the drawable being used by the Editor with our coloured drawable
+        val selectHandleField = editor.javaClass.getDeclaredField(it.selectHandleFieldName)
+        selectHandleField.isAccessible = true
+        selectHandleField.set(editor, drawable)
+    }
+}
+
+private class HandleDescriptor(val resourceFieldName: String, val selectHandleFieldName: String)
+
+private val handles =
+    arrayOf(
+        HandleDescriptor(
+            resourceFieldName = "mTextSelectHandleRes",
+            selectHandleFieldName = "mSelectHandleCenter",
+        ),
+        HandleDescriptor(
+            resourceFieldName = "mTextSelectHandleLeftRes",
+            selectHandleFieldName = "mSelectHandleLeft",
+        ),
+        HandleDescriptor(
+            resourceFieldName = "mTextSelectHandleRightRes",
+            selectHandleFieldName = "mSelectHandleRight",
+        ),
+    )
+
+private fun TextView.getEditor(): Any {
+    val editorField = TextView::class.java.getDeclaredField("mEditor")
+    editorField.isAccessible = true
+    return editorField.get(this)
 }
 
 fun TextView.setCompoundDrawableTint(@ColorInt color: Int) {
