@@ -19,7 +19,7 @@
     <string name="attach_file">Datei hinzufügen</string>
     <string name="audio_recordings">Sprachnotizen</string>
     <string name="auto_backup">Automatisches Backup</string>
-    <string name="auto_backup_error_message">Überprüfe deine Einstellungen oder melde einen Bug</string>
+    <string name="auto_backup_error_message">Beim autom. Backup ist ein Fehler aufgetreten:\n\'%1$s\'\nÜberprüfe deine Einstellungen oder melde einen Bug</string>
     <string name="auto_backup_failed">NotallyX Auto Backup fehlgeschlagen</string>
     <string name="auto_backup_last">Letztes Backup</string>
     <string name="auto_backup_on_save">Autom. Backup beim Notiz-Speichern</string>

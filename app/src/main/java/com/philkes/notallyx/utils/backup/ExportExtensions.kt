@@ -61,6 +61,7 @@ import com.philkes.notallyx.utils.listZipFiles
 import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.logToFile
 import com.philkes.notallyx.utils.nameWithoutExtension
+import com.philkes.notallyx.utils.recreateDir
 import com.philkes.notallyx.utils.removeTrailingParentheses
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
@@ -80,7 +81,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
-import net.lingala.zip4j.exception.ZipException
 import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.EncryptionMethod
@@ -148,16 +148,7 @@ fun Context.createBackup(): Result {
                 )
             } catch (e: Exception) {
                 log(msg = "Failed creating backup to '$uri/$name'", throwable = e)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    if (
-                        checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
-                            PackageManager.PERMISSION_GRANTED
-                    ) {
-                        postErrorNotification(e)
-                    }
-                } else {
-                    postErrorNotification(e)
-                }
+                tryPostErrorNotification(e)
                 return Result.success(
                     Data.Builder().putString(OUTPUT_DATA_EXCEPTION, e.message).build()
                 )
@@ -222,10 +213,11 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
                 "Auto backup on note save (${savedNote?.let {"id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
             throwable = e,
         )
+        tryPostErrorNotification(e)
     }
 }
 
-fun ContextWrapper.checkAutoSave(
+suspend fun ContextWrapper.checkAutoSave(
     preferences: NotallyXPreferences,
     note: BaseNote? = null,
     forceFullBackup: Boolean = false,
@@ -236,7 +228,9 @@ fun ContextWrapper.checkAutoSave(
             if (forceFullBackup) {
                 deleteModifiedNoteBackup(backupPath)
             }
-            autoBackupOnSave(backupPath, preferences.backupPassword.value, note)
+            withContext(Dispatchers.IO) {
+                autoBackupOnSave(backupPath, preferences.backupPassword.value, note)
+            }
         }
     }
 }
@@ -258,78 +252,81 @@ fun ContextWrapper.exportAsZip(
     backupProgress: MutableLiveData<Progress>? = null,
 ): Int {
     backupProgress?.postValue(Progress(indeterminate = true))
-
     val tempFile = File.createTempFile("export", "tmp", cacheDir)
-    val zipFile =
-        ZipFile(tempFile, if (password != PASSWORD_EMPTY) password.toCharArray() else null)
-    val zipParameters =
-        ZipParameters().apply {
-            isEncryptFiles = password != PASSWORD_EMPTY
-            if (!compress) {
-                compressionLevel = CompressionLevel.NO_COMPRESSION
+    try {
+        val zipFile =
+            ZipFile(tempFile, if (password != PASSWORD_EMPTY) password.toCharArray() else null)
+        val zipParameters =
+            ZipParameters().apply {
+                isEncryptFiles = password != PASSWORD_EMPTY
+                if (!compress) {
+                    compressionLevel = CompressionLevel.NO_COMPRESSION
+                }
+                encryptionMethod = EncryptionMethod.AES
             }
-            encryptionMethod = EncryptionMethod.AES
-        }
 
-    val (databaseOriginal, databaseCopy) = copyDatabase()
-    zipFile.addFile(databaseCopy, zipParameters.copy(DATABASE_NAME))
-    databaseCopy.delete()
+        val (databaseOriginal, databaseCopy) = copyDatabase()
+        zipFile.addFile(databaseCopy, zipParameters.copy(DATABASE_NAME))
+        databaseCopy.delete()
 
-    val imageRoot = getExternalImagesDirectory()
-    val fileRoot = getExternalFilesDirectory()
-    val audioRoot = getExternalAudioDirectory()
+        val imageRoot = getExternalImagesDirectory()
+        val fileRoot = getExternalFilesDirectory()
+        val audioRoot = getExternalAudioDirectory()
 
-    val totalNotes = databaseOriginal.getBaseNoteDao().count()
-    val images = databaseOriginal.getBaseNoteDao().getAllImages().toFileAttachments()
-    val files = databaseOriginal.getBaseNoteDao().getAllFiles().toFileAttachments()
-    val audios = databaseOriginal.getBaseNoteDao().getAllAudios()
-    val totalAttachments = images.count() + files.count() + audios.size
-    backupProgress?.postValue(Progress(0, totalAttachments))
+        val totalNotes = databaseOriginal.getBaseNoteDao().count()
+        val images = databaseOriginal.getBaseNoteDao().getAllImages().toFileAttachments()
+        val files = databaseOriginal.getBaseNoteDao().getAllFiles().toFileAttachments()
+        val audios = databaseOriginal.getBaseNoteDao().getAllAudios()
+        val totalAttachments = images.count() + files.count() + audios.size
+        backupProgress?.postValue(Progress(0, totalAttachments))
 
-    val counter = AtomicInteger(0)
-    images.export(
-        zipFile,
-        zipParameters,
-        imageRoot,
-        SUBFOLDER_IMAGES,
-        this,
-        backupProgress,
-        totalAttachments,
-        counter,
-    )
-    files.export(
-        zipFile,
-        zipParameters,
-        fileRoot,
-        SUBFOLDER_FILES,
-        this,
-        backupProgress,
-        totalAttachments,
-        counter,
-    )
-    audios
-        .asSequence()
-        .flatMap { string -> Converters.jsonToAudios(string) }
-        .forEach { audio ->
-            try {
-                backupFile(zipFile, zipParameters, audioRoot, SUBFOLDER_AUDIOS, audio.name)
-            } catch (exception: Exception) {
-                log(TAG, throwable = exception)
-            } finally {
-                backupProgress?.postValue(Progress(counter.incrementAndGet(), totalAttachments))
+        val counter = AtomicInteger(0)
+        images.export(
+            zipFile,
+            zipParameters,
+            imageRoot,
+            SUBFOLDER_IMAGES,
+            this,
+            backupProgress,
+            totalAttachments,
+            counter,
+        )
+        files.export(
+            zipFile,
+            zipParameters,
+            fileRoot,
+            SUBFOLDER_FILES,
+            this,
+            backupProgress,
+            totalAttachments,
+            counter,
+        )
+        audios
+            .asSequence()
+            .flatMap { string -> Converters.jsonToAudios(string) }
+            .forEach { audio ->
+                try {
+                    backupFile(zipFile, zipParameters, audioRoot, SUBFOLDER_AUDIOS, audio.name)
+                } catch (exception: Exception) {
+                    log(TAG, throwable = exception)
+                } finally {
+                    backupProgress?.postValue(Progress(counter.incrementAndGet(), totalAttachments))
+                }
             }
-        }
 
-    zipFile.close()
-    contentResolver.openOutputStream(fileUri)?.use { outputStream ->
-        FileInputStream(zipFile.file).use { inputStream ->
-            inputStream.copyTo(outputStream)
-            outputStream.flush()
+        zipFile.close()
+        contentResolver.openOutputStream(fileUri)?.use { outputStream ->
+            FileInputStream(zipFile.file).use { inputStream ->
+                inputStream.copyTo(outputStream)
+                outputStream.flush()
+            }
+            zipFile.file.delete()
         }
-        zipFile.file.delete()
+        backupProgress?.postValue(Progress(inProgress = false))
+        return totalNotes
+    } finally {
+        tempFile.delete()
     }
-    backupProgress?.postValue(Progress(inProgress = false))
-    return totalNotes
 }
 
 fun Context.exportToZip(
@@ -337,29 +334,31 @@ fun Context.exportToZip(
     files: List<BackupFile>,
     password: String = PASSWORD_EMPTY,
 ): Boolean {
-    val tempDir = File(cacheDir, "tempZip").apply { mkdirs() }
-    val zipInputStream = contentResolver.openInputStream(zipUri) ?: return false
-    extractZipToDirectory(zipInputStream, tempDir, password)
-    files.forEach { file ->
-        val targetFile = File(tempDir, "${file.first?.let { "$it/" } ?: ""}${file.second.name}")
-        file.second.copyTo(targetFile, overwrite = true)
+    val tempDir = File(cacheDir, "export").recreateDir()
+    try {
+        val zipInputStream = contentResolver.openInputStream(zipUri) ?: return false
+        extractZipToDirectory(zipInputStream, tempDir, password)
+        files.forEach { file ->
+            val targetFile = File(tempDir, "${file.first?.let { "$it/" } ?: ""}${file.second.name}")
+            file.second.copyTo(targetFile, overwrite = true)
+        }
+        val zipOutputStream = contentResolver.openOutputStream(zipUri, "w") ?: return false
+        createZipFromDirectory(tempDir, zipOutputStream, password)
+    } finally {
+        tempDir.deleteRecursively()
     }
-    val zipOutputStream = contentResolver.openOutputStream(zipUri, "w") ?: return false
-    createZipFromDirectory(tempDir, zipOutputStream, password)
-    tempDir.deleteRecursively()
     return true
 }
 
 private fun extractZipToDirectory(zipInputStream: InputStream, outputDir: File, password: String) {
+    val tempZipFile = File.createTempFile("extractedZip", null, outputDir)
     try {
-        val tempZipFile = File.createTempFile("tempZip", ".zip", outputDir)
         tempZipFile.outputStream().use { zipOutputStream -> zipInputStream.copyTo(zipOutputStream) }
         val zipFile =
             ZipFile(tempZipFile, if (password != PASSWORD_EMPTY) password.toCharArray() else null)
         zipFile.extractAll(outputDir.absolutePath)
+    } finally {
         tempZipFile.delete()
-    } catch (e: ZipException) {
-        e.printStackTrace()
     }
 }
 
@@ -369,10 +368,9 @@ private fun createZipFromDirectory(
     password: String = PASSWORD_EMPTY,
     compress: Boolean = false,
 ) {
+    val tempZipFile = File.createTempFile("tempZip", ".zip")
     try {
-        val tempZipFile = File.createTempFile("tempZip", ".zip")
         tempZipFile.deleteOnExit()
-
         val zipFile =
             ZipFile(tempZipFile, if (password != PASSWORD_EMPTY) password.toCharArray() else null)
         val zipParameters =
@@ -386,9 +384,8 @@ private fun createZipFromDirectory(
             }
         zipFile.addFolder(sourceDir, zipParameters)
         tempZipFile.inputStream().use { inputStream -> inputStream.copyTo(zipOutputStream) }
+    } finally {
         tempZipFile.delete()
-    } catch (e: Exception) {
-        e.printStackTrace()
     }
 }
 
@@ -615,53 +612,65 @@ fun Context.exportPreferences(preferences: NotallyXPreferences, uri: Uri): Boole
     }
 }
 
-private fun Context.postErrorNotification(e: Throwable) {
-    getSystemService<NotificationManager>()?.let { manager ->
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            manager.createChannelIfNotExists(NOTIFICATION_CHANNEL_ID)
-        }
-        val notification =
-            NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
-                .setSmallIcon(R.drawable.error)
-                .setContentTitle(getString(R.string.auto_backup_failed))
-                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                .setStyle(
-                    NotificationCompat.BigTextStyle()
-                        .bigText(
-                            getString(
-                                R.string.auto_backup_error_message,
-                                "${e.javaClass.simpleName}: ${e.localizedMessage}",
+private fun Context.tryPostErrorNotification(e: Throwable) {
+    fun postErrorNotification(e: Throwable) {
+        getSystemService<NotificationManager>()?.let { manager ->
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                manager.createChannelIfNotExists(NOTIFICATION_CHANNEL_ID)
+            }
+            val notification =
+                NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
+                    .setSmallIcon(R.drawable.error)
+                    .setContentTitle(getString(R.string.auto_backup_failed))
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setStyle(
+                        NotificationCompat.BigTextStyle()
+                            .bigText(
+                                getString(
+                                    R.string.auto_backup_error_message,
+                                    "${e.javaClass.simpleName}: ${e.localizedMessage}",
+                                )
                             )
-                        )
-                )
-                .addAction(
-                    R.drawable.settings,
-                    getString(R.string.settings),
-                    PendingIntent.getActivity(
-                        this,
-                        0,
-                        Intent(this, MainActivity::class.java).apply {
-                            putExtra(MainActivity.EXTRA_FRAGMENT_TO_OPEN, R.id.Settings)
-                        },
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                    ),
-                )
-                .addAction(
-                    R.drawable.error,
-                    getString(R.string.report_bug),
-                    PendingIntent.getActivity(
-                        this,
-                        0,
-                        createReportBugIntent(
-                            e.stackTraceToString(),
-                            title = "Auto Backup failed",
-                            body = "Error occurred during auto backup, see logs below",
+                    )
+                    .addAction(
+                        R.drawable.settings,
+                        getString(R.string.settings),
+                        PendingIntent.getActivity(
+                            this,
+                            0,
+                            Intent(this, MainActivity::class.java).apply {
+                                putExtra(MainActivity.EXTRA_FRAGMENT_TO_OPEN, R.id.Settings)
+                            },
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                         ),
-                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-                    ),
-                )
-                .build()
-        manager.notify(NOTIFICATION_ID, notification)
+                    )
+                    .addAction(
+                        R.drawable.error,
+                        getString(R.string.report_bug),
+                        PendingIntent.getActivity(
+                            this,
+                            0,
+                            createReportBugIntent(
+                                e.stackTraceToString(),
+                                title = "Auto Backup failed",
+                                body = "Error occurred during auto backup, see logs below",
+                            ),
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                        ),
+                    )
+                    .build()
+            manager.notify(NOTIFICATION_ID, notification)
+        }
+    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        if (
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
+                PackageManager.PERMISSION_GRANTED
+        ) {
+            postErrorNotification(e)
+        }
+    } else {
+        postErrorNotification(e)
     }
 }
 
