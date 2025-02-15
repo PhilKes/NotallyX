@@ -5,8 +5,11 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSort
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.init
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.splitByChecked
 import com.philkes.notallyx.test.assertChildren
 import com.philkes.notallyx.test.assertOrder
+import com.philkes.notallyx.test.assertSize
 import com.philkes.notallyx.test.createListItem
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -30,13 +33,14 @@ open class ListItemSortedListTest {
     fun `init fixes null order values`() {
         items.init(
             listOf(
-                createListItem("A", id = 0, order = null),
-                createListItem("B", id = 1, order = null),
-                createListItem("C", id = 2, order = 2),
-                createListItem("D", id = 3, order = null),
-                createListItem("E", id = 4, order = null),
-                createListItem("F", id = 5, order = null),
-            )
+                    createListItem("A", id = 0, order = null),
+                    createListItem("B", id = 1, order = null),
+                    createListItem("C", id = 2, order = 2),
+                    createListItem("D", id = 3, order = null),
+                    createListItem("E", id = 4, order = null),
+                    createListItem("F", id = 5, order = null),
+                )
+                .init()
         )
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
@@ -49,13 +53,14 @@ open class ListItemSortedListTest {
     fun `init fixes duplicate order values`() {
         items.init(
             listOf(
-                createListItem("A", id = 0, order = 0),
-                createListItem("B", id = 1, order = 1),
-                createListItem("C", id = 2, order = 1),
-                createListItem("D", id = 3, order = 2),
-                createListItem("E", id = 4, order = 3),
-                createListItem("F", id = 5, order = 3),
-            )
+                    createListItem("A", id = 0, order = 0),
+                    createListItem("B", id = 1, order = 1),
+                    createListItem("C", id = 2, order = 1),
+                    createListItem("D", id = 3, order = 2),
+                    createListItem("E", id = 4, order = 3),
+                    createListItem("F", id = 5, order = 3),
+                )
+                .init()
         )
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
@@ -66,13 +71,14 @@ open class ListItemSortedListTest {
     fun `init with unordered input`() {
         items.init(
             listOf(
-                createListItem("A", id = 0, order = 0),
-                createListItem("F", id = 5, order = 5),
-                createListItem("D", id = 3, order = 3),
-                createListItem("E", id = 4, order = 4),
-                createListItem("C", id = 2, order = 2),
-                createListItem("B", id = 1, order = 1),
-            )
+                    createListItem("A", id = 0, order = 0),
+                    createListItem("F", id = 5, order = 5),
+                    createListItem("D", id = 3, order = 3),
+                    createListItem("E", id = 4, order = 4),
+                    createListItem("C", id = 2, order = 2),
+                    createListItem("B", id = 1, order = 1),
+                )
+                .init()
         )
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
@@ -80,50 +86,36 @@ open class ListItemSortedListTest {
     }
 
     @Test
-    fun `init with checked items`() {
-        items.init(
+    fun `split by checked items`() {
+        val list =
             listOf(
-                createListItem("D", id = 3, order = 3),
-                createListItem("E", id = 4, order = 4),
-                createListItem("F", id = 5, order = 5),
-                createListItem("A", id = 0, order = 0, checked = true),
-                createListItem("B", id = 1, order = 1, checked = true, isChild = true),
-                createListItem("C", id = 2, order = 2, checked = true, isChild = true),
-            )
-        )
-
-        items.assertOrder("D", "E", "F", "A", "B", "C")
-        assertOrders(3, 4, 5, 0, 1, 2)
-    }
-
-    @Test
-    fun `init with unordered checked items`() {
-        items.init(
-            listOf(
-                createListItem("A", id = 0, order = 0, checked = true),
-                createListItem("B", id = 1, order = 1, checked = true, isChild = true),
-                createListItem("C", id = 2, order = 2, checked = true, isChild = true),
-                createListItem("D", id = 3, order = 3),
-                createListItem("E", id = 4, order = 4),
-                createListItem("F", id = 5, order = 5),
-            )
-        )
-
-        items.assertOrder("D", "E", "F", "A", "B", "C")
-        assertOrders(3, 4, 5, 0, 1, 2)
+                    createListItem("D", id = 3, order = 3),
+                    createListItem("E", id = 4, order = 4),
+                    createListItem("F", id = 5, order = 5),
+                    createListItem("A", id = 0, order = 0, checked = true),
+                    createListItem("B", id = 1, order = 1, checked = true, isChild = true),
+                    createListItem("C", id = 2, order = 2, checked = true, isChild = true),
+                )
+                .init()
+        val (checkedItems, items) = list.splitByChecked()
+        items.assertSize(3)
+        checkedItems.assertSize(3)
+        items.assertOrder("D", "E", "F")
+        checkedItems.assertOrder("A", "B", "C")
     }
 
     @Test
     fun `init with first item is child`() {
         items.init(
             listOf(
-                createListItem("A", id = 0, order = 0, isChild = true),
-                createListItem("B", id = 1, order = 1),
-                createListItem("C", id = 2, order = 2),
-                createListItem("D", id = 3, order = 3, isChild = true),
-                createListItem("E", id = 4, order = 4, isChild = true),
-                createListItem("F", id = 5, order = 5),
-            )
+                    createListItem("A", id = 0, order = 0, isChild = true),
+                    createListItem("B", id = 1, order = 1),
+                    createListItem("C", id = 2, order = 2),
+                    createListItem("D", id = 3, order = 3, isChild = true),
+                    createListItem("E", id = 4, order = 4, isChild = true),
+                    createListItem("F", id = 5, order = 5),
+                )
+                .init()
         )
 
         items.assertOrder("A", "B", "C", "D", "E", "F")

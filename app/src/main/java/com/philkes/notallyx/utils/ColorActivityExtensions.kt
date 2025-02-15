@@ -74,7 +74,7 @@ fun Activity.showColorSelectDialog(
             },
         )
     DialogColorBinding.inflate(layoutInflater).apply {
-        RecyclerView.adapter = colorAdapter
+        MainListView.adapter = colorAdapter
         dialog.setView(root)
         dialog.setOnShowListener {
             setNavigationbarLight?.let { dialog.window?.setLightStatusAndNavBar(it) }
@@ -230,7 +230,7 @@ private fun Activity.showDeleteColorDialog(
             },
         )
     DialogColorBinding.inflate(layoutInflater).apply {
-        RecyclerView.apply {
+        MainListView.apply {
             updatePadding(left = 2.dp, right = 2.dp)
             (layoutManager as? GridLayoutManager)?.let { it.spanCount = 6 }
             adapter = colorAdapter

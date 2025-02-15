@@ -6,6 +6,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertIds
 import com.philkes.notallyx.test.assertOrder
+import com.philkes.notallyx.test.assertSize
 import org.junit.Test
 
 class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
@@ -58,9 +59,9 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeChecked(0, true)
         listManager.changeChecked(3, true)
-        listManager.changeChecked(0, false)
+        listManager.changeChecked(0, false, isFromCheckedList = true)
         listManager.changeChecked(4, true)
-        listManager.changeChecked(1, false)
+        listManager.changeChecked(0, false, isFromCheckedList = true)
         listManager.changeChecked(2, true)
         val bodiesAfterMove = items.map { it.body }.toTypedArray()
         val checkedValues = items.map { it.checked }.toBooleanArray()
@@ -83,11 +84,12 @@ class ListManagerWithChangeHistoryTest : ListManagerTestBase() {
         listManager.changeIsChild(2, true)
         listManager.changeIsChild(3, true)
         listManager.changeChecked(1, checked = true, pushChange = true)
-        listManager.changeChecked(4, checked = false, pushChange = true)
+        listManager.changeChecked(2, checked = false, isFromCheckedList = true, pushChange = true)
 
         changeHistory.undo()
 
-        items.assertOrder("A", "E", "F", "B", "C", "D")
+        items.assertOrder("A", "E", "F")
+        itemsChecked!!.assertOrder("B", "C", "D")
         "B".assertIsChecked()
         "C".assertIsChecked()
         "D".assertIsChecked()

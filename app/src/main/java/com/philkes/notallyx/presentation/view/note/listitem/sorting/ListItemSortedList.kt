@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.view.note.listitem.sorting
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.areAllChecked
 import com.philkes.notallyx.data.model.deepCopy
 
 class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<ListItem>) :
@@ -24,6 +25,27 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
         return position
     }
 
+    fun addSimple(item: ListItem): Int {
+        return super.add(item)
+    }
+
+    fun removeWithChildren(item: ListItem) {
+        beginBatchedUpdates()
+        if (item.isChild) {
+            findParent(item)?.let { (_, parent) -> parent.children.remove(item) }
+        }
+        item.children.forEach { remove(it) }
+        remove(item)
+        endBatchedUpdates()
+    }
+
+    fun addWithChildren(parent: ListItem) {
+        beginBatchedUpdates()
+        addSimple(parent)
+        parent.children.forEach { addSimple(it) }
+        endBatchedUpdates()
+    }
+
     fun add(item: ListItem, isChild: Boolean?) {
         if (isChild != null) {
             forceItemIsChild(item, isChild)
@@ -42,7 +64,7 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
         }
         if (item.isChild != newValue) {
             if (!item.isChild) {
-                item.children.clear()
+                //                item.children.clear()
             } else {
                 removeChildFromParent(item)
             }
@@ -55,18 +77,24 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
 
     override fun removeItemAt(index: Int): ListItem {
         val item = this[index]
-        val removedItem = super.removeItemAt(index)
+        val removedItem = removeItemAtSimple(index)
         if (item?.isChild == true) {
             removeChildFromParent(item)
         }
         return removedItem
     }
 
-    fun init(items: Collection<ListItem>, resetIds: Boolean = true) {
+    fun removeItemAtSimple(index: Int): ListItem = super.removeItemAt(index)
+
+    //    fun init(items: Collection<ListItem>, resetIds: Boolean = true) {
+    //        beginBatchedUpdates()
+    //        val initializedItems = items.init(resetIds)
+    //        internalSetItems(initializedItems)
+    //        endBatchedUpdates()
+    //    }
+    fun init(items: Collection<ListItem>) {
         beginBatchedUpdates()
-        val initializedItems = items.deepCopy()
-        initList(initializedItems, resetIds)
-        internalSetItems(initializedItems)
+        internalSetItems(items)
         endBatchedUpdates()
     }
 
@@ -152,53 +180,6 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
         }
     }
 
-    private fun initList(list: List<ListItem>, resetIds: Boolean) {
-        if (resetIds) {
-            list.forEachIndexed { index, item -> item.id = index }
-        }
-        initOrders(list)
-        initChildren(list)
-    }
-
-    private fun initChildren(list: List<ListItem>) {
-        list.forEach { it.children.clear() }
-        var parent: ListItem? = null
-        list.forEach { item ->
-            if (item.isChild && parent != null) {
-                parent!!.children.add(item)
-            } else {
-                item.isChild = false
-                parent = item
-            }
-        }
-    }
-
-    /** Makes sure every [ListItem.order] is valid and correct */
-    private fun initOrders(list: List<ListItem>): Boolean {
-        var orders = list.map { it.order }.toMutableList()
-        var invalidOrderFound = false
-        list.forEachIndexed { idx, item ->
-            if (item.order == null || orders.count { it == idx } > 1) {
-                invalidOrderFound = true
-                if (orders.contains(idx)) {
-                    shiftAllOrdersAfterItem(list, item)
-                }
-                item.order = idx
-                orders = list.map { it.order }.toMutableList()
-            }
-        }
-        return invalidOrderFound
-    }
-
-    private fun shiftAllOrdersAfterItem(list: List<ListItem>, item: ListItem) {
-        // Move all orders after the item to ensure no duplicate orders
-        val sortedByOrders = list.sortedBy { it.order }
-        val position = sortedByOrders.indexOfFirst { it.id == item.id }
-        for (i in position + 1..sortedByOrders.lastIndex) {
-            sortedByOrders[i].order = sortedByOrders[i].order!! + 1
-        }
-    }
-
     fun updateChildInParent(position: Int, item: ListItem) {
         val childIndex: Int?
         val parentInfo = findParent(item)
@@ -218,13 +199,71 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
     }
 
     /** @return position of the found item and its difference to index */
-    private fun findLastIsNotChild(index: Int): Int? {
+    fun findLastIsNotChild(index: Int): Int? {
         if (index < 0) return null
+        if (index > lastIndex) return null
         for (i in index downTo 0) {
             if (!this[i].isChild) {
                 return i
             }
         }
         return null
+    }
+}
+
+fun Collection<ListItem>.init(resetIds: Boolean = true): List<ListItem> {
+    val initializedItems = deepCopy()
+    initList(initializedItems, resetIds)
+    return initializedItems
+}
+
+fun List<ListItem>.splitByChecked(): Pair<List<ListItem>, List<ListItem>> = partition {
+    it.checked && (!it.isChild || findParent(it)?.second?.children?.areAllChecked() == true)
+}
+
+private fun initList(list: List<ListItem>, resetIds: Boolean) {
+    if (resetIds) {
+        list.forEachIndexed { index, item -> item.id = index }
+    }
+    initOrders(list)
+    initChildren(list)
+}
+
+private fun initChildren(list: List<ListItem>) {
+    list.forEach { it.children.clear() }
+    var parent: ListItem? = null
+    list.forEach { item ->
+        if (item.isChild && parent != null) {
+            parent!!.children.add(item)
+        } else {
+            item.isChild = false
+            parent = item
+        }
+    }
+}
+
+/** Makes sure every [ListItem.order] is valid and correct */
+private fun initOrders(list: List<ListItem>): Boolean {
+    var orders = list.map { it.order }.toMutableList()
+    var invalidOrderFound = false
+    list.forEachIndexed { idx, item ->
+        if (item.order == null || orders.count { it == idx } > 1) {
+            invalidOrderFound = true
+            if (orders.contains(idx)) {
+                shiftAllOrdersAfterItem(list, item)
+            }
+            item.order = idx
+            orders = list.map { it.order }.toMutableList()
+        }
+    }
+    return invalidOrderFound
+}
+
+private fun shiftAllOrdersAfterItem(list: List<ListItem>, item: ListItem) {
+    // Move all orders after the item to ensure no duplicate orders
+    val sortedByOrders = list.sortedBy { it.order }
+    val position = sortedByOrders.indexOfFirst { it.id == item.id }
+    for (i in position + 1..sortedByOrders.lastIndex) {
+        sortedByOrders[i].order = sortedByOrders[i].order!! + 1
     }
 }

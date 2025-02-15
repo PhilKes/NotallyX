@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.philkes.notallyx.data.model.ListItem
 
 /** ItemTouchHelper.Callback that allows dragging ListItem with its children. */
 class ListItemDragCallback(private val elevation: Float, internal val listManager: ListManager) :
@@ -15,7 +14,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
     private var lastIsCurrentlyActive = false
     private var childViewHolders: List<ViewHolder> = mutableListOf()
 
-    private var itemsBefore: List<ListItem>? = null
+    private var stateBefore: ListState? = null
     private var positionFrom: Int? = null
     private var positionTo: Int? = null
     private var newPosition: Int? = null
@@ -40,7 +39,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
 
     internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
-            itemsBefore = listManager.getItems()
+            stateBefore = listManager.getState()
             listManager.startDrag(from)
         }
         val swapped =
@@ -120,7 +119,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
         positionFrom = null
         positionTo = null
         newPosition = null
-        itemsBefore = null
+        stateBefore = null
     }
 
     internal fun onDragEnd() {
@@ -131,13 +130,13 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
         if (positionFrom == positionTo) {
             return
         }
-        if (newPosition != null && itemsBefore != null) {
+        if (newPosition != null && stateBefore != null) {
             // The items have already been moved accordingly via move() calls
             listManager.finishMove(
                 positionFrom!!,
                 positionTo!!,
                 newPosition!!,
-                itemsBefore!!,
+                stateBefore!!,
                 updateIsChild = true,
                 updateChildren = true,
                 pushChange = true,

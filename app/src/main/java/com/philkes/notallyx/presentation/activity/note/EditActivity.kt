@@ -70,6 +70,7 @@ import com.philkes.notallyx.presentation.view.note.preview.PreviewImageAdapter
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
+import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
@@ -216,10 +217,7 @@ abstract class EditActivity(private val type: Type) :
         selectLabelsActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    val list =
-                        result.data?.getStringArrayListExtra(
-                            SelectLabelsActivity.EXTRA_SELECTED_LABELS
-                        )
+                    val list = result.data?.getStringArrayListExtra(EXTRA_SELECTED_LABELS)
                     if (list != null && list != notallyModel.labels) {
                         notallyModel.setLabels(list)
                         binding.LabelGroup.bindLabels(
@@ -871,7 +869,8 @@ abstract class EditActivity(private val type: Type) :
                 setControlsContrastColorForAllViews(colorInt)
             }
             root.setBackgroundColor(colorInt)
-            RecyclerView.setBackgroundColor(colorInt)
+            MainListView.setBackgroundColor(colorInt)
+            CheckedListView.setBackgroundColor(colorInt)
             Toolbar.backgroundTintList = ColorStateList.valueOf(colorInt)
             Toolbar.setControlsContrastColorForAllViews(colorInt)
         }
@@ -893,10 +892,15 @@ abstract class EditActivity(private val type: Type) :
         when (type) {
             Type.NOTE -> {
                 binding.AddItem.visibility = GONE
-                binding.RecyclerView.visibility = GONE
+                binding.MainListView.visibility = GONE
+                binding.CheckedListView.visibility = GONE
             }
             Type.LIST -> {
                 binding.EnterBody.visibility = GONE
+                binding.CheckedListView.visibility =
+                    if (preferences.listItemSorting.value == ListItemSort.AUTO_SORT_BY_CHECKED)
+                        VISIBLE
+                    else GONE
             }
         }
 

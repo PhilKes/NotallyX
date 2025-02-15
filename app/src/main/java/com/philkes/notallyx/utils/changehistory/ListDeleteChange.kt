@@ -1,22 +1,18 @@
 package com.philkes.notallyx.utils.changehistory
 
-import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.view.note.listitem.ListState
 
-class ListDeleteChange(
-    internal val itemOrder: Int,
-    internal val deletedItem: ListItem,
-    private val listManager: ListManager,
-) : Change {
-    override fun redo() {
-        listManager.deleteById(deletedItem.id, pushChange = false)
-    }
+class ListDeleteChange(old: ListState, new: ListState, private val listManager: ListManager) :
+    ValueChange<ListState>(new, old) {
 
-    override fun undo() {
-        listManager.add(itemOrder, deletedItem, pushChange = false)
+    override fun update(value: ListState, isUndo: Boolean) {
+        // Since checked Changes can be quite complex (with auto-sort) simply use snapshots
+        // before/after
+        listManager.setItems(if (isUndo) oldValue else newValue)
     }
 
     override fun toString(): String {
-        return "DeleteChange id: ${deletedItem.id} itemOrder: $itemOrder deletedItem: $deletedItem"
+        return "ListDeleteChange"
     }
 }

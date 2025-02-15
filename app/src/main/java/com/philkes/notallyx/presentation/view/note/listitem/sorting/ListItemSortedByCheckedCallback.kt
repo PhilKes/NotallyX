@@ -17,19 +17,23 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
         this.items = items
     }
 
+    private fun compareOrder(item1: ListItem, item2: ListItem) =
+        item1.order!!.compareTo(item2.order!!)
+
     override fun compare(item1: ListItem?, item2: ListItem?): Int {
         return when {
             item1 == null && item2 == null -> 0
             item1 == null && item2 != null -> -1
             item1 != null && item2 == null -> 1
-            item1!!.id == item2!!.id -> if (item1.checked) -1 else 1
+            //            item1 == item2 -> 0
+            item1!!.id == item2!!.id -> 0 // TODO should return 0 ?
             item1.isDragged && !item2.isDragged || !item1.isDragged && item2.isDragged ->
                 item1.order!!.compareTo(item2.order!!)
             item1.isChild && item2.isChild -> {
                 val parent1 = items.findParent(item1)!!.second
                 val parent2 = items.findParent(item2)!!.second
                 return when {
-                    parent1.id == parent2.id -> compareChecked(item1, item2)
+                    parent1.id == parent2.id -> compareOrder(item1, item2)
                     else -> compare(parent1, parent2)
                 }
             }
@@ -42,7 +46,7 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
                         items.findParent(item2)!!.second
                     }
                 return when {
-                    item1.id == parent2.id -> compareChecked(item1, item2)
+                    item1.id == parent2.id -> compareOrder(item1, item2)
                     else -> compare(item1, parent2)
                 }
             }
@@ -55,12 +59,13 @@ class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
                         items.findParent(item1)!!.second
                     }
                 when {
-                    item2.id == parent1.id -> compareChecked(item1, item2)
+                    item2.id == parent1.id -> compareOrder(item1, item2)
                     else -> compare(parent1, item2)
                 }
             }
 
-            else -> compareChecked(item1, item2)
+            //            else -> compareChecked(item1, item2)
+            else -> compareOrder(item1, item2)
         }
     }
 
