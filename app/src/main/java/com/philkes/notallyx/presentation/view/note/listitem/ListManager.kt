@@ -200,6 +200,9 @@ class ListManager(
             items.removeChildFromParent(item)
             items.updateChildInParent(newPosition, item)
         }
+        if (positionTo == 0) {
+            items.refreshItem(1)
+        }
         if (pushChange) {
             changeHistory.push(ListMoveChange(stateBefore, getState(), this))
         }
@@ -462,8 +465,8 @@ class ListManager(
                 getItem(position).order!!
             }
 
-        items.shiftItemOrdersHigher(order, 1)
-        itemsChecked?.shiftItemOrdersHigher(order, 1)
+        items.shiftItemOrdersHigher(order, 1 + newItem.children.size)
+        itemsChecked?.shiftItemOrdersHigher(order, 1 + newItem.children.size)
 
         newItem.order = order
         newItem.children.forEachIndexed { index, child -> child.order = order + index + 1 }
@@ -476,19 +479,9 @@ class ListManager(
             }
         if (forceIsChild == true) {
             newItem.isChild = true
-            val parent = items.findParent(newItem)
-            if (parent != null) {
-                val parentItem = parent.second
-                parentItem.children.add(newItem)
-                items.addWithChildren(parentItem)
-            } else {
-                val actualPosition = position.coerceAtMost(items.lastIndex)
-                items.findLastIsNotChild(actualPosition - 1)?.let { parentPos ->
-                    val parentItem = items[parentPos]
-                    parentItem.children.add(actualPosition - parentPos - 1, newItem)
-                    items.addWithChildren(parentItem)
-                }
-            }
+            val actualPosition = position.coerceAtMost(items.lastIndex)
+            items.updateChildInParent(actualPosition, newItem, clearChildren = false)
+            items.addWithChildren(newItem)
         } else {
             newItem.isChild = forceIsChild ?: newItem.isChild
             items.addWithChildren(newItem)
