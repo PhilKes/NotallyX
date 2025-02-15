@@ -61,7 +61,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        val layoutManager = binding?.RecyclerView?.layoutManager as? LinearLayoutManager
+        val layoutManager = binding?.MainListView?.layoutManager as? LinearLayoutManager
         if (layoutManager != null) {
             val firstVisiblePosition = layoutManager.findFirstVisibleItemPosition()
             if (firstVisiblePosition != RecyclerView.NO_POSITION) {
@@ -87,8 +87,8 @@ abstract class NotallyFragment : Fragment(), ItemListener {
             val scrollPosition = bundle.getInt(EXTRA_SCROLL_POS, -1)
             val scrollOffset = bundle.getInt(EXTRA_SCROLL_OFFSET, 0)
             if (scrollPosition > -1) {
-                binding?.RecyclerView?.post {
-                    val layoutManager = binding?.RecyclerView?.layoutManager as? LinearLayoutManager
+                binding?.MainListView?.post {
+                    val layoutManager = binding?.MainListView?.layoutManager as? LinearLayoutManager
                     layoutManager?.scrollToPositionWithOffset(scrollPosition, scrollOffset)
                 }
             }
@@ -254,12 +254,12 @@ abstract class NotallyFragment : Fragment(), ItemListener {
             object : RecyclerView.AdapterDataObserver() {
                 override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
                     if (itemCount > 0) {
-                        binding?.RecyclerView?.scrollToPosition(positionStart)
+                        binding?.MainListView?.scrollToPosition(positionStart)
                     }
                 }
             }
         )
-        binding?.RecyclerView?.apply {
+        binding?.MainListView?.apply {
             adapter = notesAdapter
             setHasFixedSize(false)
         }
@@ -293,7 +293,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
     }
 
     private fun setupRecyclerView() {
-        binding?.RecyclerView?.layoutManager =
+        binding?.MainListView?.layoutManager =
             if (model.preferences.notesView.value == NotesView.GRID) {
                 StaggeredGridLayoutManager(2, RecyclerView.VERTICAL)
             } else LinearLayoutManager(requireContext())

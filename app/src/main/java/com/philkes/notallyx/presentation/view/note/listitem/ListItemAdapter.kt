@@ -16,6 +16,7 @@ class ListItemAdapter(
     elevation: Float,
     private val preferences: NotallyXPreferences,
     private val listManager: ListManager,
+    private val isCheckedListAdapter: Boolean,
 ) : RecyclerView.Adapter<ListItemVH>() {
 
     private lateinit var list: ListItemSortedList
@@ -45,7 +46,7 @@ class ListItemAdapter(
         val inflater = LayoutInflater.from(parent.context)
         val binding = RecyclerListItemBinding.inflate(inflater, parent, false)
         binding.root.background = parent.background
-        return ListItemVH(binding, listManager, touchHelper, textSize)
+        return ListItemVH(binding, listManager, touchHelper, textSize, isCheckedListAdapter)
     }
 
     internal fun setBackgroundColor(@ColorInt color: Int) {

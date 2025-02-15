@@ -9,7 +9,7 @@ fun ListItem.findChild(childId: Int): ListItem? {
 }
 
 fun List<ListItem>.areAllChecked(except: ListItem? = null): Boolean {
-    return this.none { !it.checked && it != except }
+    return this.none { !it.checked && (except == null || it.id != except.id) }
 }
 
 fun MutableList<ListItem>.containsId(id: Int): Boolean {

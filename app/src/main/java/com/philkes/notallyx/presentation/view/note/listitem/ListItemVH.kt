@@ -29,6 +29,7 @@ class ListItemVH(
     val listManager: ListManager,
     touchHelper: ItemTouchHelper,
     textSize: TextSize,
+    val isInCheckedAutoSort: Boolean,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var dragHandleInitialY: Float = 0f
@@ -126,7 +127,9 @@ class ListItemVH(
     private fun updateDeleteButton(item: ListItem, position: Int) {
         binding.Delete.apply {
             visibility = if (item.checked) VISIBLE else INVISIBLE
-            setOnClickListener { listManager.delete(absoluteAdapterPosition) }
+            setOnClickListener {
+                listManager.delete(absoluteAdapterPosition, isFromCheckedList = isInCheckedAutoSort)
+            }
             contentDescription = "Delete$position"
         }
     }
@@ -144,7 +147,11 @@ class ListItemVH(
                     // TODO: when there are multiple checked items above it does not jump to the
                     // last
                     // unchecked item but always re-adds a new item
-                    listManager.delete(absoluteAdapterPosition, false) != null
+                    listManager.delete(
+                        absoluteAdapterPosition,
+                        isFromCheckedList = isInCheckedAutoSort,
+                        force = false,
+                    )
                 } else {
                     false
                 }
@@ -159,7 +166,7 @@ class ListItemVH(
         if (checkBoxListener == null) {
             checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
                 buttonView!!.setOnCheckedChangeListener(null)
-                listManager.changeChecked(absoluteAdapterPosition, isChecked)
+                listManager.changeChecked(absoluteAdapterPosition, isChecked, isInCheckedAutoSort)
                 buttonView.setOnCheckedChangeListener(checkBoxListener)
             }
         }
@@ -200,7 +207,11 @@ class ListItemVH(
                     if (text.trim().length > count) {
                         editText.setText(text.substring(0, start) + text.substring(start + count))
                     } else {
-                        listManager.delete(absoluteAdapterPosition, pushChange = false)
+                        listManager.delete(
+                            absoluteAdapterPosition,
+                            isFromCheckedList = isInCheckedAutoSort,
+                            pushChange = false,
+                        )
                     }
                     items.forEachIndexed { idx, it ->
                         listManager.add(absoluteAdapterPosition + idx + 1, it, pushChange = true)

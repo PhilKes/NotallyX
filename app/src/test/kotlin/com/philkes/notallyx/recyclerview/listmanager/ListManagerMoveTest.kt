@@ -126,17 +126,6 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.assertOrder("A", "B", "C", "D", "E", "F")
     }
 
-    @Test
-    fun `dont move parent under checked item if auto-sort enabled`() {
-        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
-        listManager.changeChecked(5, true)
-
-        val newPosition = listManager.move(2, 5)
-
-        assertNull(newPosition)
-        items.assertOrder("A", "B", "C", "D", "E", "F")
-    }
-
     // endregion
 
     // region undoMove
@@ -264,7 +253,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("Before")
 
         listItemDragCallback.simulateDrag(4, 2, "E".itemCount)
-        items.printList("After move 3 to 2")
+        items.printList("After move 4 to 2")
 
         items.assertOrder("A", "B", "E", "F", "C", "D")
         "A".assertChildren("B", "E", "F", "C")
@@ -351,31 +340,6 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.assertOrder("D", "A", "B", "C", "E", "F")
         "D".assertIsParent()
         "C".assertChildren()
-    }
-
-    @Test
-    fun `endDrag unchecked below unchecked over checked`() {
-        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
-        listManager.changeCheckedForAll(true, false)
-        listManager.changeChecked(1, false)
-        listManager.changeChecked(2, false)
-        listItemDragCallback.simulateDrag(0, 1, 1)
-
-        items.assertOrder("C", "B", "A", "D", "E", "F")
-    }
-
-    @Test
-    fun `endDrag over and under order of a checked item`() {
-        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
-        listManager.changeChecked(1, true)
-        listItemDragCallback.simulateDrag(1, 0, 1)
-        "C".assertOrder(0)
-        "A".assertOrder(1)
-        "B".assertOrder(2)
-        items.assertOrder("C", "A", "D", "E", "F", "B")
-        listManager.changeChecked(items.lastIndex, false)
-        listItemDragCallback.simulateDrag(0, 1, 1)
-        items.assertOrder("A", "C", "B", "D", "E", "F")
     }
 
     @Test
