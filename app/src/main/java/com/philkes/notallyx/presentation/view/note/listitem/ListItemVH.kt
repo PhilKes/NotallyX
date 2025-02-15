@@ -10,6 +10,7 @@ import android.widget.TextView.VISIBLE
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import cn.leaqi.drawer.SwipeDrawer.DIRECTION_LEFT
 import cn.leaqi.drawer.SwipeDrawer.STATE_CLOSE
 import cn.leaqi.drawer.SwipeDrawer.STATE_OPEN
@@ -166,7 +167,13 @@ class ListItemVH(
         if (checkBoxListener == null) {
             checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
                 buttonView!!.setOnCheckedChangeListener(null)
-                listManager.changeChecked(absoluteAdapterPosition, isChecked, isInCheckedAutoSort)
+                if (absoluteAdapterPosition != NO_POSITION) {
+                    listManager.changeChecked(
+                        absoluteAdapterPosition,
+                        isChecked,
+                        isInCheckedAutoSort,
+                    )
+                }
                 buttonView.setOnCheckedChangeListener(checkBoxListener)
             }
         }

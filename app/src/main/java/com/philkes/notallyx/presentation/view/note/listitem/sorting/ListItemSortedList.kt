@@ -25,6 +25,10 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
         return position
     }
 
+    fun refreshItem(position: Int) {
+        callback.onChanged(position, 1)
+    }
+
     fun addSimple(item: ListItem): Int {
         return super.add(item)
     }
@@ -180,7 +184,7 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
         }
     }
 
-    fun updateChildInParent(position: Int, item: ListItem) {
+    fun updateChildInParent(position: Int, item: ListItem, clearChildren: Boolean = true) {
         val childIndex: Int?
         val parentInfo = findParent(item)
         val parent: ListItem?
@@ -195,7 +199,9 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
         }
         parent!!.children.add(childIndex, item)
         parent.children.addAll(childIndex + 1, item.children)
-        item.children.clear()
+        if (clearChildren) {
+            item.children.clear()
+        }
     }
 
     /** @return position of the found item and its difference to index */
