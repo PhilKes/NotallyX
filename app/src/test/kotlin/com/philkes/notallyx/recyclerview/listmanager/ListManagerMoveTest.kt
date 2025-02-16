@@ -296,13 +296,14 @@ class ListManagerMoveTest : ListManagerTestBase() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
+        listManager.changeIsChild(5, true, false)
         items.printList("Before")
 
         listItemDragCallback.simulateDrag(3, 0, "D".itemCount)
         items.printList("After move 3 to 0")
 
-        items.assertOrder("D", "E", "A", "B", "C", "F")
-        "D".assertChildren("E")
+        items.assertOrder("D", "E", "F", "A", "B", "C")
+        "D".assertChildren("E", "F")
         "A".assertChildren("B")
     }
 
