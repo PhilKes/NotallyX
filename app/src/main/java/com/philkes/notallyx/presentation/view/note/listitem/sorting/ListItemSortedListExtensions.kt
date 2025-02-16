@@ -53,9 +53,10 @@ fun ListItemSortedList.moveItemRange(
             this.forceItemIsChild(it, forceIsChild, resetBefore = true)
         }
     }
-    // Have to recalc twice for relative order of children in parents
-    this.recalcPositions(itemsToMove.reversed().map { it.id })
-    this.recalcPositions(itemsToMove.reversed().map { it.id })
+    val itemIds = itemsToMove.map { it.id }
+    // Have to recalc the childs positions first
+    this.recalcPositions(itemIds.reversed())
+    this.recalcPositions(itemIds)
     this.endBatchedUpdates()
     val newPosition = this.indexOfFirst { it.id == itemsToMove[0].id }!!
     return newPosition
