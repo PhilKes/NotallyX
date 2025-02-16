@@ -97,7 +97,7 @@ const val OUTPUT_DATA_EXCEPTION = "exception"
 private const val ON_SAVE_BACKUP_FILE = "NotallyX_AutoBackup.zip"
 private const val PERIODIC_BACKUP_FILE_PREFIX = "NotallyX_Backup_"
 
-fun Context.createBackup(): Result {
+fun ContextWrapper.createBackup(): Result {
     val app = applicationContext as Application
     val preferences = NotallyXPreferences.getInstance(app)
     val (_, maxBackups) = preferences.periodicBackups.value
@@ -105,7 +105,11 @@ fun Context.createBackup(): Result {
 
     if (path != EMPTY_PATH) {
         val uri = Uri.parse(path)
-        val folder = requireNotNull(DocumentFile.fromTreeUri(app, uri))
+        val folder =
+            requireBackupFolder(
+                path,
+                "Periodic Backup failed, because auto-backup path '$path' is invalid",
+            ) ?: return Result.success()
         fun log(msg: String? = null, throwable: Throwable? = null, stackTrace: String? = null) {
             logToFile(
                 TAG,
@@ -116,67 +120,54 @@ fun Context.createBackup(): Result {
                 stackTrace = stackTrace,
             )
         }
-
-        if (folder.exists()) {
+        try {
             val formatter = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
             val backupFilePrefix = PERIODIC_BACKUP_FILE_PREFIX
             val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
             log(msg = "Creating '$uri/$name.zip'...")
-            try {
-                val zipUri = requireNotNull(folder.createFile(MIME_TYPE_ZIP, name)).uri
-                val exportedNotes =
-                    app.exportAsZip(zipUri, password = preferences.backupPassword.value)
-                log(msg = "Exported $exportedNotes notes")
-                val backupFiles = folder.listZipFiles(backupFilePrefix)
-                log(msg = "Found ${backupFiles.size} backups")
-                val backupsToBeDeleted = backupFiles.drop(maxBackups)
-                if (backupsToBeDeleted.isNotEmpty()) {
-                    log(
-                        msg =
-                            "Deleting ${backupsToBeDeleted.size} oldest backups (maxBackups: $maxBackups): ${backupsToBeDeleted.joinToString { "'${it.name.toString()}'" }}"
-                    )
-                }
-                backupsToBeDeleted.forEach {
-                    if (it.exists()) {
-                        it.delete()
-                    }
-                }
-                log(msg = "Finished backup to '$zipUri'")
-                preferences.periodicBackupLastExecution.save(Date().time)
-                return Result.success(
-                    Data.Builder().putString(OUTPUT_DATA_BACKUP_URI, zipUri.path!!).build()
-                )
-            } catch (e: Exception) {
-                log(msg = "Failed creating backup to '$uri/$name'", throwable = e)
-                tryPostErrorNotification(e)
-                return Result.success(
-                    Data.Builder().putString(OUTPUT_DATA_EXCEPTION, e.message).build()
+            val zipUri = requireNotNull(folder.createFile(MIME_TYPE_ZIP, name)).uri
+            val exportedNotes = app.exportAsZip(zipUri, password = preferences.backupPassword.value)
+            log(msg = "Exported $exportedNotes notes")
+            val backupFiles = folder.listZipFiles(backupFilePrefix)
+            log(msg = "Found ${backupFiles.size} backups")
+            val backupsToBeDeleted = backupFiles.drop(maxBackups)
+            if (backupsToBeDeleted.isNotEmpty()) {
+                log(
+                    msg =
+                        "Deleting ${backupsToBeDeleted.size} oldest backups (maxBackups: $maxBackups): ${backupsToBeDeleted.joinToString { "'${it.name.toString()}'" }}"
                 )
             }
-        } else {
-            log(msg = "Folder '${folder.uri}' does not exist, therefore skipping auto-backup")
+            backupsToBeDeleted.forEach {
+                if (it.exists()) {
+                    it.delete()
+                }
+            }
+            log(msg = "Finished backup to '$zipUri'")
+            preferences.periodicBackupLastExecution.save(Date().time)
+            return Result.success(
+                Data.Builder().putString(OUTPUT_DATA_BACKUP_URI, zipUri.path!!).build()
+            )
+        } catch (e: Exception) {
+            log(msg = "Failed creating backup to '$path'", throwable = e)
+            tryPostErrorNotification(e)
+            return Result.success(
+                Data.Builder().putString(OUTPUT_DATA_EXCEPTION, e.message).build()
+            )
         }
     }
     return Result.success()
 }
 
 fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedNote: BaseNote?) {
-    val backupFolder =
-        try {
-            DocumentFile.fromTreeUri(this, backupPath.toUri())!!
-        } catch (e: Exception) {
-            log(
-                TAG,
-                msg =
-                    "Auto backup on note save (${savedNote?.let {"id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed, because auto-backup path is invalid",
-                throwable = e,
-            )
-            return
-        }
+    val folder =
+        requireBackupFolder(
+            backupPath,
+            "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed, because auto-backup path '$backupPath' is invalid",
+        ) ?: return
     try {
-        var backupFile = backupFolder.findFile(ON_SAVE_BACKUP_FILE)
+        var backupFile = folder.findFile(ON_SAVE_BACKUP_FILE)
         if (savedNote == null || backupFile == null || !backupFile.exists()) {
-            backupFile = backupFolder.createFile(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE)
+            backupFile = folder.createFile(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE)
             exportAsZip(backupFile!!.uri, password = password)
         } else {
             NotallyDatabase.getDatabase(this, observePreferences = false).value.checkpoint()
@@ -207,13 +198,29 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
     } catch (e: Exception) {
         logToFile(
             TAG,
-            backupFolder,
+            folder,
             NOTALLYX_BACKUP_LOGS_FILE,
             msg =
-                "Auto backup on note save (${savedNote?.let {"id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
+                "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
             throwable = e,
         )
         tryPostErrorNotification(e)
+    }
+}
+
+private fun ContextWrapper.requireBackupFolder(path: String, msg: String): DocumentFile? {
+    return try {
+        val folder = DocumentFile.fromTreeUri(this, path.toUri())!!
+        if (!folder.exists()) {
+            log(TAG, msg = msg)
+            tryPostErrorNotification(IllegalArgumentException("Folder '$path' does not exist"))
+            return null
+        }
+        folder
+    } catch (e: Exception) {
+        log(TAG, msg = msg, throwable = e)
+        tryPostErrorNotification(IllegalArgumentException("Folder '$path' does not exist", e))
+        return null
     }
 }
 
