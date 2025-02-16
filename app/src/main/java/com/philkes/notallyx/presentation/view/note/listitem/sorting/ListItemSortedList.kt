@@ -35,11 +35,11 @@ class ListItemSortedList(private val callback: SortedListCustomNotifyCallback<Li
 
     fun removeWithChildren(item: ListItem) {
         beginBatchedUpdates()
+        item.children.forEach { remove(it) }
+        remove(item)
         if (item.isChild) {
             findParent(item)?.let { (_, parent) -> parent.children.remove(item) }
         }
-        item.children.forEach { remove(it) }
-        remove(item)
         endBatchedUpdates()
     }
 
