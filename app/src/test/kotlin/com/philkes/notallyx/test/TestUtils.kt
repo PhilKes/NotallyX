@@ -1,13 +1,13 @@
 package com.philkes.notallyx.test
 
 import android.util.Log
+import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.toReadableString
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableString
-import com.philkes.notallyx.utils.changehistory.ListAddChange
-import com.philkes.notallyx.utils.changehistory.ListDeleteChange
 import com.philkes.notallyx.utils.changehistory.ListIsChildChange
 import io.mockk.every
 import io.mockk.mockkStatic
@@ -73,6 +73,20 @@ fun ListItemSortedList.assertOrder(vararg itemBodies: String) {
     }
 }
 
+fun List<ListItem>.assertOrder(vararg itemBodies: String) {
+    itemBodies.forEachIndexed { position, s ->
+        assertEquals("${this.toReadableString()}\nAt position: $position", s, this[position].body)
+    }
+}
+
+fun <E> SortedList<E>.assertSize(expected: Int) {
+    assertEquals("size", expected, this.size())
+}
+
+fun <E> List<E>.assertSize(expected: Int) {
+    assertEquals("size", expected, this.size)
+}
+
 fun ListItemSortedList.assertIds(vararg itemIds: Int) {
     itemIds.forEachIndexed { position, s -> assertEquals("id", s, get(position).id) }
 }
@@ -116,15 +130,15 @@ fun ListIsChildChange.assert(newValue: Boolean, position: Int) {
     assertEquals("position", position, this.position)
 }
 
-fun ListAddChange.assert(position: Int, newItem: ListItem) {
-    assertEquals("position", position, this.position)
-    assertEquals("newItem", newItem, this.itemBeforeInsert)
-}
-
-fun ListDeleteChange.assert(order: Int, deletedItem: ListItem?) {
-    assertEquals("order", order, this.itemOrder)
-    assertEquals("deletedItem", deletedItem, this.deletedItem)
-}
+// fun ListAddChange.assert(position: Int, newItem: ListItem) {
+//    assertEquals("position", position, this.position)
+//    assertEquals("newItem", newItem, this.itemBeforeInsert)
+// }
+//
+// fun ListDeleteChange.assert(order: Int, deletedItem: ListItem?) {
+//    assertEquals("order", order, this.itemOrder)
+//    assertEquals("deletedItem", deletedItem, this.deletedItem)
+// }
 
 // fun ChangeCheckedForAllChange.assert(checked: Boolean, changedPositions: Collection<Int>) {
 //    assertEquals("checked", checked, this.checked)

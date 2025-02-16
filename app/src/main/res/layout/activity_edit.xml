@@ -152,13 +152,13 @@
                     android:textAppearance="?attr/textAppearanceBodyLarge" />
 
                 <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/RecyclerView"
+                    android:id="@+id/MainListView"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:clipToPadding="false"
                     android:overScrollMode="never"
                     android:paddingTop="4dp"
-                    android:paddingStart="14dp"
+                    android:paddingStart="8dp"
                     android:paddingEnd="4dp"
                     app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
@@ -178,6 +178,18 @@
                     android:textColor="?android:textColorHint"
                     android:textIsSelectable="false"
                     app:drawableStartCompat="@drawable/add" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                  android:id="@+id/CheckedListView"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:visibility="gone"
+                  android:clipToPadding="false"
+                  android:overScrollMode="never"
+                  android:paddingTop="4dp"
+                  android:paddingStart="14dp"
+                  android:paddingEnd="4dp"
+                  app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
                 <TextView
                     android:id="@+id/AudioHeader"

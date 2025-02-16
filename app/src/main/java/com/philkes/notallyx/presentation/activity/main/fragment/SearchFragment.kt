@@ -18,7 +18,7 @@ class SearchFragment : NotallyFragment() {
             }
         binding?.ChipGroup?.visibility = View.VISIBLE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            binding?.RecyclerView?.scrollIndicators = View.SCROLL_INDICATOR_TOP
+            binding?.MainListView?.scrollIndicators = View.SCROLL_INDICATOR_TOP
         }
         super.onViewCreated(view, savedInstanceState)
 

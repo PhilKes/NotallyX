@@ -66,15 +66,15 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
             currentImage = savedImage
         }
 
-        binding.RecyclerView.apply {
+        binding.MainListView.apply {
             setHasFixedSize(true)
             layoutManager =
                 LinearLayoutManager(this@ViewImageActivity, RecyclerView.HORIZONTAL, false)
-            PagerSnapHelper().attachToRecyclerView(binding.RecyclerView)
+            PagerSnapHelper().attachToRecyclerView(binding.MainListView)
         }
 
         val initial = intent.getIntExtra(EXTRA_POSITION, 0)
-        binding.RecyclerView.scrollToPosition(initial)
+        binding.MainListView.scrollToPosition(initial)
 
         val database = NotallyDatabase.getDatabase(application)
         val id = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0)
@@ -88,7 +88,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
 
                 val mediaRoot = application.getExternalImagesDirectory()
                 val adapter = ImageAdapter(mediaRoot, images)
-                binding.RecyclerView.adapter = adapter
+                binding.MainListView.adapter = adapter
                 setupToolbar(binding, adapter)
             }
         }
@@ -112,7 +112,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
     private fun setupToolbar(binding: ActivityViewImageBinding, adapter: ImageAdapter) {
         binding.Toolbar.setNavigationOnClickListener { finish() }
 
-        val layoutManager = binding.RecyclerView.layoutManager as LinearLayoutManager
+        val layoutManager = binding.MainListView.layoutManager as LinearLayoutManager
         adapter.registerAdapterDataObserver(
             object : RecyclerView.AdapterDataObserver() {
 
@@ -123,7 +123,7 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
             }
         )
 
-        binding.RecyclerView.addOnScrollListener(
+        binding.MainListView.addOnScrollListener(
             object : RecyclerView.OnScrollListener() {
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {

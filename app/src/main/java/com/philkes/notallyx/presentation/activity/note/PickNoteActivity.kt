@@ -58,7 +58,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
                 )
             }
 
-        binding.RecyclerView.apply {
+        binding.MainListView.apply {
             adapter = this@PickNoteActivity.adapter
             setHasFixedSize(true)
             layoutManager =

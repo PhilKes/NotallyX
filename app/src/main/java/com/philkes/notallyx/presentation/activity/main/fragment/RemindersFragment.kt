@@ -36,7 +36,7 @@ class RemindersFragment : Fragment(), NoteReminderListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         reminderAdapter = NoteReminderAdapter(this)
 
-        binding?.RecyclerView?.apply {
+        binding?.MainListView?.apply {
             initListView(requireContext())
             adapter = reminderAdapter
             binding?.ImageView?.setImageResource(R.drawable.notifications)

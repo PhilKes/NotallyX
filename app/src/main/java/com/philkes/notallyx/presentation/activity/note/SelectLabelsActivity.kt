@@ -84,7 +84,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
             }
         }
 
-        binding.RecyclerView.apply {
+        binding.MainListView.apply {
             setHasFixedSize(true)
             adapter = labelAdapter
             addItemDecoration(

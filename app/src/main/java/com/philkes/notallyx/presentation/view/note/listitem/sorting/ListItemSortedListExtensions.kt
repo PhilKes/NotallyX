@@ -40,30 +40,23 @@ fun ListItemSortedList.moveItemRange(
     } else {
         this.shiftItemOrders(toOrder until fromOrder, itemCount, shiftCheckedItemOrders)
     }
-
     val itemsToMove =
         (0 until itemCount)
             .map { this[fromIndex + it] }
             .mapIndexed { index, item ->
-                val movedItem = item.clone() as ListItem
+                val movedItem = item
                 movedItem.order = insertOrder + index
                 movedItem
             }
-    itemsToMove.forEach { listItem ->
-        this.updateItemAt(this.findById(listItem.id)!!.first, listItem)
-    }
-    itemsToMove.forEach {
+    itemsToMove.firstOrNull()?.let {
         if (forceIsChild != null) {
-            val (_, item) = this.findById(it.id)!!
-            this.forceItemIsChild(item, forceIsChild, resetBefore = true)
-            itemsToMove.forEach { listItem ->
-                this.updateItemAt(this.findById(listItem.id)!!.first, listItem)
-            }
+            this.forceItemIsChild(it, forceIsChild, resetBefore = true)
         }
     }
-    this.recalcPositions(
-        itemsToMove.reversed().map { it.id }
-    ) // make sure children are at correct positions
+    val itemIds = itemsToMove.map { it.id }
+    // Have to recalc the childs positions first
+    this.recalcPositions(itemIds.reversed())
+    this.recalcPositions(itemIds)
     this.endBatchedUpdates()
     val newPosition = this.indexOfFirst { it.id == itemsToMove[0].id }!!
     return newPosition
@@ -83,13 +76,21 @@ fun ListItemSortedList.deleteItem(
     return deletedItem
 }
 
+fun ListItemSortedList.shiftItemOrdersHigher(threshold: Int, valueToAdd: Int) {
+    this.forEach {
+        if (it.order!! >= threshold) {
+            it.order = it.order!! + valueToAdd
+        }
+    }
+}
+
 fun ListItemSortedList.shiftItemOrders(
-    positionRange: IntRange,
+    orderRange: IntRange,
     valueToAdd: Int,
     shiftCheckedItemOrders: Boolean,
 ) {
     this.forEach {
-        if (it.order!! in positionRange) {
+        if (it.order!! in orderRange) {
             it.order = it.order!! + valueToAdd
         }
     }
@@ -207,7 +208,20 @@ fun ListItemSortedList.toReadableString(): String {
     return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
 }
 
+fun ListItemSortedList.findParent(childPosition: Int): Pair<Int, ListItem>? {
+    return findParent(this[childPosition])
+}
+
 fun ListItemSortedList.findParent(childItem: ListItem): Pair<Int, ListItem>? {
+    this.indices.forEach {
+        if (this[it].findChild(childItem.id) != null) {
+            return Pair(it, this[it])
+        }
+    }
+    return null
+}
+
+fun List<ListItem>.findParent(childItem: ListItem): Pair<Int, ListItem>? {
     this.indices.forEach {
         if (this[it].findChild(childItem.id) != null) {
             return Pair(it, this[it])

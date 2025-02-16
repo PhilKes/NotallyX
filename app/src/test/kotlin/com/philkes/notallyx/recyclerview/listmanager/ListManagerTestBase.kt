@@ -3,7 +3,6 @@ package com.philkes.notallyx.recyclerview.listmanager
 import android.view.inputmethod.InputMethodManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
@@ -33,6 +32,7 @@ open class ListManagerTestBase {
 
     lateinit var recyclerView: RecyclerView
     protected lateinit var adapter: RecyclerView.Adapter<*>
+    protected lateinit var adapterChecked: RecyclerView.Adapter<*>
     protected lateinit var inputMethodManager: InputMethodManager
     protected lateinit var changeHistory: ChangeHistory
     protected lateinit var listItemVH: ListItemVH
@@ -40,6 +40,7 @@ open class ListManagerTestBase {
     protected lateinit var listItemDragCallback: ListItemDragCallback
 
     protected lateinit var items: ListItemSortedList
+    protected var itemsChecked: ListItemSortedList? = null
 
     lateinit var listManager: ListManager
 
@@ -50,13 +51,13 @@ open class ListManagerTestBase {
         mockAndroidLog()
         recyclerView = mock(RecyclerView::class.java)
         adapter = mock(RecyclerView.Adapter::class.java)
+        adapterChecked = mock(RecyclerView.Adapter::class.java)
         inputMethodManager = mock(InputMethodManager::class.java)
         changeHistory = ChangeHistory()
         listItemVH = mock(ListItemVH::class.java)
         preferences = mock(NotallyXPreferences::class.java)
         listManager =
             ListManager(recyclerView, changeHistory, preferences, inputMethodManager, {}) {}
-        listManager.adapter = adapter as RecyclerView.Adapter<ListItemVH>
         // Prepare view holder
         `when`(recyclerView.findViewHolderForAdapterPosition(anyInt())).thenReturn(listItemVH)
     }
@@ -70,6 +71,7 @@ open class ListManagerTestBase {
         items = ListItemSortedList(sortCallback)
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)
+            itemsChecked = ListItemSortedList(ListItemNoSortCallback(adapterChecked))
         }
         items.init(
             listOf(
@@ -81,7 +83,7 @@ open class ListManagerTestBase {
                 createListItem("F", id = 5, order = 5),
             )
         )
-        listManager.initList(items)
+        listManager.initList(items, itemsChecked)
         listItemDragCallback = ListItemDragCallback(1.0f, listManager)
         val listItemSortingPreference = mock(EnumPreference::class.java)
         `when`(listItemSortingPreference.value).thenReturn(sorting)
@@ -93,24 +95,24 @@ open class ListManagerTestBase {
         return this.find { it.body == body }!!
     }
 
-    protected fun <E> SortedList<E>.assertSize(expected: Int) {
-        assertEquals("size", expected, this.size())
+    protected fun findItem(function: (item: ListItem) -> Boolean): ListItem? {
+        return items.find(function) ?: itemsChecked?.find(function)
     }
 
     protected fun String.assertChildren(vararg childrenBodies: String) {
-        items.find { it.body == this }!!.assertChildren(*childrenBodies)
+        findItem { it.body == this }!!.assertChildren(*childrenBodies)
     }
 
     protected fun String.assertIsChecked() {
-        assertTrue("checked", items.find { it.body == this }!!.checked)
+        assertTrue("checked", findItem { it.body == this }!!.checked)
     }
 
     protected fun String.assertIsNotChecked() {
-        assertFalse("checked", items.find { it.body == this }!!.checked)
+        assertFalse("checked", findItem { it.body == this }!!.checked)
     }
 
     protected fun String.assertOrder(expected: Int) {
-        assertEquals("order", expected, items.find { it.body == this }!!.order)
+        assertEquals("order", expected, findItem { it.body == this }!!.order)
     }
 
     protected fun String.assertPosition(expected: Int) {
@@ -118,16 +120,16 @@ open class ListManagerTestBase {
     }
 
     protected fun String.assertIsParent() {
-        assertFalse(items.find { it.body == this }!!.isChild)
+        assertFalse(findItem { it.body == this }!!.isChild)
     }
 
     protected fun String.assertIsChild() {
-        assertTrue(items.find { it.body == this }!!.isChild)
+        assertTrue(findItem { it.body == this }!!.isChild)
     }
 
     protected val String.itemCount: Int
         get() {
-            return items.find { it.body == this }!!.itemCount
+            return findItem { it.body == this }!!.itemCount
         }
 
     protected fun ListManager.addWithChildren(

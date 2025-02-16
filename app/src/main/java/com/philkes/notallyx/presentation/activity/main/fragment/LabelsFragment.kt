@@ -44,7 +44,7 @@ class LabelsFragment : Fragment(), LabelListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         labelAdapter = LabelAdapter(this)
 
-        binding?.RecyclerView?.apply {
+        binding?.MainListView?.apply {
             initListView(requireContext())
             adapter = labelAdapter
             binding?.ImageView?.setImageResource(R.drawable.label)

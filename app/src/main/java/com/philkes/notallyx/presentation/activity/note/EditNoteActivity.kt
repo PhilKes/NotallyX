@@ -340,7 +340,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
             }
             requestLayout()
             val layout = BottomTextFormattingMenuBinding.inflate(layoutInflater, this, false)
-            layout.RecyclerView.apply {
+            layout.MainListView.apply {
                 textFormattingAdapter =
                     TextFormattingAdapter(this@EditNoteActivity, binding.EnterBody, colorInt)
                 adapter = textFormattingAdapter
