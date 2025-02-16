@@ -193,11 +193,7 @@ class ListManager(
             }
             val parentAfter = items.findParent(newPosition)?.second
             if (parentAfter != null) {
-                val uncheckParent =
-                    parentAfter.children.isNotEmpty() &&
-                        !parentAfter.children.areAllChecked() &&
-                        parentAfter.checked
-                if (uncheckParent) {
+                if (parentAfter.shouldParentBeUnchecked()) {
                     if (isAutoSortByCheckedEnabled()) {
                         uncheckWithAutoSort(parentAfter, uncheckChildren = false)
                     } else {
@@ -217,11 +213,7 @@ class ListManager(
             items.forceItemIsChild(item, forceValue, resetBefore = true)
             items.updateItemAt(items.findById(item.id)!!.first, item)
             if (parentBefore != null) {
-                val checkParent =
-                    parentBefore.children.isNotEmpty() &&
-                        parentBefore.children.areAllChecked() &&
-                        !parentBefore.checked
-                if (checkParent) {
+                if (parentBefore.shouldParentBeChecked()) {
                     changeCheckedParent(parentBefore, true)
                 }
             }
@@ -428,19 +420,20 @@ class ListManager(
     private fun delete(item: ListItem, isFromCheckedList: Boolean) {
         items.shiftItemOrdersHigher(item.order!!, -1)
         itemsChecked?.shiftItemOrdersHigher(item.order!!, -1)
+        val parent = findParent(item)?.second
         if (isFromCheckedList) {
             itemsChecked!!.removeWithChildren(item)
         } else {
             items.removeWithChildren(item)
         }
+        if (parent?.shouldParentBeChecked() == true) {
+            changeCheckedParent(parent, true)
+        }
     }
 
     private fun ListItemSortedList.deleteCheckedItems() {
         beginBatchedUpdates()
-        filter { it.checked }
-            .sortedBy { it.isChild }
-            .reversed() // delete children first so sorting works properly
-            .forEach { delete(it, this == itemsChecked) }
+        filter { it.checked }.sortedBy { it.isChild }.forEach { delete(it, this == itemsChecked) }
         endBatchedUpdates()
     }
 
@@ -556,6 +549,14 @@ class ListManager(
         return isChildOf(items[otherPosition])
     }
 
+    private fun ListItem.shouldParentBeUnchecked(): Boolean {
+        return children.isNotEmpty() && !children.areAllChecked() && checked
+    }
+
+    private fun ListItem.shouldParentBeChecked(): Boolean {
+        return children.isNotEmpty() && children.areAllChecked() && !checked
+    }
+
     fun startDrag(position: Int) {
         items[position].apply {
             isDragged = true
@@ -567,7 +568,7 @@ class ListManager(
         items.forEach { it.isDragged = false }
     }
 
-    fun findParent(item: ListItem) = items.findParent(item)
+    fun findParent(item: ListItem) = items.findParent(item) ?: itemsChecked?.findParent(item)
 
     companion object {
         private const val TAG = "ListManager"
