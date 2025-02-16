@@ -138,6 +138,7 @@ class ListManager(
         val itemFrom = items[positionFrom]
         //        val itemBeforeMove = itemFrom.clone() as ListItem
         val stateBefore = getState()
+        val parent = if (itemFrom.isChild) items.findParent(itemFrom)?.second else null
         // Disallow move unchecked item under any checked item (if auto-sort enabled)
         val autoSortByCheckedEnabled = isAutoSortByCheckedEnabled()
         if (autoSortByCheckedEnabled && itemTo.checked || itemTo.isChildOf(itemFrom)) {
@@ -164,7 +165,7 @@ class ListManager(
         if (newPosition == null) return null
 
         finishMove(
-            positionFrom,
+            parent,
             positionTo,
             newPosition,
             stateBefore,
@@ -176,7 +177,7 @@ class ListManager(
     }
 
     fun finishMove(
-        positionFrom: Int,
+        parentBefore: ListItem?,
         positionTo: Int,
         newPosition: Int,
         stateBefore: ListState,
@@ -190,12 +191,40 @@ class ListManager(
             } else if (newPosition == 0) {
                 items.setIsChild(newPosition, false)
             }
+            val parentAfter = items.findParent(newPosition)?.second
+            if (parentAfter != null) {
+                val uncheckParent =
+                    parentAfter.children.isNotEmpty() &&
+                        !parentAfter.children.areAllChecked() &&
+                        parentAfter.checked
+                if (uncheckParent) {
+                    if (isAutoSortByCheckedEnabled()) {
+                        uncheckWithAutoSort(parentAfter, uncheckChildren = false)
+                    } else {
+                        items.changeChecked(
+                            false,
+                            parentAfter,
+                            changeParentToo = false,
+                            changeChildren = false,
+                        )
+                    }
+                }
+            }
         }
         val item = items[newPosition]
         if (updateChildren) {
             val forceValue = item.isChild
             items.forceItemIsChild(item, forceValue, resetBefore = true)
             items.updateItemAt(items.findById(item.id)!!.first, item)
+            if (parentBefore != null) {
+                val checkParent =
+                    parentBefore.children.isNotEmpty() &&
+                        parentBefore.children.areAllChecked() &&
+                        !parentBefore.checked
+                if (checkParent) {
+                    changeCheckedParent(parentBefore, true)
+                }
+            }
         } else if (item.isChild && newPosition > 0) {
             items.removeChildFromParent(item)
             items.updateChildInParent(newPosition, item)
@@ -240,6 +269,7 @@ class ListManager(
         checked: Boolean,
         item: ListItem,
         changeParentToo: Boolean,
+        changeChildren: Boolean = true,
     ) {
         if (item.isChild) {
             findParent(item)?.let { (_, parent) ->
@@ -253,7 +283,9 @@ class ListManager(
         } else {
             val updatedParent = item.clone() as ListItem
             updatedParent.checked = checked
-            updatedParent.children.forEach { it.checked = checked }
+            if (changeChildren) {
+                updatedParent.children.forEach { it.checked = checked }
+            }
             addWithChildren(updatedParent)
         }
     }
@@ -265,7 +297,7 @@ class ListManager(
         itemsChecked!!.addWithChildren(parent)
     }
 
-    private fun uncheckWithAutoSort(item: ListItem) {
+    private fun uncheckWithAutoSort(item: ListItem, uncheckChildren: Boolean = true) {
         if (item.isChild) {
             val (_, parent) = itemsChecked!!.findParent(item)!!
             itemsChecked!!.removeWithChildren(parent)
@@ -275,7 +307,9 @@ class ListManager(
         } else {
             itemsChecked!!.removeWithChildren(item)
             item.checked = false
-            item.children.forEach { it.checked = false }
+            if (uncheckChildren) {
+                item.children.forEach { it.checked = false }
+            }
             items.addWithChildren(item)
         }
     }
@@ -532,6 +566,8 @@ class ListManager(
     fun endDrag() {
         items.forEach { it.isDragged = false }
     }
+
+    fun findParent(item: ListItem) = items.findParent(item)
 
     companion object {
         private const val TAG = "ListManager"

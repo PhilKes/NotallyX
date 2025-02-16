@@ -360,6 +360,70 @@ class ListManagerMoveTest : ListManagerTestBase() {
         "E".assertChildren("D")
     }
 
+    @Test
+    fun `endDrag last unchecked child from otherwise checked parent`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        listManager.changeIsChild(3, true, false)
+        listManager.changeIsChild(4, true, false)
+        listManager.changeChecked(3, true)
+
+        listItemDragCallback.simulateDrag(4, 1, 1)
+
+        items.assertOrder("A", "E", "B", "C", "D", "F")
+        "A".assertChildren("E")
+        "E".assertIsNotChecked()
+        "C".assertChildren("D")
+        "C".assertIsChecked()
+        "D".assertIsChecked()
+    }
+
+    @Test
+    fun `endDrag first unchecked child from otherwise checked parent`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        listManager.changeIsChild(3, true, false)
+        listManager.changeIsChild(4, true, false)
+        listManager.changeChecked(4, true)
+
+        listItemDragCallback.simulateDrag(3, 1, 1)
+
+        items.assertOrder("A", "D", "B", "C", "E", "F")
+        "A".assertChildren("D")
+        "D".assertIsNotChecked()
+        "C".assertChildren("E")
+        "C".assertIsChecked()
+        "E".assertIsChecked()
+    }
+
+    @Test
+    fun `endDrag unchecked child from otherwise checked parent with auto-sort`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(3, true, false)
+        listManager.changeIsChild(4, true, false)
+        listManager.changeChecked(3, true)
+
+        listItemDragCallback.simulateDrag(4, 1, 1)
+
+        items.assertOrder("A", "E", "B", "F")
+        itemsChecked!!.assertOrder("C", "D")
+        "A".assertChildren("E")
+        "E".assertIsNotChecked()
+    }
+
+    @Test
+    fun `endDrag unchecked child into checked parent`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        listManager.changeIsChild(1, true, false)
+        listManager.changeIsChild(4, true, false)
+        listManager.changeChecked(4, true)
+
+        listItemDragCallback.simulateDrag(1, 4, 1)
+
+        items.assertOrder("A", "C", "D", "E", "B")
+        "D".assertChildren("E", "B")
+        "D".assertIsNotChecked()
+        "E".assertIsChecked()
+        "B".assertIsNotChecked()
+    }
     // endregion
 
 }

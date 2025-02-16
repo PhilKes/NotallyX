@@ -208,6 +208,10 @@ fun ListItemSortedList.toReadableString(): String {
     return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
 }
 
+fun ListItemSortedList.findParent(childPosition: Int): Pair<Int, ListItem>? {
+    return findParent(this[childPosition])
+}
+
 fun ListItemSortedList.findParent(childItem: ListItem): Pair<Int, ListItem>? {
     this.indices.forEach {
         if (this[it].findChild(childItem.id) != null) {
