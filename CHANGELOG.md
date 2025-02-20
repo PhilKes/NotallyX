@@ -1,5 +1,45 @@
 # Changelog
 
+## [v7.1.0](https://github.com/PhilKes/NotallyX/tree/v7.1.0) (2025-02-20)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.0.0...v7.1.0)
+
+### Added Features
+
+- Dark mode for note colors [\#352](https://github.com/PhilKes/NotallyX/issues/352)
+- Add "new color" option when deleting a color [\#347](https://github.com/PhilKes/NotallyX/issues/347)
+- Make "Start view" as default view [\#339](https://github.com/PhilKes/NotallyX/issues/339)
+- Display first item as title for lists without title [\#317](https://github.com/PhilKes/NotallyX/issues/317)
+- Remove delete option from top bar since it's already in the bottom more menu  [\#316](https://github.com/PhilKes/NotallyX/issues/316)
+- Add "Export" to bottom menu [\#315](https://github.com/PhilKes/NotallyX/issues/315)
+- Move "Hide labels" switch up below the labels slider [\#311](https://github.com/PhilKes/NotallyX/issues/311)
+- Display widgets with the notes' colors [\#300](https://github.com/PhilKes/NotallyX/issues/300)
+- Allow Pinning a Specific Label as the Starting Page [\#269](https://github.com/PhilKes/NotallyX/issues/269)
+- Move checked / unchecked items in list [\#251](https://github.com/PhilKes/NotallyX/issues/251)
+- Moving all labels to the sidebar [\#240](https://github.com/PhilKes/NotallyX/issues/240)
+- Add "no label" category [\#219](https://github.com/PhilKes/NotallyX/issues/219)
+- Manual color selection [\#187](https://github.com/PhilKes/NotallyX/issues/187)
+- Pure Dark Mode [\#16](https://github.com/PhilKes/NotallyX/issues/16)
+
+### Fixed Bugs
+
+- Moving group of task at first position wrong order [\#392](https://github.com/PhilKes/NotallyX/issues/392)
+- Parent task not checked in specific case [\#391](https://github.com/PhilKes/NotallyX/issues/391)
+- Add auto-backup no error notification [\#381](https://github.com/PhilKes/NotallyX/issues/381)
+- Backup on save setting not restored [\#373](https://github.com/PhilKes/NotallyX/issues/373)
+- Start View setting not restored [\#367](https://github.com/PhilKes/NotallyX/issues/367)
+- \(List\) Child item can't be place after the item below it [\#362](https://github.com/PhilKes/NotallyX/issues/362)
+- Android 9 Crash java.lang.NoSuchMethodError: getTextSelectHandleLeft\(\) [\#358](https://github.com/PhilKes/NotallyX/issues/358)
+- List items order bug [\#357](https://github.com/PhilKes/NotallyX/issues/357)
+- Lists parent-child items crash [\#356](https://github.com/PhilKes/NotallyX/issues/356)
+- List new items wrong position [\#354](https://github.com/PhilKes/NotallyX/issues/354)
+- Replacement color message title limited to 2 lines [\#348](https://github.com/PhilKes/NotallyX/issues/348)
+- \(Lists\) Delete checked items and undo crash [\#331](https://github.com/PhilKes/NotallyX/issues/331)
+- Sort List items strange bug [\#330](https://github.com/PhilKes/NotallyX/issues/330)
+- Backup folder re-select prompt closes automatically [\#324](https://github.com/PhilKes/NotallyX/issues/324)
+- Biometric lock can't be enabled [\#259](https://github.com/PhilKes/NotallyX/issues/259)
+
+
 ## [v7.0.0](https://github.com/PhilKes/NotallyX/tree/v7.0.0) (2025-01-27)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v6.4.1...v7.0.0)
