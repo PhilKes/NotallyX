@@ -135,7 +135,9 @@ tasks.preBuild.dependsOn(tasks.named("installLocalGitHooks"), tasks.exportTransl
 tasks.register("generateChangelogs") {
     doLast {
         exec {
-            commandLine("bash", rootProject.file("generate-changelogs.sh").absolutePath)
+            commandLine("bash", rootProject.file("generate-changelogs.sh").absolutePath,
+                "v${project.findProperty("app.lastVersionName").toString()}",
+                rootProject.file("CHANGELOG.md").absolutePath)
             standardOutput = System.out
             errorOutput = System.err
             isIgnoreExitValue = true
