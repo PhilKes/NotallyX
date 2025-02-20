@@ -11,9 +11,9 @@ import com.philkes.notallyx.data.model.containsId
 class ListItemSortedByCheckedCallback(adapter: RecyclerView.Adapter<*>?) :
     SortedListCustomNotifyCallback<ListItem>(adapter) {
 
-    internal lateinit var items: ListItemSortedList
+    internal lateinit var items: MutableList<ListItem>
 
-    fun setList(items: ListItemSortedList) {
+    fun setList(items: MutableList<ListItem>) {
         this.items = items
     }
 

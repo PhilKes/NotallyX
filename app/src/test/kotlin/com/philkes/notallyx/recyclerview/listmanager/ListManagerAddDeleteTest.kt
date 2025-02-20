@@ -1,11 +1,11 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.printList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.assertSize
 import com.philkes.notallyx.test.createListItem
-import com.philkes.notallyx.test.printList
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test

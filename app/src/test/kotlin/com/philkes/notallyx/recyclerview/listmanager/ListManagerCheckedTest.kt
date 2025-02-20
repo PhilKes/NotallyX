@@ -1,10 +1,10 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
+import com.philkes.notallyx.data.model.printList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.assertSize
-import com.philkes.notallyx.test.printList
 import com.philkes.notallyx.test.simulateDrag
 import org.junit.Test
 
@@ -134,7 +134,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "B".assertIsNotChecked()
         "C".assertIsNotChecked()
         "A".assertChildren("B", "C")
-        items.assertOrder("A", "B", "C", "Parent1", "Child1", "Child2")
+        items.assertOrder("Parent1", "Child1", "Child2", "A", "B", "C")
     }
 
     @Test

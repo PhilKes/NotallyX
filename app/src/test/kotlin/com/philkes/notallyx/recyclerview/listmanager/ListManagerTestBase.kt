@@ -3,15 +3,18 @@ package com.philkes.notallyx.recyclerview.listmanager
 import android.view.inputmethod.InputMethodManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.presentation.view.note.listitem.CheckedListItemAdapter
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.indexOfFirst
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.init
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -24,23 +27,24 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
+import org.mockito.Mockito.any
 import org.mockito.Mockito.anyInt
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
+import org.mockito.kotlin.doAnswer
 
 open class ListManagerTestBase {
 
     lateinit var recyclerView: RecyclerView
-    protected lateinit var adapter: RecyclerView.Adapter<*>
-    protected lateinit var adapterChecked: RecyclerView.Adapter<*>
+    protected lateinit var adapter: ListItemAdapter
+    protected lateinit var adapterChecked: CheckedListItemAdapter
     protected lateinit var inputMethodManager: InputMethodManager
     protected lateinit var changeHistory: ChangeHistory
     protected lateinit var listItemVH: ListItemVH
     protected lateinit var preferences: NotallyXPreferences
     protected lateinit var listItemDragCallback: ListItemDragCallback
-
-    protected lateinit var items: ListItemSortedList
-    protected var itemsChecked: ListItemSortedList? = null
+    private lateinit var itemsInternal: MutableList<ListItem>
+    protected var itemsChecked: SortedList<ListItem>? = null
 
     lateinit var listManager: ListManager
 
@@ -50,8 +54,8 @@ open class ListManagerTestBase {
     fun setUp() {
         mockAndroidLog()
         recyclerView = mock(RecyclerView::class.java)
-        adapter = mock(RecyclerView.Adapter::class.java)
-        adapterChecked = mock(RecyclerView.Adapter::class.java)
+        adapter = mock(ListItemAdapter::class.java)
+        adapterChecked = mock(CheckedListItemAdapter::class.java)
         inputMethodManager = mock(InputMethodManager::class.java)
         changeHistory = ChangeHistory()
         listItemVH = mock(ListItemVH::class.java)
@@ -68,28 +72,41 @@ open class ListManagerTestBase {
                 ListItemSort.AUTO_SORT_BY_CHECKED -> ListItemSortedByCheckedCallback(adapter)
                 else -> ListItemNoSortCallback(adapter)
             }
-        items = ListItemSortedList(sortCallback)
+        itemsInternal = mutableListOf<ListItem>()
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)
-            itemsChecked = ListItemSortedList(ListItemNoSortCallback(adapterChecked))
+            itemsChecked = SortedList(ListItem::class.java, ListItemNoSortCallback(adapterChecked))
         }
-        items.init(
+        itemsInternal.addAll(
             listOf(
-                createListItem("A", id = 0, order = 0),
-                createListItem("B", id = 1, order = 1),
-                createListItem("C", id = 2, order = 2),
-                createListItem("D", id = 3, order = 3),
-                createListItem("E", id = 4, order = 4),
-                createListItem("F", id = 5, order = 5),
-            )
+                    createListItem("A", id = 0, order = 0),
+                    createListItem("B", id = 1, order = 1),
+                    createListItem("C", id = 2, order = 2),
+                    createListItem("D", id = 3, order = 3),
+                    createListItem("E", id = 4, order = 4),
+                    createListItem("F", id = 5, order = 5),
+                )
+                .init()
         )
-        listManager.initList(items, itemsChecked)
+        `when`(adapter.items).thenAnswer { itemsInternal }
+        doAnswer { invocation ->
+                val listArgument = invocation.getArgument<MutableList<ListItem>>(0)
+                itemsInternal = listArgument
+            }
+            .`when`(adapter)
+            .submitList(any())
+
+        listManager.initList(itemsInternal, adapter, itemsChecked, adapterChecked)
+        adapter.submitList(items)
         listItemDragCallback = ListItemDragCallback(1.0f, listManager)
         val listItemSortingPreference = mock(EnumPreference::class.java)
         `when`(listItemSortingPreference.value).thenReturn(sorting)
         `when`(preferences.listItemSorting)
             .thenReturn(listItemSortingPreference as EnumPreference<ListItemSort>)
     }
+
+    protected val items: MutableList<ListItem>
+        get() = itemsInternal
 
     protected operator fun List<ListItem>.get(body: String): ListItem {
         return this.find { it.body == body }!!
@@ -133,7 +150,7 @@ open class ListManagerTestBase {
         }
 
     protected fun ListManager.addWithChildren(
-        position: Int = items.size(),
+        position: Int = items.size,
         parentBody: String,
         vararg childrenBodies: String,
     ) {

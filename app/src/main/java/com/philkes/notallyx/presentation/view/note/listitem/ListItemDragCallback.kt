@@ -17,8 +17,14 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
 
     private var stateBefore: ListState? = null
     private var positionFrom: Int? = null
-    private var parent: ListItem? = null
+    private var parentBefore: ListItem? = null
+    private var itemTo: ListItem? = null
     private var positionTo: Int? = null
+        set(value) {
+            Log.d(TAG, "positionTo: $value")
+            field = value
+        }
+
     private var newPosition: Int? = null
 
     override fun isLongPressDragEnabled() = false
@@ -41,29 +47,43 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
 
     internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
+            positionFrom = from
             stateBefore = listManager.getState()
             val item = listManager.getItem(from)
-            parent = if (item.isChild) listManager.findParent(item)?.second else null
-            listManager.startDrag(from)
+            parentBefore = if (item.isChild) listManager.findParent(item)?.second else null
         }
-        val swapped =
-            listManager.move(from, to, pushChange = false, updateChildren = false, isDrag = true)
-        if (swapped != null) {
-            if (positionFrom == null) {
-                positionFrom = from
-            }
-            positionTo = to
-            newPosition = swapped
+        itemTo = listManager.getItem(to)
+        val positionTo = listManager.move(from, to, pushChange = false)
+        if (positionTo != -1) {
+            this.positionTo = positionTo
         }
-        return swapped != null
+        return positionTo != -1
     }
 
+    //    internal fun move(from: Int, to: Int): Boolean {
+    //        if (positionFrom == null) {
+    //            stateBefore = listManager.getState()
+    //            val item = listManager.getItem(from)
+    //            parent = if (item.isChild) listManager.findParent(item)?.second else null
+    //            listManager.startDrag(from)
+    //        }
+    //        val swapped =
+    //            listManager.move(from, to, pushChange = false, updateChildren = false, isDrag =
+    // true)
+    //        if (swapped != null) {
+    //            if (positionFrom == null) {
+    //                positionFrom = from
+    //            }
+    //            positionTo = to
+    //            newPosition = swapped
+    //        }
+    //        return swapped != null
+    //    }
+
     override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
-        if (
-            lastState != actionState &&
-                actionState == ItemTouchHelper.ACTION_STATE_IDLE &&
-                positionTo != -1
-        ) {
+
+        Log.d(TAG, "onSelectedChanged: $actionState, positionTo: $positionTo")
+        if (lastState != actionState && actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
             onDragEnd()
         }
         lastState = actionState
@@ -134,15 +154,13 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
         if (positionFrom == positionTo) {
             return
         }
-        if (newPosition != null && stateBefore != null) {
+        if (positionTo != null && positionTo != -1 && stateBefore != null) {
             // The items have already been moved accordingly via move() calls
             listManager.finishMove(
-                parent,
-                positionTo!!,
-                newPosition!!,
+                listManager.getItem(positionTo!!),
+                itemTo!!,
+                parentBefore,
                 stateBefore!!,
-                updateIsChild = true,
-                updateChildren = true,
                 pushChange = true,
             )
         }

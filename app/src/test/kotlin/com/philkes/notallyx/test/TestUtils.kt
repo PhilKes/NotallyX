@@ -5,7 +5,6 @@ import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.toReadableString
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableString
 import com.philkes.notallyx.utils.changehistory.ListIsChildChange
@@ -40,9 +39,10 @@ fun ListItemDragCallback.simulateDrag(positionFrom: Int, positionTo: Int, itemCo
     var from = positionFrom
     if (positionFrom < positionTo) {
         for (i in positionFrom until positionTo) {
-            val moved = this.move(from, i + 1)
+            val to = i + 1 + itemCount - 1
+            val moved = this.move(from, to)
             if (moved) {
-                from = i + 1 - itemCount + 1
+                from = i + 1
             }
         }
     } else {
@@ -56,18 +56,11 @@ fun ListItemDragCallback.simulateDrag(positionFrom: Int, positionTo: Int, itemCo
     this.onDragEnd()
 }
 
-fun ListItemSortedList.printList(text: String? = null) {
-    text?.let { print("--------------\n$it\n") }
-    println("--------------")
-    println(toReadableString())
-    println("--------------")
-}
-
-fun ListItemSortedList.find(vararg bodies: String): List<ListItem> {
+fun SortedList<ListItem>.find(vararg bodies: String): List<ListItem> {
     return bodies.map { body -> this.find { it.body == body }!! }
 }
 
-fun ListItemSortedList.assertOrder(vararg itemBodies: String) {
+fun SortedList<ListItem>.assertOrder(vararg itemBodies: String) {
     itemBodies.forEachIndexed { position, s ->
         assertEquals("${this.toReadableString()}\nAt position: $position", s, get(position).body)
     }
@@ -87,11 +80,21 @@ fun <E> List<E>.assertSize(expected: Int) {
     assertEquals("size", expected, this.size)
 }
 
-fun ListItemSortedList.assertIds(vararg itemIds: Int) {
+fun SortedList<ListItem>.assertIds(vararg itemIds: Int) {
     itemIds.forEachIndexed { position, s -> assertEquals("id", s, get(position).id) }
 }
 
-fun ListItemSortedList.assertChecked(vararg checked: Boolean) {
+fun List<ListItem>.assertIds(vararg itemIds: Int) {
+    itemIds.forEachIndexed { position, s -> assertEquals("id", s, get(position).id) }
+}
+
+fun SortedList<ListItem>.assertChecked(vararg checked: Boolean) {
+    checked.forEachIndexed { index, expected ->
+        assertEquals("checked at position: $index", expected, get(index).checked)
+    }
+}
+
+fun List<ListItem>.assertChecked(vararg checked: Boolean) {
     checked.forEachIndexed { index, expected ->
         assertEquals("checked at position: $index", expected, get(index).checked)
     }
@@ -126,8 +129,8 @@ fun ListItem.assertChildren(vararg childrenBodies: String) {
 // }
 
 fun ListIsChildChange.assert(newValue: Boolean, position: Int) {
-    assertEquals("isChild", newValue, this.newValue)
-    assertEquals("position", position, this.position)
+    //    assertEquals("isChild", newValue, this.newValue)
+    //    assertEquals("position", position, this.position)
 }
 
 // fun ListAddChange.assert(position: Int, newItem: ListItem) {

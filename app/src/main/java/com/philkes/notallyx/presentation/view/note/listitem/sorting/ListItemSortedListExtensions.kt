@@ -1,7 +1,9 @@
 package com.philkes.notallyx.presentation.view.note.listitem.sorting
 
+import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.findChild
+import com.philkes.notallyx.data.model.findParentPosition
 import com.philkes.notallyx.data.model.plus
 
 fun ListItemSortedList.deleteItem(item: ListItem) {
@@ -96,11 +98,47 @@ fun ListItemSortedList.shiftItemOrders(
     }
 }
 
+fun List<ListItem>.shiftItemOrders(orderRange: IntRange, valueToAdd: Int) {
+    this.forEach {
+        if (it.order!! in orderRange) {
+            it.order = it.order!! + valueToAdd
+        }
+    }
+}
+
+fun List<ListItem>.shiftItemOrdersHigher(threshold: Int, valueToAdd: Int) {
+    this.forEach {
+        if (it.order!! > threshold) {
+            it.order = it.order!! + valueToAdd
+        }
+    }
+}
+
+fun SortedList<ListItem>.shiftItemOrdersHigher(threshold: Int, valueToAdd: Int) {
+    this.forEach {
+        if (it.order!! > threshold) {
+            it.order = it.order!! + valueToAdd
+        }
+    }
+}
+
 fun ListItemSortedList.toMutableList(): MutableList<ListItem> {
     return this.indices.map { this[it] }.toMutableList()
 }
 
+fun SortedList<ListItem>.toMutableList(): MutableList<ListItem> {
+    return this.indices.map { this[it] }.toMutableList()
+}
+
+fun SortedList<ListItem>.cloneList(): MutableList<ListItem> {
+    return toMutableList().cloneList()
+}
+
 fun ListItemSortedList.cloneList(): MutableList<ListItem> {
+    return this.indices.map { this[it].clone() as ListItem }.toMutableList()
+}
+
+fun List<ListItem>.cloneList(): MutableList<ListItem> {
     return this.indices.map { this[it].clone() as ListItem }.toMutableList()
 }
 
@@ -199,20 +237,20 @@ fun ListItemSortedList.setCheckedWithChildren(position: Int, checked: Boolean): 
     return changedPositionsAfterSort.reversed()[0]
 }
 
-fun ListItemSortedList.findById(id: Int): Pair<Int, ListItem>? {
+fun SortedList<ListItem>.findById(id: Int): Pair<Int, ListItem>? {
     val position = this.indexOfFirst { it.id == id } ?: return null
     return Pair(position, this[position])
 }
 
-fun ListItemSortedList.toReadableString(): String {
+fun SortedList<ListItem>.toReadableString(): String {
     return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
 }
 
-fun ListItemSortedList.findParent(childPosition: Int): Pair<Int, ListItem>? {
+fun SortedList<ListItem>.findParent(childPosition: Int): Pair<Int, ListItem>? {
     return findParent(this[childPosition])
 }
 
-fun ListItemSortedList.findParent(childItem: ListItem): Pair<Int, ListItem>? {
+fun SortedList<ListItem>.findParent(childItem: ListItem): Pair<Int, ListItem>? {
     this.indices.forEach {
         if (this[it].findChild(childItem.id) != null) {
             return Pair(it, this[it])
@@ -269,29 +307,29 @@ private fun ListItemSortedList.updatePositions(
     return changedPositionsAfterSort
 }
 
-fun ListItemSortedList.recalcPositions(itemIds: Collection<Int> = this.map { it.id }) {
+fun SortedList<ListItem>.recalcPositions(itemIds: Collection<Int> = this.map { it.id }) {
     itemIds.forEach { id -> this.recalculatePositionOfItemAt(this.findById(id)!!.first) }
 }
 
-fun <R> ListItemSortedList.map(transform: (ListItem) -> R): List<R> {
+fun <R> SortedList<ListItem>.map(transform: (ListItem) -> R): List<R> {
     return (0 until this.size()).map { transform.invoke(this[it]) }
 }
 
-fun <R> ListItemSortedList.mapIndexed(transform: (Int, ListItem) -> R): List<R> {
+fun <R> SortedList<ListItem>.mapIndexed(transform: (Int, ListItem) -> R): List<R> {
     return (0 until this.size()).mapIndexed { idx, it -> transform.invoke(idx, this[it]) }
 }
 
-fun ListItemSortedList.forEach(function: (item: ListItem) -> Unit) {
+fun SortedList<ListItem>.forEach(function: (item: ListItem) -> Unit) {
     return (0 until this.size()).forEach { function.invoke(this[it]) }
 }
 
-fun ListItemSortedList.forEachIndexed(function: (idx: Int, item: ListItem) -> Unit) {
+fun SortedList<ListItem>.forEachIndexed(function: (idx: Int, item: ListItem) -> Unit) {
     for (i in 0 until this.size()) {
         function.invoke(i, this[i])
     }
 }
 
-fun ListItemSortedList.filter(function: (item: ListItem) -> Boolean): List<ListItem> {
+fun SortedList<ListItem>.filter(function: (item: ListItem) -> Boolean): List<ListItem> {
     val list = mutableListOf<ListItem>()
     for (i in 0 until this.size()) {
         if (function.invoke(this[i])) {
@@ -301,7 +339,7 @@ fun ListItemSortedList.filter(function: (item: ListItem) -> Boolean): List<ListI
     return list.toList()
 }
 
-fun ListItemSortedList.find(function: (item: ListItem) -> Boolean): ListItem? {
+fun SortedList<ListItem>.find(function: (item: ListItem) -> Boolean): ListItem? {
     for (i in 0 until this.size()) {
         if (function.invoke(this[i])) {
             return this[i]
@@ -310,7 +348,7 @@ fun ListItemSortedList.find(function: (item: ListItem) -> Boolean): ListItem? {
     return null
 }
 
-fun ListItemSortedList.indexOfFirst(function: (item: ListItem) -> Boolean): Int? {
+fun SortedList<ListItem>.indexOfFirst(function: (item: ListItem) -> Boolean): Int? {
     for (i in 0 until this.size()) {
         if (function.invoke(this[i])) {
             return i
@@ -319,16 +357,64 @@ fun ListItemSortedList.indexOfFirst(function: (item: ListItem) -> Boolean): Int?
     return null
 }
 
-val ListItemSortedList.lastIndex: Int
+val SortedList<ListItem>.lastIndex: Int
     get() = this.size() - 1
 
-val ListItemSortedList.indices: IntRange
+val SortedList<ListItem>.indices: IntRange
     get() = (0 until this.size())
 
-fun ListItemSortedList.isNotEmpty(): Boolean {
+fun SortedList<ListItem>.isNotEmpty(): Boolean {
     return size() > 0
 }
 
-fun ListItemSortedList.isEmpty(): Boolean {
+fun SortedList<ListItem>.isEmpty(): Boolean {
     return size() == 0
+}
+
+fun MutableList<ListItem>.removeWithChildren(item: ListItem): Pair<Int, Int> {
+    val index = indexOf(item)
+    removeAll(item + item.children)
+    return Pair(index, item.children.size + 1)
+}
+
+fun MutableList<ListItem>.addWithChildren(item: ListItem): Pair<Int, Int> {
+    var insertIdx = indexOfFirst { it.order!! > item.order!! }
+    if (insertIdx < 0) {
+        insertIdx = size
+    }
+    addAll(insertIdx, item + item.children)
+    return Pair(insertIdx, item.children.size + 1)
+}
+
+fun SortedList<ListItem>.addWithChildren(item: ListItem) {
+    addAll(item + item.children)
+}
+
+fun SortedList<ListItem>.removeWithChildren(item: ListItem) {
+    item.children.forEach { remove(it) }
+    remove(item)
+}
+
+fun MutableList<ListItem>.updateChildInParent(
+    position: Int,
+    item: ListItem,
+    clearChildren: Boolean = true,
+) {
+    val childIndex: Int?
+    val parentInfo = findParent(item)
+    val parent: ListItem?
+    if (parentInfo == null) {
+        val parentPosition = findParentPosition(position)!!
+        childIndex = position - parentPosition - 1
+        parent = this[parentPosition]
+    } else {
+        parent = parentInfo.second
+        childIndex = parent.children.indexOfFirst { child -> child.id == item.id }
+        parent.children.removeAt(childIndex)
+    }
+    parent.children.add(childIndex, item)
+    parent.children.addAll(childIndex + 1, item.children)
+    if (clearChildren) {
+        item.children.clear()
+    }
 }

@@ -5,38 +5,35 @@ import android.view.ViewGroup
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
+import com.philkes.notallyx.utils.Cache.list
 
-class ListItemAdapter(
+class CheckedListItemAdapter(
     @ColorInt var backgroundColor: Int,
     private val textSize: TextSize,
     elevation: Float,
     private val preferences: NotallyXPreferences,
     private val listManager: ListManager,
     private val isCheckedListAdapter: Boolean,
-) : ListAdapter<ListItem, ListItemVH>(DIFF_CALLBACK), HighlightText {
+) : RecyclerView.Adapter<ListItemVH>(), HighlightText {
 
+    private lateinit var list: SortedList<ListItem>
     private val callback = ListItemDragCallback(elevation, listManager)
     private val touchHelper = ItemTouchHelper(callback)
 
-    private val highlights = mutableMapOf<Int, MutableList<ListItemHighlight>>()
+    private val highlights = mutableMapOf<Int, MutableList<ListItemAdapter.ListItemHighlight>>()
 
-    lateinit var items: MutableList<ListItem>
-        private set
-
-    override fun submitList(list: MutableList<ListItem>?) {
-        list?.let { items = it }
-        super.submitList(list)
+    internal fun setList(list: SortedList<ListItem>) {
+        this.list = list
     }
 
-    override fun submitList(list: MutableList<ListItem>?, commitCallback: Runnable?) {
-        list?.let { items = it }
-        super.submitList(list, commitCallback)
+    override fun getItemCount(): Int {
+        return list.size()
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
@@ -44,7 +41,7 @@ class ListItemAdapter(
     }
 
     override fun onBindViewHolder(holder: ListItemVH, position: Int) {
-        val item = getItem(position)
+        val item = list[position]
         holder.bind(
             backgroundColor,
             item,
@@ -66,6 +63,10 @@ class ListItemAdapter(
         notifyDataSetChanged()
     }
 
+    //    internal fun setList(list: ListItemSortedList) {
+    //        this.list = list
+    //    }
+
     internal fun clearHighlights(): Set<Int> {
         val highlightedItemPos =
             highlights.entries.flatMap { (_, value) -> value.map { it.itemPos } }.toSet()
@@ -74,7 +75,7 @@ class ListItemAdapter(
         return highlightedItemPos
     }
 
-    override fun highlightText(highlight: ListItemHighlight) {
+    override fun highlightText(highlight: ListItemAdapter.ListItemHighlight) {
         if (highlights.containsKey(highlight.itemPos)) {
             highlights[highlight.itemPos]!!.add(highlight)
         } else {
@@ -99,19 +100,6 @@ class ListItemAdapter(
         }
         return selectedItemPos
     }
-
-    internal fun notifyListItemChanged(id: Int) {
-        val index = currentList.indexOfFirst { it.id == id }
-        notifyItemChanged(index)
-    }
-
-    data class ListItemHighlight(
-        val itemPos: Int,
-        val resultPos: Int,
-        val startIdx: Int,
-        val endIdx: Int,
-        var selected: Boolean,
-    )
 
     companion object {
         private val DIFF_CALLBACK =

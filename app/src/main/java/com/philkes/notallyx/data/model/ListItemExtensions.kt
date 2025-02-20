@@ -1,11 +1,21 @@
 package com.philkes.notallyx.data.model
 
+import androidx.recyclerview.widget.SortedList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableString
+
 operator fun ListItem.plus(list: List<ListItem>): List<ListItem> {
     return mutableListOf(this) + list
 }
 
 fun ListItem.findChild(childId: Int): ListItem? {
     return this.children.find { child -> child.id == childId }
+}
+
+fun ListItem.check(checked: Boolean, checkChildren: Boolean = true) {
+    this.checked = checked
+    if (checkChildren) {
+        this.children.forEach { child -> child.checked = checked }
+    }
 }
 
 fun List<ListItem>.areAllChecked(except: ListItem? = null): Boolean {
@@ -39,4 +49,18 @@ fun List<ListItem>.findParentPosition(childPosition: Int): Int? {
         }
     }
     return null
+}
+
+fun SortedList<ListItem>.printList(text: String? = null) {
+    text?.let { print("--------------\n$it\n") }
+    println("--------------")
+    println(toReadableString())
+    println("--------------")
+}
+
+fun Collection<ListItem>.printList(text: String? = null) {
+    text?.let { print("--------------\n$it\n") }
+    println("--------------")
+    println(toReadableString())
+    println("--------------")
 }

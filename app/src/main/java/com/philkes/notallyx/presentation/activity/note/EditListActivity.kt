@@ -2,18 +2,21 @@ package com.philkes.notallyx.presentation.activity.note
 
 import android.os.Bundle
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.note.action.MoreListActions
 import com.philkes.notallyx.presentation.view.note.action.MoreListBottomSheet
+import com.philkes.notallyx.presentation.view.note.listitem.CheckedListItemAdapter
+import com.philkes.notallyx.presentation.view.note.listitem.HighlightText
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.init
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
@@ -27,9 +30,9 @@ import java.util.concurrent.atomic.AtomicInteger
 class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     private var adapter: ListItemAdapter? = null
-    private var adapterChecked: ListItemAdapter? = null
-    private lateinit var items: ListItemSortedList
-    private var itemsChecked: ListItemSortedList? = null
+    private var adapterChecked: CheckedListItemAdapter? = null
+    private lateinit var items: MutableList<ListItem>
+    private var itemsChecked: SortedList<ListItem>? = null
     private lateinit var listManager: ListManager
 
     override fun finish() {
@@ -85,7 +88,34 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         setBottomAppBarColor(colorInt)
     }
 
-    private fun ListItemSortedList.highlightSearch(
+    private fun SortedList<ListItem>.highlightSearch(
+        search: String,
+        adapter: HighlightText?,
+        resultPosCounter: AtomicInteger,
+        alreadyNotifiedItemPos: MutableSet<Int>,
+    ): Int {
+        return mapIndexed { idx, item ->
+                val occurrences = item.body.findAllOccurrences(search)
+                occurrences.onEach { (startIdx, endIdx) ->
+                    adapter?.highlightText(
+                        ListItemAdapter.ListItemHighlight(
+                            idx,
+                            resultPosCounter.getAndIncrement(),
+                            startIdx,
+                            endIdx,
+                            false,
+                        )
+                    )
+                }
+                if (occurrences.isNotEmpty()) {
+                    alreadyNotifiedItemPos.add(idx)
+                }
+                occurrences.size
+            }
+            .sum()
+    }
+
+    private fun List<ListItem>.highlightSearch(
         search: String,
         adapter: ListItemAdapter?,
         resultPosCounter: AtomicInteger,
@@ -201,12 +231,12 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 ListItemSort.AUTO_SORT_BY_CHECKED -> ListItemSortedByCheckedCallback(adapter)
                 else -> ListItemNoSortCallback(adapter)
             }
-        items = ListItemSortedList(sortCallback)
+        items = mutableListOf()
         val initializedItems = notallyModel.items.init(true)
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)
             adapterChecked =
-                ListItemAdapter(
+                CheckedListItemAdapter(
                     colorInt,
                     notallyModel.textSize,
                     elevation,
@@ -214,20 +244,21 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                     listManager,
                     true,
                 )
-            itemsChecked = ListItemSortedList(ListItemNoSortCallback(adapterChecked))
             val (checkedItems, uncheckedItems) = initializedItems.splitByChecked()
-            items.init(uncheckedItems)
-            itemsChecked!!.init(checkedItems)
-            adapter?.setList(items)
+            items.addAll(uncheckedItems)
+            itemsChecked =
+                SortedList(ListItem::class.java, ListItemNoSortCallback(adapterChecked!!))
+            itemsChecked!!.addAll(checkedItems)
+            adapter?.submitList(items)
             adapterChecked?.setList(itemsChecked!!)
             binding.MainListView.adapter = adapter
             binding.CheckedListView.adapter = adapterChecked
-            listManager.initList(items, itemsChecked)
+            listManager.initList(items, adapter!!, itemsChecked, adapterChecked!!)
         } else {
-            items.init(initializedItems)
-            adapter?.setList(items)
+            items.addAll(initializedItems)
+            adapter?.submitList(items)
             binding.MainListView.adapter = adapter
-            listManager.initList(items)
+            listManager.initList(items, adapter!!)
         }
         savedInstanceState?.let {
             val itemPos = it.getInt(EXTRA_ITEM_POS, -1)
