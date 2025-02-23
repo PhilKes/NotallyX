@@ -80,7 +80,6 @@
         android:visibility="invisible"
         android:minWidth="48dp"
         android:minHeight="48dp"
-        android:layout_marginEnd="8dp"
         app:srcCompat="@drawable/delete"
         app:tint="?attr/colorControlNormal" />
 
