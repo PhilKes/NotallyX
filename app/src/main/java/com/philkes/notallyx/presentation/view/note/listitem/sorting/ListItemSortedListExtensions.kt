@@ -106,6 +106,14 @@ fun List<ListItem>.shiftItemOrders(orderRange: IntRange, valueToAdd: Int) {
     }
 }
 
+fun SortedList<ListItem>.shiftItemOrders(orderRange: IntRange, valueToAdd: Int) {
+    this.forEach {
+        if (it.order!! in orderRange) {
+            it.order = it.order!! + valueToAdd
+        }
+    }
+}
+
 fun List<ListItem>.shiftItemOrdersHigher(threshold: Int, valueToAdd: Int) {
     this.forEach {
         if (it.order!! > threshold) {

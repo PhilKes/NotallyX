@@ -213,6 +213,7 @@ class ListManager(
 
         if (isMoveUp) {
             list.shiftItemOrders(fromOrder + itemCount until toOrder + 1, -itemCount)
+            itemsChecked?.shiftItemOrders(fromOrder + itemCount until toOrder + 1, -itemCount)
             if (stateBefore.checkedItems != null) {
                 stateBefore.checkedItems.shiftItemOrders(
                     fromOrder + itemCount until toOrder + 1,
@@ -221,6 +222,7 @@ class ListManager(
             }
         } else {
             list.shiftItemOrders(toOrder until fromOrder, itemCount)
+            itemsChecked?.shiftItemOrders(toOrder until fromOrder, itemCount)
             if (stateBefore.checkedItems != null) {
                 stateBefore.checkedItems.shiftItemOrders(toOrder until fromOrder, itemCount)
             }

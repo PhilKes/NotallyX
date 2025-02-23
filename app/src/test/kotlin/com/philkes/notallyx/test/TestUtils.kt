@@ -72,6 +72,12 @@ fun List<ListItem>.assertOrder(vararg itemBodies: String) {
     }
 }
 
+fun List<ListItem>.assertOrderValues(vararg orders: Int) {
+    orders.forEachIndexed { position, s ->
+        assertEquals("${this.toReadableString()}\nAt position: $position", s, this[position].order)
+    }
+}
+
 fun <E> SortedList<E>.assertSize(expected: Int) {
     assertEquals("size", expected, this.size())
 }

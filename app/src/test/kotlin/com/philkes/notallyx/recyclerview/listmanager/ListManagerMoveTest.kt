@@ -434,6 +434,23 @@ class ListManagerMoveTest : ListManagerTestBase() {
         "E".assertIsChecked()
         "B".assertIsNotChecked()
     }
+
+    //    @Test
+    //    fun `endDrag batched items`() {
+    //        setSorting(ListItemSort.NO_AUTO_SORT)
+    //        listManager.changeIsChild(3, true, false)
+    //        listManager.changeChecked(2, true)
+    //        listItemDragCallback.simulateDrag(1, 2, 1)
+    //        listManager.changeChecked(0, false, isFromCheckedList = true)
+    //        listManager.changeIsChild(3, false, false)
+    //
+    //
+    //        items.assertOrder("A", "C", "D", "E", "B")
+    //        "D".assertChildren("E", "B")
+    //        "D".assertIsNotChecked()
+    //        "E".assertIsChecked()
+    //        "B".assertIsNotChecked()
+    //    }
     // endregion
 
 }

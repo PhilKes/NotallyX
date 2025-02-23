@@ -4,6 +4,7 @@ import com.philkes.notallyx.data.model.printList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
+import com.philkes.notallyx.test.assertOrderValues
 import com.philkes.notallyx.test.assertSize
 import com.philkes.notallyx.test.simulateDrag
 import org.junit.Test
@@ -170,6 +171,20 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         "D".assertChildren("E")
         "D".assertIsChecked()
         "E".assertIsChecked()
+    }
+
+    @Test
+    fun `changeChecked false with auto-sort correct orders`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(2, checked = true)
+        listItemDragCallback.simulateDrag(1, 2, 1)
+        items.printList("Before")
+        listManager.changeChecked(0, checked = false, isFromCheckedList = true)
+        items.printList("After")
+
+        items.assertOrder("A", "C", "D", "E", "B", "F")
+        items.assertOrderValues(0, 1, 2, 3, 4)
     }
 
     // endregion
