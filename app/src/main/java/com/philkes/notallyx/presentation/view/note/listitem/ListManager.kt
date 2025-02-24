@@ -96,16 +96,7 @@ class ListManager(
             item.children.addAll(childrenBelow)
         }
         adapter.notifyItemRangeInserted(insertPos, count)
-        //        val actualPosition = position.coerceAtMost(items.size())
-        //        endSearch?.invoke()
-        //        (item + item.children).forEach { setIdIfUnset(it) }
-        //
-        //        items.beginBatchedUpdates()
-        //        //        for ((idx, newItem) in (item + item.children).withIndex()) {
-        //        addItem(actualPosition, item)
-        //        //        }
-        //        items.endBatchedUpdates()
-        //
+        items.notifyPreviousFirstItem(insertPos, count)
         if (pushChange) {
             changeHistory.push(ListAddChange(stateBefore, getState(), this))
         }
@@ -274,11 +265,9 @@ class ListManager(
         val forceIsChild = (itemTo.isChild || itemTo.children.isNotEmpty()) && !item.isChild
         if (positionTo == 0) {
             item.isChild = false
-            //            adapter.notifyItemChanged(positionTo)
+            items.notifyPreviousFirstItem(0, 1)
         } else if (forceIsChild) {
             item.isChild = true
-            //            items.updateChildInParent(positionTo, item)
-            //            adapter.notifyItemChanged(positionTo)
         }
 
         if (item.isChild) {
@@ -296,7 +285,7 @@ class ListManager(
             parent.updateParentChecked()
             parentBefore?.updateParentChecked()
         }
-        if (forceIsChild) {
+        if (forceIsChild || positionTo == 0) {
             adapter.notifyItemChanged(positionTo)
         }
         if (pushChange) {
@@ -407,6 +396,7 @@ class ListManager(
         val (pos, count) = items.removeWithChildren(parent)
         if (items == this@ListManager.items) {
             adapter.notifyItemRangeRemoved(pos, count)
+            items.notifyPreviousFirstItem(pos, 0)
         }
         parent.check(true)
         itemsChecked!!.addWithChildren(parent)
@@ -425,6 +415,7 @@ class ListManager(
             val (insertPos, count) = items.addWithChildren(parent)
             if (items == this@ListManager.items) {
                 adapter.notifyItemRangeInserted(insertPos, count)
+                items.notifyPreviousFirstItem(insertPos, count)
             }
         } else {
             itemsChecked!!.removeWithChildren(item)
@@ -432,7 +423,15 @@ class ListManager(
             val (insertPos, count) = items.addWithChildren(item)
             if (items == this@ListManager.items) {
                 adapter.notifyItemRangeInserted(insertPos, count)
+                items.notifyPreviousFirstItem(insertPos, count)
             }
+        }
+    }
+
+    private fun MutableList<ListItem>.notifyPreviousFirstItem(position: Int, count: Int) {
+        if (position == 0 && size > count) {
+            // To trigger enabling isChild swiping for the item that was previously at pos 0
+            adapter.notifyItemChanged(count)
         }
     }
 
