@@ -52,9 +52,9 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
             val item = listManager.getItem(from)
             parentBefore = if (item.isChild) listManager.findParent(item)?.second else null
         }
-        itemTo = listManager.getItem(to)
-        val positionTo = listManager.move(from, to, pushChange = false)
+        val (positionTo, itemFrom) = listManager.move(from, to, pushChange = false)
         if (positionTo != -1) {
+            itemTo = itemFrom
             this.positionTo = positionTo
         }
         return positionTo != -1

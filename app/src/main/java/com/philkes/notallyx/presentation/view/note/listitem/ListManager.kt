@@ -179,16 +179,17 @@ class ListManager(
         pushChange: Boolean = true,
         updateChildren: Boolean = true,
         isDrag: Boolean = false,
-    ): Int {
+    ): Pair<Int, ListItem?> {
         val stateBefore = getState()
         val list = items.toMutableList()
         val movedItem = list[positionFrom]
+        val itemBefore = list[positionTo]
         // Do not allow to move parent into its own children
         if (
             !movedItem.isChild &&
                 positionTo in (positionFrom..positionFrom + movedItem.children.size)
         ) {
-            return -1
+            return Pair(-1, null)
         }
 
         //        val parentBefore = if (movedItem.isChild) list.findParent(movedItem)!!.second else
@@ -236,7 +237,7 @@ class ListManager(
         //            movedItem.children.clear()
         //        }
         submitList(list)
-        return insertIdx
+        return Pair(insertIdx, itemBefore)
         //        if (pushChange) {
         //            finishMove(movedItem, positionTo, parentBefore, stateBefore, true)
         //            changeHistory.push(ListMoveChange(stateBefore, getState(), this))
@@ -262,12 +263,16 @@ class ListManager(
         pushChange: Boolean,
     ) {
         val positionTo = items.indexOfFirst { it.id == item.id }
+        val positionFrom = stateBefore.items.indexOfFirst { it.id == item.id }
         val forceIsChild = (itemTo.isChild || itemTo.children.isNotEmpty()) && !item.isChild
         if (positionTo == 0) {
             item.isChild = false
             items.notifyPreviousFirstItem(0, 1)
         } else if (forceIsChild) {
             item.isChild = true
+        }
+        if (positionFrom == 0) {
+            adapter.notifyItemChanged(0)
         }
 
         if (item.isChild) {
@@ -285,7 +290,7 @@ class ListManager(
             parent.updateParentChecked()
             parentBefore?.updateParentChecked()
         }
-        if (forceIsChild || positionTo == 0) {
+        if (forceIsChild || positionTo == 0 || positionFrom == 0) {
             adapter.notifyItemChanged(positionTo)
         }
         if (pushChange) {
