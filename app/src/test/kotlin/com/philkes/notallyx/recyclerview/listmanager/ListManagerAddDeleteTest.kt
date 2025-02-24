@@ -2,6 +2,8 @@ package com.philkes.notallyx.recyclerview.listmanager
 
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.printList
+import com.philkes.notallyx.presentation.view.note.listitem.ListState
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.cloneList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.assertSize
@@ -190,6 +192,19 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         "B".assertChildren("C")
         "B".assertIsChecked()
         "C".assertIsChecked()
+    }
+
+    @Test
+    fun `delete single item with other item having same body`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        val items = this.items.cloneList()
+        items[1].body = "A"
+        listManager.setItems(ListState(items, null))
+
+        listManager.delete(1)
+
+        this.items.assertSize(5)
+        this.items.assertOrder("A", "C", "D", "E", "F")
     }
 
     // endregion

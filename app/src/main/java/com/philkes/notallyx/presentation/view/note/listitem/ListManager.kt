@@ -84,9 +84,6 @@ class ListManager(
         item.children.forEachIndexed { index, child -> child.order = insertOrder + 1 + index }
 
         val (insertPos, count) = items.addWithChildren(item)
-        for (i in 0 until count) {
-            adapter.notifyItemInserted(insertPos)
-        }
         if (item.isChild) {
             items.findParentPosition(insertPos)?.let { parentPos ->
                 items[parentPos].children.add(insertPos - parentPos - 1, item)
@@ -98,6 +95,7 @@ class ListManager(
             parent.children.removeAll(childrenBelow)
             item.children.addAll(childrenBelow)
         }
+        adapter.notifyItemRangeInserted(insertPos, count)
         //        val actualPosition = position.coerceAtMost(items.size())
         //        endSearch?.invoke()
         //        (item + item.children).forEach { setIdIfUnset(it) }
@@ -355,12 +353,12 @@ class ListManager(
     }
 
     fun changeText(
-        editText: EditText,
-        listener: TextWatcher,
         position: Int,
         value: EditTextState,
         before: EditTextState? = null,
         pushChange: Boolean = true,
+        editText: EditText?,
+        listener: TextWatcher?,
     ) {
         //        if(!pushChange) {
         endSearch?.invoke()
@@ -369,7 +367,7 @@ class ListManager(
         item.body = value.text.toString()
         if (pushChange) {
             changeHistory.push(
-                ListEditTextChange(editText, position, before!!, value, listener, this)
+                ListEditTextChange(editText!!, position, before!!, value, listener!!, this)
             )
             // TODO: fix focus change
 
@@ -426,19 +424,14 @@ class ListManager(
             parent.checked = false
             val (insertPos, count) = items.addWithChildren(parent)
             if (items == this@ListManager.items) {
-                for (i in 0 until count) {
-                    adapter.notifyItemInserted(insertPos)
-                }
+                adapter.notifyItemRangeInserted(insertPos, count)
             }
         } else {
             itemsChecked!!.removeWithChildren(item)
             item.check(false, uncheckChildren)
             val (insertPos, count) = items.addWithChildren(item)
-
             if (items == this@ListManager.items) {
-                for (i in 0 until count) {
-                    adapter.notifyItemInserted(insertPos)
-                }
+                adapter.notifyItemRangeInserted(insertPos, count)
             }
         }
     }

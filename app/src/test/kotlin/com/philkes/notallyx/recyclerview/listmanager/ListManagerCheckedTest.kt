@@ -1,6 +1,9 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
 import com.philkes.notallyx.data.model.printList
+import com.philkes.notallyx.presentation.view.note.listitem.ListState
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.cloneList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
@@ -185,6 +188,21 @@ class ListManagerCheckedTest : ListManagerTestBase() {
 
         items.assertOrder("A", "C", "D", "E", "B", "F")
         items.assertOrderValues(0, 1, 2, 3, 4)
+    }
+
+    @Test
+    fun `changeChecked true with auto-sort with other item having same body`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        val items = this.items.cloneList()
+        items[1].body = "A"
+        listManager.setItems(ListState(items, itemsChecked!!.toMutableList()))
+
+        listManager.changeChecked(1, checked = true)
+
+        this.items.assertSize(5)
+        this.items.assertOrder("A", "C", "D", "E", "F")
+        itemsChecked!!.assertSize(1)
+        itemsChecked!!.assertOrder("A")
     }
 
     // endregion

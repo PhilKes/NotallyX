@@ -37,6 +37,7 @@ data class ListItem(
             return false
         }
         return (this.body == other.body &&
+            this.order == other.order &&
             this.checked == other.checked &&
             this.isChild == other.isChild)
     }

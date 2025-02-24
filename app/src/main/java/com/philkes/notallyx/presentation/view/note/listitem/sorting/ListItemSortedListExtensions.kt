@@ -381,7 +381,7 @@ fun SortedList<ListItem>.isEmpty(): Boolean {
 
 fun MutableList<ListItem>.removeWithChildren(item: ListItem): Pair<Int, Int> {
     val index = indexOf(item)
-    removeAll(item + item.children)
+    removeAll(item.children + item)
     return Pair(index, item.children.size + 1)
 }
 
@@ -399,8 +399,7 @@ fun SortedList<ListItem>.addWithChildren(item: ListItem) {
 }
 
 fun SortedList<ListItem>.removeWithChildren(item: ListItem) {
-    item.children.forEach { remove(it) }
-    remove(item)
+    (item.children + item).forEach { remove(it) }
 }
 
 fun MutableList<ListItem>.updateChildInParent(
