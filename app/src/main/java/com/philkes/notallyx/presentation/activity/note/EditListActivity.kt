@@ -31,7 +31,9 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
 
     private var adapter: ListItemAdapter? = null
     private var adapterChecked: CheckedListItemAdapter? = null
-    private lateinit var items: MutableList<ListItem>
+    private val items: MutableList<ListItem>
+        get() = adapter!!.items
+
     private var itemsChecked: SortedList<ListItem>? = null
     private lateinit var listManager: ListManager
 
@@ -231,7 +233,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 ListItemSort.AUTO_SORT_BY_CHECKED -> ListItemSortedByCheckedCallback(adapter)
                 else -> ListItemNoSortCallback(adapter)
             }
-        items = mutableListOf()
+        val items = mutableListOf<ListItem>()
         val initializedItems = notallyModel.items.init(true)
         if (sortCallback is ListItemSortedByCheckedCallback) {
             sortCallback.setList(items)

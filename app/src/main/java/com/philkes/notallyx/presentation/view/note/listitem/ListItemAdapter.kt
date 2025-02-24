@@ -120,7 +120,9 @@ class ListItemAdapter(
                     oldItem.id == newItem.id
 
                 override fun areContentsTheSame(oldItem: ListItem, newItem: ListItem) =
-                    oldItem == newItem
+                    oldItem.body == newItem.body &&
+                        oldItem.isChild == newItem.isChild &&
+                        oldItem.checked == newItem.checked
             }
     }
 }
