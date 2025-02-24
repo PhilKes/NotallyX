@@ -147,7 +147,12 @@ fun ListItemSortedList.cloneList(): MutableList<ListItem> {
 }
 
 fun List<ListItem>.cloneList(): MutableList<ListItem> {
-    return this.indices.map { this[it].clone() as ListItem }.toMutableList()
+    val clone = this.indices.map { this[it].clone() as ListItem }.toMutableList()
+    clone.forEach { itemClone ->
+        itemClone.children =
+            itemClone.children.map { child -> clone.first { it.id == child.id } }.toMutableList()
+    }
+    return clone
 }
 
 fun ListItemSortedList.setIsChild(

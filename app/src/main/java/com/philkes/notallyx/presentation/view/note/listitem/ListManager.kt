@@ -567,19 +567,24 @@ class ListManager(
     fun changeIsChild(position: Int, isChild: Boolean, pushChange: Boolean = true) {
         val stateBefore = getState()
         items.findParentPosition(position)?.let { parentPos ->
-            val parent = items[parentPos]
+            val nearestParent = items[parentPos]
             val item = items[position]
             item.isChild = isChild
             if (isChild) {
-                parent.children.addAll(position - parentPos - 1, item + item.children)
+                nearestParent.children.addAll(position - parentPos - 1, item + item.children)
                 item.children.clear()
             } else {
-                val childIndex = parent.children.indexOf(item)
-                val childrenBelow = parent.children.filterIndexed { idx, _ -> idx > childIndex }
-                parent.children.removeAll(childrenBelow)
-                parent.children.remove(item)
+                val childIndex = nearestParent.children.indexOf(item)
+                val childrenBelow =
+                    nearestParent.children.filterIndexed { idx, _ -> idx > childIndex }
+                nearestParent.children.removeAll(childrenBelow)
+                nearestParent.children.remove(item)
                 item.children = childrenBelow.toMutableList()
             }
+            if (!item.isChild) {
+                item.updateParentChecked()
+            }
+            nearestParent.updateParentChecked()
         }
 
         if (pushChange) {
