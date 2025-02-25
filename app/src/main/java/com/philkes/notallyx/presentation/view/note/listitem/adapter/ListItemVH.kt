@@ -1,4 +1,4 @@
-package com.philkes.notallyx.presentation.view.note.listitem
+package com.philkes.notallyx.presentation.view.note.listitem.adapter
 
 import android.util.TypedValue
 import android.view.KeyEvent
@@ -22,6 +22,7 @@ import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
+import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
@@ -88,7 +89,7 @@ class ListItemVH(
         @ColorInt backgroundColor: Int,
         item: ListItem,
         position: Int,
-        highlights: List<ListItemAdapter.ListItemHighlight>?,
+        highlights: List<ListItemHighlight>?,
         autoSort: ListItemSort,
     ) {
         updateEditText(item, position)
@@ -129,7 +130,7 @@ class ListItemVH(
         binding.Delete.apply {
             visibility = if (item.checked) VISIBLE else INVISIBLE
             setOnClickListener {
-                listManager.delete(absoluteAdapterPosition, isFromCheckedList = isInCheckedAutoSort)
+                listManager.delete(absoluteAdapterPosition, inCheckedList = isInCheckedAutoSort)
             }
             contentDescription = "Delete$position"
         }
@@ -150,7 +151,7 @@ class ListItemVH(
                     // unchecked item but always re-adds a new item
                     listManager.delete(
                         absoluteAdapterPosition,
-                        isFromCheckedList = isInCheckedAutoSort,
+                        inCheckedList = isInCheckedAutoSort,
                         force = false,
                     )
                 } else {
@@ -216,7 +217,7 @@ class ListItemVH(
                     } else {
                         listManager.delete(
                             absoluteAdapterPosition,
-                            isFromCheckedList = isInCheckedAutoSort,
+                            inCheckedList = isInCheckedAutoSort,
                             pushChange = false,
                         )
                     }

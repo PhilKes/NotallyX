@@ -18,12 +18,8 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
     private var stateBefore: ListState? = null
     private var positionFrom: Int? = null
     private var parentBefore: ListItem? = null
-    private var itemTo: ListItem? = null
+    private var itemBefore: ListItem? = null
     private var positionTo: Int? = null
-        set(value) {
-            Log.d(TAG, "positionTo: $value")
-            field = value
-        }
 
     private var newPosition: Int? = null
 
@@ -52,37 +48,15 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
             val item = listManager.getItem(from)
             parentBefore = if (item.isChild) listManager.findParent(item)?.second else null
         }
-        val (positionTo, itemFrom) = listManager.move(from, to, pushChange = false)
+        val (positionTo, itemBefore) = listManager.move(from, to)
         if (positionTo != -1) {
-            itemTo = itemFrom
+            this.itemBefore = itemBefore
             this.positionTo = positionTo
         }
         return positionTo != -1
     }
 
-    //    internal fun move(from: Int, to: Int): Boolean {
-    //        if (positionFrom == null) {
-    //            stateBefore = listManager.getState()
-    //            val item = listManager.getItem(from)
-    //            parent = if (item.isChild) listManager.findParent(item)?.second else null
-    //            listManager.startDrag(from)
-    //        }
-    //        val swapped =
-    //            listManager.move(from, to, pushChange = false, updateChildren = false, isDrag =
-    // true)
-    //        if (swapped != null) {
-    //            if (positionFrom == null) {
-    //                positionFrom = from
-    //            }
-    //            positionTo = to
-    //            newPosition = swapped
-    //        }
-    //        return swapped != null
-    //    }
-
     override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
-
-        Log.d(TAG, "onSelectedChanged: $actionState, positionTo: $positionTo")
         if (lastState != actionState && actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
             onDragEnd()
         }
@@ -121,8 +95,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
         childViewHolders.forEach { animateFadeIn(it) }
     }
 
-    internal fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
-        Log.d(TAG, "onDragStart")
+    private fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
         reset()
         if (viewHolder.absoluteAdapterPosition == -1) {
             return
@@ -139,31 +112,28 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
         }
     }
 
-    internal fun reset() {
-        positionFrom = null
-        positionTo = null
-        newPosition = null
-        stateBefore = null
-    }
-
     internal fun onDragEnd() {
         Log.d(TAG, "onDragEnd: from: $positionFrom to: $positionTo")
-        if (positionFrom != null) {
-            listManager.endDrag()
-        }
         if (positionFrom == positionTo) {
             return
         }
         if (positionTo != null && positionTo != -1 && stateBefore != null) {
             // The items have already been moved accordingly via move() calls
             listManager.finishMove(
-                listManager.getItem(positionTo!!),
-                itemTo!!,
+                positionTo!!,
+                itemBefore!!,
                 parentBefore,
                 stateBefore!!,
                 pushChange = true,
             )
         }
+    }
+
+    internal fun reset() {
+        positionFrom = null
+        positionTo = null
+        newPosition = null
+        stateBefore = null
     }
 
     private fun animateFadeOut(viewHolder: ViewHolder) {

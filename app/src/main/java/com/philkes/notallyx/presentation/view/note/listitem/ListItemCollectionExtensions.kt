@@ -1,34 +1,41 @@
-package com.philkes.notallyx.presentation.view.note.listitem.sorting
+package com.philkes.notallyx.presentation.view.note.listitem
 
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
-import com.philkes.notallyx.data.model.areAllChecked
 import com.philkes.notallyx.data.model.deepCopy
 import com.philkes.notallyx.data.model.findChild
-import com.philkes.notallyx.data.model.findParentPosition
 import com.philkes.notallyx.data.model.plus
+import com.philkes.notallyx.utils.filter
+import com.philkes.notallyx.utils.forEach
+import com.philkes.notallyx.utils.indices
+import com.philkes.notallyx.utils.map
+import com.philkes.notallyx.utils.mapIndexed
 
 fun List<ListItem>.shiftItemOrders(orderRange: IntRange, valueToAdd: Int) {
-    this.forEach {
-        if (it.order!! in orderRange) {
-            it.order = it.order!! + valueToAdd
-        }
-    }
+    this.forEach { it.shiftOrder(orderRange, valueToAdd) }
 }
 
 fun SortedList<ListItem>.shiftItemOrders(orderRange: IntRange, valueToAdd: Int) {
-    this.forEach {
-        if (it.order!! in orderRange) {
-            it.order = it.order!! + valueToAdd
-        }
+    forEach { it.shiftOrder(orderRange, valueToAdd) }
+}
+
+private fun ListItem.shiftOrder(orderRange: IntRange, valueToAdd: Int) {
+    if (order!! in orderRange) {
+        order = order!! + valueToAdd
     }
 }
 
 fun List<ListItem>.shiftItemOrdersHigher(threshold: Int, valueToAdd: Int) {
-    this.forEach {
-        if (it.order!! > threshold) {
-            it.order = it.order!! + valueToAdd
-        }
+    this.forEach { it.shiftOrderHigher(threshold, valueToAdd) }
+}
+
+fun SortedList<ListItem>.shiftItemOrdersHigher(threshold: Int, valueToAdd: Int) {
+    this.forEach { it.shiftOrderHigher(threshold, valueToAdd) }
+}
+
+private fun ListItem.shiftOrderHigher(threshold: Int, valueToAdd: Int) {
+    if (order!! > threshold) {
+        order = order!! + valueToAdd
     }
 }
 
@@ -43,14 +50,6 @@ fun List<ListItem>.shiftItemOrdersBetween(
             it.order!! in (thresholdMin + 1 until thresholdMax) &&
                 excludeParent?.let(it::isChildOf) != true
         ) {
-            it.order = it.order!! + valueToAdd
-        }
-    }
-}
-
-fun SortedList<ListItem>.shiftItemOrdersHigher(threshold: Int, valueToAdd: Int) {
-    this.forEach {
-        if (it.order!! > threshold) {
             it.order = it.order!! + valueToAdd
         }
     }
@@ -73,13 +72,7 @@ fun SortedList<ListItem>.shiftItemOrdersBetween(
 }
 
 fun SortedList<ListItem>.toMutableList(): MutableList<ListItem> {
-    return this.indices.map { this[it] }.toMutableList()
-}
-
-fun SortedItemsList.cloneList(): SortedList<ListItem> {
-    val clone = SortedList(ListItem::class.java, callback)
-    clone.addAll(toMutableList().cloneList())
-    return clone
+    return indices.map { this[it] }.toMutableList()
 }
 
 fun List<ListItem>.cloneList(): MutableList<ListItem> {
@@ -91,17 +84,8 @@ fun List<ListItem>.cloneList(): MutableList<ListItem> {
     return clone
 }
 
-fun SortedList<ListItem>.findById(id: Int): Pair<Int, ListItem>? {
-    val position = this.indexOfFirst { it.id == id } ?: return null
-    return Pair(position, this[position])
-}
-
 fun SortedList<ListItem>.toReadableString(): String {
     return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
-}
-
-fun SortedList<ListItem>.findParent(childPosition: Int): Pair<Int, ListItem>? {
-    return findParent(this[childPosition])
 }
 
 fun SortedList<ListItem>.findParent(childItem: ListItem): Pair<Int, ListItem>? {
@@ -120,66 +104,6 @@ fun List<ListItem>.findParent(childItem: ListItem): Pair<Int, ListItem>? {
         }
     }
     return null
-}
-
-fun <R> SortedList<ListItem>.map(transform: (ListItem) -> R): List<R> {
-    return (0 until this.size()).map { transform.invoke(this[it]) }
-}
-
-fun <R> SortedList<ListItem>.mapIndexed(transform: (Int, ListItem) -> R): List<R> {
-    return (0 until this.size()).mapIndexed { idx, it -> transform.invoke(idx, this[it]) }
-}
-
-fun SortedList<ListItem>.forEach(function: (item: ListItem) -> Unit) {
-    return (0 until this.size()).forEach { function.invoke(this[it]) }
-}
-
-fun SortedList<ListItem>.forEachIndexed(function: (idx: Int, item: ListItem) -> Unit) {
-    for (i in 0 until this.size()) {
-        function.invoke(i, this[i])
-    }
-}
-
-fun SortedList<ListItem>.filter(function: (item: ListItem) -> Boolean): List<ListItem> {
-    val list = mutableListOf<ListItem>()
-    for (i in 0 until this.size()) {
-        if (function.invoke(this[i])) {
-            list.add(this[i])
-        }
-    }
-    return list.toList()
-}
-
-fun SortedList<ListItem>.find(function: (item: ListItem) -> Boolean): ListItem? {
-    for (i in 0 until this.size()) {
-        if (function.invoke(this[i])) {
-            return this[i]
-        }
-    }
-    return null
-}
-
-fun SortedList<ListItem>.indexOfFirst(function: (item: ListItem) -> Boolean): Int? {
-    for (i in 0 until this.size()) {
-        if (function.invoke(this[i])) {
-            return i
-        }
-    }
-    return null
-}
-
-val SortedList<ListItem>.lastIndex: Int
-    get() = this.size() - 1
-
-val SortedList<ListItem>.indices: IntRange
-    get() = (0 until this.size())
-
-fun SortedList<ListItem>.isNotEmpty(): Boolean {
-    return size() > 0
-}
-
-fun SortedList<ListItem>.isEmpty(): Boolean {
-    return size() == 0
 }
 
 fun MutableList<ListItem>.removeWithChildren(item: ListItem): Pair<Int, Int> {
@@ -284,4 +208,114 @@ private fun shiftAllOrdersAfterItem(list: List<ListItem>, item: ListItem) {
     for (i in position + 1..sortedByOrders.lastIndex) {
         sortedByOrders[i].order = sortedByOrders[i].order!! + 1
     }
+}
+
+fun List<ListItem>.areAllChecked(except: ListItem? = null): Boolean {
+    return this.none { !it.checked && (except == null || it.id != except.id) }
+}
+
+fun MutableList<ListItem>.containsId(id: Int): Boolean {
+    return this.any { it.id == id }
+}
+
+fun Collection<ListItem>.toReadableString(): String {
+    return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
+}
+
+fun List<ListItem>.findChildrenPositions(parentPosition: Int): List<Int> {
+    val childrenPositions = mutableListOf<Int>()
+    for (position in parentPosition + 1 until this.size) {
+        if (this[position].isChild) {
+            childrenPositions.add(position)
+        } else {
+            break
+        }
+    }
+    return childrenPositions
+}
+
+fun List<ListItem>.findParentPosition(childPosition: Int): Int? {
+    for (position in childPosition - 1 downTo 0) {
+        if (!this[position].isChild) {
+            return position
+        }
+    }
+    return null
+}
+
+fun Collection<ListItem>.printList(text: String? = null) {
+    text?.let { print("--------------\n$it\n") }
+    println("--------------")
+    println(toReadableString())
+    println("--------------")
+}
+
+fun Collection<ListItem>.findParentsByChecked(checked: Boolean): List<ListItem> {
+    return filter { !it.isChild && it.checked == checked }.distinct()
+}
+
+fun SortedList<ListItem>.findParentsByChecked(checked: Boolean): List<ListItem> {
+    return filter { !it.isChild && it.checked == checked }.distinct()
+}
+
+fun SortedList<ListItem>.deleteCheckedItems() {
+    mapIndexed { index, listItem -> Pair(index, listItem) }
+        .filter { it.second.checked }
+        .sortedBy { it.second.isChild }
+        .forEach { remove(it.second) }
+}
+
+fun MutableList<ListItem>.deleteCheckedItems(): Set<Int> {
+    return mapIndexed { index, listItem -> Pair(index, listItem) }
+        .filter { it.second.checked }
+        .sortedBy { it.second.isChild }
+        .onEach { remove(it.second) }
+        .map { it.first }
+        .toSet()
+}
+
+/**
+ * Find correct parent for `childPosition` and update it's `children`.
+ *
+ * @return Correct parent
+ */
+fun List<ListItem>.refreshParent(childPosition: Int): ListItem? {
+    val item = this[childPosition]
+    findParent(item)?.let { (pos, parent) -> parent.children.removeWithChildren(item) }
+    return findParentPosition(childPosition)?.let { parentPos ->
+        this[parentPos].children.addAll(childPosition - parentPos - 1, item + item.children)
+        item.children.clear()
+        this[parentPos]
+    }
+}
+
+fun SortedList<ListItem>.removeFromParent(child: ListItem): ListItem? {
+    if (!child.isChild) {
+        return null
+    }
+    return findParent(child)?.second?.also { it.children.remove(child) }
+}
+
+fun List<ListItem>.removeFromParent(child: ListItem): ListItem? {
+    if (!child.isChild) {
+        return null
+    }
+    return findParent(child)?.second?.also { it.children.remove(child) }
+}
+
+fun MutableList<ListItem>.addToParent(childPosition: Int) {
+    findParentPosition(childPosition)?.let { parentPos ->
+        this[parentPos].children.add(childPosition - parentPos - 1, this[childPosition])
+    }
+}
+
+fun MutableList<ListItem>.removeChildrenBelowPositionFromParent(
+    parentPosition: Int,
+    thresholdPosition: Int,
+): List<ListItem> {
+    val children = this[parentPosition].children
+    val childrenBelow =
+        children.filterIndexed { idx, _ -> parentPosition + idx + 1 > thresholdPosition - 1 }
+    children.removeAll(childrenBelow)
+    return childrenBelow
 }

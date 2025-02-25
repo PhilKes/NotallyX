@@ -1,49 +1,44 @@
-package com.philkes.notallyx.presentation.view.note.listitem
+package com.philkes.notallyx.presentation.view.note.listitem.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
-import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
+import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
+import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
-class ListItemAdapter(
+data class ListItemHighlight(
+    val itemPos: Int,
+    val resultPos: Int,
+    val startIdx: Int,
+    val endIdx: Int,
+    var selected: Boolean,
+)
+
+abstract class ListItemAdapterBase(
+    private val adapter: RecyclerView.Adapter<*>,
     @ColorInt var backgroundColor: Int,
     private val textSize: TextSize,
     elevation: Float,
     private val preferences: NotallyXPreferences,
     private val listManager: ListManager,
     private val isCheckedListAdapter: Boolean,
-) : ListAdapter<ListItem, ListItemVH>(DIFF_CALLBACK), HighlightText {
+) {
 
     private val callback = ListItemDragCallback(elevation, listManager)
     private val touchHelper = ItemTouchHelper(callback)
-
     private val highlights = mutableMapOf<Int, MutableList<ListItemHighlight>>()
 
-    lateinit var items: MutableList<ListItem>
-        private set
-
-    override fun submitList(list: MutableList<ListItem>?) {
-        list?.let { items = it }
-        super.submitList(list)
-    }
-
-    override fun submitList(list: MutableList<ListItem>?, commitCallback: Runnable?) {
-        list?.let { items = it }
-        super.submitList(list, commitCallback)
-    }
-
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+    fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         touchHelper.attachToRecyclerView(recyclerView)
     }
 
-    override fun onBindViewHolder(holder: ListItemVH, position: Int) {
+    fun onBindViewHolder(holder: ListItemVH, position: Int) {
         val item = getItem(position)
         holder.bind(
             backgroundColor,
@@ -54,7 +49,9 @@ class ListItemAdapter(
         )
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListItemVH {
+    abstract fun getItem(position: Int): ListItem
+
+    fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ListItemVH {
         val inflater = LayoutInflater.from(parent.context)
         val binding = RecyclerListItemBinding.inflate(inflater, parent, false)
         binding.root.background = parent.background
@@ -63,24 +60,24 @@ class ListItemAdapter(
 
     internal fun setBackgroundColor(@ColorInt color: Int) {
         backgroundColor = color
-        notifyDataSetChanged()
+        adapter.notifyDataSetChanged()
     }
 
     internal fun clearHighlights(): Set<Int> {
         val highlightedItemPos =
             highlights.entries.flatMap { (_, value) -> value.map { it.itemPos } }.toSet()
         highlights.clear()
-        highlightedItemPos.forEach { notifyItemChanged(it) }
+        highlightedItemPos.forEach { adapter.notifyItemChanged(it) }
         return highlightedItemPos
     }
 
-    override fun highlightText(highlight: ListItemHighlight) {
+    fun highlightText(highlight: ListItemHighlight) {
         if (highlights.containsKey(highlight.itemPos)) {
             highlights[highlight.itemPos]!!.add(highlight)
         } else {
             highlights[highlight.itemPos] = mutableListOf(highlight)
         }
-        notifyItemChanged(highlight.itemPos)
+        adapter.notifyItemChanged(highlight.itemPos)
     }
 
     internal fun selectHighlight(pos: Int): Int {
@@ -90,7 +87,7 @@ class ListItemAdapter(
                 val isSelected = it.selected
                 it.selected = it.resultPos == pos
                 if (isSelected != it.selected) {
-                    notifyItemChanged(it.itemPos)
+                    adapter.notifyItemChanged(it.itemPos)
                 }
                 if (it.selected) {
                     selectedItemPos = it.itemPos
@@ -98,31 +95,5 @@ class ListItemAdapter(
             }
         }
         return selectedItemPos
-    }
-
-    internal fun notifyListItemChanged(id: Int) {
-        val index = currentList.indexOfFirst { it.id == id }
-        notifyItemChanged(index)
-    }
-
-    data class ListItemHighlight(
-        val itemPos: Int,
-        val resultPos: Int,
-        val startIdx: Int,
-        val endIdx: Int,
-        var selected: Boolean,
-    )
-
-    companion object {
-        private val DIFF_CALLBACK =
-            object : DiffUtil.ItemCallback<ListItem>() {
-                override fun areItemsTheSame(oldItem: ListItem, newItem: ListItem) =
-                    oldItem.id == newItem.id
-
-                override fun areContentsTheSame(oldItem: ListItem, newItem: ListItem) =
-                    oldItem.body == newItem.body &&
-                        oldItem.isChild == newItem.isChild &&
-                        oldItem.checked == newItem.checked
-            }
     }
 }

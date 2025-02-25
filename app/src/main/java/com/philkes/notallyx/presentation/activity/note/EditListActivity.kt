@@ -10,21 +10,22 @@ import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.note.action.MoreListActions
 import com.philkes.notallyx.presentation.view.note.action.MoreListBottomSheet
-import com.philkes.notallyx.presentation.view.note.listitem.CheckedListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.HighlightText
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.CheckedListItemAdapter
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemAdapter
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemHighlight
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemVH
+import com.philkes.notallyx.presentation.view.note.listitem.init
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemParentSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.SortedItemsList
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.init
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.splitByChecked
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
-import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
+import com.philkes.notallyx.presentation.view.note.listitem.splitByChecked
+import com.philkes.notallyx.presentation.view.note.listitem.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.autoSortByCheckedEnabled
 import com.philkes.notallyx.utils.findAllOccurrences
+import com.philkes.notallyx.utils.indices
+import com.philkes.notallyx.utils.mapIndexed
 import java.util.concurrent.atomic.AtomicInteger
 
 class EditListActivity : EditActivity(Type.LIST), MoreListActions {
@@ -100,7 +101,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 val occurrences = item.body.findAllOccurrences(search)
                 occurrences.onEach { (startIdx, endIdx) ->
                     adapter?.highlightText(
-                        ListItemAdapter.ListItemHighlight(
+                        ListItemHighlight(
                             idx,
                             resultPosCounter.getAndIncrement(),
                             startIdx,
@@ -127,7 +128,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 val occurrences = item.body.findAllOccurrences(search)
                 occurrences.onEach { (startIdx, endIdx) ->
                     adapter?.highlightText(
-                        ListItemAdapter.ListItemHighlight(
+                        ListItemHighlight(
                             idx,
                             resultPosCounter.getAndIncrement(),
                             startIdx,
@@ -228,9 +229,10 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 listManager,
                 false,
             )
-        val items = mutableListOf<ListItem>()
         val initializedItems = notallyModel.items.init(true)
-        if (preferences.listItemSorting.value == ListItemSort.AUTO_SORT_BY_CHECKED) {
+        if (preferences.autoSortByCheckedEnabled) {
+            val (checkedItems, uncheckedItems) = initializedItems.splitByChecked()
+            adapter?.submitList(uncheckedItems.toMutableList())
             adapterChecked =
                 CheckedListItemAdapter(
                     colorInt,
@@ -240,21 +242,19 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                     listManager,
                     true,
                 )
-            val (checkedItems, uncheckedItems) = initializedItems.splitByChecked()
-            items.addAll(uncheckedItems)
-            itemsChecked = SortedItemsList(ListItemParentSortCallback(adapterChecked!!))
-            itemsChecked!!.addAll(checkedItems)
-            adapter?.submitList(items)
+            itemsChecked =
+                SortedItemsList(ListItemParentSortCallback(adapterChecked!!)).apply {
+                    addAll(checkedItems)
+                }
             adapterChecked?.setList(itemsChecked!!)
-            binding.MainListView.adapter = adapter
             binding.CheckedListView.adapter = adapterChecked
-            listManager.initList(items, adapter!!, itemsChecked, adapterChecked!!)
         } else {
             items.addAll(initializedItems)
             adapter?.submitList(items)
-            binding.MainListView.adapter = adapter
-            listManager.initList(items, adapter!!)
         }
+        listManager.init(adapter!!, itemsChecked, adapterChecked!!)
+        binding.MainListView.adapter = adapter
+
         savedInstanceState?.let {
             val itemPos = it.getInt(EXTRA_ITEM_POS, -1)
             if (itemPos > -1) {
@@ -280,6 +280,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
     override fun setColor() {
         super.setColor()
         adapter?.setBackgroundColor(colorInt)
+        adapterChecked?.setBackgroundColor(colorInt)
     }
 
     companion object {

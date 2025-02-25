@@ -1,9 +1,9 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.data.model.printList
 import com.philkes.notallyx.presentation.view.note.listitem.ListState
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.cloneList
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
+import com.philkes.notallyx.presentation.view.note.listitem.cloneList
+import com.philkes.notallyx.presentation.view.note.listitem.printList
+import com.philkes.notallyx.presentation.view.note.listitem.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertChecked
 import com.philkes.notallyx.test.assertOrder
@@ -115,7 +115,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeIsChild(2, true)
         listManager.changeChecked(0, checked = true, pushChange = true)
 
-        listManager.changeChecked(0, checked = false, isFromCheckedList = true, pushChange = true)
+        listManager.changeChecked(0, checked = false, inCheckedList = true, pushChange = true)
 
         items.assertSize(6)
         itemsChecked!!.assertSize(0)
@@ -131,7 +131,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeChecked(0, checked = true, pushChange = true)
         listManager.addWithChildren(0, "Parent1", "Child1", "Child2")
 
-        listManager.changeChecked(0, checked = false, isFromCheckedList = true, pushChange = true)
+        listManager.changeChecked(0, checked = false, inCheckedList = true, pushChange = true)
 
         itemsChecked!!.assertSize(0)
         "A".assertIsNotChecked()
@@ -148,7 +148,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeIsChild(3, true)
         listManager.changeChecked(1, checked = true, pushChange = true)
 
-        listManager.changeChecked(1, checked = false, isFromCheckedList = true, pushChange = true)
+        listManager.changeChecked(1, checked = false, inCheckedList = true, pushChange = true)
 
         itemsChecked!!.assertSize(0)
         items.assertOrder("A", "B", "C", "D", "E", "F")
@@ -163,7 +163,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(4, true)
         listManager.changeChecked(3, checked = true, pushChange = true)
-        listManager.changeChecked(1, checked = false, isFromCheckedList = true, pushChange = true)
+        listManager.changeChecked(1, checked = false, inCheckedList = true, pushChange = true)
         listItemDragCallback.simulateDrag(3, 1, 2)
         items.printList("Before")
         listManager.changeChecked(1, checked = true, pushChange = true)
@@ -183,7 +183,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         listManager.changeChecked(2, checked = true)
         listItemDragCallback.simulateDrag(1, 2, 1)
         items.printList("Before")
-        listManager.changeChecked(0, checked = false, isFromCheckedList = true)
+        listManager.changeChecked(0, checked = false, inCheckedList = true)
         items.printList("After")
 
         items.assertOrder("A", "C", "D", "E", "B", "F")

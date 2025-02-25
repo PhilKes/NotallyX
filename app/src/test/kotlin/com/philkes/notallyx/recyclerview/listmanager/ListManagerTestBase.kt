@@ -4,15 +4,14 @@ import android.view.inputmethod.InputMethodManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.ListItem
-import com.philkes.notallyx.presentation.view.note.listitem.CheckedListItemAdapter
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
-import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.CheckedListItemAdapter
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemAdapter
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemVH
+import com.philkes.notallyx.presentation.view.note.listitem.init
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemParentSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.SortedItemsList
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.init
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -20,6 +19,7 @@ import com.philkes.notallyx.test.assertChildren
 import com.philkes.notallyx.test.createListItem
 import com.philkes.notallyx.test.mockAndroidLog
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.find
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -89,7 +89,7 @@ open class ListManagerTestBase {
             .`when`(adapter)
             .submitList(any())
 
-        listManager.initList(itemsInternal, adapter, itemsChecked, adapterChecked)
+        listManager.init(adapter, itemsChecked, adapterChecked)
         adapter.submitList(items)
         listItemDragCallback = ListItemDragCallback(1.0f, listManager)
         val listItemSortingPreference = mock(EnumPreference::class.java)

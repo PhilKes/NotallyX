@@ -1,7 +1,6 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
-import com.philkes.notallyx.data.model.printList
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.lastIndex
+import com.philkes.notallyx.presentation.view.note.listitem.printList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertOrder
 import com.philkes.notallyx.test.createListItem

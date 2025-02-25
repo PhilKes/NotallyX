@@ -2,12 +2,17 @@ package com.philkes.notallyx.presentation.view.note.listitem.sorting
 
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
+import androidx.recyclerview.widget.SortedListAdapterCallback
 import com.philkes.notallyx.data.model.ListItem
-import com.philkes.notallyx.data.model.containsId
+import com.philkes.notallyx.presentation.view.note.listitem.containsId
+import com.philkes.notallyx.presentation.view.note.listitem.findParent
 
-/** Sort algorithm that only sorts by [ListItem.order] */
+/**
+ * Sort algorithm that only sorts by [ListItem.order]. A children is always below it's parent and
+ * above parents with a lower order.
+ */
 class ListItemParentSortCallback(adapter: RecyclerView.Adapter<*>?) :
-    SortedListCustomNotifyCallback<ListItem>(adapter) {
+    SortedListAdapterCallback<ListItem>(adapter) {
 
     private var items: SortedList<ListItem>? = null
 

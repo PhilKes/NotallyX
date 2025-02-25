@@ -3,11 +3,10 @@ package com.philkes.notallyx.test
 import android.util.Log
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
-import com.philkes.notallyx.data.model.toReadableString
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.toReadableString
+import com.philkes.notallyx.presentation.view.note.listitem.toReadableString
 import com.philkes.notallyx.utils.changehistory.ListIsChildChange
+import com.philkes.notallyx.utils.find
 import io.mockk.every
 import io.mockk.mockkStatic
 import org.junit.Assert.assertEquals
