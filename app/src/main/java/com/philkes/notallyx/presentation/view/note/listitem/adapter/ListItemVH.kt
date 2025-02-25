@@ -1,4 +1,4 @@
-package com.philkes.notallyx.presentation.view.note.listitem
+package com.philkes.notallyx.presentation.view.note.listitem.adapter
 
 import android.util.TypedValue
 import android.view.KeyEvent
@@ -10,6 +10,7 @@ import android.widget.TextView.VISIBLE
 import androidx.annotation.ColorInt
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView.NO_POSITION
 import cn.leaqi.drawer.SwipeDrawer.DIRECTION_LEFT
 import cn.leaqi.drawer.SwipeDrawer.STATE_CLOSE
 import cn.leaqi.drawer.SwipeDrawer.STATE_OPEN
@@ -21,6 +22,7 @@ import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
+import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
@@ -29,6 +31,7 @@ class ListItemVH(
     val listManager: ListManager,
     touchHelper: ItemTouchHelper,
     textSize: TextSize,
+    val isInCheckedAutoSort: Boolean,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var dragHandleInitialY: Float = 0f
@@ -86,7 +89,7 @@ class ListItemVH(
         @ColorInt backgroundColor: Int,
         item: ListItem,
         position: Int,
-        highlights: List<ListItemAdapter.ListItemHighlight>?,
+        highlights: List<ListItemHighlight>?,
         autoSort: ListItemSort,
     ) {
         updateEditText(item, position)
@@ -126,7 +129,9 @@ class ListItemVH(
     private fun updateDeleteButton(item: ListItem, position: Int) {
         binding.Delete.apply {
             visibility = if (item.checked) VISIBLE else INVISIBLE
-            setOnClickListener { listManager.delete(absoluteAdapterPosition) }
+            setOnClickListener {
+                listManager.delete(absoluteAdapterPosition, inCheckedList = isInCheckedAutoSort)
+            }
             contentDescription = "Delete$position"
         }
     }
@@ -144,7 +149,11 @@ class ListItemVH(
                     // TODO: when there are multiple checked items above it does not jump to the
                     // last
                     // unchecked item but always re-adds a new item
-                    listManager.delete(absoluteAdapterPosition, false) != null
+                    listManager.delete(
+                        absoluteAdapterPosition,
+                        inCheckedList = isInCheckedAutoSort,
+                        force = false,
+                    )
                 } else {
                     false
                 }
@@ -159,7 +168,13 @@ class ListItemVH(
         if (checkBoxListener == null) {
             checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
                 buttonView!!.setOnCheckedChangeListener(null)
-                listManager.changeChecked(absoluteAdapterPosition, isChecked)
+                if (absoluteAdapterPosition != NO_POSITION) {
+                    listManager.changeChecked(
+                        absoluteAdapterPosition,
+                        isChecked,
+                        isInCheckedAutoSort,
+                    )
+                }
                 buttonView.setOnCheckedChangeListener(checkBoxListener)
             }
         }
@@ -200,7 +215,11 @@ class ListItemVH(
                     if (text.trim().length > count) {
                         editText.setText(text.substring(0, start) + text.substring(start + count))
                     } else {
-                        listManager.delete(absoluteAdapterPosition, pushChange = false)
+                        listManager.delete(
+                            absoluteAdapterPosition,
+                            inCheckedList = isInCheckedAutoSort,
+                            pushChange = false,
+                        )
                     }
                     items.forEachIndexed { idx, it ->
                         listManager.add(absoluteAdapterPosition + idx + 1, it, pushChange = true)

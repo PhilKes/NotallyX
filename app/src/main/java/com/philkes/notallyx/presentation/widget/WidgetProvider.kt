@@ -16,15 +16,14 @@ import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.data.model.findChildrenPositions
-import com.philkes.notallyx.data.model.findParentPosition
 import com.philkes.notallyx.presentation.activity.ConfigureWidgetActivity
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
-import com.philkes.notallyx.presentation.activity.note.ViewImageActivity.Companion.EXTRA_POSITION
 import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getContrastFontColor
+import com.philkes.notallyx.presentation.view.note.listitem.findChildrenPositions
+import com.philkes.notallyx.presentation.view.note.listitem.findParentPosition
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.utils.embedIntentExtras

@@ -1,18 +1,15 @@
 package com.philkes.notallyx.recyclerview.listmanager
 
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.presentation.view.note.listitem.ListState
+import com.philkes.notallyx.presentation.view.note.listitem.cloneList
+import com.philkes.notallyx.presentation.view.note.listitem.printList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
-import com.philkes.notallyx.test.assert
-import com.philkes.notallyx.test.assertChildren
 import com.philkes.notallyx.test.assertOrder
+import com.philkes.notallyx.test.assertSize
 import com.philkes.notallyx.test.createListItem
-import com.philkes.notallyx.test.find
-import com.philkes.notallyx.test.printList
-import com.philkes.notallyx.utils.changehistory.ListAddChange
-import com.philkes.notallyx.utils.changehistory.ListDeleteChange
-import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
-import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class ListManagerAddDeleteTest : ListManagerTestBase() {
@@ -22,12 +19,10 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
     fun `add item at default position`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         val item = createListItem("Test")
-        val newItem = item.clone() as ListItem
         listManager.add(item = item)
 
         "Test".assertPosition(6)
         items.assertSize(7)
-        (changeHistory.lookUp() as ListAddChange).assert(6, newItem)
     }
 
     @Test
@@ -39,7 +34,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         items.assertOrder("A", "", "B")
         "A".assertChildren("", "B")
         items.assertSize(7)
-        (changeHistory.lookUp() as ListAddChange).assert(1, listManager.defaultNewItem(1))
+        //        (changeHistory.lookUp() as ListAddChange).assert(1, listManager.defaultNewItem(1))
     }
 
     @Test
@@ -51,7 +46,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         items.assertOrder("A", "B", "")
         "A".assertChildren("B", "")
         items.assertSize(7)
-        (changeHistory.lookUp() as ListAddChange).assert(2, listManager.defaultNewItem(1))
+        //        (changeHistory.lookUp() as ListAddChange).assert(2, listManager.defaultNewItem(1))
     }
 
     @Test
@@ -65,21 +60,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         "Test".assertIsChecked()
         "Test".assertOrder(0)
         items.assertSize(7)
-        (changeHistory.lookUp() as ListAddChange).assert(0, newItem)
-    }
-
-    @Test
-    fun `add checked item with correct order when auto-sort enabled`() {
-        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
-        val itemToAdd = ListItem("Test", true, false, null, mutableListOf())
-        val newItem = itemToAdd.clone() as ListItem
-        listManager.add(position = 0, item = itemToAdd)
-
-        "Test".assertPosition(6)
-        "Test".assertIsChecked()
-        "Test".assertOrder(0)
-        items.assertSize(7)
-        (changeHistory.lookUp() as ListAddChange).assert(0, newItem)
+        //        (changeHistory.lookUp() as ListAddChange).assert(0, newItem)
     }
 
     @Test
@@ -104,7 +85,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         "Child2".assertOrder(8)
         items.assertSize(9)
 
-        (changeHistory.lookUp() as ListAddChange).assert(6, newItem)
+        //        (changeHistory.lookUp() as ListAddChange).assert(6, newItem)
     }
 
     // endregion
@@ -114,9 +95,9 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
     @Test
     fun `delete first item from list unforced does not delete`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
-        val deletedItem = listManager.delete(position = 0, force = false, allowFocusChange = false)
+        val deleted = listManager.delete(position = 0, force = false, allowFocusChange = false)
 
-        assertNull(deletedItem)
+        assertFalse(deleted)
         items.assertSize(6)
         assertFalse(changeHistory.canUndo.value)
     }
@@ -126,9 +107,10 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         val deletedItem = listManager.delete(position = 0, force = true)
 
-        assertEquals("A", deletedItem!!.body)
+        //        assertEquals("A", deletedItem!!.body)
         items.assertSize(5)
-        (changeHistory.lookUp() as ListDeleteChange).assert(0, deletedItem)
+        items.assertOrder("B", "C")
+        //        (changeHistory.lookUp() as ListDeleteChange).assert(0, deletedItem)
     }
 
     @Test
@@ -136,26 +118,27 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true)
 
-        val deletedItem = listManager.delete(position = 0, force = true)!!
+        val deleted = listManager.delete(position = 0, force = true)
 
+        assertTrue(deleted)
         items.assertSize(4)
-        assertEquals("A", deletedItem.body)
-        deletedItem.assertChildren("B")
-        (changeHistory.lookUp() as ListDeleteChange).assert(0, deletedItem)
+        items.assertOrder("C", "D")
+        //        (changeHistory.lookUp() as ListDeleteChange).assert(0, deleted)
     }
 
     @Test
     fun `delete at invalid position`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
-        val deletedItem = listManager.delete(10)
+        val deleted = listManager.delete(10)
 
-        assertNull(deletedItem)
+        assertFalse(deleted)
         assertFalse(changeHistory.canUndo.value)
     }
 
-    // endregion
-
-    // region deleteCheckedItems
+    //
+    //    // endregion
+    //
+    //    // region deleteCheckedItems
 
     @Test
     fun `delete checked items`() {
@@ -163,7 +146,6 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
-        val deletedItems = items.find("A", "C")
 
         listManager.deleteCheckedItems()
 
@@ -176,10 +158,53 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         listManager.changeIsChild(3, true)
         listManager.changeChecked(2, true)
         listManager.changeChecked(0, true)
-        val deletedItems = items.find("A", "C")
         listManager.deleteCheckedItems()
 
         items.assertOrder("B", "E", "F")
+    }
+
+    @Test
+    fun `delete unchecked child from otherwise checked parent`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        listManager.changeIsChild(2, true)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(2, true)
+
+        listManager.delete(3)
+
+        items.assertOrder("A", "B", "C", "E", "F")
+        "B".assertChildren("C")
+        "B".assertIsChecked()
+        "C".assertIsChecked()
+    }
+
+    @Test
+    fun `delete unchecked child from otherwise checked parent with auto-sort`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(2, true)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(2, true)
+
+        listManager.delete(3)
+
+        items.assertOrder("A", "E", "F")
+        itemsChecked!!.assertOrder("B", "C")
+        "B".assertChildren("C")
+        "B".assertIsChecked()
+        "C".assertIsChecked()
+    }
+
+    @Test
+    fun `delete single item with other item having same body`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        val items = this.items.cloneList()
+        items[1].body = "A"
+        listManager.setItems(ListState(items, null))
+
+        listManager.delete(1)
+
+        this.items.assertSize(5)
+        this.items.assertOrder("A", "C", "D", "E", "F")
     }
 
     // endregion

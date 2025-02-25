@@ -1,5 +1,7 @@
 package com.philkes.notallyx.data.model
 
+import com.philkes.notallyx.presentation.view.note.listitem.areAllChecked
+
 operator fun ListItem.plus(list: List<ListItem>): List<ListItem> {
     return mutableListOf(this) + list
 }
@@ -8,35 +10,17 @@ fun ListItem.findChild(childId: Int): ListItem? {
     return this.children.find { child -> child.id == childId }
 }
 
-fun List<ListItem>.areAllChecked(except: ListItem? = null): Boolean {
-    return this.none { !it.checked && it != except }
-}
-
-fun MutableList<ListItem>.containsId(id: Int): Boolean {
-    return this.any { it.id == id }
-}
-
-fun Collection<ListItem>.toReadableString(): String {
-    return map { "$it order: ${it.order} id: ${it.id}" }.joinToString("\n")
-}
-
-fun List<ListItem>.findChildrenPositions(parentPosition: Int): List<Int> {
-    val childrenPositions = mutableListOf<Int>()
-    for (position in parentPosition + 1 until this.size) {
-        if (this[position].isChild) {
-            childrenPositions.add(position)
-        } else {
-            break
-        }
+fun ListItem.check(checked: Boolean, checkChildren: Boolean = true) {
+    this.checked = checked
+    if (checkChildren) {
+        this.children.forEach { child -> child.checked = checked }
     }
-    return childrenPositions
 }
 
-fun List<ListItem>.findParentPosition(childPosition: Int): Int? {
-    for (position in childPosition - 1 downTo 0) {
-        if (!this[position].isChild) {
-            return position
-        }
-    }
-    return null
+fun ListItem.shouldParentBeUnchecked(): Boolean {
+    return children.isNotEmpty() && !children.areAllChecked() && checked
+}
+
+fun ListItem.shouldParentBeChecked(): Boolean {
+    return children.isNotEmpty() && children.areAllChecked() && !checked
 }

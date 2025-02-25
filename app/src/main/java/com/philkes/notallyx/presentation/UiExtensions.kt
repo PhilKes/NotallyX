@@ -295,11 +295,11 @@ fun EditText.createListTextWatcherWithHistory(
         override fun afterTextChanged(s: Editable?) {
             if (!ignoreOriginalChange) {
                 listManager.changeText(
-                    this@createListTextWatcherWithHistory,
-                    this,
                     positionGetter.invoke(),
                     EditTextState(getText()!!.clone(), selectionStart),
                     before = stateBefore,
+                    editText = this@createListTextWatcherWithHistory,
+                    listener = this,
                 )
             }
         }

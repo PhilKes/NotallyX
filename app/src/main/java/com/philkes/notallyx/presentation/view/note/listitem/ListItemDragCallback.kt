@@ -15,9 +15,12 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
     private var lastIsCurrentlyActive = false
     private var childViewHolders: List<ViewHolder> = mutableListOf()
 
-    private var itemsBefore: List<ListItem>? = null
+    private var stateBefore: ListState? = null
     private var positionFrom: Int? = null
+    private var parentBefore: ListItem? = null
+    private var itemBefore: ListItem? = null
     private var positionTo: Int? = null
+
     private var newPosition: Int? = null
 
     override fun isLongPressDragEnabled() = false
@@ -40,27 +43,21 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
 
     internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
-            itemsBefore = listManager.getItems()
-            listManager.startDrag(from)
+            positionFrom = from
+            stateBefore = listManager.getState()
+            val item = listManager.getItem(from)
+            parentBefore = if (item.isChild) listManager.findParent(item)?.second else null
         }
-        val swapped =
-            listManager.move(from, to, pushChange = false, updateChildren = false, isDrag = true)
-        if (swapped != null) {
-            if (positionFrom == null) {
-                positionFrom = from
-            }
-            positionTo = to
-            newPosition = swapped
+        val (positionTo, itemBefore) = listManager.move(from, to)
+        if (positionTo != -1) {
+            this.itemBefore = itemBefore
+            this.positionTo = positionTo
         }
-        return swapped != null
+        return positionTo != -1
     }
 
     override fun onSelectedChanged(viewHolder: ViewHolder?, actionState: Int) {
-        if (
-            lastState != actionState &&
-                actionState == ItemTouchHelper.ACTION_STATE_IDLE &&
-                positionTo != -1
-        ) {
+        if (lastState != actionState && actionState == ItemTouchHelper.ACTION_STATE_IDLE) {
             onDragEnd()
         }
         lastState = actionState
@@ -98,8 +95,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
         childViewHolders.forEach { animateFadeIn(it) }
     }
 
-    internal fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
-        Log.d(TAG, "onDragStart")
+    private fun onDragStart(viewHolder: ViewHolder, recyclerView: RecyclerView) {
         reset()
         if (viewHolder.absoluteAdapterPosition == -1) {
             return
@@ -116,33 +112,28 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
         }
     }
 
+    internal fun onDragEnd() {
+        Log.d(TAG, "onDragEnd: from: $positionFrom to: $positionTo")
+        if (positionFrom == positionTo) {
+            return
+        }
+        if (positionTo != null && positionTo != -1 && stateBefore != null) {
+            // The items have already been moved accordingly via move() calls
+            listManager.finishMove(
+                positionTo!!,
+                itemBefore!!,
+                parentBefore,
+                stateBefore!!,
+                pushChange = true,
+            )
+        }
+    }
+
     internal fun reset() {
         positionFrom = null
         positionTo = null
         newPosition = null
-        itemsBefore = null
-    }
-
-    internal fun onDragEnd() {
-        Log.d(TAG, "onDragEnd: from: $positionFrom to: $positionTo")
-        if (positionFrom != null) {
-            listManager.endDrag()
-        }
-        if (positionFrom == positionTo) {
-            return
-        }
-        if (newPosition != null && itemsBefore != null) {
-            // The items have already been moved accordingly via move() calls
-            listManager.finishMove(
-                positionFrom!!,
-                positionTo!!,
-                newPosition!!,
-                itemsBefore!!,
-                updateIsChild = true,
-                updateChildren = true,
-                pushChange = true,
-            )
-        }
+        stateBefore = null
     }
 
     private fun animateFadeOut(viewHolder: ViewHolder) {

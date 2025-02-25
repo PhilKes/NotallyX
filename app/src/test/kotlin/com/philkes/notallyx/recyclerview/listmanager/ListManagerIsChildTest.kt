@@ -45,6 +45,36 @@ class ListManagerIsChildTest : ListManagerTestBase() {
         (changeHistory.lookUp() as ListIsChildChange).assert(false, 1)
     }
 
+    @Test
+    fun `changeIsChild unchecks checked parent`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        listManager.changeIsChild(1, true)
+        listManager.changeIsChild(2, true)
+        listManager.changeChecked(1, true)
+        listManager.changeChecked(2, true)
+
+        listManager.changeIsChild(3, isChild = true)
+
+        "A".assertChildren("B", "C", "D")
+        "A".assertIsNotChecked()
+        "D".assertIsNotChecked()
+    }
+
+    @Test
+    fun `changeIsChild make unchecked parent child in otherwise checked parent with auto-sort`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(1, true)
+        listManager.changeIsChild(2, true)
+        listManager.changeIsChild(3, true)
+        listManager.changeChecked(1, true)
+        listManager.changeChecked(2, true)
+
+        listManager.changeIsChild(3, isChild = false)
+
+        items.assertOrder("D", "E", "F")
+        itemsChecked!!.assertOrder("A", "B", "C")
+    }
+
     // endregion
 
 }

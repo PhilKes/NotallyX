@@ -102,7 +102,7 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>(), ReminderLi
 
     private fun setupRecyclerView() {
         reminderAdapter = ReminderAdapter(this)
-        binding.RecyclerView.apply {
+        binding.MainListView.apply {
             initListView(this@RemindersActivity)
             adapter = reminderAdapter
         }

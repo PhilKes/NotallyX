@@ -15,7 +15,13 @@ open class ListEditTextChange(
 ) : ListPositionValueChange<EditTextState>(after, before, position) {
 
     override fun update(position: Int, value: EditTextState, isUndo: Boolean) {
-        listManager.changeText(editText, listener, position, value, pushChange = false)
+        listManager.changeText(
+            position,
+            value,
+            pushChange = false,
+            editText = editText,
+            listener = listener,
+        )
         editText.apply {
             removeTextChangedListener(listener)
             text = value.text.withoutSpans<CharacterStyle>()

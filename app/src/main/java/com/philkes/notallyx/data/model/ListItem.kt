@@ -7,7 +7,6 @@ data class ListItem(
     var order: Int?,
     var children: MutableList<ListItem>,
     var id: Int = -1,
-    var isDragged: Boolean = false,
 ) : Cloneable {
 
     public override fun clone(): Any {
@@ -19,7 +18,6 @@ data class ListItem(
             order,
             children.map { it.clone() as ListItem }.toMutableList(),
             id,
-            isDragged,
         )
     }
 
@@ -36,7 +34,9 @@ data class ListItem(
         if (other !is ListItem) {
             return false
         }
-        return (this.body == other.body &&
+        return (this.id == other.id &&
+            this.body == other.body &&
+            this.order == other.order &&
             this.checked == other.checked &&
             this.isChild == other.isChild)
     }

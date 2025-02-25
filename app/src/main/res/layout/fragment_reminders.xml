@@ -15,7 +15,7 @@
       app:tint="?attr/colorPrimary" />
 
     <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/RecyclerView"
+      android:id="@+id/MainListView"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_below="@id/ChipGroup"
