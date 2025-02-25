@@ -3,17 +3,15 @@ package com.philkes.notallyx.recyclerview.listmanager
 import android.view.inputmethod.InputMethodManager
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.note.listitem.CheckedListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemParentSortCallback
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.SortedItemsList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.find
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.indexOfFirst
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.init
 import com.philkes.notallyx.presentation.viewmodel.preference.EnumPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
@@ -44,7 +42,7 @@ open class ListManagerTestBase {
     protected lateinit var preferences: NotallyXPreferences
     protected lateinit var listItemDragCallback: ListItemDragCallback
     private lateinit var itemsInternal: MutableList<ListItem>
-    protected var itemsChecked: SortedList<ListItem>? = null
+    protected var itemsChecked: SortedItemsList? = null
 
     lateinit var listManager: ListManager
 
@@ -67,15 +65,10 @@ open class ListManagerTestBase {
     }
 
     protected fun setSorting(sorting: ListItemSort) {
-        val sortCallback =
-            when (sorting) {
-                ListItemSort.AUTO_SORT_BY_CHECKED -> ListItemSortedByCheckedCallback(adapter)
-                else -> ListItemNoSortCallback(adapter)
-            }
         itemsInternal = mutableListOf<ListItem>()
-        if (sortCallback is ListItemSortedByCheckedCallback) {
-            sortCallback.setList(items)
-            itemsChecked = SortedList(ListItem::class.java, ListItemNoSortCallback(adapterChecked))
+        if (sorting == ListItemSort.AUTO_SORT_BY_CHECKED) {
+            val sortCallback = ListItemParentSortCallback(adapterChecked)
+            itemsChecked = SortedItemsList(sortCallback)
         }
         itemsInternal.addAll(
             listOf(

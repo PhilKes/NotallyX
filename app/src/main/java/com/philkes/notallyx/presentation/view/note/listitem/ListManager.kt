@@ -14,7 +14,7 @@ import com.philkes.notallyx.data.model.findChild
 import com.philkes.notallyx.data.model.findParentPosition
 import com.philkes.notallyx.data.model.plus
 import com.philkes.notallyx.data.model.toReadableString
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedList
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.SortedItemsList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.addWithChildren
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.cloneList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.filter
@@ -23,7 +23,9 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.lastIndex
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.removeWithChildren
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.shiftItemOrders
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.shiftItemOrdersBetween
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.shiftItemOrdersHigher
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.changehistory.ChangeCheckedForAllChange
@@ -55,7 +57,7 @@ class ListManager(
     private val items: MutableList<ListItem>
         get() = adapter.items
 
-    private var itemsChecked: SortedList<ListItem>? = null
+    private var itemsChecked: SortedItemsList? = null
 
     fun add(
         position: Int = items.size,
@@ -343,7 +345,15 @@ class ListManager(
 
     fun setItems(state: ListState) {
         submitList(state.items)
-        this.itemsChecked?.replaceAll(state.checkedItems!!)
+        this.itemsChecked?.apply {
+            //            callback.setItems(state.checkedItems!!)
+            clear()
+            //            addAll(state.checkedItems.toMutableList())
+            val (children, parents) = state.checkedItems!!.toMutableList().partition { it.isChild }
+            //             Need to use replaceAll for auto-sorting checked items
+            replaceAll(parents.toTypedArray(), false)
+            addAll(children.toTypedArray(), false)
+        }
     }
 
     fun changeText(
@@ -369,35 +379,24 @@ class ListManager(
         }
     }
 
-    private fun ListItemSortedList.changeChecked(
-        checked: Boolean,
-        item: ListItem,
-        changeParentToo: Boolean,
-        changeChildren: Boolean = true,
-    ) {
-        if (item.isChild) {
-            findParent(item)?.let { (_, parent) ->
-                val updatedParent = parent.clone() as ListItem
-                updatedParent.findChild(item.id)!!.checked = checked
-                if (changeParentToo) {
-                    updatedParent.checked = checked
-                }
-                addWithChildren(updatedParent)
-            }
-        } else {
-            val updatedParent = item.clone() as ListItem
-            updatedParent.checked = checked
-            if (changeChildren) {
-                updatedParent.children.forEach { it.checked = checked }
-            }
-            addWithChildren(updatedParent)
-        }
-    }
-
     private fun checkWithAutoSort(
         parent: ListItem,
         items: MutableList<ListItem> = this@ListManager.items,
     ) {
+        if (parent.children.isNotEmpty()) {
+            // Order could not be correct yet since at the time of making the item a child
+            // there could have been checked items in between the child and parent
+            //            val parentOrder = parent.order!!
+            //            shiftItemOrdersBetween(
+            //                parentOrder,
+            //                parent.children.first().order!!,
+            //                parent.children.size,
+            //                excludeParent = parent
+            //            )
+            //            parent.children.forEachIndexed { index, child -> child.order = parentOrder
+            // + 1+ index }
+        }
+
         val (pos, count) = items.removeWithChildren(parent)
         if (items == this@ListManager.items) {
             adapter.notifyItemRangeRemoved(pos, count)
@@ -519,14 +518,6 @@ class ListManager(
         }
     }
 
-    private fun ListItemSortedList.findParentIds(checked: Boolean): List<Int> {
-        return filter { !it.isChild && it.checked == checked }.map { it.id }
-    }
-
-    private fun Collection<ListItem>.findParentIds(checked: Boolean): List<Int> {
-        return filter { !it.isChild && it.checked == checked }.map { it.id }.distinct()
-    }
-
     private fun Collection<ListItem>.findParentsByChecked(checked: Boolean): List<ListItem> {
         return filter { !it.isChild && it.checked == checked }.distinct()
     }
@@ -564,6 +555,26 @@ class ListManager(
         //        }
     }
 
+    private fun shiftItemOrdersBetween(
+        thresholdMin: Int,
+        thresholdMax: Int,
+        valueToAdd: Int,
+        excludeParent: ListItem? = null,
+    ) {
+        items.shiftItemOrdersBetween(
+            thresholdMin,
+            thresholdMax,
+            valueToAdd,
+            excludeParent = excludeParent,
+        )
+        itemsChecked?.shiftItemOrdersBetween(
+            thresholdMin,
+            thresholdMax,
+            valueToAdd,
+            excludeParent = excludeParent,
+        )
+    }
+
     fun changeIsChild(position: Int, isChild: Boolean, pushChange: Boolean = true) {
         val stateBefore = getState()
         items.findParentPosition(position)?.let { parentPos ->
@@ -571,15 +582,20 @@ class ListManager(
             val item = items[position]
             item.isChild = isChild
             if (isChild) {
-                nearestParent.children.addAll(position - parentPos - 1, item + item.children)
+                val childIndex = position - parentPos - 1
+                nearestParent.children.addAll(childIndex, item + item.children)
+                // Order has to be updated because there could be checked items between the new
+                // child and parent
                 item.children.clear()
             } else {
-                val childIndex = nearestParent.children.indexOf(item)
-                val childrenBelow =
-                    nearestParent.children.filterIndexed { idx, _ -> idx > childIndex }
-                nearestParent.children.removeAll(childrenBelow)
-                nearestParent.children.remove(item)
-                item.children = childrenBelow.toMutableList()
+                nearestParent.children.apply {
+                    val childIndex = indexOf(item)
+                    val childrenBelow = filterIndexed { idx, _ -> idx > childIndex }
+                    removeAll(childrenBelow)
+                    remove(item)
+                    item.children = childrenBelow.toMutableList()
+                }
+                // TODO: update order
             }
             if (!item.isChild) {
                 item.updateParentChecked()
@@ -640,17 +656,12 @@ class ListManager(
     }
 
     private fun MutableList<ListItem>.deleteCheckedItems() {
-        val isFromCheckedList = this == itemsChecked
         mapIndexed { index, listItem -> Pair(index, listItem) }
             .filter { it.second.checked }
             .sortedBy { it.second.isChild }
             .forEach {
-                if (isFromCheckedList) {
-                    itemsChecked!!.remove(it.second)
-                } else {
-                    items.remove(it.second)
-                    adapter.notifyItemRemoved(it.first)
-                }
+                remove(it.second)
+                adapter.notifyItemRemoved(it.first)
             }
     }
 
@@ -667,7 +678,7 @@ class ListManager(
     fun initList(
         items: MutableList<ListItem>,
         adapter: ListItemAdapter,
-        itemsChecked: SortedList<ListItem>? = null,
+        itemsChecked: SortedItemsList? = null,
         adapterChecked: CheckedListItemAdapter? = null,
     ) {
         //        this.items = items
@@ -689,7 +700,8 @@ class ListManager(
 
     //    internal fun getState() = ListState(items.cloneList(), itemsChecked?.cloneList())
     // TODO
-    internal fun getState() = ListState(items.cloneList(), itemsChecked?.cloneList())
+    internal fun getState() =
+        ListState(items.cloneList(), itemsChecked?.toMutableList()?.cloneList())
 
     internal fun defaultNewItem(position: Int) =
         ListItem(

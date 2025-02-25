@@ -195,7 +195,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         val items = this.items.cloneList()
         items[1].body = "A"
-        listManager.setItems(ListState(items, itemsChecked!!.toMutableList()))
+        listManager.setItems(ListState(items, itemsChecked!!.toMutableList().cloneList()))
 
         listManager.changeChecked(1, checked = true)
 
@@ -203,6 +203,38 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         this.items.assertOrder("A", "C", "D", "E", "F")
         itemsChecked!!.assertSize(1)
         itemsChecked!!.assertOrder("A")
+    }
+
+    @Test
+    fun `changeChecked true with auto-sort parent with child with checked item in between`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeChecked(2, true)
+        listManager.changeIsChild(2, true)
+
+        listManager.changeChecked(1, true)
+
+        items.assertOrder("A", "E", "F")
+        itemsChecked!!.assertOrder("B", "D", "C")
+        "B".assertChildren("D")
+    }
+
+    @Test
+    fun `changeChecked true with auto-sort parent with children with checked item in between`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeChecked(2, true)
+        listManager.changeIsChild(3, true)
+        listManager.changeIsChild(4, true)
+        listManager.changeIsChild(2, true)
+
+        listManager.changeChecked(1, true)
+
+        items.assertOrder("A")
+        itemsChecked!!.assertOrder("B", "D", "E", "F", "C")
+        "B".assertChildren("D", "E", "F")
+        "D".assertOrder(3)
+        "E".assertOrder(4)
+        "F".assertOrder(5)
+        "C".assertOrder(2)
     }
 
     // endregion

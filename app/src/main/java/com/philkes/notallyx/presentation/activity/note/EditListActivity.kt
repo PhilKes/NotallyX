@@ -15,8 +15,8 @@ import com.philkes.notallyx.presentation.view.note.listitem.HighlightText
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemAdapter
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemNoSortCallback
-import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemSortedByCheckedCallback
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemParentSortCallback
+import com.philkes.notallyx.presentation.view.note.listitem.sorting.SortedItemsList
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.indices
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.init
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.mapIndexed
@@ -34,7 +34,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
     private val items: MutableList<ListItem>
         get() = adapter!!.items
 
-    private var itemsChecked: SortedList<ListItem>? = null
+    private var itemsChecked: SortedItemsList? = null
     private lateinit var listManager: ListManager
 
     override fun finish() {
@@ -228,15 +228,9 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 listManager,
                 false,
             )
-        val sortCallback =
-            when (preferences.listItemSorting.value) {
-                ListItemSort.AUTO_SORT_BY_CHECKED -> ListItemSortedByCheckedCallback(adapter)
-                else -> ListItemNoSortCallback(adapter)
-            }
         val items = mutableListOf<ListItem>()
         val initializedItems = notallyModel.items.init(true)
-        if (sortCallback is ListItemSortedByCheckedCallback) {
-            sortCallback.setList(items)
+        if (preferences.listItemSorting.value == ListItemSort.AUTO_SORT_BY_CHECKED) {
             adapterChecked =
                 CheckedListItemAdapter(
                     colorInt,
@@ -248,8 +242,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 )
             val (checkedItems, uncheckedItems) = initializedItems.splitByChecked()
             items.addAll(uncheckedItems)
-            itemsChecked =
-                SortedList(ListItem::class.java, ListItemNoSortCallback(adapterChecked!!))
+            itemsChecked = SortedItemsList(ListItemParentSortCallback(adapterChecked!!))
             itemsChecked!!.addAll(checkedItems)
             adapter?.submitList(items)
             adapterChecked?.setList(itemsChecked!!)
