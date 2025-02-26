@@ -173,22 +173,17 @@ class ListManager(
         return result
     }
 
-    /**
-     * @return position of the moved item afterwards and the item that was at the `positionTo`
-     *   before.
-     */
-    fun move(positionFrom: Int, positionTo: Int): Pair<Int, ListItem?> {
+    /** @return position of the moved item afterwards and the moved item count. */
+    fun move(positionFrom: Int, positionTo: Int): Pair<Int, Int> {
         val stateBefore = getState()
         val list = items.toMutableList()
         val movedItem = list[positionFrom]
-        val itemBefore = list[positionTo]
-
         // Do not allow to move parent into its own children
         if (
             !movedItem.isChild &&
                 positionTo in (positionFrom..positionFrom + movedItem.children.size)
         ) {
-            return Pair(-1, null)
+            return Pair(-1, -1)
         }
 
         val itemCount = 1 + movedItem.children.size
@@ -212,21 +207,23 @@ class ListManager(
         (movedItem + movedItem.children).forEachIndexed { index, item ->
             item.order = insertOrder + index
         }
-        val (insertIdx, _) = list.addWithChildren(movedItem)
+        val (insertIdx, count) = list.addWithChildren(movedItem)
         adapter.submitList(list)
-        return Pair(insertIdx, itemBefore)
+        return Pair(insertIdx, count)
     }
 
+    /** Finishes a drag movement by updating [ListItem.isChild] accordingly. */
     fun finishMove(
         positionTo: Int,
-        itemBefore: ListItem,
+        count: Int,
         parentBefore: ListItem?,
         stateBefore: ListState,
         pushChange: Boolean,
     ) {
         val item = items[positionTo]
+        val itemBelow = items.getOrNull(positionTo + count)
+        val forceIsChild = itemBelow?.isChild == true && !item.isChild
         val positionFrom = stateBefore.items.indexOfFirst { it.id == item.id }
-        val forceIsChild = (itemBefore.isChild || itemBefore.children.isNotEmpty()) && !item.isChild
         var isChildChanged = false
         if (positionTo == 0) {
             item.isChild = false
