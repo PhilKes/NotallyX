@@ -157,6 +157,8 @@ fun List<ListItem>.splitByChecked(): Pair<List<ListItem>, List<ListItem>> = part
     it.checked && (!it.isChild || findParent(it)?.second?.children?.areAllChecked() == true)
 }
 
+fun <R> List<R>.getOrNull(index: Int) = if (lastIndex >= index) this[index] else null
+
 fun Collection<ListItem>.init(resetIds: Boolean = true): List<ListItem> {
     val initializedItems = deepCopy()
     initList(initializedItems, resetIds)

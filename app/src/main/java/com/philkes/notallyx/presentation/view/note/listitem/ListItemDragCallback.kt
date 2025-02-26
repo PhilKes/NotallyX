@@ -18,7 +18,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
     private var stateBefore: ListState? = null
     private var positionFrom: Int? = null
     private var parentBefore: ListItem? = null
-    private var itemBefore: ListItem? = null
+    private var itemCount: Int? = null
     private var positionTo: Int? = null
 
     private var newPosition: Int? = null
@@ -48,9 +48,9 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
             val item = listManager.getItem(from)
             parentBefore = if (item.isChild) listManager.findParent(item)?.second else null
         }
-        val (positionTo, itemBefore) = listManager.move(from, to)
+        val (positionTo, itemCount) = listManager.move(from, to)
         if (positionTo != -1) {
-            this.itemBefore = itemBefore
+            this.itemCount = itemCount
             this.positionTo = positionTo
         }
         return positionTo != -1
@@ -121,7 +121,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
             // The items have already been moved accordingly via move() calls
             listManager.finishMove(
                 positionTo!!,
-                itemBefore!!,
+                itemCount!!,
                 parentBefore,
                 stateBefore!!,
                 pushChange = true,

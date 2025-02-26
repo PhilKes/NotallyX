@@ -53,6 +53,20 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
+    fun `move parent below child of other parent`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        listManager.changeIsChild(3, true, false)
+        listManager.changeIsChild(4, true, false)
+        items.printList("Before")
+
+        listItemDragCallback.simulateDrag(0, 4, 1)
+
+        items.assertOrder("B", "C", "D", "E", "A", "F")
+        "A".assertIsParent()
+        "C".assertChildren("D", "E")
+    }
+
+    @Test
     fun `move parent with children to bottom`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
