@@ -96,7 +96,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     var audioRoot = app.getExternalAudioDirectory()
     var filesRoot = app.getExternalFilesDirectory()
 
-    private lateinit var originalNote: BaseNote
+    var originalNote: BaseNote? = null
 
     init {
         database.observeForever { baseNoteDao = it.getBaseNoteDao() }
@@ -284,7 +284,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             app.checkAutoSave(
                 preferences,
                 note = note,
-                forceFullBackup = originalNote.attachmentsDifferFrom(note),
+                forceFullBackup = originalNote?.attachmentsDifferFrom(note) == true,
             )
             return@withContext id
         }
