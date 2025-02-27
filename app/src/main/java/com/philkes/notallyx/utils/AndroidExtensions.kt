@@ -183,8 +183,10 @@ fun Context.logToFile(
     stackTrace: String? = null,
 ) {
     msg?.let {
-        if (throwable != null || stackTrace != null) {
-            Log.e(tag, it)
+        if (throwable != null) {
+            Log.e(tag, it, throwable)
+        } else if (stackTrace != null) {
+            Log.e(tag, "$it: $stackTrace")
         } else {
             Log.i(tag, it)
         }
@@ -249,7 +251,7 @@ fun Context.catchNoBrowserInstalled(callback: () -> Unit) {
     try {
         callback()
     } catch (exception: ActivityNotFoundException) {
-        showToast(com.philkes.notallyx.R.string.install_a_browser)
+        showToast(R.string.install_a_browser)
     }
 }
 
@@ -258,10 +260,19 @@ fun Context.createReportBugIntent(
     title: String? = null,
     body: String? = null,
 ): Intent {
+    fun String?.asQueryParam(paramName: String): String {
+        return this?.let { "&$paramName=${URLEncoder.encode(this, "UTF-8")}" } ?: ""
+    }
     return Intent(
             Intent.ACTION_VIEW,
             Uri.parse(
-                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${title?.let { "&title=$it" } ?: ""}${body?.let { "&what-happened=$it" } ?: ""}&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${stackTrace?.let { "&logs=$stackTrace" } ?: ""}"
+                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${
+                    title.asQueryParam("title")
+                }&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${
+                    stackTrace.asQueryParam("logs")
+                }${
+                    body.asQueryParam("what-happened")
+                    }"
                     .take(2000)
             ),
         )

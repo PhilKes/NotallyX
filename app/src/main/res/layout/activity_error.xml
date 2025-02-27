@@ -38,6 +38,14 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
+      <TextView
+        android:id="@+id/Exception"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
+        android:gravity="center"
+        android:textSize="14sp" />
+
       <Button
         android:id="@+id/RestartButton"
         android:layout_width="wrap_content"
