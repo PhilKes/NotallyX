@@ -156,7 +156,7 @@ abstract class EditActivity(private val type: Type) :
             val persistedId = savedInstanceState?.getLong("id")
             val selectedId = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0L)
             val id = persistedId ?: selectedId
-            if (persistedId == null) {
+            if (persistedId == null || notallyModel.originalNote == null) {
                 notallyModel.setState(id)
             }
             if (notallyModel.isNewNote && intent.action == Intent.ACTION_SEND) {
