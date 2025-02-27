@@ -86,6 +86,7 @@ import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 abstract class EditActivity(private val type: Type) :
@@ -124,6 +125,10 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
+    protected open fun updateModel() {
+        notallyModel.modifiedTimestamp = System.currentTimeMillis()
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putLong("id", notallyModel.id)
@@ -133,7 +138,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     open suspend fun saveNote() {
-        notallyModel.modifiedTimestamp = System.currentTimeMillis()
+        updateModel()
         notallyModel.saveNote()
         WidgetProvider.sendBroadcast(application, longArrayOf(notallyModel.id))
     }
@@ -174,6 +179,18 @@ abstract class EditActivity(private val type: Type) :
         }
 
         setupActivityResultLaunchers()
+
+        Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
+            try {
+                updateModel()
+                runBlocking(Dispatchers.IO) { saveNote() }
+            } catch (e: Exception) {
+                log(TAG, msg = "Saving note on Crash failed", throwable = e)
+            } finally {
+                // Let the system handle the crash
+                DEFAULT_EXCEPTION_HANDLER?.uncaughtException(thread, throwable)
+            }
+        }
     }
 
     private fun setupActivityResultLaunchers() {
@@ -955,5 +972,7 @@ abstract class EditActivity(private val type: Type) :
         const val EXTRA_NOTE_ID = "notallyx.intent.extra.NOTE_ID"
         const val EXTRA_FOLDER_FROM = "notallyx.intent.extra.FOLDER_FROM"
         const val EXTRA_FOLDER_TO = "notallyx.intent.extra.FOLDER_TO"
+
+        val DEFAULT_EXCEPTION_HANDLER = Thread.getDefaultUncaughtExceptionHandler()
     }
 }

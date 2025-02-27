@@ -39,11 +39,12 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
     private lateinit var listManager: ListManager
 
     override fun finish() {
-        updateModel()
+        notallyModel.setItems(items.toMutableList() + (itemsChecked?.toMutableList() ?: listOf()))
         super.finish()
     }
 
-    private fun updateModel() {
+    override fun updateModel() {
+        super.updateModel()
         notallyModel.setItems(items.toMutableList() + (itemsChecked?.toMutableList() ?: listOf()))
     }
 

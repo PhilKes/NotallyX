@@ -24,10 +24,11 @@ class ErrorActivity : AppCompatActivity() {
             }
 
             val stackTrace = CustomActivityOnCrash.getStackTraceFromIntent(intent)
-            stackTrace?.let { application.log(TAG, stackTrace = it) }
-            ReportButton.setOnClickListener {
-                reportBug(CustomActivityOnCrash.getStackTraceFromIntent(intent))
+            stackTrace?.let {
+                application.log(TAG, stackTrace = it)
+                Exception.text = stackTrace.lines().firstOrNull() ?: ""
             }
+            ReportButton.setOnClickListener { reportBug(stackTrace) }
         }
     }
 
