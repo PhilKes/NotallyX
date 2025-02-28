@@ -130,6 +130,14 @@ fun SortedList<ListItem>.removeWithChildren(item: ListItem) {
     (item.children + item).forEach { remove(it) }
 }
 
+fun SortedList<ListItem>.setItems(list: MutableList<ListItem>) {
+    clear()
+    val (children, parents) = list.partition { it.isChild }
+    //  Need to use replaceAll for auto-sorting checked items
+    replaceAll(parents.toTypedArray(), false)
+    addAll(children.toTypedArray(), false)
+}
+
 fun List<ListItem>.splitByChecked(): Pair<List<ListItem>, List<ListItem>> = partition {
     it.checked && (!it.isChild || findParent(it)?.second?.children?.areAllChecked() == true)
 }

@@ -17,6 +17,7 @@ import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemAdap
 import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemHighlight
 import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemVH
 import com.philkes.notallyx.presentation.view.note.listitem.init
+import com.philkes.notallyx.presentation.view.note.listitem.setItems
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.ListItemParentSortCallback
 import com.philkes.notallyx.presentation.view.note.listitem.sorting.SortedItemsList
 import com.philkes.notallyx.presentation.view.note.listitem.splitByChecked
@@ -245,15 +246,14 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 )
             itemsChecked =
                 SortedItemsList(ListItemParentSortCallback(adapterChecked!!)).apply {
-                    addAll(checkedItems)
+                    setItems(checkedItems.toMutableList())
                 }
             adapterChecked?.setList(itemsChecked!!)
             binding.CheckedListView.adapter = adapterChecked
         } else {
-            items.addAll(initializedItems)
-            adapter?.submitList(items)
+            adapter?.submitList(initializedItems.toMutableList())
         }
-        listManager.init(adapter!!, itemsChecked, adapterChecked!!)
+        listManager.init(adapter!!, itemsChecked, adapterChecked)
         binding.MainListView.adapter = adapter
 
         savedInstanceState?.let {
