@@ -27,7 +27,7 @@
 [Notally](https://github.com/OmGodse/Notally), but eXtended
 
 * Create **rich text** notes with support for bold, italics, mono space and strike-through
-* Create **task lists** and order them with subtasks
+* Create **task lists** and order them with subtasks (+ auto-sort checked items to the end)
 * Set **reminders** with notifications for important notes
 * Complement your notes with any type of file such as **pictures**, PDFs, etc.
 * **Sort notes** by title, last modified date, creation date

@@ -67,13 +67,7 @@ class ListManager(
 
     fun setItems(state: ListState) {
         adapter.submitList(state.items)
-        this.itemsChecked?.apply {
-            clear()
-            val (children, parents) = state.checkedItems!!.toMutableList().partition { it.isChild }
-            //  Need to use replaceAll for auto-sorting checked items
-            replaceAll(parents.toTypedArray(), false)
-            addAll(children.toTypedArray(), false)
-        }
+        this.itemsChecked?.setItems(state.checkedItems!!)
     }
 
     fun add(

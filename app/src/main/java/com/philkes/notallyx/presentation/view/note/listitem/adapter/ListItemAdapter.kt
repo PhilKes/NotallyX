@@ -69,8 +69,14 @@ class ListItemAdapter(
     internal fun selectHighlight(pos: Int) = itemAdapterBase.selectHighlight(pos)
 
     internal fun notifyListItemChanged(id: Int) {
-        val index = currentList.indexOfFirst { it.id == id }
-        notifyItemChanged(index)
+        val list = currentList
+        val index = list.indexOfFirst { it.id == id }
+        val item = list[index]
+        if (item.isChild) {
+            notifyItemChanged(index)
+        } else {
+            notifyItemRangeChanged(index, item.children.size + 1)
+        }
     }
 
     companion object {

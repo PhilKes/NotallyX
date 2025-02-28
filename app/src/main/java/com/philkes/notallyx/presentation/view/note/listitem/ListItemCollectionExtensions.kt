@@ -106,6 +106,10 @@ fun List<ListItem>.findParent(childItem: ListItem): Pair<Int, ListItem>? {
     return null
 }
 
+fun List<ListItem>.findInsertIdx(item: ListItem): Int {
+    return indexOfFirst { it.order!! > item.order!! }.let { if (it < 0) size else it }
+}
+
 fun MutableList<ListItem>.removeWithChildren(item: ListItem): Pair<Int, Int> {
     val index = indexOf(item)
     removeAll(item.children + item)
@@ -113,10 +117,7 @@ fun MutableList<ListItem>.removeWithChildren(item: ListItem): Pair<Int, Int> {
 }
 
 fun MutableList<ListItem>.addWithChildren(item: ListItem): Pair<Int, Int> {
-    var insertIdx = indexOfFirst { it.order!! > item.order!! }
-    if (insertIdx < 0) {
-        insertIdx = size
-    }
+    val insertIdx = findInsertIdx(item)
     addAll(insertIdx, item + item.children)
     return Pair(insertIdx, item.children.size + 1)
 }
@@ -129,28 +130,12 @@ fun SortedList<ListItem>.removeWithChildren(item: ListItem) {
     (item.children + item).forEach { remove(it) }
 }
 
-fun MutableList<ListItem>.updateChildInParent(
-    position: Int,
-    item: ListItem,
-    clearChildren: Boolean = true,
-) {
-    val childIndex: Int?
-    val parentInfo = findParent(item)
-    val parent: ListItem?
-    if (parentInfo == null) {
-        val parentPosition = findParentPosition(position)!!
-        childIndex = position - parentPosition - 1
-        parent = this[parentPosition]
-    } else {
-        parent = parentInfo.second
-        childIndex = parent.children.indexOfFirst { child -> child.id == item.id }
-        parent.children.removeAt(childIndex)
-    }
-    parent.children.add(childIndex, item)
-    parent.children.addAll(childIndex + 1, item.children)
-    if (clearChildren) {
-        item.children.clear()
-    }
+fun SortedList<ListItem>.setItems(list: MutableList<ListItem>) {
+    clear()
+    val (children, parents) = list.partition { it.isChild }
+    //  Need to use replaceAll for auto-sorting checked items
+    replaceAll(parents.toTypedArray(), false)
+    addAll(children.toTypedArray(), false)
 }
 
 fun List<ListItem>.splitByChecked(): Pair<List<ListItem>, List<ListItem>> = partition {
@@ -285,9 +270,12 @@ fun List<ListItem>.refreshParent(childPosition: Int): ListItem? {
     val item = this[childPosition]
     findParent(item)?.let { (pos, parent) -> parent.children.removeWithChildren(item) }
     return findParentPosition(childPosition)?.let { parentPos ->
-        this[parentPos].children.addAll(childPosition - parentPos - 1, item + item.children)
+        val parent = this[parentPos]
+        val children = parent.children
+        val childIndex = children.findInsertIdx(item)
+        children.addAll(childIndex, item + item.children)
         item.children.clear()
-        this[parentPos]
+        parent
     }
 }
 
