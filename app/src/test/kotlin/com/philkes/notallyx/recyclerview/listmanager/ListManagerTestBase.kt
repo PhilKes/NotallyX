@@ -110,6 +110,7 @@ open class ListManagerTestBase {
     }
 
     protected fun String.assertChildren(vararg childrenBodies: String) {
+        assertIsParent()
         findItem { it.body == this }!!.assertChildren(*childrenBodies)
     }
 

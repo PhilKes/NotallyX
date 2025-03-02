@@ -256,10 +256,10 @@ class ListManagerMoveTest : ListManagerTestBase() {
 
     // endregion
 
-    // region endDrag
+    // region finishMove
 
     @Test
-    fun `endDrag parent without children`() {
+    fun `finishMove parent without children`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listItemDragCallback.simulateDrag(3, 1, "D".itemCount)
 
@@ -267,7 +267,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag parent with children into other parent`() {
+    fun `finishMove parent with children into other parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
@@ -283,7 +283,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag parent with children into other parent with auto-sort enabled`() {
+    fun `finishMove parent with children into other parent with auto-sort enabled`() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
@@ -300,7 +300,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag parent with children to bottom`() {
+    fun `finishMove parent with children to bottom`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
@@ -315,7 +315,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag parent with children to top`() {
+    fun `finishMove parent with children to top`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
@@ -331,7 +331,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag child to other parent`() {
+    fun `finishMove child to other parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
 
@@ -342,7 +342,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag child above other child`() {
+    fun `finishMove child above other child`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
@@ -355,7 +355,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag child to top`() {
+    fun `finishMove child to top`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
 
@@ -367,7 +367,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag drag child to end of list`() {
+    fun `finishMove drag child to end of list`() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true)
         listItemDragCallback.simulateDrag(3, items.lastIndex, 1)
@@ -375,7 +375,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag drag child one below`() {
+    fun `finishMove drag child one below`() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true)
         listItemDragCallback.simulateDrag(3, 4, 1)
@@ -384,7 +384,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag last unchecked child from otherwise checked parent`() {
+    fun `finishMove last unchecked child from otherwise checked parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
@@ -401,7 +401,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag first unchecked child from otherwise checked parent`() {
+    fun `finishMove first unchecked child from otherwise checked parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
@@ -418,7 +418,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag unchecked child from otherwise checked parent with auto-sort`() {
+    fun `finishMove unchecked child from otherwise checked parent with auto-sort`() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
@@ -435,7 +435,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag unchecked child into checked parent`() {
+    fun `finishMove unchecked child into checked parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
@@ -451,7 +451,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `endDrag parent with child below other parent keeps it parent`() {
+    fun `finishMove parent with child below other parent keeps it parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
 
@@ -460,6 +460,20 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.assertOrder("C", "D", "A", "B", "E")
         "D".assertChildren()
         "A".assertIsParent()
+        "A".assertChildren("B")
+    }
+
+    @Test
+    fun `finishMove child to same position as before`() {
+        setSorting(ListItemSort.NO_AUTO_SORT)
+        listManager.changeIsChild(1, true, false)
+
+        listItemDragCallback.reset()
+        listItemDragCallback.move(1, 2)
+        listItemDragCallback.move(2, 1)
+        listItemDragCallback.onDragEnd()
+
+        items.assertOrder("A", "B", "C", "D", "E", "F")
         "A".assertChildren("B")
     }
 
