@@ -7,6 +7,7 @@ import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 class ActionMode {
 
     val enabled = NotNullLiveData(false)
+    val loading = NotNullLiveData(false)
     val count = NotNullLiveData(0)
     val selectedNotes = HashMap<Long, BaseNote>()
     val selectedIds = selectedNotes.keys
@@ -47,4 +48,6 @@ class ActionMode {
 
     // We assume selectedNotes.size is 1
     fun getFirstNote() = selectedNotes.values.first()
+
+    fun isEmpty() = selectedNotes.values.isEmpty()
 }
