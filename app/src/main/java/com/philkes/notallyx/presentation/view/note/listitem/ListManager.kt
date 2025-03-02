@@ -221,7 +221,7 @@ class ListManager(
         var isChildChanged = false
         if (positionTo == 0) {
             item.isChild = false
-            items.notifyPreviousFirstItem(0, 1)
+            items.notifyPreviousFirstItem(0, count)
             isChildChanged = true
         } else if (forceIsChild) {
             item.isChild = true
