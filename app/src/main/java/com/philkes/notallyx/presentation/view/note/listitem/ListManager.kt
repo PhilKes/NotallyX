@@ -232,9 +232,9 @@ class ListManager(
             isChildChanged = true
         }
 
+        parentBefore?.updateParentChecked()
         if (item.isChild) {
             items.refreshParent(positionTo)?.updateParentChecked()
-            parentBefore?.updateParentChecked()
         }
         if (isChildChanged) {
             adapter.notifyItemChanged(positionTo)
