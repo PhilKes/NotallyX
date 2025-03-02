@@ -294,18 +294,29 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
         val menu = binding.ActionMode.menu
         baseModel.folder.observe(this@MainActivity, ModelFolderObserver(menu, baseModel))
+        baseModel.actionMode.loading.observe(this@MainActivity) { loading ->
+            menu.setGroupEnabled(Menu.NONE, !loading)
+        }
     }
 
     private fun moveNotes(folderTo: Folder) {
-        val folderFrom = baseModel.actionMode.getFirstNote().folder
-        val ids = baseModel.moveBaseNotes(folderTo)
-        Snackbar.make(
-                findViewById(R.id.DrawerLayout),
-                getQuantityString(folderTo.movedToResId(), ids.size),
-                Snackbar.LENGTH_SHORT,
-            )
-            .apply { setAction(R.string.undo) { baseModel.moveBaseNotes(ids, folderFrom) } }
-            .show()
+        if (baseModel.actionMode.loading.value || baseModel.actionMode.isEmpty()) {
+            return
+        }
+        try {
+            baseModel.actionMode.loading.value = true
+            val folderFrom = baseModel.actionMode.getFirstNote().folder
+            val ids = baseModel.moveBaseNotes(folderTo)
+            Snackbar.make(
+                    findViewById(R.id.DrawerLayout),
+                    getQuantityString(folderTo.movedToResId(), ids.size),
+                    Snackbar.LENGTH_SHORT,
+                )
+                .apply { setAction(R.string.undo) { baseModel.moveBaseNotes(ids, folderFrom) } }
+                .show()
+        } finally {
+            baseModel.actionMode.loading.value = false
+        }
     }
 
     private fun share() {
