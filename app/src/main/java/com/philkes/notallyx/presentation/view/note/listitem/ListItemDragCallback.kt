@@ -114,9 +114,6 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
 
     internal fun onDragEnd() {
         Log.d(TAG, "onDragEnd: from: $positionFrom to: $positionTo")
-        if (positionFrom == positionTo) {
-            return
-        }
         if (positionTo != null && positionTo != -1 && stateBefore != null) {
             // The items have already been moved accordingly via move() calls
             listManager.finishMove(
