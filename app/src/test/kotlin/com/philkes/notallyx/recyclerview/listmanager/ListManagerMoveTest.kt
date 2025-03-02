@@ -422,13 +422,15 @@ class ListManagerMoveTest : ListManagerTestBase() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
+        listManager.changeIsChild(5, true, false)
         listManager.changeChecked(3, true)
+        listManager.changeChecked(5, true)
 
-        listItemDragCallback.simulateDrag(4, 1, 1)
+        listItemDragCallback.simulateDrag(4, 0, 1)
 
-        items.assertOrder("A", "E", "B", "F")
-        itemsChecked!!.assertOrder("C", "D")
-        "A".assertChildren("E")
+        items.assertOrder("E", "A", "B")
+        itemsChecked!!.assertOrder("C", "D", "F")
+        "C".assertChildren("D", "F")
         "E".assertIsNotChecked()
     }
 

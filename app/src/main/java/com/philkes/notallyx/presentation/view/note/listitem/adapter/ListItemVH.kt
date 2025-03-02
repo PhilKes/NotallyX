@@ -31,7 +31,7 @@ class ListItemVH(
     val listManager: ListManager,
     touchHelper: ItemTouchHelper,
     textSize: TextSize,
-    val isInCheckedAutoSort: Boolean,
+    private val inCheckedList: Boolean,
 ) : RecyclerView.ViewHolder(binding.root) {
 
     private var dragHandleInitialY: Float = 0f
@@ -130,7 +130,7 @@ class ListItemVH(
         binding.Delete.apply {
             visibility = if (item.checked) VISIBLE else INVISIBLE
             setOnClickListener {
-                listManager.delete(absoluteAdapterPosition, inCheckedList = isInCheckedAutoSort)
+                listManager.delete(absoluteAdapterPosition, inCheckedList = inCheckedList)
             }
             contentDescription = "Delete$position"
         }
@@ -151,7 +151,7 @@ class ListItemVH(
                     // unchecked item but always re-adds a new item
                     listManager.delete(
                         absoluteAdapterPosition,
-                        inCheckedList = isInCheckedAutoSort,
+                        inCheckedList = inCheckedList,
                         force = false,
                     )
                 } else {
@@ -169,11 +169,7 @@ class ListItemVH(
             checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
                 buttonView!!.setOnCheckedChangeListener(null)
                 if (absoluteAdapterPosition != NO_POSITION) {
-                    listManager.changeChecked(
-                        absoluteAdapterPosition,
-                        isChecked,
-                        isInCheckedAutoSort,
-                    )
+                    listManager.changeChecked(absoluteAdapterPosition, isChecked, inCheckedList)
                 }
                 buttonView.setOnCheckedChangeListener(checkBoxListener)
             }
@@ -217,7 +213,7 @@ class ListItemVH(
                     } else {
                         listManager.delete(
                             absoluteAdapterPosition,
-                            inCheckedList = isInCheckedAutoSort,
+                            inCheckedList = inCheckedList,
                             pushChange = false,
                         )
                     }
