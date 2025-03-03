@@ -110,6 +110,8 @@ fun List<ListItem>.findInsertIdx(item: ListItem): Int {
     return indexOfFirst { it.order!! > item.order!! }.let { if (it < 0) size else it }
 }
 
+fun List<ListItem>.firstBodyOrEmptyString() = firstOrNull()?.body ?: ""
+
 fun MutableList<ListItem>.removeWithChildren(item: ListItem): Pair<Int, Int> {
     val index = indexOf(item)
     removeAll(item.children + item)

@@ -195,7 +195,7 @@ class ListManagerCheckedTest : ListManagerTestBase() {
         setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
         val items = this.items.cloneList()
         items[1].body = "A"
-        listManager.setItems(ListState(items, itemsChecked!!.toMutableList().cloneList()))
+        listManager.setState(ListState(items, itemsChecked!!.toMutableList().cloneList()))
 
         listManager.changeChecked(1, checked = true)
 

@@ -152,24 +152,24 @@ class ListManagerMoveTest : ListManagerTestBase() {
     // region undoMove
 
     @Test
-    fun `setItems parent without children`() {
+    fun `setState parent without children`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listItemDragCallback.simulateDrag(1, 4, "B".itemCount)
         val itemsBeforeMove = (changeHistory.lookUp() as ListMoveChange).oldValue
 
-        listManager.setItems(itemsBeforeMove)
+        listManager.setState(itemsBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
     }
 
     @Test
-    fun `setItems parent with children into other parent`() {
+    fun `setState parent with children into other parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(2, true, false)
         listItemDragCallback.simulateDrag(1, 3, "B".itemCount)
         val itemsBeforeMove = (changeHistory.lookUp() as ListMoveChange).oldValue
 
-        listManager.setItems(itemsBeforeMove)
+        listManager.setState(itemsBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "B".assertChildren("C")
@@ -177,7 +177,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `setItems move parent with children to bottom`() {
+    fun `setState move parent with children to bottom`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(2, true, false)
@@ -186,7 +186,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("After move 0 to ${items.lastIndex}")
         val itemsBeforeMove = (changeHistory.lookUp() as ListMoveChange).oldValue
 
-        listManager.setItems(itemsBeforeMove)
+        listManager.setState(itemsBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "A".assertChildren("B", "C")
@@ -194,7 +194,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `setItems parent with children to top`() {
+    fun `setState parent with children to top`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(1, true, false)
         listManager.changeIsChild(4, true, false)
@@ -203,7 +203,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("After move 3 to 0")
         val itemsBeforeMove = (changeHistory.lookUp() as ListMoveChange).oldValue
 
-        listManager.setItems(itemsBeforeMove)
+        listManager.setState(itemsBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "A".assertChildren("B")
@@ -211,13 +211,13 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `setItems child to other parent`() {
+    fun `setState child to other parent`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listItemDragCallback.simulateDrag(3, 1, 1)
         val itemsBeforeMove = (changeHistory.lookUp() as ListMoveChange).oldValue
 
-        listManager.setItems(itemsBeforeMove)
+        listManager.setState(itemsBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "C".assertChildren("D")
@@ -225,7 +225,7 @@ class ListManagerMoveTest : ListManagerTestBase() {
     }
 
     @Test
-    fun `setItems child above other child`() {
+    fun `setState child above other child`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listManager.changeIsChild(4, true, false)
@@ -235,20 +235,20 @@ class ListManagerMoveTest : ListManagerTestBase() {
         items.printList("After move 5 to 3")
         val itemsBeforeMove = (changeHistory.lookUp() as ListMoveChange).oldValue
 
-        listManager.setItems(itemsBeforeMove)
+        listManager.setState(itemsBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "C".assertChildren("D", "E", "F")
     }
 
     @Test
-    fun `setItems child to top`() {
+    fun `setState child to top`() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         listManager.changeIsChild(3, true, false)
         listItemDragCallback.simulateDrag(3, 0, 1)
         val itemsBeforeMove = (changeHistory.lookUp() as ListMoveChange).oldValue
 
-        listManager.setItems(itemsBeforeMove)
+        listManager.setState(itemsBeforeMove)
 
         items.assertOrder("A", "B", "C", "D", "E", "F")
         "C".assertChildren("D")

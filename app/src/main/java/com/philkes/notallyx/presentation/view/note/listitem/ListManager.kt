@@ -23,6 +23,7 @@ import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.DeleteCheckedChange
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.ListAddChange
+import com.philkes.notallyx.utils.changehistory.ListBatchChange
 import com.philkes.notallyx.utils.changehistory.ListCheckedChange
 import com.philkes.notallyx.utils.changehistory.ListDeleteChange
 import com.philkes.notallyx.utils.changehistory.ListEditTextChange
@@ -30,7 +31,12 @@ import com.philkes.notallyx.utils.changehistory.ListIsChildChange
 import com.philkes.notallyx.utils.changehistory.ListMoveChange
 import com.philkes.notallyx.utils.lastIndex
 
-data class ListState(val items: MutableList<ListItem>, val checkedItems: MutableList<ListItem>?)
+data class ListState(
+    val items: MutableList<ListItem>,
+    val checkedItems: MutableList<ListItem>?,
+    val focusedItemPos: Int? = null,
+    val cursorPos: Int? = null,
+)
 
 /**
  * Should be used for all changes to the items list. Notifies the [RecyclerView.Adapter] and pushes
@@ -51,6 +57,7 @@ class ListManager(
         get() = adapter.items
 
     private var itemsChecked: SortedItemsList? = null
+    private var batchChangeBeforeState: ListState? = null
 
     fun init(
         adapter: ListItemAdapter,
@@ -65,9 +72,38 @@ class ListManager(
         this.itemsChecked?.let { Log.d(TAG, "itemsChecked:\n${it}") }
     }
 
-    fun setItems(state: ListState) {
+    internal fun getState(): ListState {
+        val (pos, cursorPos) = recyclerView.getFocusedPositionAndCursor()
+        return ListState(
+            items.cloneList(),
+            itemsChecked?.toMutableList()?.cloneList(),
+            pos,
+            cursorPos,
+        )
+    }
+
+    internal fun setState(state: ListState) {
         adapter.submitList(state.items)
         this.itemsChecked?.setItems(state.checkedItems!!)
+        // Focus item's EditText and set cursor position
+        state.focusedItemPos?.let { itemPos ->
+            recyclerView.postDelayed(
+                {
+                    (recyclerView.findViewHolderForAdapterPosition(itemPos) as? ListItemVH?)?.let {
+                        viewHolder ->
+                        inputMethodManager?.let { inputManager ->
+                            val maxCursorPos = viewHolder.binding.EditText.length()
+                            viewHolder.focusEditText(
+                                selectionStart =
+                                    state.cursorPos?.coerceIn(0, maxCursorPos) ?: maxCursorPos,
+                                inputMethodManager = inputManager,
+                            )
+                        }
+                    }
+                },
+                20,
+            ) // Delay is needed, otherwise focus is overwritten by submitList()
+        }
     }
 
     fun add(
@@ -84,7 +120,7 @@ class ListManager(
             } else if (position <= items.lastIndex) {
                 items[position - 1].order!! + 1
             } else {
-                items.last().order!! + 1
+                items.lastOrNull()?.let { it.order!! + 1 } ?: 0
             }
         shiftItemOrdersHigher(insertOrder - 1, 1 + item.children.size)
         item.order = insertOrder
@@ -345,12 +381,36 @@ class ListManager(
 
     fun findParent(item: ListItem) = items.findParent(item) ?: itemsChecked?.findParent(item)
 
+    internal fun startBatchChange(cursorPos: Int? = null) {
+        batchChangeBeforeState = getState()
+        cursorPos?.let { batchChangeBeforeState = batchChangeBeforeState!!.copy(cursorPos = it) }
+    }
+
+    internal fun finishBatchChange(focusedItemPos: Int? = null) {
+        batchChangeBeforeState?.let {
+            val state =
+                focusedItemPos?.let {
+                    getState().copy(focusedItemPos = focusedItemPos, cursorPos = null)
+                } ?: getState()
+            changeHistory.push(ListBatchChange(it, state, this))
+        }
+    }
+
     internal fun getItem(position: Int, fromCheckedList: Boolean = false): ListItem {
         return if (fromCheckedList) itemsChecked!![position] else items[position]
     }
 
-    internal fun getState() =
-        ListState(items.cloneList(), itemsChecked?.toMutableList()?.cloneList())
+    private fun RecyclerView.getFocusedPositionAndCursor(): Pair<Int?, Int?> {
+        return focusedChild?.let { view ->
+            val position = getChildAdapterPosition(view)
+            if (position == RecyclerView.NO_POSITION) {
+                return Pair(null, null)
+            }
+            val viewHolder = recyclerView.findViewHolderForAdapterPosition(position)
+            val cursorPos = (viewHolder as? ListItemVH)?.binding?.EditText?.selectionStart
+            return Pair(position, cursorPos)
+        } ?: Pair(null, null)
+    }
 
     internal fun defaultNewItem(position: Int) =
         ListItem(
