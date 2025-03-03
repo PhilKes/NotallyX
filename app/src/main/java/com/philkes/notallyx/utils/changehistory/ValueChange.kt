@@ -2,7 +2,7 @@ package com.philkes.notallyx.utils.changehistory
 
 import com.philkes.notallyx.utils.truncate
 
-abstract class ValueChange<T>(internal val newValue: T, internal val oldValue: T) : Change {
+abstract class ValueChange<T>(internal val oldValue: T, internal val newValue: T) : Change {
 
     override fun redo() {
         update(newValue, false)

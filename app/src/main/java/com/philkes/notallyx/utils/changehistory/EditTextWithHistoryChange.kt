@@ -11,7 +11,7 @@ class EditTextWithHistoryChange(
     before: EditTextState,
     after: EditTextState,
     private val updateModel: (newValue: Editable) -> Unit,
-) : ValueChange<EditTextState>(after, before) {
+) : ValueChange<EditTextState>(before, after) {
 
     override fun update(value: EditTextState, isUndo: Boolean) {
         editText.applyWithoutTextWatcher {

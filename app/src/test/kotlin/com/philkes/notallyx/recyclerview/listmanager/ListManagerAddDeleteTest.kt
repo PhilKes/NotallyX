@@ -199,7 +199,7 @@ class ListManagerAddDeleteTest : ListManagerTestBase() {
         setSorting(ListItemSort.NO_AUTO_SORT)
         val items = this.items.cloneList()
         items[1].body = "A"
-        listManager.setItems(ListState(items, null))
+        listManager.setState(ListState(items, null))
 
         listManager.delete(1)
 

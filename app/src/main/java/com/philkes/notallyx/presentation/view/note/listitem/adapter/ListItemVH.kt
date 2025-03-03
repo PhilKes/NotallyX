@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton.OnCheckedChangeListener
+import android.widget.EditText
 import android.widget.TextView.INVISIBLE
 import android.widget.TextView.VISIBLE
 import androidx.annotation.ColorInt
@@ -18,13 +19,16 @@ import com.philkes.notallyx.data.imports.txt.extractListItems
 import com.philkes.notallyx.data.imports.txt.findListSyntaxRegex
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
+import com.philkes.notallyx.presentation.clone
 import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.view.note.listitem.firstBodyOrEmptyString
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
+import com.philkes.notallyx.utils.changehistory.EditTextState
 
 class ListItemVH(
     val binding: RecyclerListItemBinding,
@@ -208,24 +212,37 @@ class ListItemVH(
                 .findListSyntaxRegex(checkContains = true, plainNewLineAllowed = true)
                 ?.let { listSyntaxRegex ->
                     val items = changedText.extractListItems(listSyntaxRegex)
-                    if (text.trim().length > count) {
-                        editText.setText(text.substring(0, start) + text.substring(start + count))
-                    } else {
-                        listManager.delete(
-                            absoluteAdapterPosition,
-                            inCheckedList = inCheckedList,
-                            pushChange = false,
-                        )
-                    }
-                    items.forEachIndexed { idx, it ->
-                        listManager.add(absoluteAdapterPosition + idx + 1, it, pushChange = true)
+                    if (items.isNotEmpty()) {
+                        listManager.startBatchChange(start)
+                        val position = absoluteAdapterPosition
+                        val itemHadTextBefore = text.trim().length > count
+                        val firstPastedItemBody = items.firstBodyOrEmptyString()
+                        val updatedText =
+                            if (itemHadTextBefore) {
+                                text.substring(0, start) + firstPastedItemBody
+                            } else firstPastedItemBody
+                        editText.changeText(position, updatedText)
+                        items.drop(1).forEachIndexed { index, it ->
+                            listManager.add(position + 1 + index, it, pushChange = false)
+                        }
+                        listManager.finishBatchChange(position + items.size - 1)
                     }
                 }
         }
         return containsLines
     }
 
-    fun getSelection(): Pair<Int, Int> {
-        return Pair(binding.EditText.selectionStart, binding.EditText.selectionEnd)
+    private fun EditText.changeText(position: Int, after: CharSequence) {
+        setText(after)
+        val stateAfter = EditTextState(editableText.clone(), selectionStart)
+        listManager.changeText(
+            position,
+            stateAfter,
+            pushChange = false,
+            editText = null,
+            listener = null,
+        )
     }
+
+    fun getSelection() = with(binding.EditText) { Pair(selectionStart, selectionEnd) }
 }
