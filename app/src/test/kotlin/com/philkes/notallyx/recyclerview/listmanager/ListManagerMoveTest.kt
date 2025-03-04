@@ -3,6 +3,7 @@ package com.philkes.notallyx.recyclerview.listmanager
 import com.philkes.notallyx.presentation.view.note.listitem.printList
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.test.assertOrder
+import com.philkes.notallyx.test.assertSize
 import com.philkes.notallyx.test.createListItem
 import com.philkes.notallyx.test.simulateDrag
 import com.philkes.notallyx.utils.changehistory.ListMoveChange
@@ -477,6 +478,22 @@ class ListManagerMoveTest : ListManagerTestBase() {
         "A".assertChildren("B")
     }
 
+    @Test
+    fun `finishMove unchecked child moved below checked child in same parent with auto-sort`() {
+        setSorting(ListItemSort.AUTO_SORT_BY_CHECKED)
+        listManager.changeIsChild(1, true, false)
+        listManager.changeIsChild(2, true, false)
+        listManager.changeChecked(2, true)
+
+        listItemDragCallback.simulateDrag(1, 2, 1)
+
+        items.assertOrder("A", "C", "B", "D")
+        itemsChecked!!.assertSize(0)
+        "A".assertChildren("C", "B")
+        "A".assertIsNotChecked()
+        "C".assertIsChecked()
+        "B".assertIsNotChecked()
+    }
     // endregion
 
 }
