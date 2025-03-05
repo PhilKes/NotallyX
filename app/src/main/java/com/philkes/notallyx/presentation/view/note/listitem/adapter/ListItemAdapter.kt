@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.view.note.listitem.adapter
 
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -18,6 +19,7 @@ class ListItemAdapter(
     private val preferences: NotallyXPreferences,
     private val listManager: ListManager,
     private val isCheckedListAdapter: Boolean,
+    scrollView: NestedScrollView,
 ) : ListAdapter<ListItem, ListItemVH>(DIFF_CALLBACK), HighlightText {
 
     private val itemAdapterBase =
@@ -30,6 +32,7 @@ class ListItemAdapter(
                 preferences,
                 listManager,
                 isCheckedListAdapter,
+                scrollView,
             ) {
             override fun getItem(position: Int): ListItem = this@ListItemAdapter.getItem(position)
         }
