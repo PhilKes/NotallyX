@@ -3,7 +3,8 @@ package com.philkes.notallyx.presentation.view.note.listitem.adapter
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
-import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.core.widget.NestedScrollView
+import androidx.recyclerview.widget.NestedScrollViewItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
@@ -28,10 +29,11 @@ abstract class ListItemAdapterBase(
     private val preferences: NotallyXPreferences,
     private val listManager: ListManager,
     private val isCheckedListAdapter: Boolean,
+    scrollView: NestedScrollView,
 ) {
 
     private val callback = ListItemDragCallback(elevation, listManager)
-    private val touchHelper = ItemTouchHelper(callback)
+    private val touchHelper = NestedScrollViewItemTouchHelper(callback, scrollView)
     private val highlights = mutableMapOf<Int, MutableList<ListItemHighlight>>()
 
     fun onAttachedToRecyclerView(recyclerView: RecyclerView) {

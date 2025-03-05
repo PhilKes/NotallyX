@@ -2,6 +2,7 @@ package com.philkes.notallyx.presentation.view.note.listitem.adapter
 
 import android.view.ViewGroup
 import androidx.annotation.ColorInt
+import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.data.model.ListItem
@@ -17,6 +18,7 @@ class CheckedListItemAdapter(
     private val preferences: NotallyXPreferences,
     private val listManager: ListManager,
     private val isCheckedListAdapter: Boolean,
+    scrollView: NestedScrollView,
 ) : RecyclerView.Adapter<ListItemVH>(), HighlightText {
 
     private lateinit var list: SortedList<ListItem>
@@ -31,6 +33,7 @@ class CheckedListItemAdapter(
                 preferences,
                 listManager,
                 isCheckedListAdapter,
+                scrollView,
             ) {
             override fun getItem(position: Int): ListItem = list[position]
         }

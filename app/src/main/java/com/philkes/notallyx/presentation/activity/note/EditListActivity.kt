@@ -230,6 +230,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                 NotallyXPreferences.getInstance(application),
                 listManager,
                 false,
+                binding.ScrollView,
             )
         val initializedItems = notallyModel.items.init(true)
         if (preferences.autoSortByCheckedEnabled) {
@@ -243,6 +244,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
                     NotallyXPreferences.getInstance(application),
                     listManager,
                     true,
+                    binding.ScrollView,
                 )
             itemsChecked =
                 SortedItemsList(ListItemParentSortCallback(adapterChecked!!)).apply {

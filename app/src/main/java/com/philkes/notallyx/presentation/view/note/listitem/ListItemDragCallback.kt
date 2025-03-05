@@ -142,6 +142,6 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
     }
 
     companion object {
-        private const val TAG = "DragCallback"
+        private const val TAG = "ListItemDragCallback"
     }
 }
