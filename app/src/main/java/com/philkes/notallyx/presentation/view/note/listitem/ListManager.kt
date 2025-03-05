@@ -72,38 +72,40 @@ class ListManager(
         this.itemsChecked?.let { Log.d(TAG, "itemsChecked:\n${it}") }
     }
 
-    internal fun getState(): ListState {
+    internal fun getState(selectedPos: Int? = null): ListState {
         val (pos, cursorPos) = recyclerView.getFocusedPositionAndCursor()
         return ListState(
             items.cloneList(),
             itemsChecked?.toMutableList()?.cloneList(),
-            pos,
+            selectedPos ?: pos,
             cursorPos,
         )
     }
 
     internal fun setState(state: ListState) {
-        adapter.submitList(state.items)
-        this.itemsChecked?.setItems(state.checkedItems!!)
-        // Focus item's EditText and set cursor position
-        state.focusedItemPos?.let { itemPos ->
-            recyclerView.postDelayed(
-                {
-                    (recyclerView.findViewHolderForAdapterPosition(itemPos) as? ListItemVH?)?.let {
-                        viewHolder ->
-                        inputMethodManager?.let { inputManager ->
-                            val maxCursorPos = viewHolder.binding.EditText.length()
-                            viewHolder.focusEditText(
-                                selectionStart =
-                                    state.cursorPos?.coerceIn(0, maxCursorPos) ?: maxCursorPos,
-                                inputMethodManager = inputManager,
-                            )
-                        }
+        adapter.submitList(state.items) {
+            // Focus item's EditText and set cursor position
+            state.focusedItemPos?.let { itemPos ->
+                recyclerView.post {
+                    if (itemPos in 0..items.size) {
+                        recyclerView.smoothScrollToPosition(itemPos)
+                        (recyclerView.findViewHolderForAdapterPosition(itemPos) as? ListItemVH?)
+                            ?.let { viewHolder ->
+                                inputMethodManager?.let { inputManager ->
+                                    val maxCursorPos = viewHolder.binding.EditText.length()
+                                    viewHolder.focusEditText(
+                                        selectionStart =
+                                            state.cursorPos?.coerceIn(0, maxCursorPos)
+                                                ?: maxCursorPos,
+                                        inputMethodManager = inputManager,
+                                    )
+                                }
+                            }
                     }
-                },
-                20,
-            ) // Delay is needed, otherwise focus is overwritten by submitList()
+                }
+            }
         }
+        this.itemsChecked?.setItems(state.checkedItems!!)
     }
 
     fun add(
@@ -141,7 +143,7 @@ class ListManager(
         adapter.notifyItemRangeInserted(insertPos, count)
         items.notifyPreviousFirstItem(insertPos, count)
         if (pushChange) {
-            changeHistory.push(ListAddChange(stateBefore, getState(), this))
+            changeHistory.push(ListAddChange(stateBefore, getState(selectedPos = insertPos), this))
         }
 
         recyclerView.post {
@@ -205,7 +207,7 @@ class ListManager(
 
     /** @return position of the moved item afterwards and the moved item count. */
     fun move(positionFrom: Int, positionTo: Int): Pair<Int, Int> {
-        val stateBefore = getState()
+        val itemsCheckedBefore = itemsChecked?.toMutableList()?.cloneList()
         val list = items.toMutableList()
         val movedItem = list[positionFrom]
         // Do not allow to move parent into its own children
@@ -229,7 +231,7 @@ class ListManager(
                 Pair(toOrder until fromOrder, itemCount)
             }
         shiftItemOrders(orderRange, valueToAdd, items = list)
-        stateBefore.checkedItems?.shiftItemOrders(orderRange, valueToAdd)
+        itemsCheckedBefore?.shiftItemOrders(orderRange, valueToAdd)
 
         list.removeFromParent(movedItem)
         list.removeWithChildren(movedItem)

@@ -44,7 +44,7 @@ class ListItemDragCallback(private val elevation: Float, internal val listManage
     internal fun move(from: Int, to: Int): Boolean {
         if (positionFrom == null) {
             positionFrom = from
-            stateBefore = listManager.getState()
+            stateBefore = listManager.getState(selectedPos = from)
             val item = listManager.getItem(from)
             parentBefore = if (item.isChild) listManager.findParent(item)?.second else null
         }

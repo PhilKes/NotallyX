@@ -88,6 +88,12 @@ open class ListManagerTestBase {
             }
             .`when`(adapter)
             .submitList(any())
+        doAnswer { invocation ->
+                val listArgument = invocation.getArgument<MutableList<ListItem>>(0)
+                itemsInternal = listArgument
+            }
+            .`when`(adapter)
+            .submitList(any(), any())
 
         listManager.init(adapter, itemsChecked, adapterChecked)
         adapter.submitList(items)
