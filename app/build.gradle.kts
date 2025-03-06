@@ -134,14 +134,25 @@ tasks.preBuild.dependsOn(tasks.named("installLocalGitHooks"), tasks.exportTransl
 
 tasks.register("generateChangelogs") {
     doLast {
+        val githubToken = providers.gradleProperty("CHANGELOG_GITHUB_TOKEN").orNull
+
+        val command = mutableListOf(
+            "bash",
+            rootProject.file("generate-changelogs.sh").absolutePath,
+            "v${project.findProperty("app.lastVersionName").toString()}",
+            rootProject.file("CHANGELOG.md").absolutePath
+        )
+        if (!githubToken.isNullOrEmpty()) {
+            command.add(githubToken)
+        } else {
+            println("CHANGELOG_GITHUB_TOKEN not found, which limits the allowed amount of Github API calls")
+        }
         exec {
-            commandLine("bash", rootProject.file("generate-changelogs.sh").absolutePath,
-                "v${project.findProperty("app.lastVersionName").toString()}",
-                rootProject.file("CHANGELOG.md").absolutePath)
+            commandLine(command)
             standardOutput = System.out
             errorOutput = System.err
-            isIgnoreExitValue = true
         }
+
         val config = PropertiesConfiguration()
         val fileHandler = FileHandler(config).apply {
             file = rootProject.file("gradle.properties")
