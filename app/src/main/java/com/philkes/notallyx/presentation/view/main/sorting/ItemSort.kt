@@ -7,7 +7,7 @@ import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 
-abstract class BaseNoteSort(
+abstract class ItemSort(
     adapter: RecyclerView.Adapter<*>?,
     private val sortDirection: SortDirection,
 ) : SortedListAdapterCallback<Item>(adapter) {
