@@ -10,6 +10,7 @@ import com.philkes.notallyx.data.model.Header
 import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.databinding.RecyclerBaseNoteBinding
 import com.philkes.notallyx.databinding.RecyclerHeaderBinding
+import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteColorSort
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteCreationDateSort
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteModifiedDateSort
 import com.philkes.notallyx.presentation.view.main.sorting.BaseNoteTitleSort
@@ -99,7 +100,9 @@ class BaseNoteAdapter(
             NotesSortBy.TITLE -> BaseNoteTitleSort(this@BaseNoteAdapter, sortDirection)
             NotesSortBy.MODIFIED_DATE ->
                 BaseNoteModifiedDateSort(this@BaseNoteAdapter, sortDirection)
-            else -> BaseNoteCreationDateSort(this@BaseNoteAdapter, sortDirection)
+            NotesSortBy.CREATION_DATE ->
+                BaseNoteCreationDateSort(this@BaseNoteAdapter, sortDirection)
+            NotesSortBy.COLOR -> BaseNoteColorSort(this@BaseNoteAdapter, sortDirection)
         }
 
     private fun replaceSortCallback(sortCallback: SortedListAdapterCallback<Item>) {
