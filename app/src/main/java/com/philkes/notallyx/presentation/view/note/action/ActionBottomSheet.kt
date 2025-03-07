@@ -8,10 +8,12 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.annotation.ColorInt
 import androidx.core.content.ContextCompat
+import androidx.core.widget.NestedScrollView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.google.android.material.bottomsheet.BottomSheetBehavior.BottomSheetCallback
 import com.google.android.material.bottomsheet.BottomSheetBehavior.STATE_HIDDEN
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.BottomSheetActionBinding
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getColorFromAttr
@@ -33,17 +35,27 @@ open class ActionBottomSheet(
         container: ViewGroup?,
         savedInstanceState: Bundle?,
     ): View {
+        this.inflater = inflater
+        val scrollView =
+            NestedScrollView(requireContext()).apply {
+                layoutParams =
+                    ViewGroup.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                    )
+                isFillViewport = true
+            }
         layout =
             LinearLayout(context).apply {
                 layoutParams =
                     LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT,
-                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        LinearLayout.LayoutParams.WRAP_CONTENT,
                     )
                 orientation = LinearLayout.VERTICAL
                 setPadding(8.dp, 18.dp, 8.dp, 8.dp)
             }
-        this.inflater = inflater
+        scrollView.addView(layout)
         actions.forEach { action ->
             if (action.showDividerAbove) {
                 val divider =
@@ -70,28 +82,55 @@ open class ActionBottomSheet(
                     )
                     setOnClickListener {
                         if (action.callback(this@ActionBottomSheet)) {
-                            hide()
+                            dismiss()
                         }
                     }
                 }
             layout.addView(textView)
-            color?.let {
-                layout.apply {
-                    setBackgroundColor(it)
-                    setControlsContrastColorForAllViews(it, overwriteBackground = false)
-                }
-            }
         }
 
-        return layout
+        color?.let {
+            layout.apply {
+                setBackgroundColor(it)
+                setControlsContrastColorForAllViews(it, overwriteBackground = false)
+            }
+        }
+        return scrollView
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = BottomSheetDialog(requireContext(), R.style.ThemeOverlay_App_BottomSheetDialog)
+        val dialog =
+            BottomSheetDialog(
+                requireContext(),
+                com.philkes.notallyx.R.style.ThemeOverlay_App_BottomSheetDialog,
+            )
         color?.let {
             dialog.window?.apply {
                 navigationBarColor = it
                 setLightStatusAndNavBar(it.isLightColor())
+            }
+        }
+        dialog.setOnShowListener {
+            dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)?.let {
+                bottomSheet ->
+                BottomSheetBehavior.from(bottomSheet).apply {
+                    state = BottomSheetBehavior.STATE_EXPANDED
+                    isHideable = false
+                    // Disable dragging changes to allow nested scroll
+                    setBottomSheetCallback(
+                        object : BottomSheetCallback() {
+                            override fun onStateChanged(bottomSheet: View, newState: Int) {
+                                if (newState == BottomSheetBehavior.STATE_HIDDEN) {
+                                    dismiss()
+                                }
+                            }
+
+                            override fun onSlide(bottomSheet: View, slideOffset: Float) {
+                                state = BottomSheetBehavior.STATE_EXPANDED
+                            }
+                        }
+                    )
+                }
             }
         }
         return dialog
