@@ -71,6 +71,7 @@
     <string name="clear_data_message">Alle Notizen, Bilder, Dateien und Sprachnotizen werden permanent gelöscht</string>
     <string name="clear_formatting">Normal</string>
     <string name="cleared_data">Alle Daten erfolgreich geläscht</string>
+    <string name="color">Farbe</string>
     <string name="color_exists">Diese Farbe existiert bereits!</string>
     <string name="content_density">Notizvorschau</string>
     <string name="continue_">Weiter</string>
