@@ -1,5 +1,37 @@
 # Changelog
 
+## [v7.2.0](https://github.com/PhilKes/NotallyX/tree/v7.2.0) (2025-03-08)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.1.0...v7.2.0)
+
+### Added Features
+
+- Sort notes by color [\#442](https://github.com/PhilKes/NotallyX/issues/442)
+
+### Fixed Bugs
+
+- Unable to locate the 'Uncheck all' option [\#444](https://github.com/PhilKes/NotallyX/issues/444)
+- List crash when last unchecked item moved [\#436](https://github.com/PhilKes/NotallyX/issues/436)
+- Pasting multi line text in empty lists crash [\#434](https://github.com/PhilKes/NotallyX/issues/434)
+- Quickly tapping delete button crash [\#428](https://github.com/PhilKes/NotallyX/issues/428)
+- First list item can keep parent property [\#427](https://github.com/PhilKes/NotallyX/issues/427)
+- \(List\) Move last unchecked item above parent bug [\#425](https://github.com/PhilKes/NotallyX/issues/425)
+- Dragging child item to same position breaks parent association [\#422](https://github.com/PhilKes/NotallyX/issues/422)
+- Disabling list auto sorting crash [\#421](https://github.com/PhilKes/NotallyX/issues/421)
+- Crash while indenting a checklist item [\#419](https://github.com/PhilKes/NotallyX/issues/419)
+- List swipe as subtask crash [\#418](https://github.com/PhilKes/NotallyX/issues/418)
+- List crash [\#413](https://github.com/PhilKes/NotallyX/issues/413)
+- Checked parent + subtask places between item [\#410](https://github.com/PhilKes/NotallyX/issues/410)
+- App crashed while screen was off [\#408](https://github.com/PhilKes/NotallyX/issues/408)
+- Unchecked items can't be deleted [\#407](https://github.com/PhilKes/NotallyX/issues/407)
+- Some list items can't be set to subtask after unchecked [\#406](https://github.com/PhilKes/NotallyX/issues/406)
+- List items deleted [\#405](https://github.com/PhilKes/NotallyX/issues/405)
+- List item parent task becomes subtask [\#404](https://github.com/PhilKes/NotallyX/issues/404)
+- Check empty item crash [\#403](https://github.com/PhilKes/NotallyX/issues/403)
+- Drag problem in long checklist [\#396](https://github.com/PhilKes/NotallyX/issues/396)
+- List swap items bug [\#395](https://github.com/PhilKes/NotallyX/issues/395)
+- Background crashes [\#323](https://github.com/PhilKes/NotallyX/issues/323)
+
 ## [v7.1.0](https://github.com/PhilKes/NotallyX/tree/v7.1.0) (2025-02-20)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.0.0...v7.1.0)
