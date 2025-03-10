@@ -16,7 +16,7 @@ plugins {
 android {
     namespace = "com.philkes.notallyx"
     compileSdk = 34
-
+    ndkVersion = "29.0.13113456"
     defaultConfig {
         applicationId = "com.philkes.notallyx"
         minSdk = 21
@@ -27,8 +27,10 @@ android {
             "en", "ca", "cs", "da", "de", "el", "es", "fr", "hu", "in", "it", "ja", "my", "nb", "nl", "nn", "pl", "pt-rBR", "pt-rPT", "ro", "ru", "sk", "sv", "tl", "tr", "uk", "vi", "zh-rCN", "zh-rTW"
         )
         vectorDrawables.generatedDensities?.clear()
+        ndk {
+            debugSymbolLevel=  "FULL"
+        }
     }
-
     ksp {
         arg("room.generateKotlin", "true")
         arg("room.schemaLocation", "$projectDir/schemas")
