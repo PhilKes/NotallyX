@@ -63,6 +63,7 @@
     <string name="cant_load_image">Nelze načíst obrázek. Možná byl přesunut nebo odstraněn</string>
     <string name="cant_open_link">Odkaz nelze otevřít</string>
     <string name="change_color">Změnit barvu</string>
+    <string name="change_color_message">Vyberte barvu nebo vytvořte novou. Barvu také můžete upravit dlouhým stisknutím. </string>
     <string name="change_note">Změnit poznámku</string>
     <string name="check_all_items">Vybrat  všechny položky</string>
     <string name="choose_another_folder">Vybrat jinou složku</string>
@@ -73,10 +74,13 @@
     <string name="clear_data_message">Všechny poznámky, obrázky, soubory a zvuky budou nenávratně odstraněny</string>
     <string name="clear_formatting">Odstranit formátování</string>
     <string name="cleared_data">Všechna data byla vymazána</string>
+    <string name="color">Barva</string>
+    <string name="color_exists">Tato barva již existuje!</string>
     <string name="content_density">Kompaktnost obsahu</string>
     <string name="continue_">Pokračovat</string>
     <string name="copied_link">Odkaz zkopírován do schránky</string>
     <string name="copy">Kopírovat</string>
+    <string name="crash_message">Došlo k neočekávané chybě. \nOmluvte prosím vzniklé nepříjemnosti. </string>
     <string name="create_github_issue">Vytvořit GitHub issue </string>
     <string name="creation_date">Datum vytvoření</string>
     <string name="custom">Vlastní</string>
@@ -94,6 +98,7 @@
     <string name="delete_all_notes">Smazat všechny poznámky\?</string>
     <string name="delete_audio_recording_forever">Smazat trvale zvukový záznam\?</string>
     <string name="delete_checked_items">Smazat vybrané položky</string>
+    <string name="delete_color_message">Jakou barvu by měly mít poznámky aktuálně používající tuto barvu\? </string>
     <string name="delete_file">Smazat soubor \'%1$s\'\?</string>
     <string name="delete_forever">Smazat navždy</string>
     <string name="delete_image_forever">Smazat obrázek\?</string>
@@ -117,8 +122,10 @@
     <string name="disabled">Zakázat</string>
     <string name="discard">Zahodit</string>
     <string name="display_text">Text k zobrazení</string>
+    <string name="donate">Podpořit</string>
     <string name="drag_handle">Chytni a přetáhni</string>
     <string name="edit">Upravit</string>
+    <string name="edit_color">Upravit barvu</string>
     <string name="edit_label">Upravit štítek</string>
     <string name="edit_link">Upravit odkaz</string>
     <string name="edit_reminders">Upravit upomínky</string>
@@ -212,6 +219,7 @@
         <item quantity="many">…%1$d dalších souborů</item>
         <item quantity="one">…%1$d další soubor</item>
     </plurals>
+    <string name="new_color">Nová barva</string>
     <string name="next">Další</string>
     <string name="no_auto_sort">Neřadit automaticky</string>
     <string name="none">Žádné</string>
@@ -245,9 +253,11 @@
     <string name="repetition_custom">Vlastní opakování</string>
     <string name="repetition_value_hint">Hodnota</string>
     <string name="report_bug">Nahlásit problém/chybu</string>
+    <string name="report_crash">Nahlásit chybu spolu s protokoly o pádu.\n\n</string>
     <string name="reset_settings">Resetovat nastavení</string>
     <string name="reset_settings_message">Všechna nastavení budou obnovena na výchozí hodnotu.</string>
     <string name="reset_settings_success">Úspěšné obnovení všech nastavení</string>
+    <string name="restart_app">Restartovat aplikaci</string>
     <string name="restore">Obnovit</string>
     <plurals name="restored_selected_notes">
         <item quantity="few">Obnoveny %1$d poznámky</item>
@@ -277,11 +287,14 @@
     <string name="sort_direction">Směr řazení</string>
     <string name="source_code">Zdrojový kód</string>
     <string name="start">Spustit</string>
+    <string name="start_view">Výchozí pohled</string>
+    <string name="start_view_hint">Vyberte, který pohled/štítek by měl být zobrazen při spuštění aplikace. Výchozí je hlavní pohled na poznámky.\n</string>
     <string name="stop">Zastavit</string>
     <string name="strikethrough">Přeškrtnuté</string>
     <string name="take_note">Napsat poznámku</string>
     <string name="tap_for_more_options">Klepněte pro více možností</string>
     <string name="tap_to_set_up">Nastavit klepnutím sem</string>
+    <string name="text_default">Výchozí</string>
     <string name="text_size">Velikost písma</string>
     <string name="theme">Téma</string>
     <string name="title">Název</string>
@@ -296,6 +309,7 @@
     <string name="undo">Zpět</string>
     <string name="unknown_error">Neznámá chyba</string>
     <string name="unknown_name">Neznámý název</string>
+    <string name="unlabeled">Bez štítku</string>
     <string name="unlock">Odemknout pomocí biometrických údajů/PIN</string>
     <string name="unlock_with_biometrics_not_setup">Dříve jste biometrický zámek zapnuli, ale biometrické údaje/PIN již nejsou pro vaše zařízení nastaveny.\n\nPokud chcete biometrický zámek vypnout, stiskněte tlačítko Zakázat, jinak nastavte biometrické údaje/PIN pro vaše zařízení.</string>
     <string name="unpin">Odepnout</string>
