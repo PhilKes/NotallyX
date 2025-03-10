@@ -70,6 +70,7 @@
     <string name="clear_data_message">Toutes les notes, images, fichiers et audios seront supprimés définitivement</string>
     <string name="clear_formatting">Supprimer le formatage</string>
     <string name="cleared_data">Toutes les données ont été supprimées</string>
+    <string name="color">Couleur</string>
     <string name="color_exists">Cette couleur existe déjà !</string>
     <string name="content_density">Densité d\'affichage</string>
     <string name="continue_">Continuer</string>
