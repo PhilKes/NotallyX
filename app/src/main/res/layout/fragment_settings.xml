@@ -233,6 +233,20 @@
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:text="@string/send_feedback" />
+        
+        <TextView
+          android:id="@+id/Rate"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/rate" />
+
+        <TextView
+          android:id="@+id/Donate"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/donate" />
 
         <TextView
             android:id="@+id/SourceCode"
@@ -242,18 +256,11 @@
             android:text="@string/source_code" />
 
         <TextView
-            android:id="@+id/Libraries"
-            style="@style/Preference"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/libraries" />
-
-        <TextView
-          android:id="@+id/Donate"
+          android:id="@+id/Libraries"
           style="@style/Preference"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="@string/donate" />
+          android:text="@string/libraries" />
 
         <TextView
           android:id="@+id/VersionText"
