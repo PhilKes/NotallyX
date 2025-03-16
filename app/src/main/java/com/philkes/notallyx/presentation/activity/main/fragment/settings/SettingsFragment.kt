@@ -695,8 +695,10 @@ class SettingsFragment : Fragment() {
                     .setCancelButton()
                     .show()
             }
+            Rate.setOnClickListener {
+                openLink("https://play.google.com/store/apps/details?id=com.philkes.notallyx")
+            }
             SourceCode.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
-            // TODO: add ColorPickerView
             Libraries.setOnClickListener {
                 val libraries =
                     arrayOf(
