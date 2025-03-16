@@ -224,7 +224,7 @@ private fun ContextWrapper.requireBackupFolder(path: String, msg: String): Docum
     }
 }
 
-suspend fun ContextWrapper.checkAutoSave(
+suspend fun ContextWrapper.checkBackupOnSave(
     preferences: NotallyXPreferences,
     note: BaseNote? = null,
     forceFullBackup: Boolean = false,

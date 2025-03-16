@@ -22,7 +22,7 @@
     <string name="auto_backup_error_message">Si é verificato un errore durante il backup automatico:\n\'%1$s\'\nPer favore controlla le tue impostazioni o segnala un bug</string>
     <string name="auto_backup_failed">Backup automatico di NotallyX non riuscito</string>
     <string name="auto_backup_last">Ultimo backup</string>
-    <string name="auto_backup_on_save">Backup automatico al salvataggio della nota</string>
+    <string name="auto_backup_on_save">Backup automatico dopo l\'uscita dalla nota</string>
     <string name="auto_backup_on_save_hint">Abilitando questa opzione, un backup (NotallyX_AutoBackup.zip) verrà creato automaticamente nella \"Cartella di Backup\" configurata ogni volta che una nota viene salvata.\nTieni presente che questa operazione potrebbe influire sulle prestazioni</string>
     <string name="auto_backup_period">Frequenza dei backup automatici</string>
     <string name="auto_backups_folder">Cartella backup</string>
