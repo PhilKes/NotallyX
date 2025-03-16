@@ -22,8 +22,8 @@
     <string name="auto_backup_error_message">Beim autom. Backup ist ein Fehler aufgetreten:\n\'%1$s\'\nÜberprüfe deine Einstellungen oder melde einen Bug</string>
     <string name="auto_backup_failed">NotallyX Auto Backup fehlgeschlagen</string>
     <string name="auto_backup_last">Letztes Backup</string>
-    <string name="auto_backup_on_save">Autom. Backup beim Notiz-Speichern</string>
-    <string name="auto_backup_on_save_hint">Ist dies aktiviert, wird jedesmal wenn eine Notiz gespeichert wird autom. ein Backup (\"NotallyX_AutoBackup.zip\") im \"Backups Ordner\" erstellt.\nDies kann die App-Performance beeinträchtigen</string>
+    <string name="auto_backup_on_save">Autom. Backup beim Notiz Verlassen</string>
+    <string name="auto_backup_on_save_hint">Ist dies aktiviert, wird jedesmal wenn eine Notiz verlassen wird autom. ein Backup (\"NotallyX_AutoBackup.zip\") im \"Backups Ordner\" erstellt.\nDies kann die App-Performance beeinträchtigen</string>
     <string name="auto_backup_period">Intervall für autom. Backups</string>
     <string name="auto_backups_folder">Backups Ordner</string>
     <string name="auto_backups_folder_hint">Ordner in dem alle autom. Backups erstellt werden</string>

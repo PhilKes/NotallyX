@@ -434,6 +434,29 @@ fun PreferenceSeekbarBinding.setup(
     }
 }
 
+fun PreferenceSeekbarBinding.setupAutoSaveIdleTime(
+    preference: IntPreference,
+    context: Context,
+    value: Int = preference.value,
+    onChange: (newValue: Int) -> Unit,
+) {
+    Slider.apply {
+        setLabelFormatter { sliderValue ->
+            if (sliderValue == -1f) {
+                context.getString(R.string.disabled)
+            } else "${sliderValue.toInt()}s"
+        }
+        addOnChangeListener { _, value, _ ->
+            if (value == -1f) {
+                setAlpha(0.6f) // Reduce opacity to make it look disabled
+            } else {
+                setAlpha(1f) // Restore normal appearance
+            }
+        }
+    }
+    setup(preference, context, value, onChange)
+}
+
 fun PreferenceBinding.setupStartView(
     preference: StringPreference,
     value: String,

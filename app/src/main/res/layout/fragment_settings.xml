@@ -30,6 +30,16 @@
             android:id="@+id/TextSize"
             layout="@layout/preference" />
 
+        <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:background="?android:attr/listDivider" />
+
+        <TextView
+          style="@style/PreferenceHeader"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/behaviour" />
 
         <include
             android:id="@+id/NotesSortOrder"
@@ -39,10 +49,13 @@
             android:id="@+id/CheckedListItemSorting"
             layout="@layout/preference" />
 
-
         <include
           android:id="@+id/StartView"
           layout="@layout/preference" />
+
+        <include
+          android:id="@+id/AutoSaveAfterIdle"
+          layout="@layout/preference_seekbar" />
 
         <View
             android:layout_width="match_parent"
