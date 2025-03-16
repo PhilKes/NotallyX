@@ -23,13 +23,14 @@
     <string name="auto_backup_error_message">An error occurred during auto backup:\n\'%1$s\'\nPlease check your settings or report a bug</string>
     <string name="auto_backup_failed">NotallyX Auto Backup failed</string>
     <string name="auto_backup_last">Last Backup</string>
-    <string name="auto_backup_on_save">Backup on Note save automatically</string>
-    <string name="auto_backup_on_save_hint">By enabling this, a backup (\"NotallyX_AutoBackup.zip\") is automatically created in the configured \"Backups Folder\" whenever a note is saved.\nBe aware this might affect performance</string>
+    <string name="auto_backup_on_save">Backup on exit Note automatically</string>
+    <string name="auto_backup_on_save_hint">By enabling this, a backup (\"NotallyX_AutoBackup.zip\") is automatically created in the configured \"Backups Folder\" whenever a note is exited.\nBe aware this might affect performance</string>
     <string name="auto_backup_period">Auto backup period</string>
     <string name="auto_backups_folder">Backups Folder</string>
     <string name="auto_backups_folder_hint">Folder in which all auto backups will be stored in.</string>
     <string name="auto_backups_folder_rechoose">You need to re-choose your Backups Folder so that NotallyX has permission to write to it.\nYou can also press cancel to skip importing Backups Folder value</string>
     <string name="auto_backups_folder_set">Set up a Backups Folder above first</string>
+    <string name="auto_save_after_idle_time">Auto save note after specified idle time</string>
     <string name="auto_sort_by_checked">Sort checked items to the end</string>
     <string name="back">Back</string>
     <string name="backup">Backup</string>
@@ -38,6 +39,7 @@
     <string name="backup_period_days">Auto backup period in days</string>
     <string name="backup_periodic">Periodic Backups</string>
     <string name="backup_periodic_hint">By enabling this, backups are automatically created in the configured Backups Folder.\nThis may not work if you have power saving mode enabled</string>
+    <string name="behaviour">Behaviour</string>
     <string name="biometric_lock">Lock app with device biometric or PIN</string>
     <string name="biometrics_disable_success">Biometric/PIN lock has been disabled</string>
     <string name="biometrics_failure">Failed to authenticate via Biometric/PIN</string>

@@ -23,7 +23,7 @@
     <string name="auto_backup_error_message">Během automatického zálohování došlo k chybě:\n\'%1$s\'\nProsím, zkontrolujte nastavení nebo nahlaste chybu</string>
     <string name="auto_backup_failed">Automatické zálohování NotallyX selhalo</string>
     <string name="auto_backup_last">Poslední záloha</string>
-    <string name="auto_backup_on_save">Automaticky zálohovat při uložení poznámky</string>
+    <string name="auto_backup_on_save">Automaticky zálohovat při ukončení poznámky</string>
     <string name="auto_backup_on_save_hint">Pokud tuto možnost povolíte, záloha („NotallyX_AutoBackup.zip“) bude automaticky vytvořena ve zvoleném „Adresáři záloh“ pokaždé, když bude poznámka uložena. Mějte na paměti, že to může ovlivnit výkon</string>
     <string name="auto_backup_period">Frekvence automatického zálohování</string>
     <string name="auto_backups_folder">Adresář pro zálohy</string>

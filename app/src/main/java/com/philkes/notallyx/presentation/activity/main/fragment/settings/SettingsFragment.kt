@@ -616,6 +616,12 @@ class SettingsFragment : Fragment() {
                     }
                 }
             }
+            binding.AutoSaveAfterIdle.setupAutoSaveIdleTime(
+                autoSaveAfterIdleTime,
+                requireContext(),
+            ) { newValue ->
+                model.savePreference(autoSaveAfterIdleTime, newValue)
+            }
             ClearData.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(R.string.clear_data_message)

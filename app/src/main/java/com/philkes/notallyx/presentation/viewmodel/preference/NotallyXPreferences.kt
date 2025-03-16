@@ -111,6 +111,16 @@ class NotallyXPreferences private constructor(private val context: Context) {
         )
     }
 
+    val autoSaveAfterIdleTime =
+        IntPreference(
+            "autoSaveAfterIdleTime",
+            preferences,
+            5,
+            -1,
+            20,
+            R.string.auto_save_after_idle_time,
+        )
+
     val biometricLock =
         createEnumPreference(
             preferences,
@@ -219,6 +229,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 periodicBackups,
                 backupPassword,
                 backupOnSave,
+                autoSaveAfterIdleTime,
             )
             .forEach { it.refresh() }
     }

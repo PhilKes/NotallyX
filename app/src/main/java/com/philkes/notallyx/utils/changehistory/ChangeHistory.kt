@@ -6,7 +6,7 @@ import kotlin.IllegalStateException
 
 class ChangeHistory {
     private val changeStack = ArrayList<Change>()
-    private var stackPointer = NotNullLiveData(-1)
+    var stackPointer = NotNullLiveData(-1)
 
     internal val canUndo = NotNullLiveData(false)
     internal val canRedo = NotNullLiveData(false)

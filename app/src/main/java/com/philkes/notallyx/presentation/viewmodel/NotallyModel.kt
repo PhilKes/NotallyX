@@ -40,7 +40,7 @@ import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.backup.checkAutoSave
+import com.philkes.notallyx.utils.backup.checkBackupOnSave
 import com.philkes.notallyx.utils.backup.importAudio
 import com.philkes.notallyx.utils.backup.importFile
 import com.philkes.notallyx.utils.cancelNoteReminders
@@ -268,7 +268,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             withContext(Dispatchers.IO) { app.deleteAttachments(attachments) }
         }
         if (checkAutoSave) {
-            app.checkAutoSave(preferences, forceFullBackup = true)
+            app.checkBackupOnSave(preferences, forceFullBackup = true)
         }
     }
 
@@ -277,17 +277,24 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         this.items.addAll(items)
     }
 
-    suspend fun saveNote(): Long {
+    suspend fun saveNote(checkBackupOnSave: Boolean = true): Long {
         return withContext(Dispatchers.IO) {
             val note = getBaseNote()
             val id = baseNoteDao.insert(note)
-            app.checkAutoSave(
-                preferences,
-                note = note,
-                forceFullBackup = originalNote?.attachmentsDifferFrom(note) == true,
-            )
+            if (checkBackupOnSave) {
+                checkBackupOnSave(note)
+            }
+            originalNote = note.deepCopy()
             return@withContext id
         }
+    }
+
+    suspend fun checkBackupOnSave(note: BaseNote = getBaseNote()) {
+        app.checkBackupOnSave(
+            preferences,
+            note = note,
+            forceFullBackup = originalNote?.attachmentsDifferFrom(note) == true,
+        )
     }
 
     fun isEmpty(): Boolean {
