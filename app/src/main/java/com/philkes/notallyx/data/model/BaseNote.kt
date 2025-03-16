@@ -31,6 +31,50 @@ data class BaseNote(
         const val COLOR_DEFAULT = "DEFAULT"
         const val COLOR_NEW = "NEW"
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as BaseNote
+
+        if (id != other.id) return false
+        if (type != other.type) return false
+        if (folder != other.folder) return false
+        if (color != other.color) return false
+        if (title != other.title) return false
+        if (pinned != other.pinned) return false
+        if (timestamp != other.timestamp) return false
+        if (labels != other.labels) return false
+        if (body != other.body) return false
+        if (spans != other.spans) return false
+        if (items != other.items) return false
+        if (images != other.images) return false
+        if (files != other.files) return false
+        if (audios != other.audios) return false
+        if (reminders != other.reminders) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id.hashCode()
+        result = 31 * result + type.hashCode()
+        result = 31 * result + folder.hashCode()
+        result = 31 * result + color.hashCode()
+        result = 31 * result + title.hashCode()
+        result = 31 * result + pinned.hashCode()
+        result = 31 * result + timestamp.hashCode()
+        result = 31 * result + labels.hashCode()
+        result = 31 * result + body.hashCode()
+        result = 31 * result + spans.hashCode()
+        result = 31 * result + items.hashCode()
+        result = 31 * result + images.hashCode()
+        result = 31 * result + files.hashCode()
+        result = 31 * result + audios.hashCode()
+        result = 31 * result + reminders.hashCode()
+        return result
+    }
 }
 
 fun BaseNote.deepCopy(): BaseNote {

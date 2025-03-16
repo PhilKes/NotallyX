@@ -22,7 +22,7 @@
     <string name="auto_backup_error_message">Ha ocurrido un error durante una copia automática:\n\'%1$s’\nComprueba tus ajustes o informa de un error</string>
     <string name="auto_backup_failed">Falló la copia de seguridad automática de Notallyx</string>
     <string name="auto_backup_last">Última copia de seguridad</string>
-    <string name="auto_backup_on_save">Copia de seguridad automática al guardar una nota</string>
+    <string name="auto_backup_on_save">Copia de seguridad automática al salir una nota</string>
     <string name="auto_backup_on_save_hint">Al habilitar esta opción, se crea automáticamente una copia de seguridad (\"NotallyX_AutoBackup.zip\") en la \"Directorio de copias de seguridad\" configurada cada vez que se guarda una nota.\nTenga en cuenta que esto puede afectar el rendimiento.</string>
     <string name="auto_backup_period">Periodo de copia automática</string>
     <string name="auto_backups_folder">Directorio de copias de seguridad</string>

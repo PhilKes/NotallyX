@@ -22,7 +22,7 @@
     <string name="auto_backup_error_message">Wystąpił błąd podczas tworzenia automatycznej kopii zapasowej:\n„%1$s”\nSprawdź ustawienia lub zgłoś błąd</string>
     <string name="auto_backup_failed">Automatyczna kopia zapasowa NotallyX nie powiodła się</string>
     <string name="auto_backup_last">Ostatnia kopia zapasowa</string>
-    <string name="auto_backup_on_save">Kopia zapasowa po zapisaniu notatki</string>
+    <string name="auto_backup_on_save">Kopia zapasowa po wyjściu z notatki</string>
     <string name="auto_backup_on_save_hint">Po włączeniu tej opcji kopia zapasowa („NotallyX_AutoBackup.zip”) jest automatycznie tworzona w skonfigurowanym „Folderze kopii zapasowych” za każdym razem, gdy zapisywana jest notatka.\nPamiętaj, że może mieć to wpływ na wydajność</string>
     <string name="auto_backup_period">Okres tworzenia automatycznych kopii zapasowych</string>
     <string name="auto_backups_folder">Folder kopii zapasowych</string>

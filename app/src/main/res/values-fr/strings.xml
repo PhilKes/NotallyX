@@ -22,7 +22,7 @@
     <string name="auto_backup_error_message">Une erreur est survenue lors de la sauvegarde automatique:\n\'%1$s\'\nVeuillez vérifier vos paramètres ou signaler un bug</string>
     <string name="auto_backup_failed">La sauvegarde automatique de NotallyX a échoué </string>
     <string name="auto_backup_last">Dernière sauvegarde</string>
-    <string name="auto_backup_on_save">Sauvegarde automatique après chaque édition</string>
+    <string name="auto_backup_on_save">Sauvegarde automatique après avoir quitté la note</string>
     <string name="auto_backup_on_save_hint">En activant cette option, une sauvegarde (\"NotallyX_AutoBackup.zip\") est automatiquement créée dans le \"Dossier des sauvegardes\" configuré, à chaque fois qu\'une note est enregistrée.\nAttention, cela pourrait affecter les performances.</string>
     <string name="auto_backups_folder">Dossier des sauvegardes</string>
     <string name="auto_backups_folder_hint">Dossier dans lequel toutes les sauvegardes automatiques seront stockées.</string>

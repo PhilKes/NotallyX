@@ -8,8 +8,11 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.provider.Settings
 import android.text.Editable
+import android.util.Log
 import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
@@ -114,12 +117,25 @@ abstract class EditActivity(private val type: Type) :
     protected var colorInt: Int = -1
     protected var inputMethodManager: InputMethodManager? = null
 
+    private val autoSaveHandler = Handler(Looper.getMainLooper())
+    private val autoSaveRunnable = Runnable {
+        lifecycleScope.launch(Dispatchers.Main) {
+            updateModel()
+            if (notallyModel.isModified()) {
+                Log.d(TAG, "Auto-saving note...")
+                saveNote(checkAutoSave = false)
+            }
+        }
+    }
+
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
             if (notallyModel.isEmpty()) {
                 notallyModel.deleteBaseNote(checkAutoSave = false)
             } else if (notallyModel.isModified()) {
                 saveNote()
+            } else {
+                notallyModel.checkBackupOnSave()
             }
             super.finish()
         }
@@ -137,9 +153,9 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
-    open suspend fun saveNote() {
+    open suspend fun saveNote(checkAutoSave: Boolean = true) {
         updateModel()
-        notallyModel.saveNote()
+        notallyModel.saveNote(checkAutoSave)
         WidgetProvider.sendBroadcast(application, longArrayOf(notallyModel.id))
     }
 
@@ -193,6 +209,19 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
+    override fun onDestroy() {
+        autoSaveHandler.removeCallbacks(autoSaveRunnable)
+        super.onDestroy()
+    }
+
+    protected fun resetIdleTimer() {
+        autoSaveHandler.removeCallbacks(autoSaveRunnable)
+        val idleTime = preferences.autoSaveAfterIdleTime.value
+        if (idleTime > -1) {
+            autoSaveHandler.postDelayed(autoSaveRunnable, idleTime.toLong() * 1000)
+        }
+    }
+
     private fun setupActivityResultLaunchers() {
         recordAudioActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
@@ -243,6 +272,7 @@ abstract class EditActivity(private val type: Type) :
                             paddingTop = true,
                             colorInt,
                         )
+                        resetIdleTimer()
                     }
                 }
             }
@@ -317,6 +347,7 @@ abstract class EditActivity(private val type: Type) :
             ChangeHistory().apply {
                 canUndo.observe(this@EditActivity) { canUndo -> undo?.isEnabled = canUndo }
                 canRedo.observe(this@EditActivity) { canRedo -> redo?.isEnabled = canRedo }
+                stackPointer.observe(this@EditActivity) { _ -> resetIdleTimer() }
             }
     }
 
@@ -645,6 +676,7 @@ abstract class EditActivity(private val type: Type) :
                     }
                     notallyModel.color = selectedColor
                     setColor()
+                    resetIdleTimer()
                 },
             ) { colorToDelete, newColor ->
                 baseModel.changeColor(colorToDelete, newColor)
@@ -652,6 +684,7 @@ abstract class EditActivity(private val type: Type) :
                     notallyModel.color = newColor
                     setColor()
                 }
+                resetIdleTimer()
             }
         }
     }
