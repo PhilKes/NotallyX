@@ -232,7 +232,9 @@ fun ViewGroup.addIconButton(
         ImageButton(ContextThemeWrapper(context, R.style.AppTheme)).apply {
             setImageResource(drawable)
             contentDescription = context.getString(title)
-            setBackgroundResource(R.color.Transparent)
+            val outValue = TypedValue()
+            context.theme.resolveAttribute(android.R.attr.actionBarItemBackground, outValue, true)
+            setBackgroundResource(outValue.resourceId)
             setOnClickListener(onClick)
             scaleType = ImageView.ScaleType.FIT_CENTER
             adjustViewBounds = true
