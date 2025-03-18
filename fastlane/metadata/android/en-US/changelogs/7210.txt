@@ -1,0 +1,1 @@
+* Fix exporting backups with biometric lock enabled
