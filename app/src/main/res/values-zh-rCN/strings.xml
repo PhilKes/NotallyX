@@ -29,6 +29,7 @@
     <string name="auto_backups_folder_hint">保存所有自动备份文件的文件夹</string>
     <string name="auto_backups_folder_rechoose">你需要重新选择备份文件夹，这样 NotallyX 有写入它的权限。你也可以按：取消“跳过导入备份文件夹的值</string>
     <string name="auto_backups_folder_set">先在上方设置备份文件夹</string>
+    <string name="auto_save_after_idle_time">在指定的空闲时间后自动保存笔记</string>
     <string name="auto_sort_by_checked">将所选项目排到末尾</string>
     <string name="back">返回</string>
     <string name="backup">备份</string>
@@ -37,6 +38,7 @@
     <string name="backup_period_days">自动备份周期/天</string>
     <string name="backup_periodic">定期备份</string>
     <string name="backup_periodic_hint">启用此选项后将自动在配置的备份文件夹中创建备份文件。如果你启用了节能模式，这可能无法正常工作</string>
+    <string name="behaviour">行为</string>
     <string name="biometric_lock">使用生物识别或PIN解锁应用</string>
     <string name="biometrics_disable_success">已停用生物特征/Pin 锁</string>
     <string name="biometrics_failure">未能通过生物特征/PIN验证身份</string>
@@ -158,6 +160,7 @@
     <string name="import_backup">导入备份</string>
     <string name="import_backup_password_hint">如果你的备份文件没有密码保护，只需按下“导入”即可。如有，起输入正确的密码</string>
     <string name="import_other">从其它APP导入笔记</string>
+    <string name="import_settings">导入设置</string>
     <string name="import_settings_failure">导入设置</string>
     <string name="import_settings_message">为了导入设置，请选择有效的 NotallyX 设置 JSON 文件</string>
     <string name="import_settings_success">成功地导入了设置</string>
