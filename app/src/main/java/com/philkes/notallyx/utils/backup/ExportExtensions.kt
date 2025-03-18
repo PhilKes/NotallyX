@@ -81,6 +81,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
+import net.lingala.zip4j.exception.ZipException
 import net.lingala.zip4j.model.ZipParameters
 import net.lingala.zip4j.model.enums.CompressionLevel
 import net.lingala.zip4j.model.enums.EncryptionMethod
@@ -164,6 +165,9 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
             backupPath,
             "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed, because auto-backup path '$backupPath' is invalid",
         ) ?: return
+    fun log(msg: String? = null, throwable: Throwable? = null) {
+        logToFile(TAG, folder, NOTALLYX_BACKUP_LOGS_FILE, msg = msg, throwable = throwable)
+    }
     try {
         var backupFile = folder.findFile(ON_SAVE_BACKUP_FILE)
         if (savedNote == null || backupFile == null || !backupFile.exists()) {
@@ -193,16 +197,21 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
                             NotallyDatabase.getCurrentDatabaseFile(this@autoBackupOnSave),
                         )
                 }
-            exportToZip(backupFile.uri, files, password)
+            try {
+                exportToZip(backupFile.uri, files, password)
+            } catch (e: ZipException) {
+                log(
+                    msg =
+                        "Re-creating full backup since existing auto backup ZIP is corrupt: ${e.message}"
+                )
+                backupFile.delete()
+                autoBackupOnSave(backupPath, password, savedNote)
+            }
         }
     } catch (e: Exception) {
-        logToFile(
-            TAG,
-            folder,
-            NOTALLYX_BACKUP_LOGS_FILE,
-            msg =
-                "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
-            throwable = e,
+        log(
+            "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
+            e,
         )
         tryPostErrorNotification(e)
     }
@@ -400,6 +409,7 @@ fun ContextWrapper.copyDatabase(): Pair<NotallyDatabase, File> {
     val database = NotallyDatabase.getDatabase(this, observePreferences = false).value
     database.checkpoint()
     val preferences = NotallyXPreferences.getInstance(this)
+    val databaseFile = NotallyDatabase.getCurrentDatabaseFile(this)
     return if (
         preferences.biometricLock.value == BiometricLock.ENABLED &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
@@ -407,16 +417,11 @@ fun ContextWrapper.copyDatabase(): Pair<NotallyDatabase, File> {
         val cipher = getInitializedCipherForDecryption(iv = preferences.iv.value!!)
         val passphrase = cipher.doFinal(preferences.databaseEncryptionKey.value)
         val decryptedFile = File(cacheDir, DATABASE_NAME)
-        decryptDatabase(
-            this,
-            passphrase,
-            decryptedFile,
-            NotallyDatabase.getExternalDatabaseFile(this),
-        )
+        decryptDatabase(this, passphrase, decryptedFile, databaseFile)
         Pair(database, decryptedFile)
     } else {
         val dbFile = File(cacheDir, DATABASE_NAME)
-        NotallyDatabase.getCurrentDatabaseFile(this).copyTo(dbFile, overwrite = true)
+        databaseFile.copyTo(dbFile, overwrite = true)
         Pair(database, dbFile)
     }
 }
