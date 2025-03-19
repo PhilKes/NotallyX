@@ -1,5 +1,29 @@
 # Changelog
 
+## [v7.2.1](https://github.com/PhilKes/NotallyX/tree/v7.2.1) (2025-03-18)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.2.0...v7.2.1)
+
+### Added Features
+
+- Note not automatically saved when App is killed by system [\#446](https://github.com/PhilKes/NotallyX/issues/446)
+
+### Fixed Bugs
+
+- Auto Backup failed [\#456](https://github.com/PhilKes/NotallyX/issues/456)
+
+## [v7.2.1](https://github.com/PhilKes/NotallyX/tree/v7.2.1) (2025-03-18)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.2.0...v7.2.1)
+
+### Added Features
+
+- Note not automatically saved when App is killed by system [\#446](https://github.com/PhilKes/NotallyX/issues/446)
+
+### Fixed Bugs
+
+- Auto Backup failed [\#456](https://github.com/PhilKes/NotallyX/issues/456)
+
 ## [v7.2.0](https://github.com/PhilKes/NotallyX/tree/v7.2.0) (2025-03-08)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.1.0...v7.2.0)
