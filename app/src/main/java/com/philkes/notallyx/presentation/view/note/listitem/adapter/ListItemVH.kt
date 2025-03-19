@@ -1,5 +1,6 @@
 package com.philkes.notallyx.presentation.view.note.listitem.adapter
 
+import android.graphics.Paint
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.MotionEvent
@@ -144,6 +145,12 @@ class ListItemVH(
         binding.EditText.apply {
             setText(item.body)
             isEnabled = !item.checked
+            paintFlags =
+                if (item.checked) {
+                    paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
+                } else {
+                    paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
+                }
             setOnKeyListener { _, keyCode, event ->
                 if (
                     event.action == KeyEvent.ACTION_DOWN &&
