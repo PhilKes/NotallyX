@@ -35,6 +35,12 @@ class ChangeHistory {
         makeListAction.redo()
     }
 
+    fun redoAll() {
+        while (stackPointer.value < changeStack.lastIndex) {
+            redo()
+        }
+    }
+
     fun undo() {
         if (stackPointer.value < 0) {
             throw ChangeHistoryException("There is no Change to undo!}")
@@ -43,6 +49,12 @@ class ChangeHistory {
         Log.d(TAG, "undo: $makeListAction")
         makeListAction.undo()
         stackPointer.value -= 1
+    }
+
+    fun undoAll() {
+        while (stackPointer.value >= 0) {
+            undo()
+        }
     }
 
     fun reset() {

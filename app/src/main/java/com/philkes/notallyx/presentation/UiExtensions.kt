@@ -226,7 +226,8 @@ fun ViewGroup.addIconButton(
     title: Int,
     drawable: Int,
     marginStart: Int = 10,
-    onClick: ((item: View) -> Unit)? = null,
+    onLongClick: View.OnLongClickListener? = null,
+    onClick: View.OnClickListener? = null,
 ): View {
     val view =
         ImageButton(ContextThemeWrapper(context, R.style.AppTheme)).apply {
@@ -235,7 +236,9 @@ fun ViewGroup.addIconButton(
             val outValue = TypedValue()
             context.theme.resolveAttribute(android.R.attr.actionBarItemBackground, outValue, true)
             setBackgroundResource(outValue.resourceId)
+            setOnLongClickListener(onLongClick)
             setOnClickListener(onClick)
+
             scaleType = ImageView.ScaleType.FIT_CENTER
             adjustViewBounds = true
             layoutParams =
