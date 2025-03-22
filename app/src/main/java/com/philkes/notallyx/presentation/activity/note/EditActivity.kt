@@ -476,7 +476,19 @@ abstract class EditActivity(private val type: Type) :
         binding.BottomAppBarCenter.apply {
             removeAllViews()
             undo =
-                addIconButton(R.string.undo, R.drawable.undo, marginStart = 2) {
+                addIconButton(
+                        R.string.undo,
+                        R.drawable.undo,
+                        marginStart = 2,
+                        onLongClick = {
+                            try {
+                                changeHistory.undoAll()
+                            } catch (e: ChangeHistory.ChangeHistoryException) {
+                                application.log(TAG, throwable = e)
+                            }
+                            true
+                        },
+                    ) {
                         try {
                             changeHistory.undo()
                         } catch (e: ChangeHistory.ChangeHistoryException) {
@@ -486,7 +498,19 @@ abstract class EditActivity(private val type: Type) :
                     .apply { isEnabled = changeHistory.canUndo.value }
 
             redo =
-                addIconButton(R.string.redo, R.drawable.redo, marginStart = 2) {
+                addIconButton(
+                        R.string.redo,
+                        R.drawable.redo,
+                        marginStart = 2,
+                        onLongClick = {
+                            try {
+                                changeHistory.redoAll()
+                            } catch (e: ChangeHistory.ChangeHistoryException) {
+                                application.log(TAG, throwable = e)
+                            }
+                            true
+                        },
+                    ) {
                         try {
                             changeHistory.redo()
                         } catch (e: ChangeHistory.ChangeHistoryException) {

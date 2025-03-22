@@ -47,6 +47,24 @@ class ChangeHistoryTest {
     }
 
     @Test
+    fun `test undoAll when stack has multiple changes`() {
+        val change = mock<Change>()
+        val change1 = mock<Change>()
+        val change2 = mock<Change>()
+
+        changeHistory.push(change)
+        changeHistory.push(change1)
+        changeHistory.push(change2)
+        changeHistory.undoAll()
+
+        verify(change).undo()
+        verify(change1).undo()
+        verify(change2).undo()
+        assertFalse(changeHistory.canUndo.value)
+        assertTrue(changeHistory.canRedo.value)
+    }
+
+    @Test
     fun `test redo when stack has one change`() {
         val change = mock<Change>()
 
@@ -54,6 +72,25 @@ class ChangeHistoryTest {
         changeHistory.undo()
         changeHistory.redo()
 
+        verify(change).redo()
+        assertTrue(changeHistory.canUndo.value)
+        assertFalse(changeHistory.canRedo.value)
+    }
+
+    @Test
+    fun `test redoAll when stack has multiple changes`() {
+        val change = mock<Change>()
+        val change1 = mock<Change>()
+        val change2 = mock<Change>()
+
+        changeHistory.push(change)
+        changeHistory.push(change1)
+        changeHistory.push(change2)
+        changeHistory.undoAll()
+        changeHistory.redoAll()
+
+        verify(change2).redo()
+        verify(change1).redo()
         verify(change).redo()
         assertTrue(changeHistory.canUndo.value)
         assertFalse(changeHistory.canRedo.value)
