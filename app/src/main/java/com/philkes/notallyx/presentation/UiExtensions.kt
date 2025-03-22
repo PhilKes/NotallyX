@@ -23,6 +23,7 @@ import android.text.TextWatcher
 import android.text.style.CharacterStyle
 import android.text.style.StrikethroughSpan
 import android.text.style.StyleSpan
+import android.text.style.SuggestionSpan
 import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
 import android.util.TypedValue
@@ -56,6 +57,7 @@ import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.text.getSpans
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.core.view.marginBottom
 import androidx.core.view.marginTop
@@ -286,25 +288,23 @@ fun EditText.createListTextWatcherWithHistory(
     onTextChanged: ((text: CharSequence, start: Int, count: Int) -> Boolean)? = null,
 ) =
     object : TextWatcher {
-        private lateinit var stateBefore: EditTextState
         private var ignoreOriginalChange: Boolean = false
 
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            stateBefore = EditTextState(getText()!!.clone(), selectionStart)
-        }
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             ignoreOriginalChange = onTextChanged?.invoke(s!!, start, count) ?: false
         }
 
         override fun afterTextChanged(s: Editable?) {
+            val textAfter = s!!.clone()
+            if (textAfter.getSpans<SuggestionSpan>().isNotEmpty()) {
+                return
+            }
             if (!ignoreOriginalChange) {
                 listManager.changeText(
                     positionGetter.invoke(),
-                    EditTextState(getText()!!.clone(), selectionStart),
-                    before = stateBefore,
-                    editText = this@createListTextWatcherWithHistory,
-                    listener = this,
+                    EditTextState(textAfter, selectionStart),
                 )
             }
         }
@@ -328,6 +328,9 @@ fun StylableEditTextWithHistory.createTextWatcherWithHistory(
 
         override fun afterTextChanged(s: Editable?) {
             val textAfter = requireNotNull(s).clone()
+            if (textAfter.getSpans<SuggestionSpan>().isNotEmpty()) {
+                return
+            }
             updateModel.invoke(textAfter)
             changeHistory.push(
                 EditTextWithHistoryChange(

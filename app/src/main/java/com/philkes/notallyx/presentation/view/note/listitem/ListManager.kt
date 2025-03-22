@@ -1,6 +1,5 @@
 package com.philkes.notallyx.presentation.view.note.listitem
 
-import android.text.TextWatcher
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -84,28 +83,28 @@ class ListManager(
 
     internal fun setState(state: ListState) {
         adapter.submitList(state.items) {
-            // Focus item's EditText and set cursor position
-            state.focusedItemPos?.let { itemPos ->
-                recyclerView.post {
-                    if (itemPos in 0..items.size) {
-                        recyclerView.smoothScrollToPosition(itemPos)
-                        (recyclerView.findViewHolderForAdapterPosition(itemPos) as? ListItemVH?)
-                            ?.let { viewHolder ->
-                                inputMethodManager?.let { inputManager ->
-                                    val maxCursorPos = viewHolder.binding.EditText.length()
-                                    viewHolder.focusEditText(
-                                        selectionStart =
-                                            state.cursorPos?.coerceIn(0, maxCursorPos)
-                                                ?: maxCursorPos,
-                                        inputMethodManager = inputManager,
-                                    )
-                                }
-                            }
+            state.focusedItemPos?.let { itemPos -> focusItem(itemPos, state.cursorPos) }
+        }
+        this.itemsChecked?.setItems(state.checkedItems!!)
+    }
+
+    private fun focusItem(itemPos: Int, cursorPos: Int?) {
+        // Focus item's EditText and set cursor position
+        recyclerView.post {
+            if (itemPos in 0..items.size) {
+                recyclerView.smoothScrollToPosition(itemPos)
+                (recyclerView.findViewHolderForAdapterPosition(itemPos) as? ListItemVH?)?.let {
+                    viewHolder ->
+                    inputMethodManager?.let { inputManager ->
+                        val maxCursorPos = viewHolder.binding.EditText.length()
+                        viewHolder.focusEditText(
+                            selectionStart = cursorPos?.coerceIn(0, maxCursorPos) ?: maxCursorPos,
+                            inputMethodManager = inputManager,
+                        )
                     }
                 }
             }
         }
-        this.itemsChecked?.setItems(state.checkedItems!!)
     }
 
     fun add(
@@ -282,23 +281,15 @@ class ListManager(
         }
     }
 
-    fun changeText(
-        position: Int,
-        value: EditTextState,
-        before: EditTextState? = null,
-        pushChange: Boolean = true,
-        editText: EditText?,
-        listener: TextWatcher?,
-    ) {
+    fun changeText(position: Int, value: EditTextState, pushChange: Boolean = true) {
+        val stateBefore = getState()
         //        if(!pushChange) {
         endSearch?.invoke()
         //        }
         val item = items[position]
         item.body = value.text.toString()
         if (pushChange) {
-            changeHistory.push(
-                ListEditTextChange(editText!!, position, before!!, value, listener!!, this)
-            )
+            changeHistory.push(ListEditTextChange(stateBefore, getState(), this))
             // TODO: fix focus change
             // refreshSearch?.invoke(editText)
         }

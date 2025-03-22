@@ -1,33 +1,7 @@
 package com.philkes.notallyx.utils.changehistory
 
-import android.text.TextWatcher
-import android.text.style.CharacterStyle
-import android.widget.EditText
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.view.note.listitem.ListState
 
-open class ListEditTextChange(
-    private val editText: EditText,
-    position: Int,
-    before: EditTextState,
-    after: EditTextState,
-    private val listener: TextWatcher,
-    private val listManager: ListManager,
-) : ListPositionValueChange<EditTextState>(after, before, position) {
-
-    override fun update(position: Int, value: EditTextState, isUndo: Boolean) {
-        listManager.changeText(
-            position,
-            value,
-            pushChange = false,
-            editText = editText,
-            listener = listener,
-        )
-        editText.apply {
-            removeTextChangedListener(listener)
-            text = value.text.withoutSpans<CharacterStyle>()
-            requestFocus()
-            setSelection(value.cursorPos)
-            addTextChangedListener(listener)
-        }
-    }
-}
+open class ListEditTextChange(old: ListState, new: ListState, listManager: ListManager) :
+    ListBatchChange(old, new, listManager)

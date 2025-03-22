@@ -235,13 +235,7 @@ class ListItemVH(
     private fun EditText.changeText(position: Int, after: CharSequence) {
         setText(after)
         val stateAfter = EditTextState(editableText.clone(), selectionStart)
-        listManager.changeText(
-            position,
-            stateAfter,
-            pushChange = false,
-            editText = null,
-            listener = null,
-        )
+        listManager.changeText(position, stateAfter, pushChange = false)
     }
 
     fun getSelection() = with(binding.EditText) { Pair(selectionStart, selectionEnd) }
