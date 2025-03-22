@@ -287,9 +287,10 @@ public class SQLCipherUtils {
 
             final SQLiteStatement st = db.compileStatement("ATTACH DATABASE ? AS plaintext KEY ''");
 
-            if (!decryptedFile.exists()) {
-                decryptedFile.createNewFile();
+            if(decryptedFile.exists()){
+                decryptedFile.delete();
             }
+            decryptedFile.createNewFile();
             st.bindString(1, decryptedFile.getAbsolutePath());
             st.execute();
 
