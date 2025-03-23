@@ -78,6 +78,8 @@
     <string name="color_exists">This color already exists!</string>
     <string name="content_density">Content density</string>
     <string name="continue_">Continue</string>
+    <string name="convert_to_list_note">Convert to List</string>
+    <string name="convert_to_text_note">Convert to Text Note</string>
     <string name="copied_link">Copied Link to Clipboard</string>
     <string name="copy">Copy</string>
     <string name="count" translatable="false">%1$d / %2$d</string>

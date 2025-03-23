@@ -522,7 +522,11 @@ abstract class EditActivity(private val type: Type) :
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
-                MoreNoteBottomSheet(this@EditActivity, createFolderActions(), colorInt)
+                MoreNoteBottomSheet(
+                        this@EditActivity,
+                        createNoteTypeActions() + createFolderActions(),
+                        colorInt,
+                    )
                     .show(supportFragmentManager, MoreNoteBottomSheet.TAG)
             }
         }
@@ -567,6 +571,41 @@ abstract class EditActivity(private val type: Type) :
                     },
                 )
         }
+
+    protected fun createNoteTypeActions() =
+        when (notallyModel.type) {
+            Type.NOTE ->
+                listOf(
+                    Action(R.string.convert_to_list_note, R.drawable.convert_to_text) { _ ->
+                        convertTo(Type.LIST)
+                        true
+                    }
+                )
+            Type.LIST ->
+                listOf(
+                    Action(R.string.convert_to_text_note, R.drawable.convert_to_text) { _ ->
+                        convertTo(Type.NOTE)
+                        true
+                    }
+                )
+        }
+
+    private fun convertTo(type: Type) {
+        lifecycleScope.launch {
+            notallyModel.convertTo(type)
+            val intent =
+                Intent(
+                    this@EditActivity,
+                    when (type) {
+                        Type.NOTE -> EditNoteActivity::class.java
+                        Type.LIST -> EditListActivity::class.java
+                    },
+                )
+            intent.putExtra(EXTRA_SELECTED_BASE_NOTE, notallyModel.id)
+            startActivity(intent)
+            finish()
+        }
+    }
 
     abstract fun configureUI()
 

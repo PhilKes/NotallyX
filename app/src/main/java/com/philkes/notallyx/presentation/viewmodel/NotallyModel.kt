@@ -19,6 +19,8 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.dao.NoteIdReminder
+import com.philkes.notallyx.data.imports.txt.extractListItems
+import com.philkes.notallyx.data.imports.txt.findListSyntaxRegex
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.FileAttachment
@@ -439,6 +441,34 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     private suspend fun updateReminders(updatedReminders: List<Reminder>) {
         reminders.value = updatedReminders
         withContext(Dispatchers.IO) { baseNoteDao.updateReminders(id, updatedReminders) }
+    }
+
+    suspend fun convertTo(noteType: Type) {
+        when (noteType) {
+            Type.NOTE -> {
+                body = SpannableStringBuilder(items.joinToString(separator = "\n") { it.body })
+                type = Type.NOTE
+                setItems(ArrayList())
+            }
+            Type.LIST -> {
+                val text = body.toString()
+                val listSyntaxRegex =
+                    text.findListSyntaxRegex(checkContains = true, plainNewLineAllowed = true)
+                if (listSyntaxRegex != null) {
+                    setItems(text.extractListItems(listSyntaxRegex))
+                } else {
+                    setItems(
+                        text.lines().mapIndexed { idx, itemText ->
+                            ListItem(itemText, false, false, idx, mutableListOf())
+                        }
+                    )
+                }
+                type = Type.LIST
+                body = SpannableStringBuilder()
+            }
+        }
+        Cache.list = ArrayList()
+        saveNote(checkBackupOnSave = false)
     }
 
     enum class FileType {
