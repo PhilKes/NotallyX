@@ -6,15 +6,17 @@ import android.net.Uri
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
 import android.view.View
+import androidx.core.view.isVisible
 import androidx.documentfile.provider.DocumentFile
+import com.google.android.material.color.DynamicColors
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.slider.Slider
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.R
 import com.philkes.notallyx.databinding.ChoiceItemBinding
-import com.philkes.notallyx.databinding.DialogDateFormatBinding
 import com.philkes.notallyx.databinding.DialogNotesSortBinding
 import com.philkes.notallyx.databinding.DialogPreferenceBooleanBinding
+import com.philkes.notallyx.databinding.DialogPreferenceEnumWithToggleBinding
 import com.philkes.notallyx.databinding.DialogSelectionBoxBinding
 import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.PreferenceBinding
@@ -41,6 +43,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortPreferenc
 import com.philkes.notallyx.presentation.viewmodel.preference.SortDirection
 import com.philkes.notallyx.presentation.viewmodel.preference.StringPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.TextProvider
+import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.utils.canAuthenticateWithBiometrics
 import com.philkes.notallyx.utils.toReadablePath
 
@@ -198,29 +201,82 @@ fun PreferenceBinding.setup(
     Value.text = dateFormatValue.getText(context)
 
     root.setOnClickListener {
-        val layout = DialogDateFormatBinding.inflate(layoutInflater, null, false)
+        val layout = DialogPreferenceEnumWithToggleBinding.inflate(layoutInflater, null, false)
+        layout.EnumHint.apply {
+            setText(R.string.date_format_hint)
+            isVisible = true
+        }
         DateFormat.entries.forEachIndexed { idx, dateFormat ->
             ChoiceItemBinding.inflate(layoutInflater).root.apply {
                 id = idx
                 text = dateFormat.getText(context)
                 tag = dateFormat
-                layout.DateFormatRadioGroup.addView(this)
+                layout.EnumRadioGroup.addView(this)
                 if (dateFormat == dateFormatValue) {
-                    layout.DateFormatRadioGroup.check(this.id)
+                    layout.EnumRadioGroup.check(this.id)
                 }
             }
         }
 
-        layout.ApplyToNoteView.isChecked = applyToNoteViewValue
+        layout.Toggle.apply {
+            setText(R.string.date_format_apply_in_note_view)
+            isChecked = applyToNoteViewValue
+        }
 
         MaterialAlertDialogBuilder(context)
             .setTitle(dateFormatPreference.titleResId)
             .setView(layout.root)
             .setPositiveButton(R.string.save) { dialog, _ ->
                 dialog.cancel()
-                val dateFormat = layout.DateFormatRadioGroup.checkedTag() as DateFormat
-                val applyToNoteView = layout.ApplyToNoteView.isChecked
+                val dateFormat = layout.EnumRadioGroup.checkedTag() as DateFormat
+                val applyToNoteView = layout.Toggle.isChecked
                 onSave(dateFormat, applyToNoteView)
+            }
+            .setCancelButton()
+            .show()
+    }
+}
+
+fun PreferenceBinding.setup(
+    themePreference: EnumPreference<Theme>,
+    themeValue: Theme,
+    useDynamicColorsValue: Boolean,
+    context: Context,
+    layoutInflater: LayoutInflater,
+    onSave: (theme: Theme, useDynamicColors: Boolean) -> Unit,
+) {
+    Title.setText(themePreference.titleResId!!)
+
+    Value.text = themeValue.getText(context)
+
+    root.setOnClickListener {
+        val layout = DialogPreferenceEnumWithToggleBinding.inflate(layoutInflater, null, false)
+        Theme.entries.forEachIndexed { idx, theme ->
+            ChoiceItemBinding.inflate(layoutInflater).root.apply {
+                id = idx
+                text = theme.getText(context)
+                tag = theme
+                layout.EnumRadioGroup.addView(this)
+                if (theme == themeValue) {
+                    layout.EnumRadioGroup.check(this.id)
+                }
+            }
+        }
+
+        layout.Toggle.apply {
+            isVisible = DynamicColors.isDynamicColorAvailable()
+            setText(R.string.theme_use_dynamic_colors)
+            isChecked = useDynamicColorsValue
+        }
+
+        MaterialAlertDialogBuilder(context)
+            .setTitle(themePreference.titleResId)
+            .setView(layout.root)
+            .setPositiveButton(R.string.save) { dialog, _ ->
+                dialog.cancel()
+                val theme = layout.EnumRadioGroup.checkedTag() as Theme
+                val useDynamicColors = layout.Toggle.isChecked
+                onSave(theme, useDynamicColors)
             }
             .setCancelButton()
             .show()

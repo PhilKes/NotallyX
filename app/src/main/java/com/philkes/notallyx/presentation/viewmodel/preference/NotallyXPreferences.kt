@@ -29,6 +29,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
     }
 
     val theme = createEnumPreference(preferences, "theme", Theme.FOLLOW_SYSTEM, R.string.theme)
+    val useDynamicColors = BooleanPreference("useDynamicColors", preferences, false)
     val textSize =
         createEnumPreference(preferences, "textSize", TextSize.MEDIUM, R.string.text_size)
     val dateFormat =
@@ -203,7 +204,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
         context.importPreferences(uri, preferences.edit()).also { reload() }
 
     fun reset() {
-        preferences.edit().clear().apply()
+        preferences.edit().clear().commit()
         encryptedPreferences.edit().clear().apply()
         backupsFolder.refresh()
         dataInPublicFolder.refresh()

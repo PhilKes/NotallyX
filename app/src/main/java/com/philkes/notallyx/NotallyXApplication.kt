@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.google.android.material.color.DynamicColors
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -42,10 +43,15 @@ class NotallyXApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
         if (isTestRunner()) return
-
         preferences = NotallyXPreferences.getInstance(this)
+        if (preferences.useDynamicColors.value) {
+            if (DynamicColors.isDynamicColorAvailable()) {
+                DynamicColors.applyToActivitiesIfAvailable(this)
+            }
+        } else {
+            setTheme(R.style.AppTheme)
+        }
         preferences.theme.observeForeverWithPrevious { (oldTheme, theme) ->
             when (theme) {
                 Theme.DARK ->

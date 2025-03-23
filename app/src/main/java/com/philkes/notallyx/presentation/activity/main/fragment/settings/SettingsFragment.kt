@@ -31,6 +31,7 @@ import com.philkes.notallyx.data.imports.txt.APPLICATION_TEXT_MIME_TYPES
 import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
+import com.philkes.notallyx.presentation.activity.main.MainActivity
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
@@ -51,6 +52,7 @@ import com.philkes.notallyx.utils.MIME_TYPE_JSON
 import com.philkes.notallyx.utils.MIME_TYPE_ZIP
 import com.philkes.notallyx.utils.backup.exportPreferences
 import com.philkes.notallyx.utils.catchNoBrowserInstalled
+import com.philkes.notallyx.utils.getExtraBooleanFromBundleOrIntent
 import com.philkes.notallyx.utils.getLastExceptionLog
 import com.philkes.notallyx.utils.getLogFile
 import com.philkes.notallyx.utils.getUriForFile
@@ -95,7 +97,13 @@ class SettingsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupActivityResultLaunchers()
-        savedInstanceState?.getBoolean(EXTRA_SHOW_IMPORT_BACKUPS_FOLDER, false)?.let {
+        val showImportBackupsFolder =
+            getExtraBooleanFromBundleOrIntent(
+                savedInstanceState,
+                EXTRA_SHOW_IMPORT_BACKUPS_FOLDER,
+                false,
+            )
+        showImportBackupsFolder.let {
             if (it) {
                 model.refreshBackupsFolder(
                     requireContext(),
@@ -238,9 +246,27 @@ class SettingsFragment : Fragment() {
             }
         }
 
-        theme.observe(viewLifecycleOwner) { value ->
-            binding.Theme.setup(theme, value, requireContext()) { newValue ->
-                model.savePreference(theme, newValue)
+        theme.merge(useDynamicColors).observe(viewLifecycleOwner) {
+            (themeValue, useDynamicColorsValue) ->
+            binding.Theme.setup(
+                theme,
+                themeValue,
+                useDynamicColorsValue,
+                requireContext(),
+                layoutInflater,
+            ) { newThemeValue, newUseDynamicColorsValue ->
+                model.savePreference(theme, newThemeValue)
+                model.savePreference(useDynamicColors, newUseDynamicColorsValue)
+                val packageManager = requireContext().packageManager
+                val intent = packageManager.getLaunchIntentForPackage(requireContext().packageName)
+                val componentName = intent!!.component
+                val mainIntent =
+                    Intent.makeRestartActivityTask(componentName).apply {
+                        putExtra(MainActivity.EXTRA_FRAGMENT_TO_OPEN, R.id.Settings)
+                    }
+                mainIntent.setPackage(requireContext().packageName)
+                requireContext().startActivity(mainIntent)
+                Runtime.getRuntime().exit(0)
             }
         }
 

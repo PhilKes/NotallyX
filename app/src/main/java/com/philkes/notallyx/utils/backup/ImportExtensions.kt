@@ -330,8 +330,7 @@ fun Context.importPreferences(jsonFile: Uri, to: SharedPreferences.Editor): Bool
                 else -> to.putString(key, value.toString())
             }
         }
-        to.apply()
-        return true
+        return to.commit()
     } catch (e: Exception) {
         if (this is ContextWrapper) {
             log(TAG, "Import preferences from '$jsonFile' failed", throwable = e)
