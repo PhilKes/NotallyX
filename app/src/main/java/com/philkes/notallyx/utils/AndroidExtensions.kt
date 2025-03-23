@@ -17,6 +17,7 @@ import android.content.res.Configuration
 import android.hardware.biometrics.BiometricManager
 import android.net.Uri
 import android.os.Build
+import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
@@ -243,6 +244,17 @@ fun Fragment.reportBug(stackTrace: String?) {
     }
 }
 
+fun Fragment.getExtraBooleanFromBundleOrIntent(
+    bundle: Bundle?,
+    key: String,
+    defaultValue: Boolean,
+): Boolean {
+    return bundle.getExtraBooleanOrDefault(
+        key,
+        activity?.intent?.getBooleanExtra(key, defaultValue) ?: defaultValue,
+    )
+}
+
 fun Context.reportBug(stackTrace: String?) {
     catchNoBrowserInstalled { startActivity(createReportBugIntent(stackTrace)) }
 }
@@ -399,4 +411,8 @@ fun Activity.resetApplication() {
     )
     startActivity(resetApplicationIntent)
     overridePendingTransition(android.R.anim.fade_in, android.R.anim.fade_out)
+}
+
+fun Bundle?.getExtraBooleanOrDefault(key: String, defaultValue: Boolean): Boolean {
+    return this?.getBoolean(key, defaultValue) ?: defaultValue
 }

@@ -56,6 +56,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.getSystemService
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.text.getSpans
 import androidx.core.view.WindowInsetsControllerCompat
@@ -91,6 +92,7 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.LabelBinding
+import com.philkes.notallyx.presentation.activity.main.MainActivity
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
@@ -574,10 +576,15 @@ fun @receiver:ColorInt Int.withAlpha(alpha: Float): Int {
 fun Context.getColorFromAttr(@AttrRes attr: Int): Int {
     val typedValue = TypedValue()
     val resolved = theme.resolveAttribute(attr, typedValue, true)
-    if (resolved) {
-        return typedValue.data // Returns the color as an Int
-    } else {
+    if (!resolved) {
         throw IllegalArgumentException("Attribute not found in current theme")
+    }
+    return if (typedValue.resourceId != 0) {
+        // It's a reference (@color/something), resolve it properly
+        ContextCompat.getColor(this, typedValue.resourceId)
+    } else {
+        // It's a direct color value
+        typedValue.data
     }
 }
 
@@ -748,16 +755,7 @@ fun Context.getContrastFontColor(@ColorInt backgroundColor: Int): Int {
     else ContextCompat.getColor(this, R.color.TextLight)
 }
 
-fun @receiver:ColorInt Int.isLightColor(): Boolean {
-    val red = android.graphics.Color.red(this) / 255.0
-    val green = android.graphics.Color.green(this) / 255.0
-    val blue = android.graphics.Color.blue(this) / 255.0
-
-    // Calculate relative luminance
-    val luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
-
-    return luminance > 0.5
-}
+fun @receiver:ColorInt Int.isLightColor() = ColorUtils.calculateLuminance(this) > 0.5
 
 fun MaterialAlertDialogBuilder.setCancelButton(listener: DialogInterface.OnClickListener? = null) =
     setNegativeButton(R.string.cancel, listener)
@@ -794,12 +792,20 @@ fun Context.showToast(message: CharSequence) =
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
-fun ViewGroup.addFastScroll(context: Context) {
-    FastScrollerBuilder(this)
-        .useMd2Style()
-        .setTrackDrawable(ContextCompat.getDrawable(context, R.drawable.scroll_track)!!)
-        .setPadding(0, 0, 2.dp, 0)
-        .build()
+fun Context.restartApplication(
+    fragmentIdToOpen: Int? = null,
+    extra: Pair<String, Boolean>? = null,
+) {
+    val intent = packageManager.getLaunchIntentForPackage(packageName)
+    val componentName = intent!!.component
+    val mainIntent =
+        Intent.makeRestartActivityTask(componentName).apply {
+            fragmentIdToOpen?.let { putExtra(MainActivity.EXTRA_FRAGMENT_TO_OPEN, it) }
+            extra?.let { (key, value) -> putExtra(key, value) }
+        }
+    mainIntent.setPackage(packageName)
+    startActivity(mainIntent)
+    Runtime.getRuntime().exit(0)
 }
 
 @ColorInt
@@ -808,6 +814,14 @@ fun Context.extractColor(color: String): Int {
         BaseNote.COLOR_DEFAULT -> return getColorFromAttr(R.attr.colorSurface)
         else -> android.graphics.Color.parseColor(color)
     }
+}
+
+fun ViewGroup.addFastScroll(context: Context) {
+    FastScrollerBuilder(this)
+        .useMd2Style()
+        .setTrackDrawable(ContextCompat.getDrawable(context, R.drawable.scroll_track)!!)
+        .setPadding(0, 0, 2.dp, 0)
+        .build()
 }
 
 fun Window.setLightStatusAndNavBar(value: Boolean, view: View = decorView) {

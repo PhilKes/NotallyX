@@ -31,7 +31,6 @@ import com.philkes.notallyx.presentation.bindLabels
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.extractColor
-import com.philkes.notallyx.presentation.getColorFromAttr
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.view.misc.ItemListener
@@ -203,14 +202,9 @@ class BaseNoteVH(
 
     private fun setColor(color: String) {
         binding.root.apply {
-            if (color == BaseNote.COLOR_DEFAULT) {
-                setCardBackgroundColor(0)
-                setControlsContrastColorForAllViews(context.getColorFromAttr(R.attr.colorSurface))
-            } else {
-                val colorInt = context.extractColor(color)
-                setCardBackgroundColor(colorInt)
-                setControlsContrastColorForAllViews(colorInt)
-            }
+            val colorInt = context.extractColor(color)
+            setCardBackgroundColor(colorInt)
+            setControlsContrastColorForAllViews(colorInt)
         }
     }
 

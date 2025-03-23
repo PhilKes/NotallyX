@@ -38,7 +38,9 @@ import com.philkes.notallyx.data.model.Item
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.SearchResult
 import com.philkes.notallyx.data.model.toNoteIdReminders
+import com.philkes.notallyx.presentation.activity.main.fragment.settings.SettingsFragment.Companion.EXTRA_SHOW_IMPORT_BACKUPS_FOLDER
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.restartApplication
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
@@ -595,6 +597,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             clearPersistedUriPermissions(backupsFolder)
         }
         callback()
+        app.restartApplication(R.id.Settings)
     }
 
     fun importPreferences(
@@ -607,6 +610,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val oldBackupsFolder = preferences.backupsFolder.value
         val dataInPublicFolderBefore = preferences.dataInPublicFolder.value
         val themeBefore = preferences.theme.value
+        val useDynamicColorsBefore = preferences.useDynamicColors.value
         val oldStartView = preferences.startView.value
 
         val success = preferences.import(context, uri)
@@ -618,6 +622,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 finishImportPreferences(
                     oldBackupsFolder,
                     themeBefore,
+                    useDynamicColorsBefore,
                     oldStartView,
                     context,
                     askForUriPermissions,
@@ -631,6 +636,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             finishImportPreferences(
                 oldBackupsFolder,
                 themeBefore,
+                useDynamicColorsBefore,
                 oldStartView,
                 context,
                 askForUriPermissions,
@@ -644,15 +650,18 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     private fun finishImportPreferences(
         oldBackupsFolder: String,
         themeBefore: Theme,
+        useDynamicColorsBefore: Boolean,
         oldStartView: String,
         context: Context,
         askForUriPermissions: (uri: Uri) -> Unit,
         callback: () -> Unit,
     ) {
         val backupFolder = preferences.backupsFolder.getFreshValue()
+        val hasUseDynamicColorsChange =
+            useDynamicColorsBefore != preferences.useDynamicColors.getFreshValue()
         if (oldBackupsFolder != backupFolder) {
             showRefreshBackupsFolderAfterThemeChange = true
-            if (themeBefore == preferences.theme.getFreshValue()) {
+            if (themeBefore == preferences.theme.getFreshValue() && !hasUseDynamicColorsChange) {
                 refreshBackupsFolder(context, backupFolder, askForUriPermissions)
             }
         } else {
@@ -664,6 +673,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
         preferences.theme.refresh()
         callback()
+        if (showRefreshBackupsFolderAfterThemeChange) {
+            app.restartApplication(R.id.Settings, EXTRA_SHOW_IMPORT_BACKUPS_FOLDER to true)
+        }
     }
 
     fun refreshBackupsFolder(

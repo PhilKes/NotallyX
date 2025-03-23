@@ -294,6 +294,7 @@
     <string name="text_default">Default</string>
     <string name="text_size">Text size</string>
     <string name="theme">Theme</string>
+    <string name="theme_use_dynamic_colors">Use system\'s wallpaper colors</string>
     <string name="title">Title</string>
     <string name="to_record_audio">To record audio, allow NotallyX access to your microphone. Tap Settings &gt; Permissions and turn Microphone on</string>
     <string name="unarchive">Unarchive</string>
