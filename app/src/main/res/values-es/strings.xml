@@ -29,6 +29,7 @@
     <string name="auto_backups_folder_hint">Carpeta donde se guardan las copias de seguridad automáticas.</string>
     <string name="auto_backups_folder_rechoose">Debe volver a elegir su directorio de copias de seguridad para que NotallyX tenga permiso para escribir en ella.\nTambién puede presionar Cancelar para omitir la importación del valor del directorio de copias de seguridad</string>
     <string name="auto_backups_folder_set">Establece primero la carpeta de copia en opción anterior</string>
+    <string name="auto_save_after_idle_time">Autoguardar nota después de un lapso de inactividad</string>
     <string name="auto_sort_by_checked">Ordenar con los elementos marcados al final</string>
     <string name="back">Volver</string>
     <string name="backup">Respaldar</string>
@@ -37,6 +38,7 @@
     <string name="backup_period_days">Periodo de copia automática en días</string>
     <string name="backup_periodic">Copias de seguridad periódicas</string>
     <string name="backup_periodic_hint">Al habilitar esta opción, las copias de seguridad se crean automáticamente en el directorio de copias de seguridad configurada.\nEs posible que esto no funcione si tiene habilitado el modo de ahorro de energía.</string>
+    <string name="behaviour">Comportamiento</string>
     <string name="biometric_lock">Bloquear aplicación con dispositivo biométrico o con PIN</string>
     <string name="biometrics_disable_success">El bloqueo biométrico/PIN ha sido deshabilitado</string>
     <string name="biometrics_failure">Falló la autenticación biómetrica/PIN</string>
@@ -71,9 +73,12 @@
     <string name="clear_data_message">Todas las notas, imágenes, ficheros, audios serán borrados permanentemente</string>
     <string name="clear_formatting">Borrar formato</string>
     <string name="cleared_data">Se han limpiado todos los datos</string>
+    <string name="color">Color</string>
     <string name="color_exists">¡Este color ya existe!</string>
     <string name="content_density">Densidad de contenido</string>
     <string name="continue_">Continuar</string>
+    <string name="convert_to_list_note">Convertir en lista</string>
+    <string name="convert_to_text_note">Convertir en nota de texto</string>
     <string name="copied_link">Enlace copiado al portapapeles</string>
     <string name="copy">Copiar</string>
     <string name="crash_message">Se produjo un error inesperado.\nDisculpe las molestias.</string>
@@ -289,6 +294,7 @@
     <string name="text_default">Por defecto</string>
     <string name="text_size">Tamaño de texto</string>
     <string name="theme">Tema</string>
+    <string name="theme_use_dynamic_colors">Usar color de fondo del sistema</string>
     <string name="title">Título</string>
     <string name="to_record_audio">Para grabar audio, permita que NotallyX acceda a su micrófono. Pulsa Configuración &gt; Permisos y active el micrófono.</string>
     <string name="unarchive">Desarchivar</string>
