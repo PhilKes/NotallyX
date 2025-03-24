@@ -249,8 +249,8 @@ private fun Cursor.toBaseNote(): BaseNote {
             else -> throw IllegalArgumentException("pinned must be 0 or 1")
         }
 
-    val type = Type.valueOf(typeTmp)
-    val folder = Folder.valueOf(folderTmp)
+    val type = Type.valueOfOrDefault(typeTmp)
+    val folder = Folder.valueOfOrDefault(folderTmp)
 
     val labels = Converters.jsonToLabels(labelsTmp)
     val spans = Converters.jsonToSpans(spansTmp)

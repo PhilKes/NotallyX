@@ -254,12 +254,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(cursor.getColumnIndexOrThrow("id"))
                     val colorString = cursor.getString(cursor.getColumnIndexOrThrow("color"))
-                    val color =
-                        try {
-                            Color.valueOf(colorString)
-                        } catch (e: Exception) {
-                            Color.DEFAULT
-                        }
+                    val color = Color.valueOfOrDefault(colorString)
                     val hexColor = color.toColorString()
                     db.execSQL("UPDATE BaseNote SET color = ? WHERE id = ?", arrayOf(hexColor, id))
                 }

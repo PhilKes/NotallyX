@@ -5,6 +5,7 @@ import android.text.Html
 import androidx.core.text.toHtml
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.dao.NoteIdReminder
+import com.philkes.notallyx.data.model.BaseNote.Companion.COLOR_DEFAULT
 import com.philkes.notallyx.presentation.applySpans
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -12,6 +13,7 @@ import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import org.json.JSONArray
+import org.json.JSONException
 import org.json.JSONObject
 
 private const val NOTE_URL_PREFIX = "note://"
@@ -83,8 +85,80 @@ fun BaseNote.toJson(): String {
             jsonObject.put("items", Converters.itemsToJSONArray(items))
         }
     }
-
+    jsonObject.put("reminders", Converters.remindersToJSONArray(reminders))
     return jsonObject.toString(2)
+}
+
+fun String.toBaseNote(): BaseNote {
+    val jsonObject = JSONObject(this)
+    val id = jsonObject.getLongOrDefault("id", -1L)
+    val type = Type.valueOfOrDefault(jsonObject.getStringOrDefault("type", Type.NOTE.name))
+    val folder = Folder.valueOfOrDefault(jsonObject.getStringOrDefault("folder", Folder.NOTES.name))
+    val color =
+        jsonObject.getStringOrDefault("color", COLOR_DEFAULT).takeIf { it.isValid() }
+            ?: COLOR_DEFAULT
+    val title = jsonObject.getStringOrDefault("title", "")
+    val pinned = jsonObject.getBooleanOrDefault("pinned", false)
+    val timestamp = jsonObject.getLongOrDefault("timestamp", System.currentTimeMillis())
+    val modifiedTimestamp = jsonObject.getLongOrDefault("modifiedTimestamp", timestamp)
+    val labels = Converters.jsonToLabels(jsonObject.getArrayOrEmpty("labels"))
+    val body = jsonObject.getStringOrDefault("body", "")
+    val spans = Converters.jsonToSpans(jsonObject.getArrayOrEmpty("spans"))
+    val items = Converters.jsonToItems(jsonObject.getArrayOrEmpty("items"))
+    val images = Converters.jsonToFiles(jsonObject.getArrayOrEmpty("images"))
+    val files = Converters.jsonToFiles(jsonObject.getArrayOrEmpty("files"))
+    val audios = Converters.jsonToAudios(jsonObject.getArrayOrEmpty("audios"))
+    val reminders = Converters.jsonToReminders(jsonObject.getArrayOrEmpty("reminders"))
+    return BaseNote(
+        id,
+        type,
+        folder,
+        color,
+        title,
+        pinned,
+        timestamp,
+        modifiedTimestamp,
+        labels,
+        body,
+        spans,
+        items,
+        images,
+        files,
+        audios,
+        reminders,
+    )
+}
+
+private fun JSONObject.getStringOrDefault(key: String, defaultValue: String): String {
+    return try {
+        getString(key)
+    } catch (exception: JSONException) {
+        defaultValue
+    }
+}
+
+private fun JSONObject.getArrayOrEmpty(key: String): JSONArray {
+    return try {
+        getJSONArray(key)
+    } catch (exception: JSONException) {
+        JSONArray("[]")
+    }
+}
+
+private fun JSONObject.getBooleanOrDefault(key: String, defaultValue: Boolean): Boolean {
+    return try {
+        getBoolean(key)
+    } catch (exception: JSONException) {
+        defaultValue
+    }
+}
+
+private fun JSONObject.getLongOrDefault(key: String, defaultValue: Long): Long {
+    return try {
+        getLong(key)
+    } catch (exception: JSONException) {
+        defaultValue
+    }
 }
 
 fun BaseNote.toHtml(showDateCreated: Boolean) = buildString {
@@ -222,3 +296,15 @@ fun List<ListItem>.toText() = buildString {
 }
 
 fun Collection<ListItem>.deepCopy() = map { it.copy(children = mutableListOf()) }
+
+fun ColorString.isValid() =
+    when (this) {
+        COLOR_DEFAULT -> true
+        else ->
+            try {
+                android.graphics.Color.parseColor(this)
+                true
+            } catch (e: Exception) {
+                false
+            }
+    }

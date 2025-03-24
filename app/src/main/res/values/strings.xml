@@ -188,6 +188,8 @@
     <string name="invalid_link">Copy a valid link into your clipboard</string>
     <string name="italic">Italic</string>
     <string name="item">Item</string>
+    <string name="json_files">JSON Files</string>
+    <string name="json_files_help">In order to import your Notes from JSON files (single file or folder), click Import. Every valid JSON file is imported as a separate note, the file’s name becomes the note’s title.</string>
     <string name="label_exists">Label exists</string>
     <string name="label_visibility">Hide/Show the label in the navigation panel</string>
     <string name="labels">Labels</string>
