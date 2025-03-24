@@ -581,8 +581,9 @@ suspend fun exportPlainTextFile(
         )
     }
     return withContext(Dispatchers.IO) {
+        val validFileName = fileName.takeIf { it.isNotBlank() } ?: app.getString(R.string.note)
         val file =
-            folder.createFile(exportType.mimeType, fileName)?.let {
+            folder.createFile(exportType.mimeType, validFileName)?.let {
                 app.contentResolver.openOutputStream(it.uri)?.use { stream ->
                     OutputStreamWriter(stream).use { writer ->
                         writer.write(

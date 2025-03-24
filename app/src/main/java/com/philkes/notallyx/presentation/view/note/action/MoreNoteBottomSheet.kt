@@ -31,7 +31,7 @@ class MoreNoteBottomSheet(
                                 setCompoundDrawablesWithIntrinsicBounds(null, null, null, null)
                                 setOnClickListener {
                                     callbacks.export(mimeType)
-                                    fragment.hide()
+                                    fragment.dismiss()
                                 }
                             }
                     }

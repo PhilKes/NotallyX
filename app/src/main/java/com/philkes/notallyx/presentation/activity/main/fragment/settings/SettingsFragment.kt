@@ -440,7 +440,7 @@ class SettingsFragment : Fragment() {
                         when (selectedImportSource.mimeType) {
                             FOLDER_OR_FILE_MIMETYPE ->
                                 MaterialAlertDialogBuilder(requireContext())
-                                    .setTitle(R.string.plain_text_files)
+                                    .setTitle(selectedImportSource.displayNameResId)
                                     .setItems(
                                         arrayOf(
                                             getString(R.string.folder),

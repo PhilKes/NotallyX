@@ -9,6 +9,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.imports.evernote.EvernoteImporter
 import com.philkes.notallyx.data.imports.google.GoogleKeepImporter
+import com.philkes.notallyx.data.imports.txt.JsonImporter
 import com.philkes.notallyx.data.imports.txt.PlainTextImporter
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
@@ -39,6 +40,7 @@ class NotesImporter(private val app: Application, private val database: NotallyD
                         ImportSource.GOOGLE_KEEP -> GoogleKeepImporter()
                         ImportSource.EVERNOTE -> EvernoteImporter()
                         ImportSource.PLAIN_TEXT -> PlainTextImporter()
+                        ImportSource.JSON -> JsonImporter()
                     }.import(app, uri, tempDir, progress)
                 } catch (e: Exception) {
                     Log.e(TAG, "import: failed", e)
@@ -152,6 +154,13 @@ enum class ImportSource(
         R.string.plain_text_files_help,
         null,
         R.drawable.text_file,
+    ),
+    JSON(
+        R.string.json_files,
+        FOLDER_OR_FILE_MIMETYPE,
+        R.string.json_files_help,
+        null,
+        R.drawable.file_json,
     ),
 }
 
