@@ -291,8 +291,11 @@ fun EditText.createListTextWatcherWithHistory(
 ) =
     object : TextWatcher {
         private var ignoreOriginalChange: Boolean = false
+        private lateinit var textBefore: Editable
 
-        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            textBefore = text.clone()
+        }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             ignoreOriginalChange = onTextChanged?.invoke(s!!, start, count) ?: false
@@ -300,7 +303,7 @@ fun EditText.createListTextWatcherWithHistory(
 
         override fun afterTextChanged(s: Editable?) {
             val textAfter = s!!.clone()
-            if (textAfter.getSpans<SuggestionSpan>().isNotEmpty()) {
+            if (textAfter.hasNotChanged(textBefore)) {
                 return
             }
             if (!ignoreOriginalChange) {
@@ -330,7 +333,7 @@ fun StylableEditTextWithHistory.createTextWatcherWithHistory(
 
         override fun afterTextChanged(s: Editable?) {
             val textAfter = requireNotNull(s).clone()
-            if (textAfter.getSpans<SuggestionSpan>().isNotEmpty()) {
+            if (textAfter.hasNotChanged(stateBefore.text)) {
                 return
             }
             updateModel.invoke(textAfter)
@@ -344,6 +347,10 @@ fun StylableEditTextWithHistory.createTextWatcherWithHistory(
             )
         }
     }
+
+fun Editable.hasNotChanged(before: Editable): Boolean {
+    return toString() == before.toString() && getSpans<SuggestionSpan>().isNotEmpty()
+}
 
 fun Editable.clone(): Editable = Editable.Factory.getInstance().newEditable(this)
 
