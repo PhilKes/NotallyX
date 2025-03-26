@@ -95,7 +95,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
         val fragmentIdToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_OPEN, -1)
         if (fragmentIdToLoad != -1) {
-            navController.navigate(fragmentIdToLoad, Bundle())
+            navController.navigate(fragmentIdToLoad, intent.extras)
         } else if (savedInstanceState == null) {
             navigateToStartView()
         }
@@ -107,7 +107,10 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                     if (baseModel.actionMode.enabled.value) {
                         return
                     }
-                    if (!isStartViewFragment) {
+                    if (
+                        !isStartViewFragment &&
+                            !intent.getBooleanExtra(EXTRA_SKIP_START_VIEW_ON_BACK, false)
+                    ) {
                         navigateToStartView()
                     } else {
                         finish()
@@ -689,5 +692,6 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     companion object {
         const val EXTRA_FRAGMENT_TO_OPEN = "notallyx.intent.extra.FRAGMENT_TO_OPEN"
+        const val EXTRA_SKIP_START_VIEW_ON_BACK = "notallyx.intent.extra.SKIP_START_VIEW_ON_BACK"
     }
 }
