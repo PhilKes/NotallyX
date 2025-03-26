@@ -163,14 +163,14 @@ interface BaseNoteDao {
      * directly on the LiveData to filter the results accordingly.
      */
     fun getBaseNotesByLabel(label: String): LiveData<List<BaseNote>> {
-        val result = getBaseNotesByLabel(label, Folder.NOTES)
+        val result = getBaseNotesByLabel(label, setOf(Folder.NOTES, Folder.ARCHIVED))
         return result.map { list -> list.filter { baseNote -> baseNote.labels.contains(label) } }
     }
 
     @Query(
-        "SELECT * FROM BaseNote WHERE folder = :folder AND labels LIKE '%' || :label || '%' ORDER BY pinned DESC, timestamp DESC"
+        "SELECT * FROM BaseNote WHERE folder IN (:folders) AND labels LIKE '%' || :label || '%' ORDER BY folder DESC, pinned DESC, timestamp DESC"
     )
-    fun getBaseNotesByLabel(label: String, folder: Folder): LiveData<List<BaseNote>>
+    fun getBaseNotesByLabel(label: String, folders: Collection<Folder>): LiveData<List<BaseNote>>
 
     @Query(
         "SELECT * FROM BaseNote WHERE folder = :folder AND labels == '[]' ORDER BY pinned DESC, timestamp DESC"

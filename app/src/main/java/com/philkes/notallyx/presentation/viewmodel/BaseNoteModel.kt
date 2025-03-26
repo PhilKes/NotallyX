@@ -117,6 +117,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     private val pinned = Header(app.getString(R.string.pinned))
     private val others = Header(app.getString(R.string.others))
+    private val archived = Header(app.getString(R.string.archived))
 
     val preferences = NotallyXPreferences.getInstance(app)
 
@@ -215,7 +216,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         return Content(baseNoteDao.getBaseNotesWithoutLabel(Folder.NOTES), ::transform)
     }
 
-    private fun transform(list: List<BaseNote>) = transform(list, pinned, others)
+    private fun transform(list: List<BaseNote>) = transform(list, pinned, others, archived)
 
     fun disableBackups() {
         val value = preferences.backupsFolder.value
@@ -743,24 +744,35 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         const val CURRENT_LABEL_EMPTY = ""
         val CURRENT_LABEL_NONE: String? = null
 
-        fun transform(list: List<BaseNote>, pinned: Header, others: Header): List<Item> {
+        fun transform(
+            list: List<BaseNote>,
+            pinned: Header,
+            others: Header,
+            archived: Header,
+        ): List<Item> {
             if (list.isEmpty()) {
                 return list
             } else {
-                val firstNote = list[0]
-                return if (firstNote.pinned) {
-                    val newList = ArrayList<Item>(list.size + 2)
-                    newList.add(pinned)
-
-                    val firstUnpinnedNote = list.indexOfFirst { baseNote -> !baseNote.pinned }
-                    list.forEachIndexed { index, baseNote ->
-                        if (index == firstUnpinnedNote) {
-                            newList.add(others)
-                        }
-                        newList.add(baseNote)
+                val firstPinnedNote = list.indexOfFirst { baseNote -> baseNote.pinned }
+                val firstUnpinnedNote =
+                    list.indexOfFirst { baseNote ->
+                        !baseNote.pinned && baseNote.folder != Folder.ARCHIVED
                     }
-                    newList
-                } else list
+                val mutableList: MutableList<Item> = list.toMutableList()
+                if (firstPinnedNote != -1) {
+                    mutableList.add(firstPinnedNote, pinned)
+                    if (firstUnpinnedNote != -1) {
+                        mutableList.add(firstUnpinnedNote + 1, others)
+                    }
+                }
+                val firstArchivedNote =
+                    mutableList.indexOfFirst { item ->
+                        item is BaseNote && item.folder == Folder.ARCHIVED
+                    }
+                if (firstArchivedNote != -1) {
+                    mutableList.add(firstArchivedNote, archived)
+                }
+                return mutableList
             }
         }
     }
