@@ -71,6 +71,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
 
         val pinned = Header(getString(R.string.pinned))
         val others = Header(getString(R.string.others))
+        val archived = Header(getString(R.string.archived))
 
         database.observe(this) {
             lifecycleScope.launch {
@@ -78,7 +79,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
                     withContext(Dispatchers.IO) {
                         val raw =
                             it.getBaseNoteDao().getAllNotes().filter { it.id != excludedNoteId }
-                        BaseNoteModel.transform(raw, pinned, others)
+                        BaseNoteModel.transform(raw, pinned, others, archived)
                     }
                 adapter.submitList(notes)
                 binding.EmptyView.visibility =
