@@ -87,13 +87,13 @@ class LabelsFragment : Fragment(), LabelListener {
 
     override fun onToggleVisibility(position: Int) {
         labelAdapter?.currentList?.get(position)?.let { value ->
-            val hiddenLabels = model.preferences.labelsHiddenInNavigation.value.toMutableSet()
+            val hiddenLabels = model.preferences.labelsHidden.value.toMutableSet()
             if (value.visibleInNavigation) {
                 hiddenLabels.add(value.label)
             } else {
                 hiddenLabels.remove(value.label)
             }
-            model.savePreference(model.preferences.labelsHiddenInNavigation, hiddenLabels)
+            model.savePreference(model.preferences.labelsHidden, hiddenLabels)
 
             val currentList = labelAdapter!!.currentList.toMutableList()
             currentList[position] =
@@ -104,7 +104,7 @@ class LabelsFragment : Fragment(), LabelListener {
 
     private fun setupObserver() {
         model.labels.observe(viewLifecycleOwner) { labels ->
-            val hiddenLabels = model.preferences.labelsHiddenInNavigation.value
+            val hiddenLabels = model.preferences.labelsHidden.value
             val labelsData = labels.map { label -> LabelData(label, !hiddenLabels.contains(label)) }
             labelAdapter?.submitList(labelsData)
             binding?.ImageView?.isVisible = labels.isEmpty()

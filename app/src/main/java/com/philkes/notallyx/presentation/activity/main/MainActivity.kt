@@ -195,7 +195,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 .setCheckable(true)
                 .setIcon(R.drawable.settings)
         }
-        baseModel.preferences.labelsHiddenInNavigation.observe(this) { hiddenLabels ->
+        baseModel.preferences.labelsHidden.observe(this) { hiddenLabels ->
             hideLabelsInNavigation(hiddenLabels, baseModel.preferences.maxLabels.value)
         }
         baseModel.preferences.maxLabels.observe(this) { maxLabels ->
@@ -244,10 +244,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             } else null
         configuration = AppBarConfiguration(binding.NavigationView.menu, binding.DrawerLayout)
         setupActionBarWithNavController(navController, configuration)
-        hideLabelsInNavigation(
-            baseModel.preferences.labelsHiddenInNavigation.value,
-            maxLabelsToDisplay,
-        )
+        hideLabelsInNavigation(baseModel.preferences.labelsHidden.value, maxLabelsToDisplay)
     }
 
     private fun navigateToLabel(label: String) {

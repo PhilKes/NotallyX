@@ -339,15 +339,15 @@ class SettingsFragment : Fragment() {
             MaxLabels.setup(maxLabels, requireContext()) { newValue ->
                 model.savePreference(maxLabels, newValue)
             }
-            labelsHiddenInOverview.observe(viewLifecycleOwner) { value ->
+            labelTagsHiddenInOverview.observe(viewLifecycleOwner) { value ->
                 binding.LabelsHiddenInOverview.setup(
-                    labelsHiddenInOverview,
+                    labelTagsHiddenInOverview,
                     value,
                     requireContext(),
                     layoutInflater,
                     R.string.labels_hidden_in_overview,
                 ) { enabled ->
-                    model.savePreference(labelsHiddenInOverview, enabled)
+                    model.savePreference(labelTagsHiddenInOverview, enabled)
                 }
             }
         }
