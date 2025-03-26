@@ -43,6 +43,9 @@ import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
+import com.philkes.notallyx.presentation.activity.main.MainActivity
+import com.philkes.notallyx.presentation.activity.main.MainActivity.Companion.EXTRA_FRAGMENT_TO_OPEN
+import com.philkes.notallyx.presentation.activity.main.MainActivity.Companion.EXTRA_SKIP_START_VIEW_ON_BACK
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.activity.note.SelectLabelsActivity.Companion.EXTRA_SELECTED_LABELS
 import com.philkes.notallyx.presentation.activity.note.reminders.RemindersActivity
@@ -50,6 +53,7 @@ import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addFastScroll
 import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.bindLabels
+import com.philkes.notallyx.presentation.displayEditLabelDialog
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getQuantityString
@@ -629,13 +633,37 @@ abstract class EditActivity(private val type: Type) :
             } else DateFormat.ABSOLUTE
         binding.Date.displayFormattedTimestamp(date, dateFormat, datePrefixResId)
         binding.EnterTitle.setText(notallyModel.title)
+        bindLabels()
+        setColor()
+    }
+
+    private fun bindLabels() {
         binding.LabelGroup.bindLabels(
             notallyModel.labels,
             notallyModel.textSize,
             paddingTop = true,
             colorInt,
+            onClick = { label ->
+                val bundle = Bundle()
+                bundle.putString(EXTRA_DISPLAYED_LABEL, label)
+                startActivity(
+                    Intent(this, MainActivity::class.java).apply {
+                        putExtra(EXTRA_FRAGMENT_TO_OPEN, R.id.DisplayLabel)
+                        putExtra(EXTRA_DISPLAYED_LABEL, label)
+                        putExtra(EXTRA_SKIP_START_VIEW_ON_BACK, true)
+                    }
+                )
+            },
+            onLongClick = { label ->
+                displayEditLabelDialog(label, baseModel) { oldLabel, newLabel ->
+                    notallyModel.labels.apply {
+                        remove(oldLabel)
+                        add(newLabel)
+                    }
+                    bindLabels()
+                }
+            },
         )
-        setColor()
     }
 
     private fun handleSharedNote() {

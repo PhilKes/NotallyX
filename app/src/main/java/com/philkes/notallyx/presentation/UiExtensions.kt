@@ -65,6 +65,7 @@ import androidx.core.view.marginTop
 import androidx.core.view.setPadding
 import androidx.core.view.updatePadding
 import androidx.core.widget.TextViewCompat
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
@@ -90,6 +91,7 @@ import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.SpanRepresentation
+import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.DialogProgressBinding
 import com.philkes.notallyx.databinding.LabelBinding
 import com.philkes.notallyx.presentation.activity.main.MainActivity
@@ -97,6 +99,7 @@ import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
@@ -523,6 +526,53 @@ fun Activity.checkAlarmPermission(
     } else onSuccess()
 }
 
+fun Fragment.displayEditLabelDialog(
+    oldValue: String,
+    model: BaseNoteModel,
+    onUpdateLabel: ((oldLabel: String, newLabel: String) -> Unit)? = null,
+) {
+    requireContext().displayEditLabelDialog(oldValue, model, layoutInflater, onUpdateLabel)
+}
+
+fun Activity.displayEditLabelDialog(
+    oldValue: String,
+    model: BaseNoteModel,
+    onUpdateLabel: ((oldLabel: String, newLabel: String) -> Unit)? = null,
+) {
+    displayEditLabelDialog(oldValue, model, layoutInflater, onUpdateLabel)
+}
+
+fun Context.displayEditLabelDialog(
+    oldValue: String,
+    model: BaseNoteModel,
+    layoutInflater: LayoutInflater,
+    onUpdateLabel: ((oldLabel: String, newLabel: String) -> Unit)? = null,
+) {
+    val dialogBinding = DialogInputBinding.inflate(layoutInflater)
+    dialogBinding.EditText.setText(oldValue)
+    MaterialAlertDialogBuilder(this)
+        .setView(dialogBinding.root)
+        .setTitle(R.string.edit_label)
+        .setCancelButton()
+        .setPositiveButton(R.string.save) { dialog, _ ->
+            val value = dialogBinding.EditText.text.toString().trim()
+            if (value.isNotEmpty()) {
+                model.updateLabel(oldValue, value) { success ->
+                    if (success) {
+                        onUpdateLabel?.invoke(oldValue, value)
+                        dialog.dismiss()
+                    } else showToast(R.string.label_exists)
+                }
+            }
+        }
+        .showAndFocus(dialogBinding.EditText, allowFullSize = true) { positiveButton ->
+            dialogBinding.EditText.doAfterTextChanged { text ->
+                positiveButton.isEnabled = !text.isNullOrEmpty()
+            }
+            positiveButton.isEnabled = oldValue.isNotEmpty()
+        }
+}
+
 private fun formatTimestamp(timestamp: Long, dateFormat: DateFormat): String {
     val date = Date(timestamp)
     return when (dateFormat) {
@@ -842,6 +892,8 @@ fun ChipGroup.bindLabels(
     textSize: TextSize,
     paddingTop: Boolean,
     color: Int? = null,
+    onClick: ((label: String) -> Unit)? = null,
+    onLongClick: ((label: String) -> Unit)? = null,
 ) {
     if (labels.isEmpty()) {
         visibility = View.GONE
@@ -859,6 +911,13 @@ fun ChipGroup.bindLabels(
                 setTextSize(TypedValue.COMPLEX_UNIT_SP, labelSize)
                 text = label
                 color?.let { setControlsContrastColorForAllViews(it) }
+                onClick?.let { setOnClickListener { it(label) } }
+                onLongClick?.let {
+                    setOnLongClickListener {
+                        it(label)
+                        true
+                    }
+                }
             }
         }
     }

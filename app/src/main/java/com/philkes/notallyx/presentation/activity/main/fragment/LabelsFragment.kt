@@ -6,7 +6,6 @@ import android.view.Menu
 import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
@@ -19,6 +18,7 @@ import com.philkes.notallyx.databinding.DialogInputBinding
 import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.displayEditLabelDialog
 import com.philkes.notallyx.presentation.initListView
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
@@ -77,7 +77,7 @@ class LabelsFragment : Fragment(), LabelListener {
 
     override fun onEdit(position: Int) {
         labelAdapter?.currentList?.get(position)?.let { (label, _) ->
-            displayEditLabelDialog(label)
+            displayEditLabelDialog(label, model)
         }
     }
 
@@ -147,38 +147,5 @@ class LabelsFragment : Fragment(), LabelListener {
             .setPositiveButton(R.string.delete) { _, _ -> model.deleteLabel(value) }
             .setCancelButton()
             .show()
-    }
-
-    private fun displayEditLabelDialog(oldValue: String) {
-        val dialogBinding = DialogInputBinding.inflate(layoutInflater)
-
-        dialogBinding.EditText.setText(oldValue)
-
-        MaterialAlertDialogBuilder(requireContext())
-            .setView(dialogBinding.root)
-            .setTitle(R.string.edit_label)
-            .setCancelButton()
-            .setPositiveButton(R.string.save) { dialog, _ ->
-                val value = dialogBinding.EditText.text.toString().trim()
-                if (value.isNotEmpty()) {
-                    model.updateLabel(oldValue, value) { success ->
-                        if (success) {
-                            dialog.dismiss()
-                        } else
-                            Toast.makeText(
-                                    requireContext(),
-                                    R.string.label_exists,
-                                    Toast.LENGTH_LONG,
-                                )
-                                .show()
-                    }
-                }
-            }
-            .showAndFocus(dialogBinding.EditText, allowFullSize = true) { positiveButton ->
-                dialogBinding.EditText.doAfterTextChanged { text ->
-                    positiveButton.isEnabled = !text.isNullOrEmpty()
-                }
-                positiveButton.isEnabled = oldValue.isNotEmpty()
-            }
     }
 }
