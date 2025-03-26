@@ -74,6 +74,8 @@
     <string name="color_exists">Cette couleur existe déjà !</string>
     <string name="content_density">Densité d\'affichage</string>
     <string name="continue_">Continuer</string>
+    <string name="convert_to_list_note">Convertir en liste</string>
+    <string name="convert_to_text_note">Convertir en note simple</string>
     <string name="copied_link">Lien copié dans le presse-papier</string>
     <string name="copy">Copier</string>
     <string name="crash_message">Une erreur inattendue s\'est produite.\nDésolé pour le désagrément.</string>

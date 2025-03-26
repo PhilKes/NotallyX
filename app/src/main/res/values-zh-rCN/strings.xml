@@ -185,6 +185,8 @@
     <string name="invalid_link">复制有效链接到你的剪贴板</string>
     <string name="italic">斜体</string>
     <string name="item">项目</string>
+    <string name="json_files">JSON 文件</string>
+    <string name="json_files_help">要从 JSON 文件（单一文件或文件夹）导入你的笔记，单击“导入”。每个有效的 JSON 文件会被导入成不同笔记，原始文件名成为笔记的标题。</string>
     <string name="label_exists">标签已存在</string>
     <string name="label_visibility">在导航面板中隐藏/显示标签</string>
     <string name="labels">标签</string>
