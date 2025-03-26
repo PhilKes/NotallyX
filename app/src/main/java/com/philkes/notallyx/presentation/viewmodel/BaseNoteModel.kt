@@ -13,6 +13,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import androidx.room.withTransaction
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -128,6 +129,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val actionMode = ActionMode()
 
     internal var showRefreshBackupsFolderAfterThemeChange = false
+    private var labelsHiddenObserver: Observer<Set<String>>? = null
 
     init {
         NotallyDatabase.getDatabase(app).observeForever(::init)
@@ -151,11 +153,12 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         allNotes = baseNoteDao.getAllAsync()
         allNotes!!.observeForever(allNotesObserver!!)
 
-        if (baseNotes == null) {
-            baseNotes = Content(baseNoteDao.getFrom(Folder.NOTES), ::transform)
-        } else {
-            baseNotes!!.setObserver(baseNoteDao.getFrom(Folder.NOTES))
+        labelsHiddenObserver?.let { preferences.labelsHidden.removeObserver(it) }
+        labelsHiddenObserver = Observer { labelsHidden ->
+            baseNotes = null
+            initBaseNotes(labelsHidden)
         }
+        preferences.labelsHidden.observeForever(labelsHiddenObserver!!)
 
         if (deletedNotes == null) {
             deletedNotes = Content(baseNoteDao.getFrom(Folder.DELETED), ::transform)
@@ -186,6 +189,18 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     app.clearAllFolders()
                 }
             }
+        }
+    }
+
+    private fun initBaseNotes(labelsHidden: Set<String>) {
+        val overviewNotes =
+            baseNoteDao.getFrom(Folder.NOTES).map { list ->
+                list.filter { baseNote -> baseNote.labels.none { labelsHidden.contains(it) } }
+            }
+        if (baseNotes == null) {
+            baseNotes = Content(overviewNotes, ::transform)
+        } else {
+            baseNotes!!.setObserver(overviewNotes)
         }
     }
 
@@ -538,7 +553,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun deleteLabel(value: String) {
         viewModelScope.launch(Dispatchers.IO) { commonDao.deleteLabel(value) }
-        val labelsHiddenPreference = preferences.labelsHiddenInNavigation
+        val labelsHiddenPreference = preferences.labelsHidden
         val labelsHidden = labelsHiddenPreference.value.toMutableSet()
         if (labelsHidden.contains(value)) {
             labelsHidden.remove(value)
@@ -554,7 +569,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun updateLabel(oldValue: String, newValue: String, onComplete: (success: Boolean) -> Unit) {
         executeAsyncWithCallback({ commonDao.updateLabel(oldValue, newValue) }, onComplete)
-        val labelsHiddenPreference = preferences.labelsHiddenInNavigation
+        val labelsHiddenPreference = preferences.labelsHidden
         val labelsHidden = labelsHiddenPreference.value.toMutableSet()
         if (labelsHidden.contains(oldValue)) {
             labelsHidden.remove(oldValue)

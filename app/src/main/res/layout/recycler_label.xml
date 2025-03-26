@@ -23,7 +23,7 @@
     android:layout_gravity="center_vertical"
     android:padding="8dp"
     android:background="?attr/selectableItemBackground"
-    android:contentDescription="@string/label_visibility"
+    android:contentDescription="@string/labels_hidden_in_overview_title"
     app:srcCompat="@drawable/visibility"
     app:tint="?attr/colorControlNormal" />
 

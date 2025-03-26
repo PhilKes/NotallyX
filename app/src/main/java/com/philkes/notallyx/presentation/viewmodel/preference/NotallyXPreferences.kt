@@ -76,9 +76,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
             10,
             R.string.max_lines_to_display_title,
         )
-    val labelsHiddenInNavigation =
-        StringSetPreference("labelsHiddenInNavigation", preferences, setOf())
-    val labelsHiddenInOverview =
+    val labelsHidden = StringSetPreference("labelsHiddenInNavigation", preferences, setOf())
+    val labelTagsHiddenInOverview =
         BooleanPreference(
             "labelsHiddenInOverview",
             preferences,
@@ -224,8 +223,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 maxItems,
                 maxLines,
                 maxTitle,
-                labelsHiddenInNavigation,
-                labelsHiddenInOverview,
+                labelsHidden,
+                labelTagsHiddenInOverview,
                 maxLabels,
                 periodicBackups,
                 backupPassword,
