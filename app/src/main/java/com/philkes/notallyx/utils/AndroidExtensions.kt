@@ -34,6 +34,7 @@ import com.philkes.notallyx.BuildConfig
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Type
+import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
@@ -152,6 +153,8 @@ fun Context.getUriForFile(file: File): Uri =
     FileProvider.getUriForFile(this, "${packageName}.provider", file)
 
 private val LOG_DATE_FORMATTER = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH)
+
+fun Context.getMimeType(uri: Uri) = contentResolver.getType(uri)
 
 fun ContextWrapper.log(
     tag: String,
@@ -297,22 +300,23 @@ fun ContextWrapper.shareNote(note: BaseNote) {
             Type.NOTE -> note.body
             Type.LIST -> note.items.toMutableList().toText()
         }
-    val filesUris = note.images
-        .map {File(getExternalImagesDirectory(), it.localName)}
-        .map { getUriForFile(it) }
+    val filesUris =
+        note.images
+            .map { File(getExternalImagesDirectory(), it.localName) }
+            .map { getUriForFile(it) }
     shareNote(note.title, body, filesUris)
 }
 
 private fun Context.shareNote(title: String, body: CharSequence, imageUris: List<Uri>) {
     val text = body.truncate(150_000)
     val intent =
-        Intent(if(imageUris.size >1) Intent.ACTION_SEND_MULTIPLE else Intent.ACTION_SEND)
+        Intent(if (imageUris.size > 1) Intent.ACTION_SEND_MULTIPLE else Intent.ACTION_SEND)
             .apply {
                 type = "image/*"
                 putExtra(Intent.EXTRA_TEXT, text.toString())
                 putExtra(Intent.EXTRA_TITLE, title)
                 putExtra(Intent.EXTRA_SUBJECT, title)
-                if(imageUris.size >1){
+                if (imageUris.size > 1) {
                     putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(imageUris))
                 } else {
                     putExtra(Intent.EXTRA_STREAM, imageUris.firstOrNull())

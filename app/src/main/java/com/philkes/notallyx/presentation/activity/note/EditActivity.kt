@@ -40,7 +40,7 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.data.model.toText
+import com.philkes.notallyx.data.model.isImageMimeType
 import com.philkes.notallyx.databinding.ActivityEditBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.MainActivity
@@ -83,6 +83,7 @@ import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.backup.exportNotes
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.getMimeType
 import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.mergeSkipFirst
@@ -179,7 +180,10 @@ abstract class EditActivity(private val type: Type) :
             if (persistedId == null || notallyModel.originalNote == null) {
                 notallyModel.setState(id)
             }
-            if (notallyModel.isNewNote && intent.action == Intent.ACTION_SEND) {
+            if (
+                notallyModel.isNewNote &&
+                    intent.action in setOf(Intent.ACTION_SEND, Intent.ACTION_SEND_MULTIPLE)
+            ) {
                 handleSharedNote()
             } else if (notallyModel.isNewNote) {
                 intent.getStringExtra(EXTRA_DISPLAYED_LABEL)?.let {
@@ -668,14 +672,34 @@ abstract class EditActivity(private val type: Type) :
 
     private fun handleSharedNote() {
         val title = intent.getStringExtra(Intent.EXTRA_SUBJECT)
-
         val string = intent.getStringExtra(Intent.EXTRA_TEXT)
-
+        val files =
+            IntentCompat.getParcelableArrayListExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
+                ?: IntentCompat.getParcelableExtra(intent, Intent.EXTRA_STREAM, Uri::class.java)
+                    ?.let { listOf(it) }
         if (string != null) {
             notallyModel.body = Editable.Factory.getInstance().newEditable(string)
         }
         if (title != null) {
             notallyModel.title = title
+        }
+        files?.let {
+            val filesByType =
+                it.groupBy { uri ->
+                    getMimeType(uri)?.let { mimeType ->
+                        if (mimeType.isImageMimeType) {
+                            NotallyModel.FileType.IMAGE
+                        } else {
+                            NotallyModel.FileType.ANY
+                        }
+                    } ?: NotallyModel.FileType.ANY
+                }
+            filesByType[NotallyModel.FileType.IMAGE]?.let { images ->
+                notallyModel.addImages(images.toTypedArray())
+            }
+            filesByType[NotallyModel.FileType.ANY]?.let { otherFiles ->
+                notallyModel.addFiles(otherFiles.toTypedArray())
+            }
         }
     }
 
