@@ -43,7 +43,15 @@ fun String.getNoteTypeFromUrl(): Type {
 
 val FileAttachment.isImage: Boolean
     get() {
-        return mimeType.startsWith("image/")
+        return mimeType.isImageMimeType
+    }
+val String.isImageMimeType: Boolean
+    get() {
+        return startsWith("image/")
+    }
+val String.isAudioMimeType: Boolean
+    get() {
+        return startsWith("audio/")
     }
 
 fun BaseNote.toTxt(includeTitle: Boolean = true, includeCreationDate: Boolean = true) =
