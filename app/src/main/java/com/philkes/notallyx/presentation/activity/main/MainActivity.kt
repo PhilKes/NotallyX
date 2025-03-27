@@ -321,12 +321,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     private fun share() {
         val baseNote = baseModel.actionMode.getFirstNote()
-        val body =
-            when (baseNote.type) {
-                Type.NOTE -> baseNote.body.applySpans(baseNote.spans)
-                Type.LIST -> baseNote.items.toText()
-            }
-        this.shareNote(baseNote.title, body)
+        this.shareNote(baseNote)
     }
 
     private fun deleteForever() {

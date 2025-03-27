@@ -793,12 +793,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     override fun share() {
-        val body =
-            when (type) {
-                Type.NOTE -> notallyModel.body
-                Type.LIST -> notallyModel.items.toMutableList().toText()
-            }
-        this.shareNote(notallyModel.title, body)
+        this.shareNote(notallyModel.getBaseNote())
     }
 
     override fun export(mimeType: ExportMimeType) {
