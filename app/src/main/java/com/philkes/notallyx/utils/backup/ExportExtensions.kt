@@ -89,7 +89,7 @@ import net.lingala.zip4j.model.enums.EncryptionMethod
 private const val TAG = "ExportExtensions"
 private const val NOTIFICATION_CHANNEL_ID = "AutoBackups"
 private const val NOTIFICATION_ID = 123412
-private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs.txt"
+private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs"
 private const val OUTPUT_DATA_BACKUP_URI = "backupUri"
 
 const val AUTO_BACKUP_WORK_NAME = "com.philkes.notallyx.AutoBackupWork"
@@ -124,8 +124,8 @@ fun ContextWrapper.createBackup(): Result {
         try {
             val formatter = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
             val backupFilePrefix = PERIODIC_BACKUP_FILE_PREFIX
-            val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
-            log(msg = "Creating '$uri/$name.zip'...")
+            val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}.zip"
+            log(msg = "Creating '$uri/$name'...")
             val zipUri = requireNotNull(folder.createFile(MIME_TYPE_ZIP, name)).uri
             val exportedNotes = app.exportAsZip(zipUri, password = preferences.backupPassword.value)
             log(msg = "Exported $exportedNotes notes")

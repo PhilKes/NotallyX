@@ -40,9 +40,12 @@ import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
+import java.io.BufferedReader
 import java.io.File
+import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
+import java.lang.UnsupportedOperationException
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.text.DateFormat
@@ -210,7 +213,15 @@ fun Context.logToFile(
 
     logFile?.let { file ->
         val contentResolver = contentResolver
-        val outputStream = contentResolver.openOutputStream(file.uri, "wa")
+        val (outputStream, logFileContents) =
+            try {
+                Pair(contentResolver.openOutputStream(file.uri, "wa"), null)
+            } catch (e: UnsupportedOperationException) {
+                Pair(
+                    contentResolver.openOutputStream(file.uri, "w"),
+                    contentResolver.readFileContents(file.uri),
+                )
+            }
 
         outputStream?.use { output ->
             val writer = PrintWriter(OutputStreamWriter(output, Charsets.UTF_8))
@@ -218,6 +229,7 @@ fun Context.logToFile(
             val formatter = DateFormat.getDateTimeInstance()
             val time = formatter.format(System.currentTimeMillis())
 
+            logFileContents?.let { writer.println(it) }
             if (throwable != null || stackTrace != null) {
                 writer.println("[Start]")
             }
@@ -437,3 +449,8 @@ fun Activity.resetApplication() {
 fun Bundle?.getExtraBooleanOrDefault(key: String, defaultValue: Boolean): Boolean {
     return this?.getBoolean(key, defaultValue) ?: defaultValue
 }
+
+fun ContentResolver.readFileContents(uri: Uri) =
+    openInputStream(uri)?.use { inputStream ->
+        BufferedReader(InputStreamReader(inputStream)).use { reader -> reader.readText() }
+    } ?: ""

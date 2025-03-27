@@ -11,9 +11,8 @@ import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.utils.MIME_TYPE_JSON
-import java.io.BufferedReader
+import com.philkes.notallyx.utils.readFileContents
 import java.io.File
-import java.io.InputStreamReader
 
 class PlainTextImporter : ExternalImporter {
 
@@ -35,12 +34,7 @@ class PlainTextImporter : ExternalImporter {
                         return
                     }
                     val fileNameWithoutExtension = file.name?.substringBeforeLast(".") ?: ""
-                    var content =
-                        app.contentResolver.openInputStream(file.uri)?.use { inputStream ->
-                            BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                                reader.readText()
-                            }
-                        } ?: ""
+                    var content = app.contentResolver.readFileContents(file.uri)
                     val listItems = mutableListOf<ListItem>()
                     content.findListSyntaxRegex()?.let { listSyntaxRegex ->
                         listItems.addAll(content.extractListItems(listSyntaxRegex))
