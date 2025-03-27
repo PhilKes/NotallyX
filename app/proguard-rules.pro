@@ -11,14 +11,12 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
--keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
+-keepattributes LineNumberTable,SourceFile
 -renamesourcefileattribute SourceFile
+-dontobfuscate
+-optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable
+-printmapping obfuscation/mapping.txt
+
 -keep class ** extends androidx.navigation.Navigator
 -keep class ** implements org.ocpsoft.prettytime.TimeUnit
 
