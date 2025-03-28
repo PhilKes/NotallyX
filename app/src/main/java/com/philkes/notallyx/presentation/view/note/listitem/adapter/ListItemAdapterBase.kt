@@ -11,6 +11,7 @@ import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
 data class ListItemHighlight(
@@ -40,7 +41,7 @@ abstract class ListItemAdapterBase(
         touchHelper.attachToRecyclerView(recyclerView)
     }
 
-    fun onBindViewHolder(holder: ListItemVH, position: Int) {
+    fun onBindViewHolder(holder: ListItemVH, position: Int, viewMode: NoteViewMode) {
         val item = getItem(position)
         holder.bind(
             backgroundColor,
@@ -48,6 +49,7 @@ abstract class ListItemAdapterBase(
             position,
             highlights[position],
             preferences.listItemSorting.value,
+            viewMode,
         )
     }
 

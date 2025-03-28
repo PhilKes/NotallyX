@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.view.misc
 import android.content.Context
 import android.text.Editable
 import android.text.TextWatcher
+import android.text.method.KeyListener
 import android.util.AttributeSet
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.AppCompatEditText
@@ -12,6 +13,7 @@ open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
     AppCompatEditText(context, attrs) {
     var textWatcher: TextWatcher? = null
     private var onSelectionChange: ((selStart: Int, selEnd: Int) -> Unit)? = null
+    private var keyListenerInstance: KeyListener? = null
 
     override fun onSelectionChanged(selStart: Int, selEnd: Int) {
         super.onSelectionChanged(selStart, selEnd)
@@ -28,6 +30,20 @@ open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
 
     fun setText(text: Editable) {
         super.setText(text, BufferType.EDITABLE)
+    }
+
+    fun setCanEdit(value: Boolean) {
+        post {
+            if (!value) {
+                clearFocus()
+            }
+            keyListener?.let { keyListenerInstance = it }
+            keyListener = if (value) keyListenerInstance else null // Disables text editing
+            isCursorVisible = true
+            isFocusable = value
+            isFocusableInTouchMode = value
+            setTextIsSelectable(true)
+        }
     }
 
     @Deprecated(

@@ -21,6 +21,7 @@ import android.widget.LinearLayout
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.core.view.updateLayoutParams
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -39,6 +40,7 @@ import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companio
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addIconButton
 import com.philkes.notallyx.presentation.dp
+import com.philkes.notallyx.presentation.hideKeyboard
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.setOnNextAction
 import com.philkes.notallyx.presentation.showKeyboard
@@ -46,6 +48,7 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.note.TextFormattingAdapter
 import com.philkes.notallyx.presentation.view.note.action.AddNoteActions
 import com.philkes.notallyx.presentation.view.note.action.AddNoteBottomSheet
+import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.utils.LinkMovementMethod
 import com.philkes.notallyx.utils.copyToClipBoard
 import com.philkes.notallyx.utils.findAllOccurrences
@@ -76,6 +79,17 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         super.onCreate(savedInstanceState)
 
         setupActivityResultLaunchers()
+    }
+
+    override fun toggleCanEdit(mode: NoteViewMode) {
+        super.toggleCanEdit(mode)
+        setupEditor()
+        textFormatMenu.isVisible = mode == NoteViewMode.EDIT
+        when {
+            mode == NoteViewMode.EDIT -> showKeyboard(binding.EnterBody)
+            binding.EnterBody.isFocused -> hideKeyboard(binding.EnterBody)
+        }
+        binding.EnterBody.setCanEdit(mode == NoteViewMode.EDIT)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -172,78 +186,8 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     private fun setupEditor() {
         setupMovementMethod()
-
         binding.EnterBody.customSelectionActionModeCallback =
-            object : ActionMode.Callback {
-                override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
-
-                override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?) = false
-
-                override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
-                    binding.EnterBody.isActionModeOn = true
-                    // Try block is there because this will crash on MiUI as Xiaomi has a broken
-                    // ActionMode implementation
-                    try {
-                        menu?.apply {
-                            add(R.string.link, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
-                                binding.EnterBody.showAddLinkDialog(
-                                    this@EditNoteActivity,
-                                    mode = mode,
-                                )
-                            }
-                            add(R.string.bold, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
-                                binding.EnterBody.applySpan(StyleSpan(Typeface.BOLD))
-                                mode?.finish()
-                            }
-                            add(R.string.italic, 0, showAsAction = MenuItem.SHOW_AS_ACTION_NEVER) {
-                                binding.EnterBody.applySpan(StyleSpan(Typeface.ITALIC))
-                                mode?.finish()
-                            }
-                            add(
-                                R.string.monospace,
-                                0,
-                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
-                            ) {
-                                binding.EnterBody.applySpan(TypefaceSpan("monospace"))
-                                mode?.finish()
-                            }
-                            add(
-                                R.string.strikethrough,
-                                0,
-                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
-                            ) {
-                                binding.EnterBody.applySpan(StrikethroughSpan())
-                                mode?.finish()
-                            }
-                            add(
-                                R.string.clear_formatting,
-                                0,
-                                showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
-                            ) {
-                                binding.EnterBody.clearFormatting()
-                                mode?.finish()
-                            }
-                        }
-                    } catch (exception: Exception) {
-                        exception.printStackTrace()
-                    }
-                    return true
-                }
-
-                override fun onDestroyActionMode(mode: ActionMode?) {
-                    binding.EnterBody.isActionModeOn = false
-                }
-            }
-
-        binding.ContentLayout.setOnClickListener {
-            binding.EnterBody.apply {
-                requestFocus()
-                setSelection(length())
-                showKeyboard(this)
-            }
-        }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            binding.EnterBody.customInsertionActionModeCallback =
+            if (canEdit) {
                 object : ActionMode.Callback {
                     override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
 
@@ -255,8 +199,54 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                         // ActionMode implementation
                         try {
                             menu?.apply {
-                                add(R.string.link_note, 0, order = Menu.CATEGORY_CONTAINER + 1) {
-                                    linkNote(pickNoteNewActivityResultLauncher)
+                                add(
+                                    R.string.link,
+                                    0,
+                                    showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                                ) {
+                                    binding.EnterBody.showAddLinkDialog(
+                                        this@EditNoteActivity,
+                                        mode = mode,
+                                    )
+                                }
+                                add(
+                                    R.string.bold,
+                                    0,
+                                    showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                                ) {
+                                    binding.EnterBody.applySpan(StyleSpan(Typeface.BOLD))
+                                    mode?.finish()
+                                }
+                                add(
+                                    R.string.italic,
+                                    0,
+                                    showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                                ) {
+                                    binding.EnterBody.applySpan(StyleSpan(Typeface.ITALIC))
+                                    mode?.finish()
+                                }
+                                add(
+                                    R.string.monospace,
+                                    0,
+                                    showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                                ) {
+                                    binding.EnterBody.applySpan(TypefaceSpan("monospace"))
+                                    mode?.finish()
+                                }
+                                add(
+                                    R.string.strikethrough,
+                                    0,
+                                    showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                                ) {
+                                    binding.EnterBody.applySpan(StrikethroughSpan())
+                                    mode?.finish()
+                                }
+                                add(
+                                    R.string.clear_formatting,
+                                    0,
+                                    showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
+                                ) {
+                                    binding.EnterBody.clearFormatting()
                                     mode?.finish()
                                 }
                             }
@@ -270,26 +260,69 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                         binding.EnterBody.isActionModeOn = false
                     }
                 }
+            } else null
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            binding.EnterBody.customInsertionActionModeCallback =
+                if (canEdit) {
+                    object : ActionMode.Callback {
+                        override fun onPrepareActionMode(mode: ActionMode?, menu: Menu?) = false
+
+                        override fun onActionItemClicked(mode: ActionMode?, item: MenuItem?) = false
+
+                        override fun onCreateActionMode(mode: ActionMode?, menu: Menu?): Boolean {
+                            binding.EnterBody.isActionModeOn = true
+                            // Try block is there because this will crash on MiUI as Xiaomi has a
+                            // broken
+                            // ActionMode implementation
+                            try {
+                                menu?.apply {
+                                    add(
+                                        R.string.link_note,
+                                        0,
+                                        order = Menu.CATEGORY_CONTAINER + 1,
+                                    ) {
+                                        linkNote(pickNoteNewActivityResultLauncher)
+                                        mode?.finish()
+                                    }
+                                }
+                            } catch (exception: Exception) {
+                                exception.printStackTrace()
+                            }
+                            return true
+                        }
+
+                        override fun onDestroyActionMode(mode: ActionMode?) {
+                            binding.EnterBody.isActionModeOn = false
+                        }
+                    }
+                } else null
         }
-        binding.EnterBody.setOnSelectionChange { selStart, selEnd ->
-            if (selEnd - selStart > 0) {
-                if (!textFormatMenu.isEnabled) {
-                    initBottomTextFormattingMenu()
+        if (canEdit) {
+            binding.EnterBody.setOnSelectionChange { selStart, selEnd ->
+                if (selEnd - selStart > 0) {
+                    if (!textFormatMenu.isEnabled) {
+                        initBottomTextFormattingMenu()
+                    }
+                    textFormatMenu.isEnabled = true
+                    textFormattingAdapter?.updateTextFormattingToggles(selStart, selEnd)
+                } else {
+                    if (textFormatMenu.isEnabled) {
+                        initBottomMenu()
+                    }
+                    textFormatMenu.isEnabled = false
                 }
-                textFormatMenu.isEnabled = true
-                textFormattingAdapter?.updateTextFormattingToggles(selStart, selEnd)
-            } else {
-                if (textFormatMenu.isEnabled) {
-                    initBottomMenu()
-                }
-                textFormatMenu.isEnabled = false
             }
+        } else {
+            binding.EnterBody.setOnSelectionChange { _, _ -> }
         }
         binding.ContentLayout.setOnClickListener {
             binding.EnterBody.apply {
                 requestFocus()
-                setSelection(length())
-                showKeyboard(this)
+                if (canEdit) {
+                    setSelection(length())
+                    showKeyboard(this)
+                }
             }
         }
     }
@@ -366,19 +399,23 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
         val movementMethod = LinkMovementMethod { span ->
             val items =
                 if (span.url.isNoteUrl()) {
-                    arrayOf(
-                        getString(R.string.remove_link),
-                        getString(R.string.change_note),
-                        getString(R.string.edit),
-                        getString(R.string.open_note),
-                    )
+                    if (canEdit) {
+                        arrayOf(
+                            getString(R.string.open_note),
+                            getString(R.string.remove_link),
+                            getString(R.string.change_note),
+                            getString(R.string.edit),
+                        )
+                    } else arrayOf(getString(R.string.open_note))
                 } else {
-                    arrayOf(
-                        getString(R.string.remove_link),
-                        getString(R.string.copy),
-                        getString(R.string.edit),
-                        getString(R.string.open_link),
-                    )
+                    if (canEdit) {
+                        arrayOf(
+                            getString(R.string.open_link),
+                            getString(R.string.copy),
+                            getString(R.string.remove_link),
+                            getString(R.string.edit),
+                        )
+                    } else arrayOf(getString(R.string.open_link), getString(R.string.copy))
                 }
             MaterialAlertDialogBuilder(this)
                 .setTitle(
@@ -390,40 +427,52 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                 )
                 .setItems(items) { _, which ->
                     when (which) {
-                        0 -> {
-                            binding.EnterBody.removeSpanWithHistory(
-                                span,
-                                span.url.isNoteUrl() ||
-                                    span.url == binding.EnterBody.getSpanText(span),
-                            )
-                        }
+                        0 -> openLink(span)
                         1 ->
                             if (span.url.isNoteUrl()) {
-                                selectedSpan = span
-                                linkNote(pickNoteUpdateActivityResultLauncher)
-                            } else {
-                                copyToClipBoard(span.url)
-                                showToast(R.string.copied_link)
-                            }
-
-                        2 -> {
-                            binding.EnterBody.showEditDialog(span)
-                        }
-
-                        3 -> {
-                            span.url?.let {
-                                if (it.isNoteUrl()) {
-                                    span.navigateToNote()
-                                } else {
-                                    openLink(span.url)
-                                }
-                            }
-                        }
+                                removeLink(span)
+                            } else copyLink(span)
+                        2 ->
+                            if (span.url.isNoteUrl()) {
+                                changeNoteLink(span)
+                            } else removeLink(span)
+                        3 -> editLink(span)
                     }
                 }
                 .show()
         }
         binding.EnterBody.movementMethod = movementMethod
+    }
+
+    private fun openLink(span: URLSpan) {
+        span.url?.let {
+            if (it.isNoteUrl()) {
+                span.navigateToNote()
+            } else {
+                openLink(span.url)
+            }
+        }
+    }
+
+    private fun editLink(span: URLSpan) {
+        binding.EnterBody.showEditDialog(span)
+    }
+
+    private fun changeNoteLink(span: URLSpan) {
+        selectedSpan = span
+        linkNote(pickNoteUpdateActivityResultLauncher)
+    }
+
+    private fun copyLink(span: URLSpan) {
+        copyToClipBoard(span.url)
+        showToast(R.string.copied_link)
+    }
+
+    private fun removeLink(span: URLSpan) {
+        binding.EnterBody.removeSpanWithHistory(
+            span,
+            span.url.isNoteUrl() || span.url == binding.EnterBody.getSpanText(span),
+        )
     }
 
     private fun openLink(url: String) {
