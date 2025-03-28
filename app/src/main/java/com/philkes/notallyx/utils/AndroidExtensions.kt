@@ -101,7 +101,7 @@ fun ClipboardManager.getLatestText(): CharSequence? {
     return primaryClip?.let { if (it.itemCount > 0) it.getItemAt(0)!!.text else null }
 }
 
-fun Activity.copyToClipBoard(text: CharSequence) {
+fun Context.copyToClipBoard(text: CharSequence) {
     ContextCompat.getSystemService(this, ClipboardManager::class.java)?.let {
         val clip = ClipData.newPlainText("label", text)
         it.setPrimaryClip(clip)

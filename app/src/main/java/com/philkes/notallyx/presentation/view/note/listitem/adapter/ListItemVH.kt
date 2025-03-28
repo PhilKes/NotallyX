@@ -4,6 +4,8 @@ import android.graphics.Paint
 import android.util.TypedValue
 import android.view.KeyEvent
 import android.view.MotionEvent
+import android.view.View.GONE
+import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.CompoundButton.OnCheckedChangeListener
 import android.widget.EditText
@@ -28,8 +30,10 @@ import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.firstBodyOrEmptyString
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
+import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import com.philkes.notallyx.utils.changehistory.EditTextState
+import com.philkes.notallyx.utils.copyToClipBoard
 
 class ListItemVH(
     val binding: RecyclerListItemBinding,
@@ -62,10 +66,6 @@ class ListItemVH(
                         false
                     }
                 }
-
-            setOnFocusChangeListener { _, hasFocus ->
-                binding.Delete.visibility = if (hasFocus) VISIBLE else INVISIBLE
-            }
         }
 
         binding.DragHandle.setOnTouchListener { _, event ->
@@ -96,20 +96,21 @@ class ListItemVH(
         position: Int,
         highlights: List<ListItemHighlight>?,
         autoSort: ListItemSort,
+        viewMode: NoteViewMode,
     ) {
-        updateEditText(item, position)
+        updateEditText(item, position, viewMode)
 
         updateCheckBox(item, position)
 
-        updateDeleteButton(item, position)
+        updateDeleteButton(item, position, viewMode)
 
-        updateSwipe(item.isChild, position != 0 && !item.checked)
+        updateSwipe(item.isChild, viewMode == NoteViewMode.EDIT && position != 0 && !item.checked)
         binding.DragHandle.apply {
             visibility =
-                if (item.checked && autoSort == ListItemSort.AUTO_SORT_BY_CHECKED) {
-                    INVISIBLE
-                } else {
-                    VISIBLE
+                when {
+                    viewMode != NoteViewMode.EDIT -> GONE
+                    item.checked && autoSort == ListItemSort.AUTO_SORT_BY_CHECKED -> INVISIBLE
+                    else -> VISIBLE
                 }
             contentDescription = "Drag$position"
         }
@@ -131,9 +132,14 @@ class ListItemVH(
         binding.EditText.focusAndSelect(selectionStart, selectionEnd, inputMethodManager)
     }
 
-    private fun updateDeleteButton(item: ListItem, position: Int) {
+    private fun updateDeleteButton(item: ListItem, position: Int, viewMode: NoteViewMode) {
         binding.Delete.apply {
-            visibility = if (item.checked) VISIBLE else INVISIBLE
+            visibility =
+                when {
+                    viewMode != NoteViewMode.EDIT -> GONE
+                    item.checked -> VISIBLE
+                    else -> INVISIBLE
+                }
             setOnClickListener {
                 listManager.delete(absoluteAdapterPosition, inCheckedList = inCheckedList)
             }
@@ -141,16 +147,16 @@ class ListItemVH(
         }
     }
 
-    private fun updateEditText(item: ListItem, position: Int) {
+    private fun updateEditText(item: ListItem, position: Int, viewMode: NoteViewMode) {
         binding.EditText.apply {
             setText(item.body)
-            isEnabled = !item.checked
             paintFlags =
                 if (item.checked) {
                     paintFlags or Paint.STRIKE_THRU_TEXT_FLAG
                 } else {
                     paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
+            alpha = if (item.checked) 0.5f else 1.0f
             setOnKeyListener { _, keyCode, event ->
                 if (
                     event.action == KeyEvent.ACTION_DOWN &&
@@ -170,6 +176,37 @@ class ListItemVH(
                 }
             }
             contentDescription = "EditText$position"
+            if (viewMode == NoteViewMode.EDIT) {
+                setOnFocusChangeListener { _, hasFocus ->
+                    binding.Delete.visibility = if (hasFocus) VISIBLE else INVISIBLE
+                }
+                binding.Content.descendantFocusability = ViewGroup.FOCUS_BEFORE_DESCENDANTS
+            } else {
+                onFocusChangeListener = null
+                binding.Content.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
+            }
+            setCanEdit(viewMode == NoteViewMode.EDIT)
+            when (viewMode) {
+                NoteViewMode.EDIT -> {
+                    setOnClickListener(null)
+                    setOnLongClickListener(null)
+                }
+                NoteViewMode.READ_ONLY -> {
+                    setOnClickListener {
+                        if (absoluteAdapterPosition != NO_POSITION) {
+                            listManager.changeChecked(
+                                absoluteAdapterPosition,
+                                !item.checked,
+                                inCheckedList,
+                            )
+                        }
+                    }
+                    setOnLongClickListener {
+                        context?.copyToClipBoard(item.body)
+                        true
+                    }
+                }
+            }
         }
     }
 
@@ -177,12 +214,12 @@ class ListItemVH(
 
     private fun updateCheckBox(item: ListItem, position: Int) {
         if (checkBoxListener == null) {
-            checkBoxListener = OnCheckedChangeListener { buttonView, isChecked ->
-                buttonView!!.setOnCheckedChangeListener(null)
+            checkBoxListener = OnCheckedChangeListener { _, isChecked ->
+                binding.CheckBox.setOnCheckedChangeListener(null)
                 if (absoluteAdapterPosition != NO_POSITION) {
                     listManager.changeChecked(absoluteAdapterPosition, isChecked, inCheckedList)
                 }
-                buttonView.setOnCheckedChangeListener(checkBoxListener)
+                binding.CheckBox.setOnCheckedChangeListener(checkBoxListener)
             }
         }
         binding.CheckBox.apply {

@@ -99,6 +99,7 @@ import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
+import com.philkes.notallyx.presentation.view.note.listitem.adapter.ListItemVH
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
@@ -235,7 +236,7 @@ fun ViewGroup.addIconButton(
     marginStart: Int = 10,
     onLongClick: View.OnLongClickListener? = null,
     onClick: View.OnClickListener? = null,
-): View {
+): ImageButton {
     val view =
         ImageButton(ContextThemeWrapper(context, R.style.AppTheme)).apply {
             setImageResource(drawable)
@@ -377,12 +378,12 @@ fun RadioGroup.checkedTag(): Any {
     return this.findViewById<RadioButton?>(this.checkedRadioButtonId).tag
 }
 
-fun Activity.showKeyboard(view: View) {
+fun Context.showKeyboard(view: View) {
     ContextCompat.getSystemService(this, InputMethodManager::class.java)
         ?.showSoftInput(view, InputMethodManager.SHOW_IMPLICIT)
 }
 
-fun Activity.hideKeyboard(view: View) {
+fun Context.hideKeyboard(view: View) {
     ContextCompat.getSystemService(this, InputMethodManager::class.java)
         ?.hideSoftInputFromWindow(view.windowToken, 0)
 }
@@ -942,6 +943,29 @@ fun RecyclerView.initListView(context: Context) {
     layoutManager = LinearLayoutManager(context)
     addItemDecoration(DividerItemDecoration(context, RecyclerView.VERTICAL))
     setPadding(0, 0, 0, 0)
+}
+
+val RecyclerView.focusedViewHolder
+    get() =
+        focusedChild?.let { view ->
+            val position = getChildAdapterPosition(view)
+            if (position == RecyclerView.NO_POSITION) {
+                null
+            } else {
+                findViewHolderForAdapterPosition(position)
+            }
+        }
+
+fun RecyclerView.showKeyboardOnFocusedItem() {
+    (focusedViewHolder as? ListItemVH)?.let {
+        it.binding.root.context?.showKeyboard(it.binding.EditText)
+    }
+}
+
+fun RecyclerView.hideKeyboardOnFocusedItem() {
+    (focusedViewHolder as? ListItemVH)?.let {
+        it.binding.root.context?.hideKeyboard(it.binding.EditText)
+    }
 }
 
 fun MaterialAutoCompleteTextView.select(value: CharSequence) {

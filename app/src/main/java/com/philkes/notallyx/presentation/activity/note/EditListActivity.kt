@@ -1,13 +1,16 @@
 package com.philkes.notallyx.presentation.activity.note
 
 import android.os.Bundle
+import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.SortedList
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.addIconButton
+import com.philkes.notallyx.presentation.hideKeyboardOnFocusedItem
 import com.philkes.notallyx.presentation.setOnNextAction
+import com.philkes.notallyx.presentation.showKeyboardOnFocusedItem
 import com.philkes.notallyx.presentation.view.note.action.MoreListActions
 import com.philkes.notallyx.presentation.view.note.action.MoreListBottomSheet
 import com.philkes.notallyx.presentation.view.note.listitem.HighlightText
@@ -23,6 +26,7 @@ import com.philkes.notallyx.presentation.view.note.listitem.sorting.SortedItemsL
 import com.philkes.notallyx.presentation.view.note.listitem.splitByChecked
 import com.philkes.notallyx.presentation.view.note.listitem.toMutableList
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.autoSortByCheckedEnabled
 import com.philkes.notallyx.utils.findAllOccurrences
 import com.philkes.notallyx.utils.indices
@@ -69,6 +73,21 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         super.onSaveInstanceState(outState)
     }
 
+    override fun toggleCanEdit(mode: NoteViewMode) {
+        super.toggleCanEdit(mode)
+        when (mode) {
+            NoteViewMode.EDIT -> binding.MainListView.showKeyboardOnFocusedItem()
+            NoteViewMode.READ_ONLY -> binding.MainListView.hideKeyboardOnFocusedItem()
+        }
+        adapter?.viewMode = mode
+        adapterChecked?.viewMode = mode
+        binding.AddItem.visibility =
+            when (mode) {
+                NoteViewMode.EDIT -> View.VISIBLE
+                else -> View.GONE
+            }
+    }
+
     override fun deleteChecked() {
         listManager.deleteCheckedItems()
     }
@@ -85,6 +104,14 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         super.initBottomMenu()
         binding.BottomAppBarRight.apply {
             removeAllViews()
+            toggleViewMode =
+                addIconButton(R.string.edit, R.drawable.visibility) {
+                    viewMode!!.value =
+                        when (viewMode!!.value) {
+                            NoteViewMode.EDIT -> NoteViewMode.READ_ONLY
+                            NoteViewMode.READ_ONLY -> NoteViewMode.EDIT
+                        }
+                }
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
                 MoreListBottomSheet(
                         this@EditListActivity,

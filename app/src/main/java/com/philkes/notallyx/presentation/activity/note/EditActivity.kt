@@ -20,6 +20,7 @@ import android.view.View.GONE
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.VISIBLE
 import android.view.inputmethod.InputMethodManager
+import android.widget.ImageButton
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -57,6 +58,7 @@ import com.philkes.notallyx.presentation.displayEditLabelDialog
 import com.philkes.notallyx.presentation.displayFormattedTimestamp
 import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getQuantityString
+import com.philkes.notallyx.presentation.hideKeyboard
 import com.philkes.notallyx.presentation.isLightColor
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
@@ -78,6 +80,7 @@ import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
+import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
@@ -121,6 +124,11 @@ abstract class EditActivity(private val type: Type) :
 
     protected var colorInt: Int = -1
     protected var inputMethodManager: InputMethodManager? = null
+
+    protected var viewMode: NotNullLiveData<NoteViewMode>? = null
+    protected lateinit var toggleViewMode: ImageButton
+    protected val canEdit
+        get() = viewMode?.value == NoteViewMode.EDIT
 
     private val autoSaveHandler = Handler(Looper.getMainLooper())
     private val autoSaveRunnable = Runnable {
@@ -214,6 +222,18 @@ abstract class EditActivity(private val type: Type) :
                 // Let the system handle the crash
                 DEFAULT_EXCEPTION_HANDLER?.uncaughtException(thread, throwable)
             }
+        }
+    }
+
+    open fun toggleCanEdit(mode: NoteViewMode) {
+        binding.EnterTitle.apply {
+            if (isFocused) {
+                when {
+                    mode == NoteViewMode.EDIT -> showKeyboard(this)
+                    else -> hideKeyboard(this)
+                }
+            }
+            setCanEdit(mode == NoteViewMode.EDIT)
         }
     }
 
@@ -529,6 +549,19 @@ abstract class EditActivity(private val type: Type) :
         }
         binding.BottomAppBarRight.apply {
             removeAllViews()
+
+            toggleViewMode =
+                addIconButton(R.string.edit, R.drawable.visibility) {
+                    viewMode!!.value =
+                        when (viewMode!!.value) {
+                            NoteViewMode.EDIT -> NoteViewMode.READ_ONLY
+                            NoteViewMode.READ_ONLY -> NoteViewMode.EDIT
+                        }
+                }
+            if (viewMode == null) {
+                viewMode = NotNullLiveData(preferences.defaultNoteViewMode.value)
+            }
+
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
                 MoreNoteBottomSheet(
                         this@EditActivity,
@@ -620,6 +653,15 @@ abstract class EditActivity(private val type: Type) :
     open fun setupListeners() {
         binding.EnterTitle.initHistory(changeHistory) { text ->
             notallyModel.title = text.trim().toString()
+        }
+        viewMode!!.observe(this) { value ->
+            toggleViewMode.setImageResource(
+                when (value) {
+                    NoteViewMode.READ_ONLY -> R.drawable.edit
+                    NoteViewMode.EDIT -> R.drawable.visibility
+                }
+            )
+            toggleCanEdit(value)
         }
     }
 

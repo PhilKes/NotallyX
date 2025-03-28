@@ -10,6 +10,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.note.listitem.HighlightText
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
 class ListItemAdapter(
@@ -37,6 +38,12 @@ class ListItemAdapter(
             override fun getItem(position: Int): ListItem = this@ListItemAdapter.getItem(position)
         }
 
+    var viewMode: NoteViewMode = NoteViewMode.EDIT
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     lateinit var items: MutableList<ListItem>
         private set
 
@@ -55,7 +62,7 @@ class ListItemAdapter(
     }
 
     override fun onBindViewHolder(holder: ListItemVH, position: Int) {
-        itemAdapterBase.onBindViewHolder(holder, position)
+        itemAdapterBase.onBindViewHolder(holder, position, viewMode)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

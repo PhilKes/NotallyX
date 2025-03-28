@@ -9,6 +9,7 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.presentation.view.note.listitem.HighlightText
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
 class CheckedListItemAdapter(
@@ -38,6 +39,12 @@ class CheckedListItemAdapter(
             override fun getItem(position: Int): ListItem = list[position]
         }
 
+    var viewMode: NoteViewMode = NoteViewMode.EDIT
+        set(value) {
+            field = value
+            notifyDataSetChanged()
+        }
+
     internal fun setList(list: SortedList<ListItem>) {
         this.list = list
     }
@@ -51,7 +58,7 @@ class CheckedListItemAdapter(
     }
 
     override fun onBindViewHolder(holder: ListItemVH, position: Int) {
-        itemAdapterBase.onBindViewHolder(holder, position)
+        itemAdapterBase.onBindViewHolder(holder, position, viewMode)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) =

@@ -96,6 +96,7 @@
     <string name="date_format_apply_in_note_view">Also apply in Note View</string>
     <string name="date_format_hint">Applies selected date format in Notes Overview</string>
     <string name="days">Days</string>
+    <string name="default_note_view_mode">Default Note View Mode</string>
     <string name="delete">Delete</string>
     <string name="delete_all">Delete all</string>
     <string name="delete_all_notes">Delete all notes\?</string>
@@ -244,6 +245,7 @@
     <string name="please_grant_notally_notification_auto_backup">If an auto backup fails you can receive a notification, if you grant NotallyX permission to send notifications</string>
     <string name="previous">Previous</string>
     <string name="rate">Rate this app</string>
+    <string name="read_only">Read Only</string>
     <string name="ready_to_record">Ready to record</string>
     <string name="record_audio">Record audio</string>
     <string name="recording">Recording…</string>
