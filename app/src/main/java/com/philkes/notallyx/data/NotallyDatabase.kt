@@ -19,6 +19,7 @@ import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.Label
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.toColorString
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
@@ -32,7 +33,7 @@ import net.sqlcipher.database.SQLiteDatabase
 import net.sqlcipher.database.SupportFactory
 
 @TypeConverters(Converters::class)
-@Database(entities = [BaseNote::class, Label::class], version = 8)
+@Database(entities = [BaseNote::class, Label::class], version = 9)
 abstract class NotallyDatabase : RoomDatabase() {
 
     abstract fun getLabelDao(): LabelDao
@@ -131,6 +132,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                         Migration6,
                         Migration7,
                         Migration8,
+                        Migration9,
                     )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 SQLiteDatabase.loadLibs(context)
@@ -259,6 +261,15 @@ abstract class NotallyDatabase : RoomDatabase() {
                     db.execSQL("UPDATE BaseNote SET color = ? WHERE id = ?", arrayOf(hexColor, id))
                 }
                 cursor.close()
+            }
+        }
+
+        object Migration9 : Migration(8, 9) {
+
+            override fun migrate(db: SupportSQLiteDatabase) {
+                db.execSQL(
+                    "ALTER TABLE `BaseNote` ADD COLUMN `viewMode` TEXT DEFAULT '${NoteViewMode.EDIT.name}'"
+                )
             }
         }
     }

@@ -34,8 +34,7 @@ data class ListItem(
         if (other !is ListItem) {
             return false
         }
-        return (this.id == other.id &&
-            this.body == other.body &&
+        return (this.body == other.body &&
             this.order == other.order &&
             this.checked == other.checked &&
             this.isChild == other.isChild)

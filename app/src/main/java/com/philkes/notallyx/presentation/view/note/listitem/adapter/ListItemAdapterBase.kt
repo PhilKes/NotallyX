@@ -7,11 +7,11 @@ import androidx.core.widget.NestedScrollView
 import androidx.recyclerview.widget.NestedScrollViewItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.view.note.listitem.ListItemDragCallback
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
-import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 
 data class ListItemHighlight(

@@ -17,6 +17,7 @@ import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.startsWithAnyOf
@@ -155,6 +156,7 @@ fun EvernoteNote.mapToBaseNote(): BaseNote {
         files = files,
         audios = audios,
         reminders = mutableListOf(),
+        NoteViewMode.EDIT,
     )
 }
 

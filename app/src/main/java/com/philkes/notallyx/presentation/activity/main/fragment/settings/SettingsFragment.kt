@@ -647,13 +647,6 @@ class SettingsFragment : Fragment() {
                 model.savePreference(autoSaveAfterIdleTime, newValue)
             }
 
-            defaultNoteViewMode.observe(viewLifecycleOwner) { value ->
-                DefaultNoteViewMode.setup(defaultNoteViewMode, value, requireContext()) { newValue
-                    ->
-                    model.savePreference(defaultNoteViewMode, newValue)
-                }
-            }
-
             ClearData.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
                     .setMessage(R.string.clear_data_message)

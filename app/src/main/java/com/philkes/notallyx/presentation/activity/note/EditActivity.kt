@@ -17,6 +17,7 @@ import android.util.TypedValue
 import android.view.MenuItem
 import android.view.View
 import android.view.View.GONE
+import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams
 import android.view.ViewGroup.VISIBLE
 import android.view.inputmethod.InputMethodManager
@@ -40,6 +41,7 @@ import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.isImageMimeType
 import com.philkes.notallyx.databinding.ActivityEditBinding
@@ -80,7 +82,6 @@ import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
-import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
@@ -125,10 +126,9 @@ abstract class EditActivity(private val type: Type) :
     protected var colorInt: Int = -1
     protected var inputMethodManager: InputMethodManager? = null
 
-    protected var viewMode: NotNullLiveData<NoteViewMode>? = null
     protected lateinit var toggleViewMode: ImageButton
     protected val canEdit
-        get() = viewMode?.value == NoteViewMode.EDIT
+        get() = notallyModel.viewMode.value == NoteViewMode.EDIT
 
     private val autoSaveHandler = Handler(Looper.getMainLooper())
     private val autoSaveRunnable = Runnable {
@@ -550,22 +550,7 @@ abstract class EditActivity(private val type: Type) :
         binding.BottomAppBarRight.apply {
             removeAllViews()
 
-            toggleViewMode =
-                addIconButton(R.string.edit, R.drawable.visibility) {
-                    viewMode!!.value =
-                        when (viewMode!!.value) {
-                            NoteViewMode.EDIT -> NoteViewMode.READ_ONLY
-                            NoteViewMode.READ_ONLY -> NoteViewMode.EDIT
-                        }
-                }
-            if (viewMode == null) {
-                viewMode =
-                    NotNullLiveData(
-                        if (notallyModel.isNewNote) NoteViewMode.EDIT
-                        else preferences.defaultNoteViewMode.value
-                    )
-            }
-
+            addToggleViewMode()
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
                 MoreNoteBottomSheet(
                         this@EditActivity,
@@ -576,6 +561,17 @@ abstract class EditActivity(private val type: Type) :
             }
         }
         setBottomAppBarColor(colorInt)
+    }
+
+    protected fun ViewGroup.addToggleViewMode() {
+        toggleViewMode =
+            addIconButton(R.string.edit, R.drawable.visibility) {
+                notallyModel.viewMode.value =
+                    when (notallyModel.viewMode.value) {
+                        NoteViewMode.EDIT -> NoteViewMode.READ_ONLY
+                        NoteViewMode.READ_ONLY -> NoteViewMode.EDIT
+                    }
+            }
     }
 
     protected fun createFolderActions() =
@@ -658,14 +654,14 @@ abstract class EditActivity(private val type: Type) :
         binding.EnterTitle.initHistory(changeHistory) { text ->
             notallyModel.title = text.trim().toString()
         }
-        viewMode!!.observe(this) { value ->
+        notallyModel.viewMode.observe(this) { value ->
             toggleViewMode.setImageResource(
                 when (value) {
                     NoteViewMode.READ_ONLY -> R.drawable.edit
-                    NoteViewMode.EDIT -> R.drawable.visibility
+                    else -> R.drawable.visibility
                 }
             )
-            toggleCanEdit(value)
+            value?.let { toggleCanEdit(it) }
         }
     }
 

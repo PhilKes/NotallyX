@@ -5,6 +5,7 @@ import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.Reminder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
@@ -252,6 +253,7 @@ class GoogleKeepImporterTest {
                 files,
                 audios,
                 reminders,
+                NoteViewMode.EDIT,
             )
         }
     }

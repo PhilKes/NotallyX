@@ -80,7 +80,8 @@ fun BaseNote.toJson(): String {
             .put("color", color)
             .put("title", title)
             .put("pinned", pinned)
-            .put("date-created", timestamp)
+            .put("timestamp", timestamp)
+            .put("modifiedTimestamp", modifiedTimestamp)
             .put("labels", JSONArray(labels))
 
     when (type) {
@@ -94,6 +95,7 @@ fun BaseNote.toJson(): String {
         }
     }
     jsonObject.put("reminders", Converters.remindersToJSONArray(reminders))
+    jsonObject.put("viewMode", viewMode.name)
     return jsonObject.toString(2)
 }
 
@@ -117,6 +119,7 @@ fun String.toBaseNote(): BaseNote {
     val files = Converters.jsonToFiles(jsonObject.getArrayOrEmpty("files"))
     val audios = Converters.jsonToAudios(jsonObject.getArrayOrEmpty("audios"))
     val reminders = Converters.jsonToReminders(jsonObject.getArrayOrEmpty("reminders"))
+    val viewMode = NoteViewMode.valueOfOrDefault(jsonObject.getStringOrDefault("viewMode", ""))
     return BaseNote(
         id,
         type,
@@ -134,6 +137,7 @@ fun String.toBaseNote(): BaseNote {
         files,
         audios,
         reminders,
+        viewMode,
     )
 }
 

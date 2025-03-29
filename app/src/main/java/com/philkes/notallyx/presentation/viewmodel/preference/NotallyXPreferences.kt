@@ -76,13 +76,6 @@ class NotallyXPreferences private constructor(private val context: Context) {
             10,
             R.string.max_lines_to_display_title,
         )
-    val defaultNoteViewMode =
-        createEnumPreference(
-            preferences,
-            "defaultNoteViewMode",
-            NoteViewMode.EDIT,
-            R.string.default_note_view_mode,
-        )
     val labelsHidden = StringSetPreference("labelsHiddenInNavigation", preferences, setOf())
     val labelTagsHiddenInOverview =
         BooleanPreference(
@@ -237,7 +230,6 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 backupPassword,
                 backupOnSave,
                 autoSaveAfterIdleTime,
-                defaultNoteViewMode,
             )
             .forEach { it.refresh() }
     }

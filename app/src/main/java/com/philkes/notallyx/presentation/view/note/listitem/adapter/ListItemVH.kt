@@ -21,6 +21,7 @@ import cn.leaqi.drawer.SwipeDrawer.STATE_OPEN
 import com.philkes.notallyx.data.imports.txt.extractListItems
 import com.philkes.notallyx.data.imports.txt.findListSyntaxRegex
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.databinding.RecyclerListItemBinding
 import com.philkes.notallyx.presentation.clone
 import com.philkes.notallyx.presentation.createListTextWatcherWithHistory
@@ -30,7 +31,6 @@ import com.philkes.notallyx.presentation.view.misc.EditTextAutoClearFocus
 import com.philkes.notallyx.presentation.view.note.listitem.ListManager
 import com.philkes.notallyx.presentation.view.note.listitem.firstBodyOrEmptyString
 import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
-import com.philkes.notallyx.presentation.viewmodel.preference.NoteViewMode
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.copyToClipBoard
