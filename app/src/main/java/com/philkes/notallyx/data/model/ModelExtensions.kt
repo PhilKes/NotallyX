@@ -80,7 +80,8 @@ fun BaseNote.toJson(): String {
             .put("color", color)
             .put("title", title)
             .put("pinned", pinned)
-            .put("date-created", timestamp)
+            .put("timestamp", timestamp)
+            .put("modifiedTimestamp", modifiedTimestamp)
             .put("labels", JSONArray(labels))
 
     when (type) {
@@ -94,6 +95,7 @@ fun BaseNote.toJson(): String {
         }
     }
     jsonObject.put("reminders", Converters.remindersToJSONArray(reminders))
+    jsonObject.put("viewMode", viewMode.name)
     return jsonObject.toString(2)
 }
 

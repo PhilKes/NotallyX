@@ -146,7 +146,7 @@ object Converters {
                 JSONObject().apply {
                     put("id", reminder.id) // Store date as long timestamp
                     put("dateTime", reminder.dateTime.time) // Store date as long timestamp
-                    put("repetition", reminder.repetition?.let { repetitionToJson(it) })
+                    put("repetition", reminder.repetition?.let { repetitionToJsonObject(it) })
                 }
             }
         return JSONArray(objects)
@@ -165,10 +165,14 @@ object Converters {
 
     @TypeConverter
     fun repetitionToJson(repetition: Repetition): String {
+        return repetitionToJsonObject(repetition).toString()
+    }
+
+    fun repetitionToJsonObject(repetition: Repetition): JSONObject {
         val jsonObject = JSONObject()
         jsonObject.put("value", repetition.value)
         jsonObject.put("unit", repetition.unit.name) // Store the TimeUnit as a string
-        return jsonObject.toString()
+        return jsonObject
     }
 
     @TypeConverter
