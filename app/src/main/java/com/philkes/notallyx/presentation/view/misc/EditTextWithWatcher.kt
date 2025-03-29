@@ -33,17 +33,15 @@ open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
     }
 
     fun setCanEdit(value: Boolean) {
-        post {
-            if (!value) {
-                clearFocus()
-            }
-            keyListener?.let { keyListenerInstance = it }
-            keyListener = if (value) keyListenerInstance else null // Disables text editing
-            isCursorVisible = true
-            isFocusable = value
-            isFocusableInTouchMode = value
-            setTextIsSelectable(true)
+        if (!value) {
+            clearFocus()
         }
+        keyListener?.let { keyListenerInstance = it }
+        keyListener = if (value) keyListenerInstance else null // Disables text editing
+        isCursorVisible = true
+        isFocusable = value
+        isFocusableInTouchMode = value
+        setTextIsSelectable(true)
     }
 
     @Deprecated(

@@ -50,11 +50,6 @@ class ListItemVH(
         binding.EditText.apply {
             setTextSize(TypedValue.COMPLEX_UNIT_SP, body)
 
-            setOnNextAction {
-                val position = bindingAdapterPosition + 1
-                listManager.add(position)
-            }
-
             textWatcher =
                 createListTextWatcherWithHistory(
                     listManager,
@@ -157,24 +152,6 @@ class ListItemVH(
                     paintFlags and Paint.STRIKE_THRU_TEXT_FLAG.inv()
                 }
             alpha = if (item.checked) 0.5f else 1.0f
-            setOnKeyListener { _, keyCode, event ->
-                if (
-                    event.action == KeyEvent.ACTION_DOWN &&
-                        keyCode == KeyEvent.KEYCODE_DEL &&
-                        item.body.isEmpty()
-                ) {
-                    // TODO: when there are multiple checked items above it does not jump to the
-                    // last
-                    // unchecked item but always re-adds a new item
-                    listManager.delete(
-                        absoluteAdapterPosition,
-                        inCheckedList = inCheckedList,
-                        force = false,
-                    )
-                } else {
-                    false
-                }
-            }
             contentDescription = "EditText$position"
             if (viewMode == NoteViewMode.EDIT) {
                 setOnFocusChangeListener { _, hasFocus ->
@@ -205,6 +182,25 @@ class ListItemVH(
                         context?.copyToClipBoard(item.body)
                         true
                     }
+                }
+            }
+            setOnNextAction { listManager.add(bindingAdapterPosition + 1) }
+            setOnKeyListener { _, keyCode, event ->
+                if (
+                    event.action == KeyEvent.ACTION_DOWN &&
+                        keyCode == KeyEvent.KEYCODE_DEL &&
+                        item.body.isEmpty()
+                ) {
+                    // TODO: when there are multiple checked items above it does not jump to the
+                    // last
+                    // unchecked item but always re-adds a new item
+                    listManager.delete(
+                        absoluteAdapterPosition,
+                        inCheckedList = inCheckedList,
+                        force = false,
+                    )
+                } else {
+                    false
                 }
             }
         }
