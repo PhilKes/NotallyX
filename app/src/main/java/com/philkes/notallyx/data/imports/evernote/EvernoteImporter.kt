@@ -155,6 +155,7 @@ fun EvernoteNote.mapToBaseNote(): BaseNote {
         files = files,
         audios = audios,
         reminders = mutableListOf(),
+        null,
     )
 }
 

@@ -366,11 +366,6 @@ enum class BiometricLock(override val textResId: Int) : StaticTextProvider {
     DISABLED(R.string.disabled),
 }
 
-enum class NoteViewMode(override val textResId: Int) : StaticTextProvider {
-    READ_ONLY(R.string.read_only),
-    EDIT(R.string.edit),
-}
-
 object Constants {
     const val PASSWORD_EMPTY = "None"
 }

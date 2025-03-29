@@ -2,6 +2,8 @@ package com.philkes.notallyx.data.model
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
+import org.mockito.Mockito.anyString
+import org.mockito.Mockito.mockStatic
 
 class ModelExtensionsTest {
 
@@ -59,6 +61,8 @@ class ModelExtensionsTest {
               ]
             }
         """
+        val colorMock = mockStatic(android.graphics.Color::class.java)
+        colorMock.`when`<Int> { android.graphics.Color.parseColor(anyString()) }.thenReturn(1)
 
         val baseNote = json.toBaseNote()
 

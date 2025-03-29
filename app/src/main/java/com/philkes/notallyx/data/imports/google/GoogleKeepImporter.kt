@@ -162,6 +162,7 @@ class GoogleKeepImporter : ExternalImporter {
             files = files,
             audios = audios,
             reminders = mutableListOf(),
+            null,
         )
     }
 

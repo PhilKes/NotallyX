@@ -59,6 +59,7 @@ class PlainTextImporter : ExternalImporter {
                             files = listOf(),
                             audios = listOf(),
                             reminders = listOf(),
+                            null,
                         )
                     )
                 }

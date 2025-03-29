@@ -113,6 +113,7 @@ private fun XmlPullParser.parseBaseNote(rootTag: String, folder: Folder): BaseNo
         emptyList(),
         emptyList(),
         emptyList(),
+        null,
     )
 }
 

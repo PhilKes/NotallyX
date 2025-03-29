@@ -22,6 +22,7 @@ import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.parseToColorString
 import com.philkes.notallyx.presentation.getQuantityString
@@ -280,6 +281,11 @@ private fun Cursor.toBaseNote(): BaseNote {
             Converters.jsonToReminders(getString(remindersIndex))
         } else emptyList()
 
+    val viewModeIndex = getColumnIndex("viewMode")
+    val viewMode =
+        if (viewModeIndex != -1) {
+            NoteViewMode.valueOfOrDefault(getString(viewModeIndex))
+        } else null
     return BaseNote(
         0,
         type,
@@ -297,6 +303,7 @@ private fun Cursor.toBaseNote(): BaseNote {
         files,
         audios,
         reminders,
+        viewMode,
     )
 }
 

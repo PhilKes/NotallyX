@@ -26,6 +26,7 @@ import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.Reminder
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
@@ -86,10 +87,14 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     var body: Editable = SpannableStringBuilder()
 
     val items = ArrayList<ListItem>()
+
     val images = NotNullLiveData<List<FileAttachment>>(emptyList())
     val files = NotNullLiveData<List<FileAttachment>>(emptyList())
     val audios = NotNullLiveData<List<Audio>>(emptyList())
+
     val reminders = NotNullLiveData<List<Reminder>>(emptyList())
+    val viewMode = MutableLiveData<NoteViewMode?>(null)
+    var viewModeChangedByUser = false
 
     val addingFiles = MutableLiveData<Progress>()
     val eventBus = MutableLiveData<Event<List<FileError>>>()
@@ -248,6 +253,8 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 files.value = baseNote.files
                 audios.value = baseNote.audios
                 reminders.value = baseNote.reminders
+                viewMode.value = baseNote.viewMode
+                viewModeChangedByUser = false
             } else {
                 originalNote = createBaseNote()
                 app.showToast(R.string.cant_find_note)
@@ -328,6 +335,12 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         val spans = getFilteredSpans(body)
         val body = this.body.toString()
         val nonEmptyItems = this.items.filter { item -> item.body.isNotEmpty() }
+        val viewMode =
+            if (isNewNote) {
+                null
+            } else if (viewModeChangedByUser) {
+                viewMode.value
+            } else originalNote?.viewMode
         return BaseNote(
             id,
             type,
@@ -345,6 +358,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             files.value,
             audios.value,
             reminders.value,
+            viewMode,
         )
     }
 
