@@ -4,6 +4,7 @@ import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.SpanRepresentation
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.parseToColorString
@@ -113,7 +114,7 @@ private fun XmlPullParser.parseBaseNote(rootTag: String, folder: Folder): BaseNo
         emptyList(),
         emptyList(),
         emptyList(),
-        null,
+        NoteViewMode.EDIT,
     )
 }
 

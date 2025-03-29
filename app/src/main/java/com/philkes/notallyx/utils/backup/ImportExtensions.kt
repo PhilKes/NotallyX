@@ -285,7 +285,7 @@ private fun Cursor.toBaseNote(): BaseNote {
     val viewMode =
         if (viewModeIndex != -1) {
             NoteViewMode.valueOfOrDefault(getString(viewModeIndex))
-        } else null
+        } else NoteViewMode.EDIT
     return BaseNote(
         0,
         type,

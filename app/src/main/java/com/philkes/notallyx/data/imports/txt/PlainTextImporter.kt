@@ -9,6 +9,7 @@ import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.utils.MIME_TYPE_JSON
 import com.philkes.notallyx.utils.readFileContents
@@ -59,7 +60,7 @@ class PlainTextImporter : ExternalImporter {
                             files = listOf(),
                             audios = listOf(),
                             reminders = listOf(),
-                            null,
+                            NoteViewMode.EDIT,
                         )
                     )
                 }

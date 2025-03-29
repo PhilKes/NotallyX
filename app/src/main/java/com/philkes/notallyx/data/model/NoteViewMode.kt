@@ -12,7 +12,7 @@ enum class NoteViewMode(override val textResId: Int) : StaticTextProvider {
             try {
                 NoteViewMode.valueOf(value)
             } catch (e: Exception) {
-                null
+                EDIT
             }
     }
 }

@@ -25,7 +25,7 @@ data class BaseNote(
     val files: List<FileAttachment>,
     val audios: List<Audio>,
     val reminders: List<Reminder>,
-    val viewMode: NoteViewMode?,
+    val viewMode: NoteViewMode,
 ) : Item {
 
     companion object {
@@ -75,7 +75,7 @@ data class BaseNote(
         result = 31 * result + files.hashCode()
         result = 31 * result + audios.hashCode()
         result = 31 * result + reminders.hashCode()
-        result = 31 * result + (viewMode?.hashCode() ?: 0)
+        result = 31 * result + viewMode.hashCode()
         return result
     }
 }

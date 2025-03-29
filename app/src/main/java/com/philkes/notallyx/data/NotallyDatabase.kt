@@ -19,6 +19,7 @@ import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Color
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.Label
+import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.toColorString
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
@@ -266,7 +267,9 @@ abstract class NotallyDatabase : RoomDatabase() {
         object Migration9 : Migration(8, 9) {
 
             override fun migrate(db: SupportSQLiteDatabase) {
-                db.execSQL("ALTER TABLE `BaseNote` ADD COLUMN `viewMode` TEXT DEFAULT NULL")
+                db.execSQL(
+                    "ALTER TABLE `BaseNote` ADD COLUMN `viewMode` TEXT DEFAULT '${NoteViewMode.EDIT.name}'"
+                )
             }
         }
     }

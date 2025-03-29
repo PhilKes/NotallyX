@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 9,
-    "identityHash": "794af16cac662f9dc12be0736752f1a5",
+    "identityHash": "042b20b5b4cfc8415e6cf6348196e869",
     "entities": [
       {
         "tableName": "BaseNote",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `folder` TEXT NOT NULL, `color` TEXT NOT NULL, `title` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `modifiedTimestamp` INTEGER NOT NULL, `labels` TEXT NOT NULL, `body` TEXT NOT NULL, `spans` TEXT NOT NULL, `items` TEXT NOT NULL, `images` TEXT NOT NULL, `files` TEXT NOT NULL, `audios` TEXT NOT NULL, `reminders` TEXT NOT NULL, `viewMode` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT NOT NULL, `folder` TEXT NOT NULL, `color` TEXT NOT NULL, `title` TEXT NOT NULL, `pinned` INTEGER NOT NULL, `timestamp` INTEGER NOT NULL, `modifiedTimestamp` INTEGER NOT NULL, `labels` TEXT NOT NULL, `body` TEXT NOT NULL, `spans` TEXT NOT NULL, `items` TEXT NOT NULL, `images` TEXT NOT NULL, `files` TEXT NOT NULL, `audios` TEXT NOT NULL, `reminders` TEXT NOT NULL, `viewMode` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -108,7 +108,7 @@
             "fieldPath": "viewMode",
             "columnName": "viewMode",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -158,7 +158,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '794af16cac662f9dc12be0736752f1a5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '042b20b5b4cfc8415e6cf6348196e869')"
     ]
   }
 }

@@ -93,8 +93,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
     val audios = NotNullLiveData<List<Audio>>(emptyList())
 
     val reminders = NotNullLiveData<List<Reminder>>(emptyList())
-    val viewMode = MutableLiveData<NoteViewMode?>(null)
-    var viewModeChangedByUser = false
+    val viewMode = NotNullLiveData(NoteViewMode.EDIT)
 
     val addingFiles = MutableLiveData<Progress>()
     val eventBus = MutableLiveData<Event<List<FileError>>>()
@@ -254,7 +253,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 audios.value = baseNote.audios
                 reminders.value = baseNote.reminders
                 viewMode.value = baseNote.viewMode
-                viewModeChangedByUser = false
             } else {
                 originalNote = createBaseNote()
                 app.showToast(R.string.cant_find_note)
@@ -335,12 +333,6 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         val spans = getFilteredSpans(body)
         val body = this.body.toString()
         val nonEmptyItems = this.items.filter { item -> item.body.isNotEmpty() }
-        val viewMode =
-            if (isNewNote) {
-                null
-            } else if (viewModeChangedByUser) {
-                viewMode.value
-            } else originalNote?.viewMode
         return BaseNote(
             id,
             type,
@@ -358,7 +350,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             files.value,
             audios.value,
             reminders.value,
-            viewMode,
+            viewMode.value,
         )
     }
 

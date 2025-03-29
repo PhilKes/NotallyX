@@ -551,13 +551,6 @@ abstract class EditActivity(private val type: Type) :
             removeAllViews()
 
             addToggleViewMode()
-            notallyModel.viewMode.value =
-                when {
-                    notallyModel.isNewNote -> NoteViewMode.EDIT
-                    notallyModel.viewMode.value != null -> notallyModel.viewMode.value!!
-                    else -> preferences.defaultNoteViewMode.value
-                }
-
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
                 MoreNoteBottomSheet(
                         this@EditActivity,
@@ -577,9 +570,7 @@ abstract class EditActivity(private val type: Type) :
                     when (notallyModel.viewMode.value) {
                         NoteViewMode.EDIT -> NoteViewMode.READ_ONLY
                         NoteViewMode.READ_ONLY -> NoteViewMode.EDIT
-                        null -> NoteViewMode.EDIT
                     }
-                notallyModel.viewModeChangedByUser = true
             }
     }
 

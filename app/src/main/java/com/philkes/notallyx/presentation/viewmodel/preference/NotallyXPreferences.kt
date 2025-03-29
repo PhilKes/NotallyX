@@ -7,7 +7,6 @@ import androidx.preference.PreferenceManager
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
 import com.philkes.notallyx.R
-import com.philkes.notallyx.data.model.NoteViewMode
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.utils.backup.importPreferences
@@ -76,13 +75,6 @@ class NotallyXPreferences private constructor(private val context: Context) {
             1,
             10,
             R.string.max_lines_to_display_title,
-        )
-    val defaultNoteViewMode =
-        createEnumPreference(
-            preferences,
-            "defaultNoteViewMode",
-            NoteViewMode.EDIT,
-            R.string.default_note_view_mode,
         )
     val labelsHidden = StringSetPreference("labelsHiddenInNavigation", preferences, setOf())
     val labelTagsHiddenInOverview =
@@ -238,7 +230,6 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 backupPassword,
                 backupOnSave,
                 autoSaveAfterIdleTime,
-                defaultNoteViewMode,
             )
             .forEach { it.refresh() }
     }

@@ -100,26 +100,24 @@ fun BaseNote.toJson(): String {
 fun String.toBaseNote(): BaseNote {
     val jsonObject = JSONObject(this)
     val id = jsonObject.getLongOrDefault("id", -1L)
-    val type = Type.valueOfOrDefault(jsonObject.getStringOrDefault("type", Type.NOTE.name)!!)
-    val folder =
-        Folder.valueOfOrDefault(jsonObject.getStringOrDefault("folder", Folder.NOTES.name)!!)
+    val type = Type.valueOfOrDefault(jsonObject.getStringOrDefault("type", Type.NOTE.name))
+    val folder = Folder.valueOfOrDefault(jsonObject.getStringOrDefault("folder", Folder.NOTES.name))
     val color =
-        jsonObject.getStringOrDefault("color", COLOR_DEFAULT)!!.takeIf { it.isValid() }
+        jsonObject.getStringOrDefault("color", COLOR_DEFAULT).takeIf { it.isValid() }
             ?: COLOR_DEFAULT
-    val title = jsonObject.getStringOrDefault("title", "")!!
+    val title = jsonObject.getStringOrDefault("title", "")
     val pinned = jsonObject.getBooleanOrDefault("pinned", false)
     val timestamp = jsonObject.getLongOrDefault("timestamp", System.currentTimeMillis())
     val modifiedTimestamp = jsonObject.getLongOrDefault("modifiedTimestamp", timestamp)
     val labels = Converters.jsonToLabels(jsonObject.getArrayOrEmpty("labels"))
-    val body = jsonObject.getStringOrDefault("body", "")!!
+    val body = jsonObject.getStringOrDefault("body", "")
     val spans = Converters.jsonToSpans(jsonObject.getArrayOrEmpty("spans"))
     val items = Converters.jsonToItems(jsonObject.getArrayOrEmpty("items"))
     val images = Converters.jsonToFiles(jsonObject.getArrayOrEmpty("images"))
     val files = Converters.jsonToFiles(jsonObject.getArrayOrEmpty("files"))
     val audios = Converters.jsonToAudios(jsonObject.getArrayOrEmpty("audios"))
     val reminders = Converters.jsonToReminders(jsonObject.getArrayOrEmpty("reminders"))
-    val viewMode =
-        jsonObject.getStringOrDefault("viewMode", null)?.let { NoteViewMode.valueOfOrDefault(it) }
+    val viewMode = NoteViewMode.valueOfOrDefault(jsonObject.getStringOrDefault("viewMode", ""))
     return BaseNote(
         id,
         type,
@@ -141,7 +139,7 @@ fun String.toBaseNote(): BaseNote {
     )
 }
 
-private fun JSONObject.getStringOrDefault(key: String, defaultValue: String?): String? {
+private fun JSONObject.getStringOrDefault(key: String, defaultValue: String): String {
     return try {
         getString(key)
     } catch (exception: JSONException) {
