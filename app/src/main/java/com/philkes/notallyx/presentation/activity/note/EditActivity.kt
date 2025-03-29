@@ -559,7 +559,11 @@ abstract class EditActivity(private val type: Type) :
                         }
                 }
             if (viewMode == null) {
-                viewMode = NotNullLiveData(preferences.defaultNoteViewMode.value)
+                viewMode =
+                    NotNullLiveData(
+                        if (notallyModel.isNewNote) NoteViewMode.EDIT
+                        else preferences.defaultNoteViewMode.value
+                    )
             }
 
             addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
