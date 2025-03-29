@@ -268,7 +268,7 @@ abstract class NotallyDatabase : RoomDatabase() {
 
             override fun migrate(db: SupportSQLiteDatabase) {
                 db.execSQL(
-                    "ALTER TABLE `BaseNote` ADD COLUMN `viewMode` TEXT DEFAULT '${NoteViewMode.EDIT.name}'"
+                    "ALTER TABLE `BaseNote` ADD COLUMN `viewMode` TEXT NOT NULL DEFAULT '${NoteViewMode.EDIT.name}'"
                 )
             }
         }
