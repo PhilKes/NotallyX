@@ -30,6 +30,7 @@
     <string name="auto_backups_folder_hint">Adresář pro uložení automatických záloh.</string>
     <string name="auto_backups_folder_rechoose">Vyberte znovu Adresář pro zálohy a udělte tak znovu NotallyX oprávnění do něj zapisovat.\nPro přeskočení můžete stisknout tlačítko Zrušit</string>
     <string name="auto_backups_folder_set">Nejprve nastavte adresář pro zálohy</string>
+    <string name="auto_save_after_idle_time">Automatické uložení poznámky při nečinnosti </string>
     <string name="auto_sort_by_checked">Seřadit zaškrtnuté položky na konec</string>
     <string name="back">Zpět</string>
     <string name="backup">Zálohování</string>
@@ -38,6 +39,7 @@
     <string name="backup_period_days">Frekvence automatického zálohování v dnech</string>
     <string name="backup_periodic">Periodické zálohy</string>
     <string name="backup_periodic_hint">Pokud tuto možnost povolíte, zálohy budou automaticky vytvářeny ve zvoleném adresáři záloh. Nemusí to fungovat, pokud máte povolený úsporný režim</string>
+    <string name="behaviour">Chování</string>
     <string name="biometric_lock">Uzamknout aplikaci pomocí biometrických údajů zařízení nebo kódu PIN</string>
     <string name="biometrics_disable_success">Biometrický zámek/PIN byl vypnut</string>
     <string name="biometrics_failure">Ověření pomocí biometrických údajů / kódu PIN selhalo</string>
@@ -78,6 +80,8 @@
     <string name="color_exists">Tato barva již existuje!</string>
     <string name="content_density">Kompaktnost obsahu</string>
     <string name="continue_">Pokračovat</string>
+    <string name="convert_to_list_note">Převést na seznam</string>
+    <string name="convert_to_text_note">Převést na textovou poznámku</string>
     <string name="copied_link">Odkaz zkopírován do schránky</string>
     <string name="copy">Kopírovat</string>
     <string name="crash_message">Došlo k neočekávané chybě. \nOmluvte prosím vzniklé nepříjemnosti. </string>
@@ -93,6 +97,7 @@
     <string name="date_format_apply_in_note_view">Použít také v poznámkách</string>
     <string name="date_format_hint">Nastaví vybraný formát data v přehledu poznámek</string>
     <string name="days">Dny</string>
+    <string name="default_note_view_mode">Výchozí zobrazení poznámky</string>
     <string name="delete">Smazat</string>
     <string name="delete_all">Smazat vše</string>
     <string name="delete_all_notes">Smazat všechny poznámky\?</string>
@@ -187,6 +192,8 @@
     <string name="invalid_link">Zkopírovat platný odkaz do schránky</string>
     <string name="italic">Kurzíva</string>
     <string name="item">Položka</string>
+    <string name="json_files">JSON soubory</string>
+    <string name="json_files_help">Pro import poznámek z JSON souborů (jednotlivý soubor nebo složka) klikněte na Importovat. Každý platný JSON soubor je importován jako samostatná poznámka, název souboru se stane názvem poznámky. </string>
     <string name="label_exists">Štítek již existuje</string>
     <string name="label_visibility">Skrýt/zobrazit štítek na navigačním panelu</string>
     <string name="labels">Štítky</string>
@@ -242,6 +249,7 @@
     <string name="please_grant_notally_notification_auto_backup">Pokud automatické zálohování selže, můžete obdržet oznámení, pokud NotallyX udělíte oprávnění k zasílání oznámení</string>
     <string name="previous">Předchozí</string>
     <string name="rate">Ohodnotit aplikaci</string>
+    <string name="read_only">Pouze pro čtení</string>
     <string name="ready_to_record">Připraveno k záznamu</string>
     <string name="record_audio">Spustit zvukový záznam</string>
     <string name="recording">Nahrávání…</string>
@@ -297,6 +305,7 @@
     <string name="text_default">Výchozí</string>
     <string name="text_size">Velikost písma</string>
     <string name="theme">Téma</string>
+    <string name="theme_use_dynamic_colors">Použít barvy z tapety</string>
     <string name="title">Název</string>
     <string name="to_record_audio">Chcete-li nahrávat zvuk, povolte  NotallyX přístup k mikrofonu. Klepněte na Nastavení &gt; Oprávnění a zapněte Mikrofon.</string>
     <string name="unarchive">Zrušit archivaci</string>
