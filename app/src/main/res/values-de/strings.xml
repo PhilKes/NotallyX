@@ -29,6 +29,7 @@
     <string name="auto_backups_folder_hint">Ordner in dem alle autom. Backups erstellt werden</string>
     <string name="auto_backups_folder_rechoose">Der Backups Ordner muss erneut ausgewählt werden, damit NotallyX Schreibrechte dafür erhält.\nÜber Abbrechen kann der Import dieser Einstellung übersprungen werden.</string>
     <string name="auto_backups_folder_set">Stelle erst ein Backups Ordner ein</string>
+    <string name="auto_save_after_idle_time">Autom. Speichern nach X Sekunden</string>
     <string name="auto_sort_by_checked">Abgehakte Elemente ans Ende sortieren</string>
     <string name="back">Zurück</string>
     <string name="backup">Backup</string>
@@ -37,6 +38,7 @@
     <string name="backup_period_days">Auto. Backup Intervall in Tagen</string>
     <string name="backup_periodic">Periodische Backups</string>
     <string name="backup_periodic_hint">Ist dies aktiviert, werden autom. Backups im eingestellten Backups Ordner erstellt. \nDies könnte fehlschlagen wenn Energiesparmodus aktiviert ist</string>
+    <string name="behaviour">Funktionsweise</string>
     <string name="biometric_lock">App per Biometrie/PIN sperren</string>
     <string name="biometrics_disable_success">Biometrische/PIN Sperre deaktiviert</string>
     <string name="biometrics_failure">Fehler bei Authentifizierung per Biometrie/PIN</string>
@@ -75,6 +77,8 @@
     <string name="color_exists">Diese Farbe existiert bereits!</string>
     <string name="content_density">Notizvorschau</string>
     <string name="continue_">Weiter</string>
+    <string name="convert_to_list_note">Zu Liste konvertieren</string>
+    <string name="convert_to_text_note">Zu Text-Notiz konvertieren</string>
     <string name="copied_link">Link kopiert</string>
     <string name="copy">Kopieren</string>
     <string name="crash_message">Ein unerwarteter Fehler ist aufgetreten.\nEntschuldigung für die Unannehmlichkeiten.\n</string>
@@ -182,6 +186,8 @@
     <string name="invalid_link">Kopiere einen validen Link</string>
     <string name="italic">Kursiv</string>
     <string name="item">Eintrag</string>
+    <string name="json_files">JSON Dateien</string>
+    <string name="json_files_help">Um deine JSON-Notizen (einzele Datei oder Ordner) zu importieren, klicke Import.\nJede valide Datei wird als einzelne Notiz importiert, der Dateiname wird zum Notiz-Titel.</string>
     <string name="label_exists">Label existiert bereits</string>
     <string name="label_visibility">Zeige/Verberge das Label in der Navigation</string>
     <string name="labels">Labels</string>
@@ -236,6 +242,7 @@
     <string name="please_grant_notally_notification_auto_backup">Wenn ein autom. Backup fehlschlägt kann eine Benachrichtigung geschickt werden, wenn du NotallyX erlaubst Benachrichtigungen zu schicken</string>
     <string name="previous">Vorherige</string>
     <string name="rate">App bewerten</string>
+    <string name="read_only">Lesemodus</string>
     <string name="ready_to_record">Bereit zum Aufnehmen</string>
     <string name="record_audio">Sprachnotiz aufnehmen</string>
     <string name="recording">Nimmt auf...</string>
@@ -290,6 +297,7 @@
     <string name="text_default">Standard</string>
     <string name="text_size">Textgröße</string>
     <string name="theme">Design</string>
+    <string name="theme_use_dynamic_colors">Systemhintergrundfarben verwenden</string>
     <string name="title">Titel</string>
     <string name="to_record_audio">Um Sprachnotizen zu erstellen, braucht NotallyX Zugriff auf dein Mikrofon. Klicke Einstellunge &gt; Berechtigungen und aktiviere Mikrofon</string>
     <string name="unarchive">Archivierung aufheben</string>
