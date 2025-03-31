@@ -94,6 +94,7 @@
     <string name="date_format_apply_in_note_view">同样应用于笔记视图</string>
     <string name="date_format_hint">将所选日期格式应用于笔记概览</string>
     <string name="days">天</string>
+    <string name="default_note_view_mode">默认的笔记查看模式</string>
     <string name="delete">删除</string>
     <string name="delete_all">删除全部</string>
     <string name="delete_all_notes">删除全部笔记？</string>
@@ -241,6 +242,7 @@
     <string name="please_grant_notally_notification_auto_backup">如果自动备份失败，你会收到一则通知（前提是你授予了 NotallyX 发送通知的权限）</string>
     <string name="previous">前一个</string>
     <string name="rate">给应用打分</string>
+    <string name="read_only">只读</string>
     <string name="ready_to_record">准备好录音了</string>
     <string name="record_audio">录音</string>
     <string name="recording">录音中…</string>
