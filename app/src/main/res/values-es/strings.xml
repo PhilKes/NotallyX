@@ -94,6 +94,7 @@
     <string name="date_format_apply_in_note_view">Aplicar también en la vista de nota</string>
     <string name="date_format_hint">Aplica el formato de fecha seleccionado en la vista general de notas</string>
     <string name="days">Días</string>
+    <string name="default_note_view_mode">Modo de vista de nota por omisión</string>
     <string name="delete">Eliminar</string>
     <string name="delete_all">Borrar todo</string>
     <string name="delete_all_notes">¿Borrar todas las notas\?</string>
@@ -186,6 +187,8 @@
     <string name="invalid_link">Copiar un enlace válido en tu portapapeles</string>
     <string name="italic">Cursiva</string>
     <string name="item">Elemento</string>
+    <string name="json_files">Ficheros JSON</string>
+    <string name="json_files_help">Para importar tus notas desde ficheros JSON (fichero único o carpeta), pincha en Importar. Cada fichero fichero JSON válido se importa como nota separada, el nombre del fichero será el título de la nota.</string>
     <string name="label_exists">Etiqueta existe</string>
     <string name="label_visibility">Ocultar/mostrar etiqueta en el panel de navegación</string>
     <string name="labels">Etiquetas</string>
@@ -240,6 +243,7 @@
     <string name="please_grant_notally_notification_auto_backup">Si falla una copia de seguridad automática, puede recibir una notificación, si otorga permiso a NotallyX para enviar notificaciones</string>
     <string name="previous">Anterior</string>
     <string name="rate">Calificar esta app</string>
+    <string name="read_only">Solo lectura</string>
     <string name="ready_to_record">Preparado para grabar</string>
     <string name="record_audio">Grabar audio</string>
     <string name="recording">Grabando…</string>
