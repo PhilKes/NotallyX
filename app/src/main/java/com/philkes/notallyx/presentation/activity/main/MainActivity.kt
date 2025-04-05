@@ -31,8 +31,6 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Folder
-import com.philkes.notallyx.data.model.Type
-import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.databinding.ActivityMainBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
@@ -40,7 +38,6 @@ import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
-import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.setCancelButton
@@ -78,7 +75,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     var getCurrentFragmentNotes: (() -> Collection<BaseNote>?)? = null
 
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(configuration)
+        return navController.navigateUp(configuration) || super.onSupportNavigateUp()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -489,7 +486,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 popExit = androidx.navigation.ui.R.anim.nav_default_pop_exit_anim
                 popEnter = androidx.navigation.ui.R.anim.nav_default_pop_enter_anim
             }
-            popUpTo(navController.graph.startDestination) { inclusive = false }
+            popUpTo(navController.graph.startDestinationId) { inclusive = false }
         }
         navController.navigate(id, null, options)
     }

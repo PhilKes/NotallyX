@@ -49,27 +49,29 @@ open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
         replaceWith = ReplaceWith("changeText/applyWithoutTextWatcher/..."),
     )
     override fun getText(): Editable? {
-        return super.getText()
+        return getTextSafe()
     }
 
     fun getTextClone(): Editable {
-        return super.getText()!!.clone()
+        return getTextSafe().clone()
     }
 
     fun applyWithoutTextWatcher(
         callback: EditTextWithWatcher.() -> Unit
     ): Pair<Editable, Editable> {
-        val textBefore = super.getText()!!.clone()
+        val textBefore = getTextClone()
         val editTextWatcher = textWatcher
         editTextWatcher?.let { removeTextChangedListener(it) }
         callback()
         editTextWatcher?.let { addTextChangedListener(it) }
-        return Pair(textBefore, super.getText()!!.clone())
+        return Pair(textBefore, getTextClone())
     }
 
     fun changeText(callback: (text: Editable) -> Unit): Pair<Editable, Editable> {
-        return applyWithoutTextWatcher { callback(super.getText()!!) }
+        return applyWithoutTextWatcher { callback(getTextSafe()!!) }
     }
+
+    private fun getTextSafe() = super.getText() ?: Editable.Factory.getInstance().newEditable("")
 
     fun focusAndSelect(
         start: Int = selectionStart,

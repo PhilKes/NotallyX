@@ -208,16 +208,6 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                     navController.navigate(R.id.Search, bundle)
                 }
             }
-            setOnFocusChangeListener { v, hasFocus ->
-                if (hasFocus && navController.currentDestination?.id != R.id.Search) {
-                    val bundle =
-                        Bundle().apply {
-                            putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value)
-                            putSerializable(EXTRA_INITIAL_LABEL, model.currentLabel)
-                        }
-                    navController.navigate(R.id.Search, bundle)
-                }
-            }
         }
     }
 
