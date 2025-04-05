@@ -5,52 +5,49 @@ import styles from './styles.module.css';
 
 type FeatureItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
-  description: ReactNode;
+  image: React.ComponentType<React.ComponentProps<'svg'>>;
 };
 
 const FeatureList: FeatureItem[] = [
   {
     title: 'Easy to Use',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
-    description: (
-      <>
-        Docusaurus was designed from the ground up to be easily installed and
-        used to get your website up and running quickly.
-      </>
-    ),
+    image: require('@site/static/img/phoneScreenshots/1.png').default,
   },
   {
     title: 'Focus on What Matters',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
-    description: (
-      <>
-        Docusaurus lets you focus on your docs, and we&apos;ll do the chores. Go
-        ahead and move your docs into the <code>docs</code> directory.
-      </>
-    ),
+    image: require('@site/static/img/phoneScreenshots/2.png').default,
   },
   {
     title: 'Powered by React',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
-    description: (
-      <>
-        Extend or customize your website layout by reusing React. Docusaurus can
-        be extended while reusing the same header and footer.
-      </>
-    ),
+    image: require('@site/static/img/phoneScreenshots/3.png').default,
+  },
+  {
+    title: 'Powered by React',
+    image: require('@site/static/img/phoneScreenshots/4.png').default,
+  },
+  {
+    title: 'Powered by React',
+    image: require('@site/static/img/phoneScreenshots/5.png').default,
+  },
+  {
+    title: 'Powered by React',
+    image: require('@site/static/img/phoneScreenshots/6.png').default,
+  },
+  {
+    title: 'Powered by React',
+    image: require('@site/static/img/phoneScreenshots/7.png').default,
+  },
+  {
+    title: 'Powered by React',
+    image: require('@site/static/img/phoneScreenshots/8.png').default,
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Feature({title, image, description}: FeatureItem) {
   return (
-    <div className={clsx('col col--4')}>
+    <div className={clsx('col col--3')}>
       <div className="text--center">
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className="text--center padding-horiz--md">
-        <Heading as="h3">{title}</Heading>
-        <p>{description}</p>
+        <img src={image} alt={title}  />  {/* Use <img> to display PNG */}
       </div>
     </div>
   );
