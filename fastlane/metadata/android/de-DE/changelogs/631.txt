@@ -1,9 +1,0 @@
-* Einstellungen per JSON-Datei importieren/exportieren
-
-* Scrollbar für schnelleres Scrollen hinzufügen
-
-* Möglichkeit Notizen-Übersicht auf Einzeileransicht zu konfigurieren
-
-* Menü-Button um alle Notizen zu selektieren
-
-* Kleinere Fixes für untere AppBar

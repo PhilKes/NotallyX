@@ -1,9 +1,0 @@
-Möglichkeit Änderungen zurückzunehmen/wiederholen
-Listen mit Unteraufgaben ordnen indem du sie nach rechts swipest
-Hänge beliebige Dateien an deine Notizen an.
-Sortiere Notizen nach Datum der letzten Änderung, Titel,...
-Absicherung per Biometric/PIN Lock
-Automatische Backups können nun deutlich stärker konfiguriert werden
-Adaptives Android App Icon
-Tausche schnell in Home-Screen Widget angezeigte Notizen aus
-Markiere/Lösche schnell und einfach erledigte Aufgaben über die Toolbar

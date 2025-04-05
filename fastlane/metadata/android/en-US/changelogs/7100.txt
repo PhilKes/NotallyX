@@ -1,7 +1,0 @@
-* Set View to start app in
-
-* Sort checked List items down
-
-* Add View for unlabeled notes
-
-* Color widgets in note's color

@@ -1,2 +1,0 @@
-Fix Pin, Label, Archive action in Note view
-Fix setting cursor on Undo/Redo

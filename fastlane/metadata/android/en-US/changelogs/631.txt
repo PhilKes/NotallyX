@@ -1,9 +1,0 @@
-* Import/Export settings to JSON file
-
-* Add scrollbar for faster scrolling
-
-* Adjust content density to single line notes view
-
-* Add select all notes menu button
-
-* Fix minor issues with bottom AppBar

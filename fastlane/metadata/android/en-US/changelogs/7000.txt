@@ -1,9 +1,0 @@
-* Set Reminders with notifications
-
-* Auto-Backup on note modification
-
-* Color entire UI in note's color
-
-* Send notification if Auto-Backup failed
-
-* Fix many List item bugs/glitches

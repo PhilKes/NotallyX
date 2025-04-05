@@ -1,7 +1,0 @@
-* Setze default Startansicht
-
-* Sortiere abgehakte Listenelemente ans Ende
-
-* Ansicht für Notizen ohne Label
-
-* Färbe Widget in Farbe der Notiz ein

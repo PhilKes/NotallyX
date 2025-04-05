@@ -1,9 +1,0 @@
-* Sort notes by color
-
-* Split checked/unchecked list views
-
-* Added auto-scroll when dragging list item
-
-* Fix App crash when leaving open note in background
-
-* Fix many smaller issues/bugs

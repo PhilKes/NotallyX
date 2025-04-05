@@ -1,3 +1,0 @@
-* Fix crash when creating new note
-
-* Fix crash on dis-/enabling biometric lock

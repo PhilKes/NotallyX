@@ -1,9 +1,0 @@
-* Notizen nach Farbe sortieren
-
-* Geteilte Ansichten für abgehakte/nicht abgehakte Listen
-
-* Auto. Scrollen beim Ziehen eines Listenelements hinzugefügt
-
-* Crash behoben, wenn eine Notiz im Hintergrund geöffnet bleibt
-
-* Viele kleinere Probleme/Bugs behoben

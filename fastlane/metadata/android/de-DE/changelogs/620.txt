@@ -1,4 +1,0 @@
-Importieren von Textdateien
-Exportieren mehrerer Notizen in PDF, JSON, TXT, HTML
-Notizen lokal auf externem Speicher auslagern
-Notizen in Label-Ansicht hinzufügen
