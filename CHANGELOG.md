@@ -1,5 +1,36 @@
 # Changelog
 
+## [v7.3.0](https://github.com/PhilKes/NotallyX/tree/v7.3.0) (2025-04-07)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.2.1...v7.3.0)
+
+### Added Features
+
+- Persist viewMode of each note individually [\#497](https://github.com/PhilKes/NotallyX/issues/497)
+- Read-only mode by default and new notes [\#495](https://github.com/PhilKes/NotallyX/issues/495)
+- Hide notes based on labels [\#401](https://github.com/PhilKes/NotallyX/issues/401)
+- An archived note should be visible in its label's folder. [\#398](https://github.com/PhilKes/NotallyX/issues/398)
+- Sharing notes from the app [\#380](https://github.com/PhilKes/NotallyX/issues/380)
+- Add support for json notes import [\#377](https://github.com/PhilKes/NotallyX/issues/377)
+- Sharing images to the app [\#281](https://github.com/PhilKes/NotallyX/issues/281)
+- Strikethrough checked items lists [\#250](https://github.com/PhilKes/NotallyX/issues/250)
+- Click on list element to check it [\#248](https://github.com/PhilKes/NotallyX/issues/248)
+- Add long press actions to undo/redo buttons [\#244](https://github.com/PhilKes/NotallyX/issues/244)
+- Convert Note \<=\> List [\#190](https://github.com/PhilKes/NotallyX/issues/190)
+- Edit labels inside notes [\#180](https://github.com/PhilKes/NotallyX/issues/180)
+- Support Wallpaper color themes [\#175](https://github.com/PhilKes/NotallyX/issues/175)
+- View Mode [\#76](https://github.com/PhilKes/NotallyX/issues/76)
+
+### Fixed Bugs
+
+- Android 7.0 Navigation bar color issue [\#515](https://github.com/PhilKes/NotallyX/issues/515)
+- Search Mode loop for Android \< 9.0 [\#508](https://github.com/PhilKes/NotallyX/issues/508)
+- BaseNote.viewMode database migration error [\#505](https://github.com/PhilKes/NotallyX/issues/505)
+- New list items can't be added with linebreak/enter [\#496](https://github.com/PhilKes/NotallyX/issues/496)
+- Undo changes more than the last changed character [\#472](https://github.com/PhilKes/NotallyX/issues/472)
+- Auto Backup failed [\#468](https://github.com/PhilKes/NotallyX/issues/468)
+- Amount of backups to keep in periodic backups are not respected if nextcloud mount is used. [\#133](https://github.com/PhilKes/NotallyX/issues/133)
+
 ## [v7.2.1](https://github.com/PhilKes/NotallyX/tree/v7.2.1) (2025-03-18)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.2.0...v7.2.1)
