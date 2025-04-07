@@ -1,0 +1,15 @@
+* Bearbeitungs-/Ansichtsmodus für Notizen
+
+* Notizen per Labels ausblenden
+
+* Import von Notizen im JSON-Format
+
+* Bilder direkt mit NotallyX teilen
+
+* Konverieren zwischen Text- und Listen-Notiz
+
+* Optional App-Theme basierend auf dem Hintergrundbild
+
+* Schnelles Rückgängig/Wiederholen per Long click
+
+* Archivierte Notizen sind weiterhin in der Label-Ansicht sichtbar

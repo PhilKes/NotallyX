@@ -1,0 +1,15 @@
+* Edit/View Mode for Notes
+
+* Hide Notes based on Labels
+
+* JSON Notes Import
+
+* Sharing Images directly to NotallyX
+
+* Convert between Text and List Note
+
+* Support wallpaper color theme
+
+* Quick undo/redo all via long click
+
+* Archived notes are still visible in label's view
