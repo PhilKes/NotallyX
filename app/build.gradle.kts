@@ -178,7 +178,7 @@ afterEvaluate {
 }
 
 dependencies {
-    val navVersion = "2.8.9"
+    val navVersion = "2.3.5"
     val roomVersion = "2.6.1"
 
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
