@@ -75,7 +75,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
     var getCurrentFragmentNotes: (() -> Collection<BaseNote>?)? = null
 
     override fun onSupportNavigateUp(): Boolean {
-        return navController.navigateUp(configuration) || super.onSupportNavigateUp()
+        baseModel.keyword = ""
+        return navController.navigateUp(configuration)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -486,7 +487,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                 popExit = androidx.navigation.ui.R.anim.nav_default_pop_exit_anim
                 popEnter = androidx.navigation.ui.R.anim.nav_default_pop_enter_anim
             }
-            popUpTo(navController.graph.startDestinationId) { inclusive = false }
+            popUpTo(navController.graph.startDestination) { inclusive = false }
         }
         navController.navigate(id, null, options)
     }
