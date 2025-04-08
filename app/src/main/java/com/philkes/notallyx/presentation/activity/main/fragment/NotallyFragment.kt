@@ -195,17 +195,20 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                 }
             }
             doAfterTextChanged { text ->
-                model.keyword = requireNotNull(text).trim().toString()
-                if (
-                    model.keyword.isNotEmpty() &&
-                        navController.currentDestination?.id != R.id.Search
-                ) {
-                    val bundle =
+                val isSearchFragment = navController.currentDestination?.id == R.id.Search
+                if (isSearchFragment) {
+                    model.keyword = requireNotNull(text).trim().toString()
+                }
+                if (text?.isNotEmpty() == true && !isSearchFragment) {
+                    setText("")
+                    model.keyword = text.trim().toString()
+                    navController.navigate(
+                        R.id.Search,
                         Bundle().apply {
                             putSerializable(EXTRA_INITIAL_FOLDER, model.folder.value)
                             putSerializable(EXTRA_INITIAL_LABEL, model.currentLabel)
-                        }
-                    navController.navigate(R.id.Search, bundle)
+                        },
+                    )
                 }
             }
         }
