@@ -1,5 +1,14 @@
 # Changelog
 
+## [v7.3.1](https://github.com/PhilKes/NotallyX/tree/v7.3.1) (2025-04-08)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.3.0...v7.3.1)
+
+### Fixed Bugs
+
+- Button to close note search doesn't work [\#519](https://github.com/PhilKes/NotallyX/issues/519)
+- app crashes when pressing label [\#517](https://github.com/PhilKes/NotallyX/issues/517)
+
 ## [v7.3.0](https://github.com/PhilKes/NotallyX/tree/v7.3.0) (2025-04-07)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.2.1...v7.3.0)
