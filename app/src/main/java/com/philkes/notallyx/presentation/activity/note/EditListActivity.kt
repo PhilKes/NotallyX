@@ -105,7 +105,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
         binding.BottomAppBarRight.apply {
             removeAllViews()
             addToggleViewMode()
-            addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
+            addIconButton(R.string.tap_for_more_options, R.drawable.more_vert, marginStart = 0) {
                 MoreListBottomSheet(
                         this@EditListActivity,
                         createNoteTypeActions() + createFolderActions(),

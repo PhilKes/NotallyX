@@ -24,7 +24,6 @@
     <string name="auto_backup_last">上次备份</string>
     <string name="auto_backup_on_save">保存笔记时自动备份</string>
     <string name="auto_backup_on_save_hint">启用本选项后，每当保存笔记时都会在所配置的”备份文件夹“中自动创建一个备份文件（”NotallyX_AutoBackup.zip）。请注意这可能影响性能</string>
-    <string name="auto_backup_period">自动备份周期</string>
     <string name="auto_backups_folder">备份文件夹</string>
     <string name="auto_backups_folder_hint">保存所有自动备份文件的文件夹</string>
     <string name="auto_backups_folder_rechoose">你需要重新选择备份文件夹，这样 NotallyX 有写入它的权限。你也可以按：取消“跳过导入备份文件夹的值</string>
@@ -94,7 +93,6 @@
     <string name="date_format_apply_in_note_view">同样应用于笔记视图</string>
     <string name="date_format_hint">将所选日期格式应用于笔记概览</string>
     <string name="days">天</string>
-    <string name="default_note_view_mode">默认的笔记查看模式</string>
     <string name="delete">删除</string>
     <string name="delete_all">删除全部</string>
     <string name="delete_all_notes">删除全部笔记？</string>

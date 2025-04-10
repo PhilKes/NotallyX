@@ -24,7 +24,6 @@
     <string name="auto_backup_last">最近的備份</string>
     <string name="auto_backup_on_save">筆記上的備份會自動儲存</string>
     <string name="auto_backup_on_save_hint">透過啟用此功能，每當儲存筆記時，都會在選擇的\"備份資料夾\"中自動建立備份(\"NotallyX_AutoBackup.zip\")。\n請注意這可能會影響效能</string>
-    <string name="auto_backup_period">自動備份週期</string>
     <string name="auto_backups_folder">備份資料夾</string>
     <string name="auto_backups_folder_hint">所有自動備份都儲存於其中的資料夾。</string>
     <string name="auto_backups_folder_rechoose">您需要重新選擇備份資料夾，以便 NotallyX 有權限寫入該資料夾。\n您也可以按取消跳過匯入備份資料夾</string>

@@ -240,7 +240,11 @@ fun ViewGroup.addIconButton(
     val view =
         ImageButton(ContextThemeWrapper(context, R.style.AppTheme)).apply {
             setImageResource(drawable)
-            contentDescription = context.getString(title)
+            val titleText = context.getString(title)
+            contentDescription = titleText
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                tooltipText = titleText
+            }
             val outValue = TypedValue()
             context.theme.resolveAttribute(android.R.attr.actionBarItemBackground, outValue, true)
             setBackgroundResource(outValue.resourceId)
