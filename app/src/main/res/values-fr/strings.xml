@@ -28,6 +28,7 @@
     <string name="auto_backups_folder_hint">Dossier dans lequel toutes les sauvegardes automatiques seront stockées.</string>
     <string name="auto_backups_folder_rechoose">Vous devez re-sélectionner votre dossier de sauvegarde afin que NotallyX ait l\'autorisation d\'y écrire.\nVous pouvez également appuyer sur Annuler pour ignorer l\'importation du chemin du dossier de sauvegarde.</string>
     <string name="auto_backups_folder_set">Configurer d\'abord le Dossier des sauvegardes</string>
+    <string name="auto_save_after_idle_time">Enregistrer la note après un temps d’inactivité défini</string>
     <string name="auto_sort_by_checked">Trier les éléments cochés à la fin</string>
     <string name="back">Retour</string>
     <string name="backup">Sauvegarde</string>
@@ -36,6 +37,7 @@
     <string name="backup_period_days">Fréquence de sauvegarde périodique en jours</string>
     <string name="backup_periodic">Sauvegardes périodiques</string>
     <string name="backup_periodic_hint">En activant cette option, des sauvegardes sont automatiquement créées dans le Dossier de sauvegardes configuré.\nCela peut ne pas fonctionner si le mode économie d\'énergie est activé. </string>
+    <string name="behaviour">Comportement</string>
     <string name="biometric_lock">Verrouiller l\'application avec la biométrie ou le code PIN de l\'appareil</string>
     <string name="biometrics_disable_success">Le verrouillage biométrique/code PIN a été désactivé</string>
     <string name="biometrics_failure">Échec de l\'authentification biométrique/code PIN</string>
@@ -183,6 +185,8 @@
     <string name="invalid_link">Copier un lien valide dans le presse-papier</string>
     <string name="italic">Italique</string>
     <string name="item">Élément</string>
+    <string name="json_files">Fichiers JSON</string>
+    <string name="json_files_help">Pour importer vos notes depuis des fichiers JSON (fichier unique ou dossier), cliquez sur Importer. Chaque fichier JSON valide sera importé en tant que note individuelle et son nom de fichier deviendra le titre de la note.</string>
     <string name="label_exists">L\'étiquette existe déjà</string>
     <string name="label_visibility">Masquer/Afficher l\'étiquette dans le panneau de navigation</string>
     <string name="labels">Étiquettes</string>
@@ -237,6 +241,7 @@
     <string name="please_grant_notally_notification_auto_backup">Si une sauvegarde automatique échoue, vous pouvez recevoir une notification en accordant à NotallyX l\'autorisation d\'envoyer des notifications</string>
     <string name="previous">Précédent</string>
     <string name="rate">Noter cette application</string>
+    <string name="read_only">Lecture seule</string>
     <string name="ready_to_record">Prêt à enregistrer</string>
     <string name="record_audio">Enregistrer un audio</string>
     <string name="recording">Enregistrement en cours…</string>
@@ -291,6 +296,7 @@
     <string name="text_default">Défaut</string>
     <string name="text_size">Taille du texte</string>
     <string name="theme">Thème</string>
+    <string name="theme_use_dynamic_colors">Utiliser les couleurs de fond d’écran du système</string>
     <string name="title">Titre</string>
     <string name="to_record_audio">Pour enregistrer de l\'audio, autorisez NotallyX à accéder à votre microphone. Cliquez sur Paramètres &gt; Autorisations et activez le microphone.</string>
     <string name="unarchive">Restaurer</string>
