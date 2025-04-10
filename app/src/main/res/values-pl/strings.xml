@@ -12,6 +12,8 @@
     <string name="archive">Zarchwizuj</string>
     <string name="archived">Zarchiwizowane</string>
     <plurals name="archived_selected_notes">
+        <item quantity="few">Zarchiwizowano %1$d notatki</item>
+        <item quantity="many">Zarchiwizowano %1$d notatek</item>
         <item quantity="one">Zarchiwizowano %1$d notatkę</item>
         <item quantity="other">Zarchiwizowano %1$d notatek</item>
     </plurals>
@@ -29,6 +31,7 @@
     <string name="auto_backups_folder_hint">Folder, w którym będą przechowywane wszystkie automatyczne kopie zapasowe.</string>
     <string name="auto_backups_folder_rechoose">Musisz ponownie wybrać folder kopii zapasowych, aby NotallyX miał uprawnienia do zapisu w nim.\nMożesz także nacisnąć Anuluj, aby pominąć importowanie zawartości folderu kopii zapasowych</string>
     <string name="auto_backups_folder_set">Najpierw skonfiguruj folder kopii zapasowych powyżej</string>
+    <string name="auto_save_after_idle_time">Automatycznie zapisz notatkę po określonym czasie bezczynności</string>
     <string name="auto_sort_by_checked">Przenieś zaznaczone elementy na koniec</string>
     <string name="back">Cofnij</string>
     <string name="backup">Kopia zapasowa</string>
@@ -37,6 +40,7 @@
     <string name="backup_period_days">Częstotliwość tworzenia automatycznych kopii zapasowych w dniach</string>
     <string name="backup_periodic">Powtarzalne kopie zapasowe</string>
     <string name="backup_periodic_hint">Po włączeniu tej opcji kopie zapasowe są automatycznie tworzone w skonfigurowanym folderze kopii zapasowych.\nMoże to nie działać, jeśli włączony jest tryb oszczędzania energii</string>
+    <string name="behaviour">Zachowanie</string>
     <string name="biometric_lock">Zablokuj aplikację za pomocą danych biometrycznych lub PIN-u urządzenia</string>
     <string name="biometrics_disable_success">Blokada biometryczna/PIN została wyłączona</string>
     <string name="biometrics_failure">Nie udało się uwierzytelnić za pomocą biometrii/PIN-u</string>
@@ -47,6 +51,8 @@
     <string name="calculating">Obliczanie…</string>
     <string name="cancel">Anuluj</string>
     <plurals name="cant_add_files">
+        <item quantity="few">Nie można dodać %1$d plików</item>
+        <item quantity="many">Nie można dodać %1$d plików</item>
         <item quantity="one">Nie można dodać %1$d pliku</item>
         <item quantity="other">Nie można dodać %1$d plików</item>
     </plurals>
@@ -73,9 +79,12 @@
     <string name="clear_data_message">Wszystkie notatki, obrazy, pliki i nagrania zostaną bezpowrotnie usunięte</string>
     <string name="clear_formatting">Usuń formatowanie</string>
     <string name="cleared_data">Wszystkie dane zostały usunięte</string>
+    <string name="color">Kolor</string>
     <string name="color_exists">Ten kolor już istnieje!</string>
     <string name="content_density">Zagęszczenie treści</string>
     <string name="continue_">Kontynuuj</string>
+    <string name="convert_to_list_note">Zamień na listę</string>
+    <string name="convert_to_text_note">Zamień na notatkę</string>
     <string name="copied_link">Skopiowano link do schowka</string>
     <string name="copy">Skopiuj</string>
     <string name="crash_message">Wystąpił nieoczekiwany błąd.\nPrzepraszam za niedogodności.</string>
@@ -91,6 +100,7 @@
     <string name="date_format_apply_in_note_view">Zastosuj także w widoku notatek</string>
     <string name="date_format_hint">Stosuje wybrany format daty w przeglądzie notatek</string>
     <string name="days">Dni</string>
+    <string name="default_note_view_mode">Domyślny tryb wyświetlania notatek</string>
     <string name="delete">Usuń</string>
     <string name="delete_all">Usuń wszystkie</string>
     <string name="delete_all_notes">Usunąć wszystkie notatki\?</string>
@@ -106,6 +116,8 @@
     <string name="delete_selected_notes">Usunąć zaznaczone notatki\?</string>
     <string name="deleted">Usunięte</string>
     <plurals name="deleted_selected_notes">
+        <item quantity="few">Usunięto %1$d notatki</item>
+        <item quantity="many">Usunięto %1$d notatek</item>
         <item quantity="one">Usunięto %1$d notatkę</item>
         <item quantity="other">Usunięto %1$d notatek</item>
     </plurals>
@@ -137,7 +149,7 @@
     <string name="error_while_renaming_file">Błąd podczas zmiany nazwy pliku</string>
     <string name="error_while_renaming_image">Błąd podczas zmiany nazwy obrazu</string>
     <string name="evernote">Evernote</string>
-    <string name="evernote_help">Aby zaimportować notatki z Evernote, musisz wyeksportować notatnik Evernote jako ENEX. Kliknij Pomoc, aby uzyskać więcej informacji.\nJeśli masz już plik ENEX, kliknij Importuj i wybierz go.</string>
+    <string name="evernote_help">Aby zaimportować notatki z Evernote, musisz wyeksportować notatnik Evernote jako ENEX. Kliknij Pomoc, aby uzyskać więcej informacji.\nJeśli masz już plik ENEX, kliknij Przywracanie i wybierz go.</string>
     <string name="every">Każde</string>
     <string name="export">Eksportuj</string>
     <string name="export_backup">Wykonaj kopię zapasową</string>
@@ -151,7 +163,7 @@
     <string name="folder">Folder</string>
     <string name="follow_system">Systemowy</string>
     <string name="google_keep">Google Keep</string>
-    <string name="google_keep_help">Aby zaimportować notatki z Google Keep, musisz pobrać plik ZIP Google Takeout. Wybierz tylko dane „Keep”. Kliknij Pomoc, aby uzyskać więcej informacji.\nJeśli masz już plik ZIP Takeout, kliknij Importuj i wybierz plik ZIP.</string>
+    <string name="google_keep_help">Aby zaimportować notatki z Google Keep, musisz pobrać plik ZIP Google Takeout. Wybierz tylko dane „Keep”. Kliknij Pomoc, aby uzyskać więcej informacji.\nJeśli masz już plik ZIP Takeout, kliknij Przywracanie i wybierz plik ZIP.</string>
     <string name="grid">Siatka</string>
     <string name="help">Pomoc</string>
     <string name="hours">Godzin</string>
@@ -167,6 +179,8 @@
     <string name="imported_files">Przywrócono pliki</string>
     <string name="imported_notes">Przywrócono notatki</string>
     <plurals name="imported_notes">
+        <item quantity="few">Przywrócono %1$s notatki</item>
+        <item quantity="many">Przywrócono %1$s notatek</item>
         <item quantity="one">Przywrócono %1$s notatkę</item>
         <item quantity="other">Przywrócono %1$s notatek</item>
     </plurals>
@@ -183,6 +197,8 @@
     <string name="invalid_link">Skopiuj właściwy link do schowka</string>
     <string name="italic">Kursywa</string>
     <string name="item">Element</string>
+    <string name="json_files">Pliki JSON</string>
+    <string name="json_files_help">Aby zaimportować notatki z plików JSON (pojedynczy plik lub folder), kliknij Przywracanie. Każdy prawidłowy plik JSON jest importowany jako osobna notatka, a nazwa pliku staje się tytułem notatki.</string>
     <string name="label_exists">Etykieta już istnieje</string>
     <string name="label_visibility">Ukryj/pokaż etykietę w panelu nawigacyjnym</string>
     <string name="labels">Etykieta</string>
@@ -206,11 +222,13 @@
     <string name="medium">Średni</string>
     <string name="minutes">Minut</string>
     <string name="modified_date">Zmodyfikowano</string>
-    <string name="monospace">Monospace</string>
+    <string name="monospace">Stała szerokość</string>
     <string name="monthly">Miesięcznie</string>
     <string name="months">Miesięcy</string>
     <string name="more">%1$d więcej</string>
     <plurals name="more_files">
+        <item quantity="few">…%1$d pliki więcej</item>
+        <item quantity="many">…%1$d plików więcej</item>
         <item quantity="one">…%1$d plik więcej</item>
         <item quantity="other">…%1$d plików więcej</item>
     </plurals>
@@ -229,7 +247,7 @@
     <string name="pin">Przypnij</string>
     <string name="pinned">Przypięte</string>
     <string name="plain_text_files">Zwykłe pliki tekstowe</string>
-    <string name="plain_text_files_help">Aby zaimportować Notatki z plików tekstowych (pojedynczy plik lub folder), kliknij Importuj. Każdy plik jest importowany jako osobna notatka, a nazwa pliku staje się tytułem notatki. Jeśli treść tekstu zaczyna się od składni listy (np. Markdown „- [x]”, składnia NotallyX „[✓]” lub „*”, „-”), zostanie ona przekonwertowana na notatkę listy.</string>
+    <string name="plain_text_files_help">Aby zaimportować Notatki z plików tekstowych (pojedynczy plik lub folder), kliknij Przywracanie. Każdy plik jest importowany jako osobna notatka, a nazwa pliku staje się tytułem notatki. Jeśli treść tekstu zaczyna się od składni listy (np. Markdown „- [x]”, składnia NotallyX „[✓]” lub „*”, „-”), zostanie ona przekonwertowana na notatkę listy.</string>
     <string name="play">Nagrywaj</string>
     <string name="please_grant_notally_alarm">Zezwól NotallyX na wysyłanie przypomnień</string>
     <string name="please_grant_notally_audio">Zezwól NotallyX na nagrywanie dźwięku. Nagrania nigdy nie opuszczą Twojego urządzenia</string>
@@ -237,6 +255,7 @@
     <string name="please_grant_notally_notification_auto_backup">Jeśli automatyczna kopia zapasowa nie powiedzie się, możesz otrzymać powiadomienie, jeśli zezwolisz NotallyX na wysyłanie powiadomień</string>
     <string name="previous">Wstecz</string>
     <string name="rate">Oceń aplikację</string>
+    <string name="read_only">Tylko do odczytu</string>
     <string name="ready_to_record">Oczekiwanie na nagrywanie</string>
     <string name="record_audio">Nagrywaj</string>
     <string name="recording">Nagrywanie…</string>
@@ -255,6 +274,8 @@
     <string name="restart_app">Uruchom ponownie aplikację</string>
     <string name="restore">Przywróć</string>
     <plurals name="restored_selected_notes">
+        <item quantity="few">Przywrócono %1$d notatki</item>
+        <item quantity="many">Przywrócono %1$d notatek</item>
         <item quantity="one">Przywrócono %1$d notatkę</item>
         <item quantity="other">Przywrócono %1$d notatek</item>
     </plurals>
@@ -291,10 +312,13 @@
     <string name="text_default">Domyślny</string>
     <string name="text_size">Rozmiar tekstu</string>
     <string name="theme">Motyw</string>
+    <string name="theme_use_dynamic_colors">Użyj kolorów tapety systemu</string>
     <string name="title">Tytuł</string>
     <string name="to_record_audio">Aby nagrywać dźwięk, zezwól NotallyX na dostęp do swojego mikrofonu. Dotknij Ustawienia &gt; Uprawnienia i włącz Mikrofon</string>
     <string name="unarchive">Cofnij archiwizację</string>
     <plurals name="unarchived_selected_notes">
+        <item quantity="few">Odarchiwizowano %1$d notatki</item>
+        <item quantity="many">Odarchiwizowano %1$d notatek</item>
         <item quantity="one">Odarchiwizowano %1$d notatkę</item>
         <item quantity="other">Odarchiwizowano %1$d notatek</item>
     </plurals>
