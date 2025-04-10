@@ -25,7 +25,6 @@
     <string name="auto_backup_last">Poslední záloha</string>
     <string name="auto_backup_on_save">Automaticky zálohovat při ukončení poznámky</string>
     <string name="auto_backup_on_save_hint">Pokud tuto možnost povolíte, záloha („NotallyX_AutoBackup.zip“) bude automaticky vytvořena ve zvoleném „Adresáři záloh“ pokaždé, když bude poznámka uložena. Mějte na paměti, že to může ovlivnit výkon</string>
-    <string name="auto_backup_period">Frekvence automatického zálohování</string>
     <string name="auto_backups_folder">Adresář pro zálohy</string>
     <string name="auto_backups_folder_hint">Adresář pro uložení automatických záloh.</string>
     <string name="auto_backups_folder_rechoose">Vyberte znovu Adresář pro zálohy a udělte tak znovu NotallyX oprávnění do něj zapisovat.\nPro přeskočení můžete stisknout tlačítko Zrušit</string>
@@ -97,7 +96,6 @@
     <string name="date_format_apply_in_note_view">Použít také v poznámkách</string>
     <string name="date_format_hint">Nastaví vybraný formát data v přehledu poznámek</string>
     <string name="days">Dny</string>
-    <string name="default_note_view_mode">Výchozí zobrazení poznámky</string>
     <string name="delete">Smazat</string>
     <string name="delete_all">Smazat vše</string>
     <string name="delete_all_notes">Smazat všechny poznámky\?</string>

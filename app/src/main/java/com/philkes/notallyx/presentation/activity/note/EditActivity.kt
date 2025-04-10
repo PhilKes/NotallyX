@@ -551,7 +551,7 @@ abstract class EditActivity(private val type: Type) :
             removeAllViews()
 
             addToggleViewMode()
-            addIconButton(R.string.more, R.drawable.more_vert, marginStart = 0) {
+            addIconButton(R.string.tap_for_more_options, R.drawable.more_vert, marginStart = 0) {
                 MoreNoteBottomSheet(
                         this@EditActivity,
                         createNoteTypeActions() + createFolderActions(),
@@ -655,12 +655,23 @@ abstract class EditActivity(private val type: Type) :
             notallyModel.title = text.trim().toString()
         }
         notallyModel.viewMode.observe(this) { value ->
-            toggleViewMode.setImageResource(
-                when (value) {
-                    NoteViewMode.READ_ONLY -> R.drawable.edit
-                    else -> R.drawable.visibility
+            toggleViewMode.apply {
+                setImageResource(
+                    when (value) {
+                        NoteViewMode.READ_ONLY -> R.drawable.edit
+                        else -> R.drawable.visibility
+                    }
+                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    tooltipText =
+                        getString(
+                            when (value) {
+                                NoteViewMode.READ_ONLY -> R.string.edit
+                                else -> R.string.read_only
+                            }
+                        )
                 }
-            )
+            }
             value?.let { toggleCanEdit(it) }
         }
     }

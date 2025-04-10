@@ -17,7 +17,6 @@
     <string name="attach_file">Bestand bijvoegen</string>
     <string name="audio_recordings">Audio-opnames</string>
     <string name="auto_backup">Automatische back-up</string>
-    <string name="auto_backup_period">Periode van automatische back-up</string>
     <string name="auto_sort_by_checked">Sorteer de aangevinkte items tot het einde</string>
     <string name="backup">Back-up</string>
     <string name="backup_password">Backup Wachtwoord</string>

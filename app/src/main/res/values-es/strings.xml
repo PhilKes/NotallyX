@@ -24,7 +24,6 @@
     <string name="auto_backup_last">Última copia de seguridad</string>
     <string name="auto_backup_on_save">Copia de seguridad automática al salir una nota</string>
     <string name="auto_backup_on_save_hint">Al habilitar esta opción, se crea automáticamente una copia de seguridad (\"NotallyX_AutoBackup.zip\") en la \"Directorio de copias de seguridad\" configurada cada vez que se guarda una nota.\nTenga en cuenta que esto puede afectar el rendimiento.</string>
-    <string name="auto_backup_period">Periodo de copia automática</string>
     <string name="auto_backups_folder">Directorio de copias de seguridad</string>
     <string name="auto_backups_folder_hint">Carpeta donde se guardan las copias de seguridad automáticas.</string>
     <string name="auto_backups_folder_rechoose">Debe volver a elegir su directorio de copias de seguridad para que NotallyX tenga permiso para escribir en ella.\nTambién puede presionar Cancelar para omitir la importación del valor del directorio de copias de seguridad</string>
@@ -94,7 +93,6 @@
     <string name="date_format_apply_in_note_view">Aplicar también en la vista de nota</string>
     <string name="date_format_hint">Aplica el formato de fecha seleccionado en la vista general de notas</string>
     <string name="days">Días</string>
-    <string name="default_note_view_mode">Modo de vista de nota por omisión</string>
     <string name="delete">Eliminar</string>
     <string name="delete_all">Borrar todo</string>
     <string name="delete_all_notes">¿Borrar todas las notas\?</string>
