@@ -1073,7 +1073,9 @@ abstract class EditActivity(private val type: Type) :
         colorInt = extractColor(notallyModel.color)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             window.statusBarColor = colorInt
-            window.navigationBarColor = colorInt
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                window.navigationBarColor = colorInt
+            }
             window.setLightStatusAndNavBar(colorInt.isLightColor())
         }
         binding.apply {

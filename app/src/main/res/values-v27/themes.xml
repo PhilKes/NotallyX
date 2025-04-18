@@ -54,4 +54,9 @@
     <item name="android:navigationBarColor">?attr/colorSurface</item>
     <item name="android:windowLightNavigationBar">true</item>
   </style>
+
+  <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
+    <item name="bottomSheetStyle">@style/ModalBottomSheet</item>
+    <item name="android:windowIsFloating">false</item>
+  </style>
 </resources>
