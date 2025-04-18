@@ -1,15 +1,18 @@
 package com.philkes.notallyx
 
+import android.app.Activity
 import android.app.Application
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Build
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.Observer
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.android.material.color.DynamicColors
+import com.philkes.notallyx.presentation.setEnabledSecureFlag
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -33,7 +36,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class NotallyXApplication : Application() {
+class NotallyXApplication : Application(), Application.ActivityLifecycleCallbacks {
 
     private lateinit var biometricLockObserver: Observer<BiometricLock>
     private lateinit var preferences: NotallyXPreferences
@@ -43,6 +46,7 @@ class NotallyXApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        registerActivityLifecycleCallbacks(this)
         if (isTestRunner()) return
         preferences = NotallyXPreferences.getInstance(this)
         if (preferences.useDynamicColors.value) {
@@ -168,4 +172,20 @@ class NotallyXApplication : Application() {
             return Build.FINGERPRINT.equals("robolectric", ignoreCase = true)
         }
     }
+
+    override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
+        activity.setEnabledSecureFlag(preferences.secureFlag.value)
+    }
+
+    override fun onActivityStarted(activity: Activity) {}
+
+    override fun onActivityResumed(activity: Activity) {}
+
+    override fun onActivityPaused(activity: Activity) {}
+
+    override fun onActivityStopped(activity: Activity) {}
+
+    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
+
+    override fun onActivityDestroyed(activity: Activity) {}
 }

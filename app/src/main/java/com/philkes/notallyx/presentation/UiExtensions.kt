@@ -531,6 +531,17 @@ fun Activity.checkAlarmPermission(
     } else onSuccess()
 }
 
+fun Activity.setEnabledSecureFlag(enabled: Boolean) {
+    if (enabled) {
+        window.setFlags(
+            WindowManager.LayoutParams.FLAG_SECURE,
+            WindowManager.LayoutParams.FLAG_SECURE,
+        )
+    } else {
+        window.clearFlags(WindowManager.LayoutParams.FLAG_SECURE)
+    }
+}
+
 fun Fragment.displayEditLabelDialog(
     oldValue: String,
     model: BaseNoteModel,

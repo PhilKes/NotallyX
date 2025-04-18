@@ -135,6 +135,8 @@ class NotallyXPreferences private constructor(private val context: Context) {
     val fallbackDatabaseEncryptionKey by lazy {
         ByteArrayPreference("fallback_database_encryption_key", encryptedPreferences, ByteArray(0))
     }
+    val secureFlag =
+        BooleanPreference("secureFlag", preferences, false, R.string.disallow_screenshots)
 
     val dataInPublicFolder =
         BooleanPreference("dataOnExternalStorage", preferences, false, R.string.data_in_public)
@@ -223,6 +225,7 @@ class NotallyXPreferences private constructor(private val context: Context) {
                 maxItems,
                 maxLines,
                 maxTitle,
+                secureFlag,
                 labelsHidden,
                 labelTagsHiddenInOverview,
                 maxLabels,

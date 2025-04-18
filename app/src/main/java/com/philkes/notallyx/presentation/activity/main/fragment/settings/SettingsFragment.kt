@@ -33,6 +33,7 @@ import com.philkes.notallyx.databinding.DialogTextInputBinding
 import com.philkes.notallyx.databinding.FragmentSettingsBinding
 import com.philkes.notallyx.presentation.activity.main.MainActivity
 import com.philkes.notallyx.presentation.setCancelButton
+import com.philkes.notallyx.presentation.setEnabledSecureFlag
 import com.philkes.notallyx.presentation.setupImportProgressDialog
 import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showAndFocus
@@ -590,6 +591,14 @@ class SettingsFragment : Fragment() {
                 layoutInflater,
             ) { newValue ->
                 model.savePreference(backupPassword, newValue)
+            }
+        }
+
+        secureFlag.observe(viewLifecycleOwner) { value ->
+            binding.SecureFlag.setup(secureFlag, value, requireContext(), layoutInflater) { newValue
+                ->
+                model.savePreference(secureFlag, newValue)
+                activity?.setEnabledSecureFlag(newValue)
             }
         }
     }
