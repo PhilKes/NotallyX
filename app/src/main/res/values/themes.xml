@@ -124,6 +124,7 @@
 
     <style name="ThemeOverlay.App.BottomSheetDialog" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <item name="bottomSheetStyle">@style/ModalBottomSheet</item>
+        <item name="android:windowIsFloating">true</item>
     </style>
 
     <style name="ModalBottomSheet" parent="Widget.Material3.BottomSheet.Modal">
