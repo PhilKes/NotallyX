@@ -119,6 +119,7 @@
     <string name="disable_lock_description">Dies entschlüsselt außerdem die Datenbank</string>
     <string name="disable_lock_title">Deaktivierte Biometrie/PIN Sperre</string>
     <string name="disabled">Deaktiviert</string>
+    <string name="disallow_screenshots">Screenshots verbieten</string>
     <string name="discard">Verwerfen</string>
     <string name="display_text">Anzeigetext</string>
     <string name="donate">Spende</string>

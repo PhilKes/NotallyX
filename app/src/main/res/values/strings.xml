@@ -121,6 +121,7 @@
     <string name="disable_lock_description">This will also decrypt the database</string>
     <string name="disable_lock_title">Disable lock via Biometric/PIN</string>
     <string name="disabled">Disabled</string>
+    <string name="disallow_screenshots">Disallow Screenshots</string>
     <string name="discard">Discard</string>
     <string name="display_text">Text to display</string>
     <string name="donate">Make a Donation</string>
