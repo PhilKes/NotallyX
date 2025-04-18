@@ -5,6 +5,8 @@ import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.deepCopy
 import com.philkes.notallyx.data.model.findChild
 import com.philkes.notallyx.data.model.plus
+import com.philkes.notallyx.data.model.shouldParentBeChecked
+import com.philkes.notallyx.data.model.shouldParentBeUnchecked
 import com.philkes.notallyx.utils.filter
 import com.philkes.notallyx.utils.forEach
 import com.philkes.notallyx.utils.indices
@@ -149,7 +151,18 @@ fun <R> List<R>.getOrNull(index: Int) = if (lastIndex >= index) this[index] else
 fun Collection<ListItem>.init(resetIds: Boolean = true): List<ListItem> {
     val initializedItems = deepCopy()
     initList(initializedItems, resetIds)
+    checkBrokenList(initializedItems)
     return initializedItems
+}
+
+private fun checkBrokenList(list: List<ListItem>) {
+    list.forEach { listItem ->
+        if (listItem.shouldParentBeChecked()) {
+            listItem.checked = true
+        } else if (listItem.shouldParentBeUnchecked()) {
+            listItem.checked = false
+        }
+    }
 }
 
 private fun initList(list: List<ListItem>, resetIds: Boolean) {
@@ -250,7 +263,7 @@ fun SortedList<ListItem>.findParentsByChecked(checked: Boolean): List<ListItem> 
 fun SortedList<ListItem>.deleteCheckedItems() {
     mapIndexed { index, listItem -> Pair(index, listItem) }
         .filter { it.second.checked }
-        .sortedBy { it.second.isChild }
+        .sortedBy { !it.second.isChild }
         .forEach { remove(it.second) }
 }
 
