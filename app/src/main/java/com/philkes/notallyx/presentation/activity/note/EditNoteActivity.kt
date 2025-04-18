@@ -68,8 +68,6 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { binding.EnterBody.requestFocus() }
 
-        setupEditor()
-
         if (notallyModel.isNewNote) {
             binding.EnterBody.requestFocus()
         }
@@ -83,13 +81,13 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     override fun toggleCanEdit(mode: NoteViewMode) {
         super.toggleCanEdit(mode)
-        setupEditor()
         textFormatMenu.isVisible = mode == NoteViewMode.EDIT
         when {
             mode == NoteViewMode.EDIT -> showKeyboard(binding.EnterBody)
             binding.EnterBody.isFocused -> hideKeyboard(binding.EnterBody)
         }
         binding.EnterBody.setCanEdit(mode == NoteViewMode.EDIT)
+        setupEditor()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
