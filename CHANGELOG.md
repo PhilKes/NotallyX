@@ -1,5 +1,23 @@
 # Changelog
 
+## [v7.4.0](https://github.com/PhilKes/NotallyX/tree/v7.4.0) (2025-04-18)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.3.1...v7.4.0)
+
+### Added Features
+
+- Don't force capitalization when adding a label [\#532](https://github.com/PhilKes/NotallyX/issues/532)
+- Add a screen protection against screenshot attempts [\#386](https://github.com/PhilKes/NotallyX/issues/386)
+
+### Fixed Bugs
+
+- Share pure text note error [\#544](https://github.com/PhilKes/NotallyX/issues/544)
+- Crash when deleting checked items in a list [\#539](https://github.com/PhilKes/NotallyX/issues/539)
+- Keyboard don't open after closing it on Android 7 [\#537](https://github.com/PhilKes/NotallyX/issues/537)
+- Unable to open links before changing view mode [\#527](https://github.com/PhilKes/NotallyX/issues/527)
+- Reminder popup cut on small screens [\#522](https://github.com/PhilKes/NotallyX/issues/522)
+- Auto Backup failed [\#514](https://github.com/PhilKes/NotallyX/issues/514)
+
 ## [v7.3.1](https://github.com/PhilKes/NotallyX/tree/v7.3.1) (2025-04-08)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.3.0...v7.3.1)
