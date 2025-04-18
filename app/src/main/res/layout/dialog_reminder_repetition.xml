@@ -1,47 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-  android:id="@+id/RepetitionOptions"
-  android:layout_width="match_parent"
-  android:layout_height="wrap_content"
-  android:layout_marginTop="16dp"
-  android:padding="16dp">
-
-  <RadioButton
-    android:id="@+id/None"
-    android:layout_width="wrap_content"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:checked="true"
-    android:text="@string/none" />
+    android:scrollbarAlwaysDrawVerticalTrack="true">
 
-  <RadioButton
-    android:id="@+id/Daily"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/daily" />
+  <RadioGroup
+      android:id="@+id/RepetitionOptions"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingTop="2dp"
+      android:paddingStart="16dp"
+      android:paddingEnd="16dp">
 
-  <RadioButton
-    android:id="@+id/Weekly"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/weekly" />
+    <RadioButton
+        android:id="@+id/None"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:checked="true"
+        android:text="@string/none" />
 
-  <RadioButton
-    android:id="@+id/Monthly"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/monthly" />
+    <RadioButton
+        android:id="@+id/Daily"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/daily" />
 
-  <RadioButton
-    android:id="@+id/Yearly"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/yearly" />
+    <RadioButton
+        android:id="@+id/Weekly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/weekly" />
 
-  <RadioButton
-    android:id="@+id/Custom"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:text="@string/custom" />
-</RadioGroup>
+    <RadioButton
+        android:id="@+id/Monthly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/monthly" />
+
+    <RadioButton
+        android:id="@+id/Yearly"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/yearly" />
+
+    <RadioButton
+        android:id="@+id/Custom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/custom" />
+  </RadioGroup>
+</ScrollView>
+
 
