@@ -1,6 +1,7 @@
 package com.philkes.notallyx.presentation.view.misc
 
 import android.content.Context
+import android.os.Build
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.method.KeyListener
@@ -8,6 +9,7 @@ import android.util.AttributeSet
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.AppCompatEditText
 import com.philkes.notallyx.presentation.clone
+import com.philkes.notallyx.presentation.showKeyboard
 
 open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
     AppCompatEditText(context, attrs) {
@@ -42,6 +44,19 @@ open class EditTextWithWatcher(context: Context, attrs: AttributeSet) :
         isFocusable = value
         isFocusableInTouchMode = value
         setTextIsSelectable(true)
+
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O_MR1) {
+            setOnClickListener {
+                if (value) {
+                    context.showKeyboard(this)
+                }
+            }
+            setOnFocusChangeListener { v, hasFocus ->
+                if (hasFocus && value) {
+                    context.showKeyboard(this)
+                }
+            }
+        }
     }
 
     @Deprecated(
