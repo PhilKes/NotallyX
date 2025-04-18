@@ -324,14 +324,14 @@ private fun Context.shareNote(title: String, body: CharSequence, imageUris: List
     val intent =
         Intent(if (imageUris.size > 1) Intent.ACTION_SEND_MULTIPLE else Intent.ACTION_SEND)
             .apply {
-                type = "image/*"
+                type = if (imageUris.isEmpty()) "text/*" else "image/*"
                 putExtra(Intent.EXTRA_TEXT, text.toString())
                 putExtra(Intent.EXTRA_TITLE, title)
                 putExtra(Intent.EXTRA_SUBJECT, title)
                 if (imageUris.size > 1) {
                     putParcelableArrayListExtra(Intent.EXTRA_STREAM, ArrayList(imageUris))
-                } else {
-                    putExtra(Intent.EXTRA_STREAM, imageUris.firstOrNull())
+                } else if (imageUris.isNotEmpty()) {
+                    putExtra(Intent.EXTRA_STREAM, imageUris.first())
                 }
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
