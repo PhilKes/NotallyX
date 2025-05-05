@@ -6,6 +6,7 @@ import android.view.View
 import androidx.core.os.BundleCompat
 import androidx.core.view.isVisible
 import com.philkes.notallyx.R
+import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Folder
 
 class SearchFragment : NotallyFragment() {
@@ -44,6 +45,9 @@ class SearchFragment : NotallyFragment() {
                 isVisible = true
             }
         } else binding?.ChipGroup?.isVisible = false
+        getObservable().observe(viewLifecycleOwner) { items ->
+            model.actionMode.updateSelected(items?.filterIsInstance<BaseNote>()?.map { it.id })
+        }
     }
 
     override fun getBackground() = R.drawable.search

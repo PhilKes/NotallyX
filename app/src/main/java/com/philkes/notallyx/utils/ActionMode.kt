@@ -44,6 +44,13 @@ class ActionMode {
         }
     }
 
+    fun updateSelected(availableItemIds: List<Long>?) {
+        selectedNotes.keys
+            .filter { availableItemIds?.contains(it) == false }
+            .forEach { selectedNotes.remove(it) }
+        refresh()
+    }
+
     fun isEnabled() = enabled.value
 
     // We assume selectedNotes.size is 1
