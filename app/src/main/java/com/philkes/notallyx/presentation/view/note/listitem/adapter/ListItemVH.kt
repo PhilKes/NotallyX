@@ -163,6 +163,7 @@ class ListItemVH(
                 binding.Content.descendantFocusability = ViewGroup.FOCUS_BLOCK_DESCENDANTS
             }
             setCanEdit(viewMode == NoteViewMode.EDIT)
+            isFocusable = !item.checked
             when (viewMode) {
                 NoteViewMode.EDIT -> {
                     setOnClickListener(null)
