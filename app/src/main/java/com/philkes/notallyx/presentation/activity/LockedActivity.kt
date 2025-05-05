@@ -64,7 +64,10 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (preferences.biometricLock.value == BiometricLock.ENABLED) {
+        if (
+            preferences.biometricLock.value == BiometricLock.ENABLED &&
+                notallyXApplication.locked.value
+        ) {
             hide()
         }
     }
