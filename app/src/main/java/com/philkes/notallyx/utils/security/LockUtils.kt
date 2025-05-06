@@ -4,15 +4,13 @@ import android.app.Activity
 import android.app.KeyguardManager
 import android.content.Context
 import android.content.Intent
-import android.hardware.biometrics.BiometricManager
-import android.hardware.biometrics.BiometricPrompt
-import android.hardware.fingerprint.FingerprintManager
 import android.os.Build
-import android.os.CancellationSignal
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.philkes.notallyx.R
 import javax.crypto.Cipher
 
@@ -27,7 +25,7 @@ fun Activity.showBiometricOrPinPrompt(
 ) {
     showBiometricOrPinPrompt(
         isForDecrypt,
-        this,
+        this as FragmentActivity,
         activityResultLauncher,
         titleResId,
         descriptionResId,
@@ -48,7 +46,7 @@ fun Fragment.showBiometricOrPinPrompt(
 ) {
     showBiometricOrPinPrompt(
         isForDecrypt,
-        requireContext(),
+        activity!!,
         activityResultLauncher,
         titleResId,
         descriptionResId,
@@ -60,7 +58,7 @@ fun Fragment.showBiometricOrPinPrompt(
 
 private fun showBiometricOrPinPrompt(
     isForDecrypt: Boolean,
-    context: Context,
+    context: FragmentActivity,
     activityResultLauncher: ActivityResultLauncher<Intent>,
     titleResId: Int,
     descriptionResId: Int? = null,
@@ -69,155 +67,60 @@ private fun showBiometricOrPinPrompt(
     onFailure: (errorCode: Int?) -> Unit,
 ) {
     when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
-            // Android 11+ with BiometricPrompt and Authenticators
-            val prompt =
-                BiometricPrompt.Builder(context)
-                    .apply {
-                        setTitle(context.getString(titleResId))
-                        descriptionResId?.let {
-                            setDescription(context.getString(descriptionResId))
-                        }
-                        setAllowedAuthenticators(
-                            BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                                BiometricManager.Authenticators.DEVICE_CREDENTIAL
-                        )
-                    }
-                    .build()
-            val cipher =
-                if (isForDecrypt) {
-                    getInitializedCipherForDecryption(iv = cipherIv!!)
-                } else {
-                    getInitializedCipherForEncryption()
-                }
-            prompt.authenticate(
-                BiometricPrompt.CryptoObject(cipher),
-                getCancellationSignal(context),
-                context.mainExecutor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult?
-                    ) {
-                        super.onAuthenticationSucceeded(result)
-                        onSuccess.invoke(result!!.cryptoObject!!.cipher)
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        onFailure.invoke(null)
-                    }
-
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
-                        super.onAuthenticationError(errorCode, errString)
-                        onFailure.invoke(errorCode)
-                    }
-                },
-            )
-        }
-        Build.VERSION.SDK_INT == Build.VERSION_CODES.Q -> {
-            // Android 10: Use BiometricPrompt without Authenticators
-            val prompt =
-                BiometricPrompt.Builder(context)
-                    .apply {
-                        setTitle(context.getString(titleResId))
-                        descriptionResId?.let {
-                            setDescription(context.getString(descriptionResId))
-                        }
-                        setNegativeButton(
-                            context.getString(R.string.cancel),
-                            context.mainExecutor,
-                        ) { _, _ ->
-                            onFailure.invoke(null)
-                        }
-                    }
-                    .build()
-            val cipher =
-                if (isForDecrypt) {
-                    getInitializedCipherForDecryption(iv = cipherIv!!)
-                } else {
-                    getInitializedCipherForEncryption()
-                }
-            prompt.authenticate(
-                BiometricPrompt.CryptoObject(cipher),
-                getCancellationSignal(context),
-                context.mainExecutor,
-                object : BiometricPrompt.AuthenticationCallback() {
-                    override fun onAuthenticationSucceeded(
-                        result: BiometricPrompt.AuthenticationResult?
-                    ) {
-                        super.onAuthenticationSucceeded(result)
-                        onSuccess.invoke(result!!.cryptoObject!!.cipher)
-                    }
-
-                    override fun onAuthenticationFailed() {
-                        super.onAuthenticationFailed()
-                        onFailure.invoke(null)
-                    }
-
-                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence?) {
-                        super.onAuthenticationError(errorCode, errString)
-                        onFailure.invoke(errorCode)
-                    }
-                },
-            )
-        }
-
         Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-            val fingerprintManager =
-                ContextCompat.getSystemService(context, FingerprintManager::class.java)
-            if (
-                fingerprintManager?.isHardwareDetected == true &&
-                    fingerprintManager.hasEnrolledFingerprints()
-            ) {
-                val cipher =
-                    if (isForDecrypt) {
-                        getInitializedCipherForDecryption(iv = cipherIv!!)
-                    } else {
-                        getInitializedCipherForEncryption()
+            val promptInfo =
+                BiometricPrompt.PromptInfo.Builder()
+                    .apply {
+                        setTitle(context.getString(titleResId))
+                        descriptionResId?.let {
+                            setDescription(context.getString(descriptionResId))
+                        }
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                            setAllowedAuthenticators(
+                                BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
+                            )
+                        } else {
+                            setNegativeButtonText(context.getString(R.string.cancel))
+                            setAllowedAuthenticators(
+                                BiometricManager.Authenticators.BIOMETRIC_STRONG
+                            )
+                        }
                     }
-                fingerprintManager.authenticate(
-                    FingerprintManager.CryptoObject(cipher),
-                    getCancellationSignal(context),
-                    0,
-                    object : FingerprintManager.AuthenticationCallback() {
-                        override fun onAuthenticationSucceeded(
-                            result: FingerprintManager.AuthenticationResult?
-                        ) {
-                            super.onAuthenticationSucceeded(result)
-                            onSuccess.invoke(result!!.cryptoObject!!.cipher)
-                        }
+                    .build()
+            val cipher =
+                if (isForDecrypt) {
+                    getInitializedCipherForDecryption(iv = cipherIv!!)
+                } else {
+                    getInitializedCipherForEncryption()
+                }
+            val authCallback =
+                object : BiometricPrompt.AuthenticationCallback() {
+                    override fun onAuthenticationSucceeded(
+                        result: BiometricPrompt.AuthenticationResult
+                    ) {
+                        super.onAuthenticationSucceeded(result)
+                        onSuccess.invoke(result.cryptoObject!!.cipher!!)
+                    }
 
-                        override fun onAuthenticationFailed() {
-                            super.onAuthenticationFailed()
-                            onFailure.invoke(null)
-                        }
+                    override fun onAuthenticationFailed() {
+                        super.onAuthenticationFailed()
+                        onFailure.invoke(null)
+                    }
 
-                        override fun onAuthenticationError(
-                            errorCode: Int,
-                            errString: CharSequence?,
-                        ) {
-                            super.onAuthenticationError(errorCode, errString)
-                            onFailure.invoke(errorCode)
-                        }
-                    },
-                    null,
-                )
-            } else {
-                promptPinAuthentication(context, activityResultLauncher, titleResId, onFailure)
-            }
+                    override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
+                        super.onAuthenticationError(errorCode, errString)
+                        onFailure.invoke(errorCode)
+                    }
+                }
+            val prompt =
+                BiometricPrompt(context, ContextCompat.getMainExecutor(context), authCallback)
+            prompt.authenticate(promptInfo, BiometricPrompt.CryptoObject(cipher))
         }
 
         else -> {
             // API 21-22: No biometric support, fallback to PIN/Password
             promptPinAuthentication(context, activityResultLauncher, titleResId, onFailure)
-        }
-    }
-}
-
-private fun getCancellationSignal(context: Context): CancellationSignal {
-    return CancellationSignal().apply {
-        setOnCancelListener {
-            Toast.makeText(context, R.string.biometrics_failure, Toast.LENGTH_SHORT).show()
         }
     }
 }

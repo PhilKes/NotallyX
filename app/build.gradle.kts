@@ -190,7 +190,7 @@ dependencies {
     implementation("androidx.security:security-crypto:1.1.0-alpha06")
     implementation("androidx.sqlite:sqlite-ktx:2.4.0")
     implementation("androidx.work:work-runtime:2.9.1")
-
+    implementation("androidx.biometric:biometric:1.1.0")
     implementation("cat.ereza:customactivityoncrash:2.4.0")
     implementation("com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0")
     implementation("com.github.bumptech.glide:glide:4.15.1")

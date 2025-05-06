@@ -1,7 +1,6 @@
 package com.philkes.notallyx.utils
 
 import android.app.Activity
-import android.app.KeyguardManager
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -12,7 +11,6 @@ import android.content.ContentResolver
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.hardware.biometrics.BiometricManager
 import android.net.Uri
@@ -126,30 +124,15 @@ fun Context.getFileName(uri: Uri): String? =
     }
 
 fun Context.canAuthenticateWithBiometrics(): Int {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-            val keyguardManager = ContextCompat.getSystemService(this, KeyguardManager::class.java)
-            val packageManager: PackageManager = this.packageManager
-            if (!packageManager.hasSystemFeature(PackageManager.FEATURE_FINGERPRINT)) {
-                return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
-            }
-            if (keyguardManager?.isKeyguardSecure == false) {
-                return BiometricManager.BIOMETRIC_ERROR_NONE_ENROLLED
-            }
-        } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
-            val biometricManager: BiometricManager =
-                this.getSystemService(BiometricManager::class.java)
-            return biometricManager.canAuthenticate()
+    val biometricManager = androidx.biometric.BiometricManager.from(this)
+    val authenticators =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG or
+                androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL
         } else {
-            val biometricManager: BiometricManager =
-                this.getSystemService(BiometricManager::class.java)
-            return biometricManager.canAuthenticate(
-                BiometricManager.Authenticators.BIOMETRIC_STRONG or
-                    BiometricManager.Authenticators.DEVICE_CREDENTIAL
-            )
+            androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG
         }
-    }
-    return BiometricManager.BIOMETRIC_ERROR_NO_HARDWARE
+    return biometricManager.canAuthenticate(authenticators)
 }
 
 fun Context.getUriForFile(file: File): Uri =
