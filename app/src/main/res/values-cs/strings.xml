@@ -123,6 +123,7 @@
     <string name="disable_lock_description">Toto rovněž dešifruje databázi</string>
     <string name="disable_lock_title">Vypnout zámek pomocí biometrických údajů/PIN</string>
     <string name="disabled">Zakázat</string>
+    <string name="disallow_screenshots">Zakázat pořizování snímků obrazovky</string>
     <string name="discard">Zahodit</string>
     <string name="display_text">Text k zobrazení</string>
     <string name="donate">Podpořit</string>
