@@ -119,6 +119,7 @@
     <string name="disable_lock_description">La base de donnée sera aussi décryptée</string>
     <string name="disable_lock_title">Désactiver le verrouillage biométrique/code PIN</string>
     <string name="disabled">Désactivé</string>
+    <string name="disallow_screenshots">Bloquer les captures d’écran</string>
     <string name="discard">Supprimer</string>
     <string name="display_text">Texte à afficher</string>
     <string name="donate">Faire un don</string>
