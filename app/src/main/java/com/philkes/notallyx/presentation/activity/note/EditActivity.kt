@@ -188,14 +188,15 @@ abstract class EditActivity(private val type: Type) :
             if (persistedId == null || notallyModel.originalNote == null) {
                 notallyModel.setState(id)
             }
-            if (
-                notallyModel.isNewNote &&
-                    intent.action in setOf(Intent.ACTION_SEND, Intent.ACTION_SEND_MULTIPLE)
-            ) {
-                handleSharedNote()
-            } else if (notallyModel.isNewNote) {
-                intent.getStringExtra(EXTRA_DISPLAYED_LABEL)?.let {
-                    notallyModel.setLabels(listOf(it))
+            if (notallyModel.isNewNote) {
+                when (intent.action) {
+                    Intent.ACTION_SEND,
+                    Intent.ACTION_SEND_MULTIPLE -> handleSharedNote()
+                    Intent.ACTION_VIEW -> handleViewNote()
+                    else ->
+                        intent.getStringExtra(EXTRA_DISPLAYED_LABEL)?.let {
+                            notallyModel.setLabels(listOf(it))
+                        }
                 }
             }
 
@@ -753,6 +754,26 @@ abstract class EditActivity(private val type: Type) :
             filesByType[NotallyModel.FileType.ANY]?.let { otherFiles ->
                 notallyModel.addFiles(otherFiles.toTypedArray())
             }
+        }
+    }
+
+    private fun handleViewNote() {
+        val text =
+            intent.data?.let { uri ->
+                contentResolver.openInputStream(uri)?.use { inputStream ->
+                    inputStream.bufferedReader().readText()
+                }
+                    ?: run {
+                        showToast(R.string.cant_load_file)
+                        null
+                    }
+            } ?: intent.getStringExtra(Intent.EXTRA_TEXT)
+        val title = intent.getStringExtra(Intent.EXTRA_SUBJECT)
+        if (text != null) {
+            notallyModel.body = Editable.Factory.getInstance().newEditable(text)
+        }
+        if (title != null) {
+            notallyModel.title = title
         }
     }
 
