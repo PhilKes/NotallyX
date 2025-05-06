@@ -119,6 +119,7 @@
     <string name="disable_lock_description">Esto también descifrará la base de datos</string>
     <string name="disable_lock_title">Deshabilitar bloqueo biométrico/PIN</string>
     <string name="disabled">Deshabilitado</string>
+    <string name="disallow_screenshots">No permitir capturas de pantalla</string>
     <string name="discard">Descartar</string>
     <string name="display_text">Texto a pantalla</string>
     <string name="donate">Hacer donación</string>
