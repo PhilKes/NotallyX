@@ -118,6 +118,7 @@
     <string name="disable_lock_description">这也会解密数据据</string>
     <string name="disable_lock_title">停用生物特征/PIN锁</string>
     <string name="disabled">禁用</string>
+    <string name="disallow_screenshots">禁止截屏</string>
     <string name="discard">取消</string>
     <string name="display_text">要展示的我呢本</string>
     <string name="donate">捐赠</string>
