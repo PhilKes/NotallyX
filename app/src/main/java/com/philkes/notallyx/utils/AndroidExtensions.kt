@@ -202,7 +202,7 @@ fun Context.logToFile(
     stackTrace?.let { Log.e(tag, "Exception occurred: $it") }
 
     val logFile =
-        folder.findFile(fileName).let {
+        folder.findFile("$fileName.txt").let {
             if (it == null || !it.exists()) {
                 folder.createFile("text/plain", fileName)
             } else if (it.isLargerThanKb(MAX_LOGS_FILE_SIZE_KB)) {
