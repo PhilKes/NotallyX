@@ -45,6 +45,7 @@ data class BaseNoteVHPreferences(
     val maxLines: Int,
     val maxTitleLines: Int,
     val hideLabels: Boolean,
+    val hideImages: Boolean,
 )
 
 class BaseNoteVH(
@@ -209,9 +210,8 @@ class BaseNoteVH(
     }
 
     private fun setImages(images: List<FileAttachment>, mediaRoot: File?) {
-
         binding.apply {
-            if (images.isNotEmpty()) {
+            if (images.isNotEmpty() && !preferences.hideImages) {
                 ImageView.visibility = VISIBLE
                 Message.visibility = GONE
 

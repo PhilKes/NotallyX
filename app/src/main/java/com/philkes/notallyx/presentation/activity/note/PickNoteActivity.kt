@@ -52,6 +52,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
                         maxLines.value,
                         maxTitle.value,
                         labelTagsHiddenInOverview.value,
+                        imagesHiddenInOverview.value,
                     ),
                     application.getExternalImagesDirectory(),
                     this@PickNoteActivity,
