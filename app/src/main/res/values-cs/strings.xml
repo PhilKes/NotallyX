@@ -163,6 +163,8 @@
     <string name="help">Nápověda</string>
     <string name="hours">Hodiny</string>
     <string name="image_format_not_supported">Formát obrázku není podporován</string>
+    <string name="images_hidden_in_overview">Pokud tuto funkci povolíte, obrázky poznámek budou v přehledu skryty.</string>
+    <string name="images_hidden_in_overview_title">Skrýt obrázky v přehledu</string>
     <string name="import_action">Importovat</string>
     <string name="import_backup">Importovat zálohu</string>
     <string name="import_backup_password_hint">Pokud vaše záloha není chráněna heslem, jednoduše stiskněte tlačítko Importovat, jinak zadejte správné heslo.</string>

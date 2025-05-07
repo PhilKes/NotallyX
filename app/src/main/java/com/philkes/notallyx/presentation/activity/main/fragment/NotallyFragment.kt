@@ -237,6 +237,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                         maxLines.value,
                         maxTitle.value,
                         labelTagsHiddenInOverview.value,
+                        imagesHiddenInOverview.value,
                     ),
                     model.imageRoot,
                     this@NotallyFragment,

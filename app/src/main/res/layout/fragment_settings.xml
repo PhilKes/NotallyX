@@ -88,6 +88,10 @@
           android:id="@+id/LabelsHiddenInOverview"
           layout="@layout/preference" />
 
+        <include
+          android:id="@+id/ImagesHiddenInOverview"
+          layout="@layout/preference" />
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"

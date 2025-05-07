@@ -351,6 +351,17 @@ class SettingsFragment : Fragment() {
                     model.savePreference(labelTagsHiddenInOverview, enabled)
                 }
             }
+            imagesHiddenInOverview.observe(viewLifecycleOwner) { value ->
+                binding.ImagesHiddenInOverview.setup(
+                    imagesHiddenInOverview,
+                    value,
+                    requireContext(),
+                    layoutInflater,
+                    R.string.images_hidden_in_overview,
+                ) { enabled ->
+                    model.savePreference(imagesHiddenInOverview, enabled)
+                }
+            }
         }
     }
 

@@ -163,6 +163,8 @@
     <string name="help">Помощь</string>
     <string name="hours">Часов</string>
     <string name="image_format_not_supported">Формат изображения не поддерживыется</string>
+    <string name="images_hidden_in_overview">Если эта функция включена, изображения заметок будут скрыты из общего списка.</string>
+    <string name="images_hidden_in_overview_title">Скрыть изображения в общем списке</string>
     <string name="import_action">Импорт</string>
     <string name="import_backup">Импорт резервной копии</string>
     <string name="import_backup_password_hint">Если резервная копия не защищена паролем, нажмите \"Импорт\". В противном случае введите пароль.</string>

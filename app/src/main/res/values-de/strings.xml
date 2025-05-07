@@ -159,6 +159,8 @@
     <string name="help">Hilfe</string>
     <string name="hours">Stunden</string>
     <string name="image_format_not_supported">Bildformat nicht unterstützt</string>
+    <string name="images_hidden_in_overview">Ist dies aktiviert, werden die Bilder der Notizen in der Übersicht ausgeblendet</string>
+    <string name="images_hidden_in_overview_title">Verberge Bilder in Übersicht</string>
     <string name="import_action">Import</string>
     <string name="import_backup">Backup importieren</string>
     <string name="import_backup_password_hint">Falls das Backup nicht passwortgeschützt ist, drücken Sie einfach auf Importieren, andernfalls geben Sie das richtige Passwort ein.</string>
