@@ -70,7 +70,7 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
                     )
             }
             if (oldTheme != null) {
-                WidgetProvider.updateWidgets(this)
+                WidgetProvider.updateWidgets(this, locked = locked.value)
             }
         }
 

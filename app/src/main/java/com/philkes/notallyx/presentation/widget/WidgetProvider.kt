@@ -11,6 +11,7 @@ import android.net.Uri
 import android.os.Build
 import android.widget.RemoteViews
 import androidx.core.content.ContextCompat
+import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.dao.BaseNoteDao
@@ -42,9 +43,10 @@ class WidgetProvider : AppWidgetProvider() {
         super.onReceive(context, intent)
         when (intent.action) {
             ACTION_NOTES_MODIFIED -> {
+                val app = context.applicationContext as NotallyXApplication
                 val noteIds = intent.getLongArrayExtra(EXTRA_MODIFIED_NOTES)
                 if (noteIds != null) {
-                    updateWidgets(context, noteIds)
+                    updateWidgets(context, noteIds, locked = app.locked.value)
                 }
             }
             ACTION_OPEN_NOTE -> openActivity(context, intent, EditNoteActivity::class.java)
@@ -85,7 +87,8 @@ class WidgetProvider : AppWidgetProvider() {
                         baseNoteDao.updateChecked(noteId, childrenPositions + position, checked!!)
                     }
                 } finally {
-                    updateWidgets(context, longArrayOf(noteId))
+                    val app = context.applicationContext as NotallyXApplication
+                    updateWidgets(context, longArrayOf(noteId), locked = app.locked.value)
                     pendingResult.finish()
                 }
             }
@@ -135,19 +138,19 @@ class WidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray,
     ) {
-        val app = context.applicationContext as Application
+        val app = context.applicationContext as NotallyXApplication
         val preferences = NotallyXPreferences.getInstance(app)
 
         appWidgetIds.forEach { id ->
             val noteId = preferences.getWidgetData(id)
             val noteType = preferences.getWidgetNoteType(id) ?: return
-            updateWidget(app, appWidgetManager, id, noteId, noteType)
+            updateWidget(app, appWidgetManager, id, noteId, noteType, locked = app.locked.value)
         }
     }
 
     companion object {
 
-        fun updateWidgets(context: Context, noteIds: LongArray? = null, locked: Boolean = false) {
+        fun updateWidgets(context: Context, noteIds: LongArray? = null, locked: Boolean) {
             val app = context.applicationContext as Application
             val preferences = NotallyXPreferences.getInstance(app)
 
