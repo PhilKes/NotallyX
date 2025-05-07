@@ -161,6 +161,8 @@
     <string name="help">Help</string>
     <string name="hours">Hours</string>
     <string name="image_format_not_supported">Image format not supported</string>
+    <string name="images_hidden_in_overview">By enabling this, the notes’ images will be hidden in the overview</string>
+    <string name="images_hidden_in_overview_title">Hide Images in Overview</string>
     <string name="import_action">Import</string>
     <string name="import_backup">Import backup</string>
     <string name="import_backup_password_hint">If your backup is not password-protected simply press Import, otherwise enter the correct password.</string>

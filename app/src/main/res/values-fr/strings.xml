@@ -159,6 +159,8 @@
     <string name="help">Aide</string>
     <string name="hours">Heures</string>
     <string name="image_format_not_supported">Format d\'image non supporté</string>
+    <string name="images_hidden_in_overview">En activant cette option, les images des notes seront masquées dans l\'aperçu</string>
+    <string name="images_hidden_in_overview_title">Masquer les images dans la vue d\'ensemble</string>
     <string name="import_action">Importer</string>
     <string name="import_backup">Importer une sauvegarde</string>
     <string name="import_backup_password_hint">Si votre sauvegarde n\'est pas protégée par mot de passe, cliquez seulement sur \"Importer une sauvegarde\", sinon entrez le mot de passe correspondant.</string>

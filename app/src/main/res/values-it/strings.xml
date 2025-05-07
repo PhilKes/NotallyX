@@ -153,6 +153,8 @@
     <string name="help">Aiuto</string>
     <string name="hours">Ore</string>
     <string name="image_format_not_supported">Formato immagine non supportato</string>
+    <string name="images_hidden_in_overview">Abilitando questa opzione le immagini delle note verranno nascoste nella panoramica.</string>
+    <string name="images_hidden_in_overview_title">Nascondi immagini nella panoramica</string>
     <string name="import_action">Importa</string>
     <string name="import_backup">Importa backup</string>
     <string name="import_backup_password_hint">Se il tuo backup non è protetto da password premi semplicemente Importa, altrimenti inserisci la password corretta.</string>

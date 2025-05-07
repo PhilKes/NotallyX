@@ -159,6 +159,8 @@
     <string name="help">Ayuda</string>
     <string name="hours">Horas</string>
     <string name="image_format_not_supported">Formato de imagen no soportado</string>
+    <string name="images_hidden_in_overview">Al habilitar esta opción, se ocultarán las imágenes de notas de la descripción general.</string>
+    <string name="images_hidden_in_overview_title">Ocultar imágenes en vista general</string>
     <string name="import_action">Importar</string>
     <string name="import_backup">Importar copia de seguridad</string>
     <string name="import_backup_password_hint">Si su copia de seguridad no está protegida con contraseña, simplemente presione Importar, de lo contrario ingrese la contraseña correcta.</string>

@@ -134,6 +134,8 @@
     <string name="help">幫助</string>
     <string name="hours">小時</string>
     <string name="image_format_not_supported">不支持的圖片格式</string>
+    <string name="images_hidden_in_overview">啟用此功能後，筆記的圖像將隱藏在概覽中。</string>
+    <string name="images_hidden_in_overview_title">在概覽中隱藏圖片</string>
     <string name="import_action">匯入</string>
     <string name="import_backup">匯入備份</string>
     <string name="import_backup_password_hint">如果您的備份沒有密碼保護，只需按匯入，否則請輸入正確的密碼。</string>

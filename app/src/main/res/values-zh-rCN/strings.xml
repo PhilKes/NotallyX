@@ -158,6 +158,8 @@
     <string name="help">帮助</string>
     <string name="hours">小时</string>
     <string name="image_format_not_supported">不支持该图片格式</string>
+    <string name="images_hidden_in_overview">如果启用此选项，则注释的图像将不会显示在概览中。</string>
+    <string name="images_hidden_in_overview_title">在概览中隐藏图片</string>
     <string name="import_action">导入</string>
     <string name="import_backup">导入备份</string>
     <string name="import_backup_password_hint">如果你的备份文件没有密码保护，只需按下“导入”即可。如有，起输入正确的密码</string>

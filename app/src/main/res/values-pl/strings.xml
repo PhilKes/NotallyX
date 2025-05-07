@@ -166,6 +166,8 @@
     <string name="help">Pomoc</string>
     <string name="hours">Godzin</string>
     <string name="image_format_not_supported">Format obrazu nie jest obsługiwany</string>
+    <string name="images_hidden_in_overview">Po włączeniu tej opcji obrazy notatek będą ukryte w przeglądzie</string>
+    <string name="images_hidden_in_overview_title">Ukryj obrazy w przeglądzie</string>
     <string name="import_action">Przywracanie</string>
     <string name="import_backup">Przywróć kopię zapasową</string>
     <string name="import_backup_password_hint">Jeśli kopia zapasowa nie jest chroniona hasłem, po prostu naciśnij Importuj, w przeciwnym razie wprowadź prawidłowe hasło.</string>
