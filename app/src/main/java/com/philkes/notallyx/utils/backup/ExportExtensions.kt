@@ -517,13 +517,14 @@ fun exportPdfFile(
     total: Int? = null,
     duplicateFileCount: Int = 1,
 ) {
-    val filePath = "$fileName.${ExportMimeType.PDF.fileExtension}"
+    val validFileName = fileName.ifBlank { app.getString(R.string.note) }
+    val filePath = "$validFileName.${ExportMimeType.PDF.fileExtension}"
     if (folder.findFile(filePath)?.exists() == true) {
         return exportPdfFile(
             app,
             note,
             folder,
-            "${fileName.removeTrailingParentheses()} ($duplicateFileCount)",
+            "${validFileName.removeTrailingParentheses()} ($duplicateFileCount)",
             pdfPrintListener,
             progress,
             counter,
