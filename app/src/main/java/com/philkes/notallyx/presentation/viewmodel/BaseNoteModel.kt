@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
@@ -336,7 +335,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun importZipBackup(uri: Uri, password: String) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             app.log(TAG, throwable = throwable)
-            app.showToast(R.string.invalid_backup)
+            app.showToast("${app.getString(R.string.invalid_backup)}: ${throwable.message}")
         }
 
         val backupDir = app.getBackupDir()
@@ -348,7 +347,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     fun importXmlBackup(uri: Uri) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             app.log(TAG, throwable = throwable)
-            app.showToast(R.string.invalid_backup)
+            app.showToast("${app.getString(R.string.invalid_backup)}: ${throwable.message}")
         }
 
         viewModelScope.launch(exceptionHandler) {
@@ -366,18 +365,15 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun importFromOtherApp(uri: Uri, importSource: ImportSource) {
         val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
-
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-            Toast.makeText(
-                    app,
-                    if (throwable is ImportException) {
-                        throwable.textResId
-                    } else R.string.invalid_backup,
-                    Toast.LENGTH_LONG,
-                )
-                .show()
             app.log(TAG, throwable = throwable)
+            if (throwable is ImportException) {
+                app.showToast(throwable.textResId)
+            } else {
+                app.showToast("${app.getString(R.string.invalid_backup)}: ${throwable.message}")
+            }
         }
+
         viewModelScope.launch(exceptionHandler) {
             val importedNotes =
                 withContext(Dispatchers.IO) {
