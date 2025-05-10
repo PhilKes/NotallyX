@@ -89,7 +89,7 @@ import net.lingala.zip4j.model.enums.EncryptionMethod
 private const val TAG = "ExportExtensions"
 private const val NOTIFICATION_CHANNEL_ID = "AutoBackups"
 private const val NOTIFICATION_ID = 123412
-private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs"
+private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs.txt"
 private const val OUTPUT_DATA_BACKUP_URI = "backupUri"
 
 const val AUTO_BACKUP_WORK_NAME = "com.philkes.notallyx.AutoBackupWork"
