@@ -45,7 +45,6 @@ import java.io.OutputStreamWriter
 import java.io.PrintWriter
 import java.lang.UnsupportedOperationException
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -156,8 +155,7 @@ fun ContextWrapper.log(
 fun ContextWrapper.getLastExceptionLog(): String? {
     val logFile = getLogFile()
     if (logFile.exists()) {
-        val logContents = logFile.readText().substringAfterLast("[Start]")
-        return URLEncoder.encode(logContents, StandardCharsets.UTF_8.toString())
+        return logFile.readText().substringAfterLast("[Start]")
     }
     return null
 }
@@ -185,12 +183,12 @@ fun Context.logToFile(
     stackTrace?.let { Log.e(tag, "Exception occurred: $it") }
 
     val logFile =
-        folder.findFile("$fileName.txt").let {
+        folder.findFile(fileName).let {
             if (it == null || !it.exists()) {
-                folder.createFile("text/plain", fileName)
+                folder.createFile("text/plain", fileName.removeSuffix(".txt"))
             } else if (it.isLargerThanKb(MAX_LOGS_FILE_SIZE_KB)) {
                 it.delete()
-                folder.createFile("text/plain", fileName)
+                folder.createFile("text/plain", fileName.removeSuffix(".txt"))
             } else it
         }
 

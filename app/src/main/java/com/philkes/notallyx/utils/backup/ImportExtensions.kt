@@ -177,14 +177,11 @@ suspend fun ContextWrapper.importZip(
         showToast(message)
     } catch (e: ZipException) {
         if (e.type == ZipException.Type.WRONG_PASSWORD) {
+            log(TAG, throwable = e)
             showToast(R.string.wrong_password)
         } else {
-            log(TAG, throwable = e)
-            showToast(R.string.invalid_backup)
+            throw e
         }
-    } catch (e: Exception) {
-        showToast(R.string.invalid_backup)
-        log(TAG, throwable = e)
     } finally {
         importingBackup?.value = ImportProgress(inProgress = false)
     }

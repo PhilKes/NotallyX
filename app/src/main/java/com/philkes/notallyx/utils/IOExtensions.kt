@@ -149,7 +149,7 @@ fun Context.getExportedPath() = getEmptyFolder("exported")
 
 fun ContextWrapper.getLogsDir() = File(filesDir, "logs").also { it.mkdir() }
 
-const val APP_LOG_FILE_NAME = "Log.v1.txt"
+const val APP_LOG_FILE_NAME = "notallyx-logs.txt"
 
 fun ContextWrapper.getLogFile(): File {
     return File(getLogsDir(), APP_LOG_FILE_NAME)
