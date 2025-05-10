@@ -37,8 +37,8 @@ fun decryptDatabase(context: ContextWrapper, passphrase: ByteArray) {
 fun decryptDatabase(
     context: Context,
     passphrase: ByteArray,
-    decryptedFile: File,
     databaseFile: File,
+    decryptedFile: File,
 ) {
     val state = SQLCipherUtils.getDatabaseState(databaseFile)
     if (state == SQLCipherUtils.State.ENCRYPTED) {
