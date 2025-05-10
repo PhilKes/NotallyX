@@ -28,6 +28,7 @@ import com.philkes.notallyx.data.model.parseToColorString
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.viewmodel.NotallyModel.FileType
+import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.SUBFOLDER_FILES
@@ -44,6 +45,8 @@ import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.mimeTypeToFileExtension
 import com.philkes.notallyx.utils.rename
 import com.philkes.notallyx.utils.scheduleNoteReminders
+import com.philkes.notallyx.utils.security.SQLCipherUtils
+import com.philkes.notallyx.utils.security.decryptDatabase
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -86,12 +89,31 @@ suspend fun ContextWrapper.importZip(
                     NotallyDatabase.DATABASE_NAME,
                 )
 
+                var dbFile = File(databaseFolder, NotallyDatabase.DATABASE_NAME)
+                val state = SQLCipherUtils.getDatabaseState(dbFile)
+                if (state == SQLCipherUtils.State.ENCRYPTED) {
+                    val fallbackEncryptionKey =
+                        NotallyXPreferences.getInstance(this@importZip)
+                            .fallbackDatabaseEncryptionKey
+                            .value
+                    if (fallbackEncryptionKey != null) {
+                        val dbFileDecrypted =
+                            File(databaseFolder, "${NotallyDatabase.DATABASE_NAME}-decrypted")
+                        decryptDatabase(
+                            this@importZip,
+                            fallbackEncryptionKey,
+                            dbFile,
+                            dbFileDecrypted,
+                        )
+                        dbFile = dbFileDecrypted
+                    } else {
+                        throw IllegalArgumentException(
+                            "Backup contains encrypted database and 'fallbackDatabaseEncryptionKey' has no value!"
+                        )
+                    }
+                }
                 val database =
-                    SQLiteDatabase.openDatabase(
-                        File(databaseFolder, NotallyDatabase.DATABASE_NAME).path,
-                        null,
-                        SQLiteDatabase.OPEN_READONLY,
-                    )
+                    SQLiteDatabase.openDatabase(dbFile.path, null, SQLiteDatabase.OPEN_READONLY)
 
                 val labelCursor = database.query("Label", null, null, null, null, null, null)
                 val baseNoteCursor = database.query("BaseNote", null, null, null, null, null, null)

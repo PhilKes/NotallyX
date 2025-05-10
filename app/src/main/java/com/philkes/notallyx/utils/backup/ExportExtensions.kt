@@ -174,7 +174,7 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
             backupFile = folder.createFile(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE)
             exportAsZip(backupFile!!.uri, password = password)
         } else {
-            NotallyDatabase.getDatabase(this, observePreferences = false).value.checkpoint()
+            val (_, file) = copyDatabase()
             val files =
                 with(savedNote) {
                     images.map {
@@ -192,10 +192,7 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
                         audios.map {
                             BackupFile(SUBFOLDER_AUDIOS, File(getExternalAudioDirectory(), it.name))
                         } +
-                        BackupFile(
-                            null,
-                            NotallyDatabase.getCurrentDatabaseFile(this@autoBackupOnSave),
-                        )
+                        BackupFile(null, file)
                 }
             try {
                 exportToZip(backupFile.uri, files, password)
@@ -417,7 +414,7 @@ fun ContextWrapper.copyDatabase(): Pair<NotallyDatabase, File> {
         val cipher = getInitializedCipherForDecryption(iv = preferences.iv.value!!)
         val passphrase = cipher.doFinal(preferences.databaseEncryptionKey.value)
         val decryptedFile = File(cacheDir, DATABASE_NAME)
-        decryptDatabase(this, passphrase, decryptedFile, databaseFile)
+        decryptDatabase(this, passphrase, databaseFile, decryptedFile)
         Pair(database, decryptedFile)
     } else {
         val dbFile = File(cacheDir, DATABASE_NAME)
