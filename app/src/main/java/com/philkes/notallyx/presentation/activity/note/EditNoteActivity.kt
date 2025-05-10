@@ -40,6 +40,7 @@ import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companio
 import com.philkes.notallyx.presentation.activity.note.PickNoteActivity.Companion.EXTRA_PICKED_NOTE_TYPE
 import com.philkes.notallyx.presentation.add
 import com.philkes.notallyx.presentation.addIconButton
+import com.philkes.notallyx.presentation.createBoldSpan
 import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.hideKeyboard
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
@@ -212,7 +213,7 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
                                     0,
                                     showAsAction = MenuItem.SHOW_AS_ACTION_NEVER,
                                 ) {
-                                    binding.EnterBody.applySpan(StyleSpan(Typeface.BOLD))
+                                    binding.EnterBody.applySpan(createBoldSpan())
                                     mode?.finish()
                                 }
                                 add(

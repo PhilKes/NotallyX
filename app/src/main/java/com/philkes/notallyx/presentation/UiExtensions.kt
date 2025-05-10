@@ -122,7 +122,7 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
         ->
         try {
             if (bold) {
-                editable.setSpan(StyleSpan(Typeface.BOLD), start, end)
+                editable.setSpan(createBoldSpan(), start, end)
             }
             if (italic) {
                 editable.setSpan(StyleSpan(Typeface.ITALIC), start, end)
@@ -143,6 +143,13 @@ fun String.applySpans(representations: List<SpanRepresentation>): Editable {
     }
     return editable
 }
+
+fun createBoldSpan() =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        StyleSpan(Typeface.BOLD, 700)
+    } else {
+        StyleSpan(Typeface.BOLD)
+    }
 
 /**
  * Adjusts or removes spans based on the selection range.

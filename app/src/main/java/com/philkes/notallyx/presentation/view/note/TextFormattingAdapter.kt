@@ -8,6 +8,7 @@ import android.text.style.TypefaceSpan
 import android.text.style.URLSpan
 import androidx.annotation.ColorInt
 import com.philkes.notallyx.R
+import com.philkes.notallyx.presentation.createBoldSpan
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
 
 class TextFormattingAdapter(
@@ -35,7 +36,7 @@ class TextFormattingAdapter(
     private val bold: Toggle =
         Toggle(R.string.bold, R.drawable.format_bold, false) {
             if (!it.checked) {
-                editText.applySpan(StyleSpan(Typeface.BOLD))
+                editText.applySpan(createBoldSpan())
             } else {
                 editText.clearFormatting(type = StylableEditTextWithHistory.TextStyleType.BOLD)
             }
