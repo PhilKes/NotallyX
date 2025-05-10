@@ -80,7 +80,7 @@ private fun Context.createReminderAlarmIntent(noteId: Long, reminderId: Long): P
     intent.putExtra(ReminderReceiver.EXTRA_NOTE_ID, noteId)
     return PendingIntent.getBroadcast(
         this,
-        0,
+        (noteId.toString() + reminderId.toString()).toInt(),
         intent,
         PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE,
     )
