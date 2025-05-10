@@ -184,65 +184,90 @@ class WidgetProvider : AppWidgetProvider() {
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, id)
             intent.embedIntentExtras()
 
-            if (!locked) {
+            MainScope().launch {
                 val database = NotallyDatabase.getDatabase(context).value
-                MainScope().launch {
-                    withContext(Dispatchers.IO) {
-                        val color = database.getBaseNoteDao().getColorOfNote(noteId)
-                        val preferences = NotallyXPreferences.getInstance(context)
-                        val (backgroundColor, _) = context.extractWidgetColors(color, preferences)
-                        val view =
-                            RemoteViews(context.packageName, R.layout.widget).apply {
-                                setRemoteAdapter(R.id.ListView, intent)
-                                setEmptyView(R.id.ListView, R.id.Empty)
-                                setOnClickPendingIntent(
-                                    R.id.Empty,
-                                    Intent(context, WidgetProvider::class.java)
-                                        .apply {
-                                            action = ACTION_SELECT_NOTE
-                                            data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
-                                        }
-                                        .asPendingIntent(context),
-                                )
-                                setPendingIntentTemplate(
-                                    R.id.ListView,
-                                    Intent(context, WidgetProvider::class.java)
-                                        .asPendingIntent(context),
-                                )
-
-                                noteType?.let {
-                                    setOnClickPendingIntent(
-                                        R.id.Layout,
-                                        Intent(context, WidgetProvider::class.java)
-                                            .setOpenNoteIntent(noteType, noteId)
-                                            .asPendingIntent(context),
-                                    )
-                                }
-
-                                setInt(R.id.Layout, "setBackgroundColor", backgroundColor)
-                            }
-                        manager.updateAppWidget(id, view)
-                        manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
-                    }
-                }
-            } else {
-                val view =
-                    RemoteViews(context.packageName, R.layout.widget_locked).apply {
-                        noteType?.let {
-                            val lockedPendingIntent =
-                                context.getOpenNotePendingIntent(noteId, noteType)
-                            setOnClickPendingIntent(R.id.Layout, lockedPendingIntent)
-                            setOnClickPendingIntent(R.id.Text, lockedPendingIntent)
+                val color =
+                    withContext(Dispatchers.IO) { database.getBaseNoteDao().getColorOfNote(noteId) }
+                if (color == null) {
+                    val app = context.applicationContext as Application
+                    val preferences = NotallyXPreferences.getInstance(app)
+                    preferences.deleteWidget(id)
+                    val view =
+                        RemoteViews(context.packageName, R.layout.widget).apply {
+                            setRemoteAdapter(R.id.ListView, intent)
+                            setEmptyView(R.id.ListView, R.id.Empty)
+                            setOnClickPendingIntent(
+                                R.id.Empty,
+                                Intent(context, WidgetProvider::class.java)
+                                    .apply {
+                                        action = ACTION_SELECT_NOTE
+                                        data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                                    }
+                                    .asPendingIntent(context),
+                            )
+                            setPendingIntentTemplate(
+                                R.id.ListView,
+                                Intent(context, WidgetProvider::class.java).asPendingIntent(context),
+                            )
                         }
-                        setTextViewCompoundDrawablesRelative(
-                            R.id.Text,
-                            0,
-                            R.drawable.lock_big,
-                            0,
-                            0,
-                        )
-                    }
-                manager.updateAppWidget(id, view)
+
+                    manager.updateAppWidget(id, view)
+                    manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
+                    return@launch
+                }
+                if (!locked) {
+                    val view =
+                        RemoteViews(context.packageName, R.layout.widget).apply {
+                            setRemoteAdapter(R.id.ListView, intent)
+                            setEmptyView(R.id.ListView, R.id.Empty)
+                            setOnClickPendingIntent(
+                                R.id.Empty,
+                                Intent(context, WidgetProvider::class.java)
+                                    .apply {
+                                        action = ACTION_SELECT_NOTE
+                                        data = Uri.parse(toUri(Intent.URI_INTENT_SCHEME))
+                                    }
+                                    .asPendingIntent(context),
+                            )
+                            setPendingIntentTemplate(
+                                R.id.ListView,
+                                Intent(context, WidgetProvider::class.java).asPendingIntent(context),
+                            )
+
+                            val preferences = NotallyXPreferences.getInstance(context)
+                            val (backgroundColor, _) =
+                                context.extractWidgetColors(color, preferences)
+                            noteType?.let {
+                                setOnClickPendingIntent(
+                                    R.id.Layout,
+                                    Intent(context, WidgetProvider::class.java)
+                                        .setOpenNoteIntent(noteType, noteId)
+                                        .asPendingIntent(context),
+                                )
+                            }
+                            setInt(R.id.Layout, "setBackgroundColor", backgroundColor)
+                        }
+                    manager.updateAppWidget(id, view)
+                    manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
+                } else {
+                    val view =
+                        RemoteViews(context.packageName, R.layout.widget_locked).apply {
+                            noteType?.let {
+                                val lockedPendingIntent =
+                                    context.getOpenNotePendingIntent(noteId, noteType)
+                                setOnClickPendingIntent(R.id.Layout, lockedPendingIntent)
+                                setOnClickPendingIntent(R.id.Text, lockedPendingIntent)
+                            }
+                            setTextViewCompoundDrawablesRelative(
+                                R.id.Text,
+                                0,
+                                R.drawable.lock_big,
+                                0,
+                                0,
+                            )
+                        }
+                    manager.updateAppWidget(id, view)
+                }
             }
         }
 
