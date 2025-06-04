@@ -633,6 +633,7 @@ abstract class EditActivity(private val type: Type) :
         }
 
     private fun convertTo(type: Type) {
+        updateModel()
         lifecycleScope.launch {
             notallyModel.convertTo(type)
             val intent =
