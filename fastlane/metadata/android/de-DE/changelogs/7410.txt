@@ -1,0 +1,17 @@
+- Intent-Filter zum Öffnen beliebiger Textdateien hinzufügen
+
+- Bilder in der Übersicht ausblenden
+
+- In Textnotiz umwandeln führt zur älteren Version zurück
+
+- Erinnerungen senden keine Benachrichtigungen
+
+- Automatische Sicherungsdatei ist verschlüsselt, wenn biometrische Sperre aktiviert ist
+
+- Fix App Absturz wenn der Suchfilter geändert wird
+
+- Hintergrund der Notiz flackert beim Laden, wenn Biometrie aktiviert ist
+
+- Fehler bei gesperrtem Widget
+
+- Doppelte Backup-Protokolldateien

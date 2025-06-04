@@ -1,5 +1,59 @@
 # Changelog
 
+## [v7.4.1](https://github.com/PhilKes/NotallyX/tree/v7.4.1) (2025-06-04)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.4.0...v7.4.1)
+
+### Added Features
+
+- Add intent-filter for opening any text format file [\#574](https://github.com/PhilKes/NotallyX/issues/574)
+- Hide images in Overview [\#228](https://github.com/PhilKes/NotallyX/issues/228)
+
+### Fixed Bugs
+
+- 'Convert to Text Note' reverts to older version [\#603](https://github.com/PhilKes/NotallyX/issues/603)
+- Reminders not sending notifications [\#584](https://github.com/PhilKes/NotallyX/issues/584)
+- Not PDF export [\#582](https://github.com/PhilKes/NotallyX/issues/582)
+- Auto-backup database file is encrypted if biometric lock is enabled [\#581](https://github.com/PhilKes/NotallyX/issues/581)
+- App crash when note is selected, search filter changed and another note is selected [\#570](https://github.com/PhilKes/NotallyX/issues/570)
+- App crashes when editing checked ListItem text [\#569](https://github.com/PhilKes/NotallyX/issues/569)
+- Note background flash when loading if biometrics enabled [\#562](https://github.com/PhilKes/NotallyX/issues/562)
+- Locked widget bug [\#558](https://github.com/PhilKes/NotallyX/issues/558)
+- Duplicate backup log files [\#557](https://github.com/PhilKes/NotallyX/issues/557)
+- Bold font unrecognizable [\#540](https://github.com/PhilKes/NotallyX/issues/540)
+
+**Closed issues:**
+
+- NotallyX has crashed unrecoverably [\#598](https://github.com/PhilKes/NotallyX/issues/598)
+- Help! [\#596](https://github.com/PhilKes/NotallyX/issues/596)
+
+## [v7.4.1](https://github.com/PhilKes/NotallyX/tree/v7.4.1) (2025-06-04)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.4.0...v7.4.1)
+
+### Added Features
+
+- Add intent-filter for opening any text format file [\#574](https://github.com/PhilKes/NotallyX/issues/574)
+- Hide images in Overview [\#228](https://github.com/PhilKes/NotallyX/issues/228)
+
+### Fixed Bugs
+
+- 'Convert to Text Note' reverts to older version [\#603](https://github.com/PhilKes/NotallyX/issues/603)
+- Reminders not sending notifications [\#584](https://github.com/PhilKes/NotallyX/issues/584)
+- Not PDF export [\#582](https://github.com/PhilKes/NotallyX/issues/582)
+- Auto-backup database file is encrypted if biometric lock is enabled [\#581](https://github.com/PhilKes/NotallyX/issues/581)
+- App crash when note is selected, search filter changed and another note is selected [\#570](https://github.com/PhilKes/NotallyX/issues/570)
+- App crashes when editing checked ListItem text [\#569](https://github.com/PhilKes/NotallyX/issues/569)
+- Note background flash when loading if biometrics enabled [\#562](https://github.com/PhilKes/NotallyX/issues/562)
+- Locked widget bug [\#558](https://github.com/PhilKes/NotallyX/issues/558)
+- Duplicate backup log files [\#557](https://github.com/PhilKes/NotallyX/issues/557)
+- Bold font unrecognizable [\#540](https://github.com/PhilKes/NotallyX/issues/540)
+
+**Closed issues:**
+
+- NotallyX has crashed unrecoverably [\#598](https://github.com/PhilKes/NotallyX/issues/598)
+- Help! [\#596](https://github.com/PhilKes/NotallyX/issues/596)
+
 ## [v7.4.0](https://github.com/PhilKes/NotallyX/tree/v7.4.0) (2025-04-18)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.3.1...v7.4.0)

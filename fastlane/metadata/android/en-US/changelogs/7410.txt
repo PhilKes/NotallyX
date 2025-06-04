@@ -1,0 +1,19 @@
+- Add intent-filter for opening any text format file
+
+- Hide images in Overview
+
+- Convert to Text Note reverts to older version
+
+- Reminders not sending notifications
+
+- Auto-backup database file is encrypted if biometric lock is enabled
+
+- Fix App crash when changing search filter
+
+- Note background flash when loading if biometrics enabled
+
+- Locked widget bug
+
+- Duplicate backup log files
+
+- Bold font unrecognizable
