@@ -5,6 +5,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.Editable
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.RadioButton
 import android.widget.TimePicker
@@ -12,6 +13,9 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -50,6 +54,7 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>(), ReminderLi
         super.onCreate(savedInstanceState)
         binding = ActivityRemindersBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
         setupToolbar()
         setupRecyclerView()
 
@@ -70,6 +75,59 @@ class RemindersActivity : LockedActivity<ActivityRemindersBinding>(), ReminderLi
                     alsoCheckAlarmPermission = true,
                 ) {}
             }
+        }
+    }
+
+    /**
+     * Configures the activity for edge-to-edge display, handling status bar and navigation bar
+     * colors, and applying appropriate insets to layout elements.
+     */
+    private fun configureEdgeToEdgeInsets() {
+        // 1. Enable edge-to-edge display for the activity window.
+        // This makes the content draw behind the system bars (status bar and navigation bar).
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // 4. Apply window insets to specific views to prevent content from being obscured.
+
+        // Set an OnApplyWindowInsetsListener on the root layout.
+        // This listener will be called whenever the system insets change (e.g., status bar, nav
+        // bar, keyboard).
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            // Get the system bars insets (status bar and navigation bar).
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Get the IME (Input Method Editor - keyboard) insets.
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            // Adjust the top margin of the Toolbar to account for the status bar.
+            // This pushes the toolbar down so it's not hidden behind the status bar.
+            binding.Toolbar.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).topMargin = systemBarsInsets.top
+                requestLayout() // Request a layout pass to apply the new margin
+            }
+            // Apply padding to the RecyclerView and EmptyState TextView to account for
+            // the navigation bar and the software keyboard.
+            // This ensures that the content within these views is not obscured at the bottom.
+            // We use padding here because these views are below the toolbar and extend to
+            // match_parent height.
+            binding.MainListView.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    systemBarsInsets.bottom + imeInsets.bottom,
+                )
+            }
+            binding.EmptyState.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    systemBarsInsets.bottom + imeInsets.bottom,
+                )
+            }
+
+            // Return the insets to allow them to be dispatched to child views if necessary.
+            insets
         }
     }
 

@@ -2,6 +2,10 @@ package com.philkes.notallyx.presentation.activity.note
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -34,6 +38,7 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
         super.onCreate(savedInstanceState)
         binding = ActivityPickNoteBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
 
         val result = Intent()
         setResult(RESULT_CANCELED, result)
@@ -86,6 +91,45 @@ open class PickNoteActivity : LockedActivity<ActivityPickNoteBinding>(), ItemLis
                 binding.EmptyView.visibility =
                     if (notes.isEmpty()) android.view.View.VISIBLE else android.view.View.GONE
             }
+        }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        // 1. Enable edge-to-edge display for the activity window.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // 3. Apply window insets to specific views to prevent content from being obscured.
+        // Set an OnApplyWindowInsetsListener on the root layout.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            // Adjust the top margin of the Toolbar to account for the status bar.
+            binding.Toolbar.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).topMargin = systemBarsInsets.top
+                requestLayout()
+            }
+
+            // Apply padding to the RecyclerView and EmptyView to account for the navigation bar and
+            // keyboard.
+            // Preserve existing horizontal padding.
+            binding.MainListView.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    systemBarsInsets.bottom + imeInsets.bottom,
+                )
+            }
+            binding.EmptyView.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    systemBarsInsets.bottom + imeInsets.bottom,
+                )
+            }
+            insets
         }
     }
 

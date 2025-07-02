@@ -6,10 +6,14 @@ import android.content.ServiceConnection
 import android.net.Uri
 import android.os.Bundle
 import android.os.IBinder
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.IntentCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
@@ -17,7 +21,9 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.databinding.ActivityPlayAudioBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.setCancelButton
+import com.philkes.notallyx.presentation.view.note.audio.AudioControlView
 import com.philkes.notallyx.utils.audio.AudioPlayService
 import com.philkes.notallyx.utils.audio.LocalBinder
 import com.philkes.notallyx.utils.getExternalAudioDirectory
@@ -43,7 +49,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         super.onCreate(savedInstanceState)
         binding = ActivityPlayAudioBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
+        configureEdgeToEdgeInsets()
         audio =
             requireNotNull(
                 intent?.let { IntentCompat.getParcelableExtra(it, EXTRA_AUDIO, Audio::class.java) }
@@ -85,6 +91,68 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
                     result.data?.data?.let { uri -> writeAudioToUri(uri) }
                 }
             }
+    }
+
+    /**
+     * Configures the activity for edge-to-edge display, handling status bar and navigation bar
+     * colors, and applying appropriate insets to layout elements.
+     */
+    private fun configureEdgeToEdgeInsets() {
+        // 1. Enable edge-to-edge display for the activity window.
+        // This makes the content draw behind the system bars (status bar and navigation bar).
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // 4. Apply window insets to specific views to prevent content from being obscured.
+        // Set an OnApplyWindowInsetsListener on the root layout.
+        // This listener will be called whenever the system insets change (e.g., status bar, nav
+        // bar, keyboard).
+        ViewCompat.setOnApplyWindowInsetsListener(binding.rootLayout) { view, insets ->
+            // Get the system bars insets (status bar and navigation bar).
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            // Get the IME (Input Method Editor - keyboard) insets.
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            // Adjust the top margin of the Toolbar to account for the status bar.
+            // This pushes the toolbar down so it's not hidden behind the status bar.
+            binding.Toolbar.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).topMargin = systemBarsInsets.top
+                requestLayout() // Request a layout pass to apply the new margin
+            }
+
+            // Adjust the bottom margins of elements aligned to the bottom of the screen.
+            // This ensures they are pushed up above the navigation bar and the software keyboard.
+
+            // Convert original 32dp margins to pixels
+            val originalPlayButtonBottomMarginPx = 32.dp
+            val originalAudioControlViewBottomMarginPx = 32.dp
+
+            // Calculate the total bottom inset (navigation bar + keyboard)
+            val totalBottomInset = systemBarsInsets.bottom + imeInsets.bottom
+
+            // Apply adjusted bottom margin to the Play button
+            binding.Play.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).bottomMargin =
+                    originalPlayButtonBottomMarginPx + totalBottomInset
+                requestLayout() // Request a layout pass to apply the new margin
+            }
+
+            // AudioControlView is above Play button, its margin needs to consider Play button's new
+            // position
+            // Its own bottom margin is also increased by the totalBottomInset
+            binding.AudioControlView.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).bottomMargin =
+                    originalAudioControlViewBottomMarginPx + totalBottomInset
+                requestLayout() // Request a layout pass to apply the new margin
+            }
+
+            // The Error TextView will naturally adjust its height due to layout_above and
+            // layout_below
+            // its bottom will be correctly above AudioControlView, which is now inset-aware.
+            // No explicit padding for Error TextView needed here unless it's scrollable content.
+
+            // Return the insets to allow them to be dispatched to child views if necessary.
+            insets
+        }
     }
 
     override fun onDestroy() {

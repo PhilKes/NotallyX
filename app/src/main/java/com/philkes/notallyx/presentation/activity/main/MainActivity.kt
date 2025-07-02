@@ -8,10 +8,14 @@ import android.view.Menu.CATEGORY_CONTAINER
 import android.view.Menu.CATEGORY_SYSTEM
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.GravityCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.children
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.LifecycleOwner
@@ -38,6 +42,7 @@ import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
+import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.setCancelButton
@@ -84,6 +89,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setSupportActionBar(binding.Toolbar)
+        configureEdgeToEdgeInsets()
+
         setupFAB()
         setupMenu()
         setupActionMode()
@@ -117,6 +124,58 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             },
         )
         onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val navHostFragment = binding.NavHostFragment
+        ViewCompat.setOnApplyWindowInsetsListener(binding.RelativeLayout) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            // Apply padding to the main content views
+            // Top margin for the Toolbar to avoid being under the status bar
+            binding.Toolbar.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).topMargin = systemBarsInsets.top
+                requestLayout()
+            }
+
+            binding.ActionMode.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).topMargin = systemBarsInsets.top
+                requestLayout()
+            }
+
+            // Apply padding to the navigationview top header
+            binding.NavigationView.getHeaderView(0).apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).topMargin = systemBarsInsets.top
+                requestLayout()
+            }
+
+            // TakeNote FAB is at the very bottom
+            binding.TakeNote.apply {
+                val marginLayoutParams = layoutParams as ViewGroup.MarginLayoutParams
+                marginLayoutParams.bottomMargin = 16.dp + systemBarsInsets.bottom + imeInsets.bottom
+                marginLayoutParams.marginEnd = 16.dp
+                requestLayout()
+            }
+
+            // The ActionMode toolbar's position will naturally be below the Toolbar,
+            // so its top offset is handled by the Toolbar's adjustment.
+
+            // The main content (NavHostFragment) needs bottom padding to avoid
+            // being obscured by the system navigation bar and the keyboard.
+            // If NavHostFragment contains a ScrollView/RecyclerView, you might apply
+            // this padding to that scrollable view instead for better behavior.
+            navHostFragment.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    systemBarsInsets.bottom + imeInsets.bottom,
+                )
+            }
+            insets
+        }
     }
 
     private fun getStartViewNavigation(): Pair<Int, Bundle> {

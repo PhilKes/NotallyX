@@ -1,77 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.coordinatorlayout.widget.CoordinatorLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:layout_height="match_parent"
-  android:layout_width="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:id="@+id/coordinatorLayout"> <LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/main_content_layout"> <com.google.android.material.appbar.MaterialToolbar
+    android:id="@+id/Toolbar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:navigationIcon="?attr/homeAsUpIndicator">
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_marginBottom="45dp">
-
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/Toolbar"
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:navigationIcon="?attr/homeAsUpIndicator" >
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/EnterSearchKeyword"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:layout_weight="9"
+            android:hint="@string/search"
+            android:inputType="textFilter"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/SearchResults"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@null"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingEnd="10dp"
+            android:textIsSelectable="false"
+            android:textAppearance="?attr/textAppearanceBody1"
+            android:visibility="gone" />
+    </LinearLayout>
+
+</com.google.android.material.appbar.MaterialToolbar>
+
+    <me.zhanghai.android.fastscroll.FastScrollNestedScrollView
+        android:id="@+id/ScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:visibility="gone"
+        android:clipToPadding="false"
+        >
+
         <LinearLayout
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:orientation="horizontal">
-
-            <EditText
-              android:id="@+id/EnterSearchKeyword"
-              android:layout_width="0dp"
-              android:layout_height="wrap_content"
-              android:background="@null"
-              android:layout_weight="9"
-              android:hint="@string/search"
-              android:inputType="textFilter"
-              android:paddingTop="10dp"
-              android:paddingBottom="10dp"
-              android:textAppearance="?attr/textAppearanceBody1"
-              android:visibility="gone" />
-
-            <TextView
-              android:id="@+id/SearchResults"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:background="@null"
-              android:paddingTop="10dp"
-              android:paddingBottom="10dp"
-              android:paddingEnd="10dp"
-              android:textIsSelectable="false"
-              android:textAppearance="?attr/textAppearanceBody1"
-              android:visibility="gone" />
-        </LinearLayout>
-
-    </com.google.android.material.appbar.MaterialToolbar>
-
-        <me.zhanghai.android.fastscroll.FastScrollNestedScrollView
-            android:id="@+id/ScrollView"
+            android:id="@+id/ContentLayout"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true"
-            android:visibility="gone"
-            android:clipToPadding="false"
-          >
+            android:layout_height="wrap_content"
+            android:focusable="false"
+            android:focusableInTouchMode="false"
+            android:orientation="vertical"
+            android:paddingBottom="16dp">
 
-            <LinearLayout
-                android:id="@+id/ContentLayout"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/ImageLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:focusable="false"
-                android:focusableInTouchMode="false"
-                android:orientation="vertical"
-                android:paddingBottom="16dp">
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:id="@+id/ImageLayout"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <com.philkes.notallyx.presentation.view.misc.AspectRatioRecyclerView
                     android:id="@+id/ImagePreview"
@@ -80,192 +77,191 @@
                     app:layout_constraintTop_toTopOf="parent"
                     />
 
-                    <com.google.android.material.chip.Chip
-                        android:id="@+id/ImagePreviewPosition"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:clickable="false"
-                        android:stateListAnimator="@null"
-                        android:textAppearance="?attr/textAppearanceBodySmall"
-                        android:visibility="visible"
-                        app:chipIcon="@drawable/add_images"
-                        app:chipStartPadding="8dp"
-                        app:layout_constraintEnd_toEndOf="@id/ImagePreview"
-                        app:layout_constraintTop_toTopOf="@id/ImagePreview"
-                        app:textStartPadding="2dp"
-                        android:layout_marginEnd="8dp"
-                        android:layout_marginTop="8dp"
-                        />
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
-                    android:id="@+id/EnterTitle"
-                    android:layout_width="match_parent"
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/ImagePreviewPosition"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:hint="@string/title"
-                    android:imeOptions="actionNext"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:paddingStart="24dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="24dp"
-                    android:paddingBottom="8dp"
-                    android:textAppearance="?attr/textAppearanceHeadline6" />
-
-                <TextView
-                    android:id="@+id/Date"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="24dp"
-                    android:paddingTop="2dp"
-                    android:paddingEnd="24dp"
-                    android:paddingBottom="6dp"
-                    android:text="@string/date"
-                    android:textAppearance="?attr/textAppearanceBodyMedium"
-                    android:textColor="?android:textColorHint" />
-
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/FilesPreview"
-                    android:paddingBottom="8dp"
-                    android:layout_marginStart="20dp"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:clickable="false"
+                    android:stateListAnimator="@null"
+                    android:textAppearance="?attr/textAppearanceBodySmall"
+                    android:visibility="visible"
+                    app:chipIcon="@drawable/add_images"
+                    app:chipStartPadding="8dp"
+                    app:layout_constraintEnd_toEndOf="@id/ImagePreview"
+                    app:layout_constraintTop_toTopOf="@id/ImagePreview"
+                    app:textStartPadding="2dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginTop="8dp"
                     />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="?android:attr/listDivider" />
+            <com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
+                android:id="@+id/EnterTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:hint="@string/title"
+                android:imeOptions="actionNext"
+                android:inputType="textMultiLine|textCapSentences"
+                android:paddingStart="24dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="8dp"
+                android:textAppearance="?attr/textAppearanceHeadline6" />
 
-                <com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
-                    android:id="@+id/EnterBody"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:background="@null"
-                    android:minHeight="48dp"
-                    android:hint="@string/note"
-                    android:inputType="textMultiLine|textCapSentences"
-                    android:paddingStart="24dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="24dp"
-                    android:textAppearance="?attr/textAppearanceBodyLarge" />
+            <TextView
+                android:id="@+id/Date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="24dp"
+                android:paddingTop="2dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="6dp"
+                android:text="@string/date"
+                android:textAppearance="?attr/textAppearanceBodyMedium"
+                android:textColor="?android:textColorHint" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/MainListView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:overScrollMode="never"
-                    android:paddingTop="4dp"
-                    android:paddingStart="8dp"
-                    android:paddingEnd="4dp"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                <TextView
-                    android:id="@+id/AddItem"
-                    style="@style/TextView.Clickable"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="12dp"
-                    android:gravity="center_vertical"
-                    android:paddingStart="20dp"
-                    android:paddingTop="12dp"
-                    android:paddingEnd="20dp"
-                    android:paddingBottom="12dp"
-                    android:text="@string/add_item"
-                    android:textAppearance="?attr/textAppearanceSubtitle2"
-                    android:textColor="?android:textColorHint"
-                    android:textIsSelectable="false"
-                    app:drawableStartCompat="@drawable/add" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/FilesPreview"
+                android:paddingBottom="8dp"
+                android:layout_marginStart="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                />
 
-                <androidx.recyclerview.widget.RecyclerView
-                  android:id="@+id/CheckedListView"
-                  android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:visibility="gone"
-                  android:clipToPadding="false"
-                  android:overScrollMode="never"
-                  android:paddingTop="4dp"
-                  android:paddingStart="8dp"
-                  android:paddingEnd="4dp"
-                  app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?android:attr/listDivider" />
 
-                <TextView
-                    android:id="@+id/AudioHeader"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="24dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="24dp"
-                    android:paddingBottom="12dp"
-                    android:text="@string/audio_recordings"
-                    android:textAppearance="?attr/textAppearanceSubtitle2" />
+            <com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
+                android:id="@+id/EnterBody"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@null"
+                android:minHeight="48dp"
+                android:hint="@string/note"
+                android:inputType="textMultiLine|textCapSentences"
+                android:paddingStart="24dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="24dp"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/AudioRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:overScrollMode="never"
-                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/MainListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingTop="4dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="4dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-                <com.google.android.material.chip.ChipGroup
-                    android:id="@+id/LabelGroup"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingStart="24dp"
-                    android:paddingTop="16dp"
-                    android:paddingEnd="24dp" />
+            <TextView
+                android:id="@+id/AddItem"
+                style="@style/TextView.Clickable"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:drawablePadding="12dp"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingTop="12dp"
+                android:paddingEnd="20dp"
+                android:paddingBottom="12dp"
+                android:text="@string/add_item"
+                android:textAppearance="?attr/textAppearanceSubtitle2"
+                android:textColor="?android:textColorHint"
+                android:textIsSelectable="false"
+                app:drawableStartCompat="@drawable/add" />
 
-            </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/CheckedListView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:clipToPadding="false"
+                android:overScrollMode="never"
+                android:paddingTop="4dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="4dp"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
 
-        </me.zhanghai.android.fastscroll.FastScrollNestedScrollView>
+            <TextView
+                android:id="@+id/AudioHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="24dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="24dp"
+                android:paddingBottom="12dp"
+                android:text="@string/audio_recordings"
+                android:textAppearance="?attr/textAppearanceSubtitle2" />
 
-    </LinearLayout>
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/AudioRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:overScrollMode="never"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/LabelGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="24dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="24dp" />
+
+        </LinearLayout>
+
+    </me.zhanghai.android.fastscroll.FastScrollNestedScrollView>
+
+</LinearLayout>
 
     <com.google.android.material.bottomappbar.BottomAppBar
-      android:id="@+id/BottomAppBarLayout"
-      android:layout_width="match_parent"
-      android:layout_height="45dp"
-      android:layout_gravity="bottom"
-      android:backgroundTint="?attr/colorSurface"
-      app:elevation="0dp"
-      >
+        android:id="@+id/BottomAppBarLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:layout_gravity="bottom"
+        android:backgroundTint="?attr/colorSurface"
+        app:elevation="0dp"
+        app:hideOnScroll="false"  >
         <androidx.constraintlayout.widget.ConstraintLayout
-          android:id="@+id/BottomAppBar"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent">
+            android:id="@+id/BottomAppBar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
             <LinearLayout
-              android:id="@+id/BottomAppBarLeft"
-              app:layout_constraintStart_toStartOf="parent"
-              app:layout_constraintTop_toTopOf="parent"
-              app:layout_constraintBottom_toBottomOf="parent"
-              android:layout_width="0dp"
-              android:layout_height="match_parent"
-              android:orientation="horizontal"
-              >
+                android:id="@+id/BottomAppBarLeft"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                >
             </LinearLayout>
             <LinearLayout
-              android:id="@+id/BottomAppBarCenter"
-              app:layout_constraintStart_toStartOf="parent"
-              app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintTop_toTopOf="parent"
-              app:layout_constraintBottom_toBottomOf="parent"
-              android:layout_width="wrap_content"
-              android:layout_height="match_parent"
-              android:orientation="horizontal"
-              android:gravity="center_horizontal"
-              >
+                android:id="@+id/BottomAppBarCenter"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal"
+                >
             </LinearLayout>
             <LinearLayout
-              android:id="@+id/BottomAppBarRight"
-              app:layout_constraintEnd_toEndOf="parent"
-              app:layout_constraintTop_toTopOf="parent"
-              app:layout_constraintBottom_toBottomOf="parent"
-              android:layout_width="wrap_content"
-              android:layout_height="match_parent"
-              android:orientation="horizontal"
-              >
+                android:id="@+id/BottomAppBarRight"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:orientation="horizontal"
+                >
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
 

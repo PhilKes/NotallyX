@@ -12,13 +12,13 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.res.Configuration
-import android.hardware.biometrics.BiometricManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.OpenableColumns
 import android.util.Log
 import android.webkit.MimeTypeMap
+import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -416,6 +416,21 @@ fun Uri.toReadablePath(): String {
     return path!!
         .replaceFirst("/tree/primary:", "Internal Storage/")
         .replaceFirst("/tree/.*:".toRegex(), "External Storage/")
+}
+
+val isBeforeVanillaIceCream
+    get() = Build.VERSION.SDK_INT <= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+
+/** Source: https://stackoverflow.com/a/79286411/9748566 */
+@Suppress("Deprecation")
+fun Activity.changeStatusAndNavigationBarColor(@ColorInt color: Int) {
+    window.statusBarColor = color
+    window.navigationBarColor = color
+    if (!isBeforeVanillaIceCream) {
+        window.decorView.setBackgroundColor(color)
+        window.insetsController?.hide(android.view.WindowInsets.Type.statusBars())
+        window.insetsController?.show(android.view.WindowInsets.Type.statusBars())
+    }
 }
 
 fun Activity.resetApplication() {

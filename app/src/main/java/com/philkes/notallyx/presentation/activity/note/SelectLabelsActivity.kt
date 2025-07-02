@@ -3,6 +3,10 @@ package com.philkes.notallyx.presentation.activity.note
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -25,6 +29,7 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
         super.onCreate(savedInstanceState)
         binding = ActivityLabelBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
 
         val savedList = savedInstanceState?.getStringArrayList(EXTRA_SELECTED_LABELS)
         val passedList = requireNotNull(intent.getStringArrayListExtra(EXTRA_SELECTED_LABELS))
@@ -36,6 +41,44 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
 
         setupToolbar()
         setupRecyclerView()
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        // 1. Enable edge-to-edge display for the activity window.
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        // 3. Apply window insets to specific views to prevent content from being obscured.
+        // Set an OnApplyWindowInsetsListener on the root layout.
+        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime())
+
+            // Adjust the top margin of the Toolbar to account for the status bar.
+            binding.Toolbar.apply {
+                (layoutParams as ViewGroup.MarginLayoutParams).topMargin = systemBarsInsets.top
+                requestLayout() // Request a layout pass to apply the new margin
+            }
+            // Apply padding to the RecyclerView and EmptyState TextView to account for the
+            // navigation bar and keyboard.
+            // Preserve existing padding.
+            binding.MainListView.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    systemBarsInsets.bottom + imeInsets.bottom,
+                )
+            }
+            binding.EmptyState.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    systemBarsInsets.bottom + imeInsets.bottom,
+                )
+            }
+            insets
+        }
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

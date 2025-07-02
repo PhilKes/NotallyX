@@ -29,6 +29,9 @@ import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.IntentCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.isVisible
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.lifecycleScope
@@ -86,6 +89,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.backup.exportNotes
+import com.philkes.notallyx.utils.changeStatusAndNavigationBarColor
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.getMimeType
 import com.philkes.notallyx.utils.getUriForFile
@@ -179,6 +183,7 @@ abstract class EditActivity(private val type: Type) :
         notallyModel.type = type
         initialiseBinding()
         setContentView(binding.root)
+        configureEdgeToEdgeInsets()
 
         initChangeHistory()
         lifecycleScope.launch {
@@ -223,6 +228,48 @@ abstract class EditActivity(private val type: Type) :
                 // Let the system handle the crash
                 DEFAULT_EXCEPTION_HANDLER?.uncaughtException(thread, throwable)
             }
+        }
+    }
+
+    private fun configureEdgeToEdgeInsets() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.mainContentLayout) { view, insets ->
+            val systemBarsInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val imeInsets = insets.getInsets(WindowInsetsCompat.Type.ime()) // For keyboard
+
+            // Apply top padding to your main content to push it below the status bar
+            // and bottom padding to push it above the navigation bar / keyboard / BottomAppBar
+            view.setPadding(
+                systemBarsInsets.left,
+                systemBarsInsets.top,
+                systemBarsInsets.right,
+                // Combine navigation bar inset with keyboard inset for bottom padding
+                // and ensure there's enough space for the BottomAppBar
+                systemBarsInsets.bottom + imeInsets.bottom,
+            )
+
+            // Let the BottomAppBar consume its own insets
+            // CoordinatorLayout usually handles this well with its children having specific
+            // behaviors.
+            // If the BottomAppBar isn't adapting, you might need a custom Behavior or ensure its
+            // height is consistent.
+            // A common approach is to set the bottom margin of your main content
+            // to the height of the BottomAppBar + the nav bar inset.
+            val navBarBottom = systemBarsInsets.bottom
+
+            // Option A: Set padding on the ScrollView inside main_content_layout
+            // This is often more effective for scrollable content.
+            binding.ScrollView.apply {
+                setPadding(
+                    paddingLeft,
+                    paddingTop,
+                    paddingRight,
+                    binding.BottomAppBarLayout.height +
+                        navBarBottom, // Space for BottomAppBar + nav bar
+                )
+            }
+            insets
         }
     }
 
@@ -1094,10 +1141,7 @@ abstract class EditActivity(private val type: Type) :
     protected open fun setColor() {
         colorInt = extractColor(notallyModel.color)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            window.statusBarColor = colorInt
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-                window.navigationBarColor = colorInt
-            }
+            changeStatusAndNavigationBarColor(colorInt)
             window.setLightStatusAndNavBar(colorInt.isLightColor())
         }
         binding.apply {

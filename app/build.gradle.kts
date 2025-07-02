@@ -15,12 +15,12 @@ plugins {
 
 android {
     namespace = "com.philkes.notallyx"
-    compileSdk = 34
+    compileSdk = 36
     ndkVersion = "29.0.13113456"
     defaultConfig {
         applicationId = "com.philkes.notallyx"
         minSdk = 21
-        targetSdk = 34
+        targetSdk = 36
         versionCode = project.findProperty("app.versionCode").toString().toInt()
         versionName = project.findProperty("app.versionName").toString()
         resourceConfigurations += listOf(
