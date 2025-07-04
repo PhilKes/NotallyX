@@ -1,5 +1,14 @@
 # Changelog
 
+## [v7.4.2](https://github.com/PhilKes/NotallyX/tree/v7.4.2) (2025-07-04)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.4.1...v7.4.2)
+
+### Fixed Bugs
+
+- App crash when deleting checked list elements [\#616](https://github.com/PhilKes/NotallyX/issues/616)
+- Export of notes as text or PDF not working [\#609](https://github.com/PhilKes/NotallyX/issues/609)
+
 ## [v7.4.1](https://github.com/PhilKes/NotallyX/tree/v7.4.1) (2025-06-04)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.4.0...v7.4.1)

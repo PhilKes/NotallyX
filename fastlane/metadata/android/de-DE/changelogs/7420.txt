@@ -1,0 +1,2 @@
+- Zielversion auf Android 15 migriert
+- Fix alle abgehakten Listenelemente löschen

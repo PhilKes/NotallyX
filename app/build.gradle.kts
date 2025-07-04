@@ -219,5 +219,5 @@ dependencies {
     testImplementation("org.json:json:20180813")
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
     testImplementation("org.mockito:mockito-core:5.13.0")
-    testImplementation("org.robolectric:robolectric:4.13")
+    testImplementation("org.robolectric:robolectric:4.15.1")
 }
