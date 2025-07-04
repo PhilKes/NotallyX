@@ -358,14 +358,16 @@ class ListManager(
         if (viewHolder != null) {
             if (viewHolder.binding.CheckBox.isChecked) {
                 moveFocusToNext(position + 1)
-            } else viewHolder.binding.EditText.requestFocus()
+            } else viewHolder.binding.EditText.apply { focusAndSelect(getTextClone().length, -1) }
         } else add(pushChange = false)
     }
 
     fun deleteCheckedItems(pushChange: Boolean = true) {
         endSearch?.invoke()
         val stateBefore = getState()
-        items.deleteCheckedItems().forEach { adapter.notifyItemRemoved(it) }
+        val itemsUpdated = items.cloneList()
+        itemsUpdated.deleteCheckedItems()
+        adapter.submitList(itemsUpdated)
         itemsChecked?.deleteCheckedItems()
         if (pushChange) {
             changeHistory.push(DeleteCheckedChange(stateBefore, getState(), this))
