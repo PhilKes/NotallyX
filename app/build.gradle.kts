@@ -200,7 +200,7 @@ dependencies {
     implementation("com.google.code.findbugs:jsr305:3.0.2")
     implementation("me.zhanghai.android.fastscroll:library:1.3.0")
     implementation("net.lingala.zip4j:zip4j:2.11.5")
-    implementation("net.zetetic:android-database-sqlcipher:4.5.3")
+    implementation("net.zetetic:sqlcipher-android:4.10.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
     implementation("org.jsoup:jsoup:1.18.1")
     implementation("org.ocpsoft.prettytime:prettytime:4.0.6.Final")

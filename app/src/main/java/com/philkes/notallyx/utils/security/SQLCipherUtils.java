@@ -19,12 +19,15 @@ package com.philkes.notallyx.utils.security;
 import android.content.Context;
 import android.text.Editable;
 
-import net.sqlcipher.database.SQLiteDatabase;
-import net.sqlcipher.database.SQLiteStatement;
+import net.zetetic.database.sqlcipher.SQLiteDatabase;
+import net.zetetic.database.sqlcipher.SQLiteStatement;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 
 public class SQLCipherUtils {
     /**
@@ -45,8 +48,7 @@ public class SQLCipherUtils {
      * @return the detected state of the database
      */
     public static State getDatabaseState(Context ctxt, String dbName) {
-        SQLiteDatabase.loadLibs(ctxt);
-
+        System.loadLibrary("sqlcipher");
         return (getDatabaseState(ctxt.getDatabasePath(dbName)));
     }
 
@@ -66,10 +68,8 @@ public class SQLCipherUtils {
             SQLiteDatabase db = null;
 
             try {
-                db =
-                        SQLiteDatabase.openDatabase(dbPath.getAbsolutePath(), "",
-                                null, SQLiteDatabase.OPEN_READONLY);
-
+                db = SQLiteDatabase.openDatabase(dbPath.getAbsolutePath(), "", null,
+                        SQLiteDatabase.OPEN_READONLY, null, null);
                 db.getVersion();
 
                 return (State.UNENCRYPTED);
@@ -128,7 +128,7 @@ public class SQLCipherUtils {
      */
     public static void encrypt(Context ctxt, String dbName, char[] passphrase)
             throws IOException {
-        encrypt(ctxt, ctxt.getDatabasePath(dbName), SQLiteDatabase.getBytes(passphrase));
+        encrypt(ctxt, ctxt.getDatabasePath(dbName), getBytes(passphrase));
     }
 
     /**
@@ -169,7 +169,7 @@ public class SQLCipherUtils {
      */
     public static void encrypt(Context ctxt, File originalFile, char[] passphrase)
             throws IOException {
-        encrypt(ctxt, originalFile, SQLiteDatabase.getBytes(passphrase));
+        encrypt(ctxt, originalFile, getBytes(passphrase));
     }
 
     /**
@@ -189,14 +189,14 @@ public class SQLCipherUtils {
      */
     public static void encrypt(Context ctxt, File originalFile, byte[] passphrase)
             throws IOException {
-        SQLiteDatabase.loadLibs(ctxt);
+        System.loadLibrary("sqlcipher");
 
         if (originalFile.exists()) {
             File newFile = File.createTempFile("sqlcipherutils", "tmp",
                     originalFile.getParentFile());
-            SQLiteDatabase db =
-                    SQLiteDatabase.openDatabase(originalFile.getAbsolutePath(),
-                            "", null, SQLiteDatabase.OPEN_READWRITE);
+            SQLiteDatabase db = SQLiteDatabase.openDatabase(originalFile.getAbsolutePath(), 
+                    "", null, SQLiteDatabase.OPEN_READWRITE, null, 
+                    null);
             int version = db.getVersion();
 
             db.close();
@@ -238,7 +238,7 @@ public class SQLCipherUtils {
      */
     public static void decrypt(Context ctxt, File originalFile, char[] passphrase)
             throws IOException {
-        decrypt(ctxt, originalFile, SQLiteDatabase.getBytes(passphrase));
+        decrypt(ctxt, originalFile, getBytes(passphrase));
     }
 
     public static void decrypt(Context ctxt, String dbName, byte[] passphrase) throws IOException {
@@ -278,7 +278,7 @@ public class SQLCipherUtils {
     }
 
     public static void decrypt(Context ctxt, File originalFile, File decryptedFile, byte[] passphrase) throws IOException {
-        SQLiteDatabase.loadLibs(ctxt);
+        System.loadLibrary("sqlcipher");
 
         if (originalFile.exists()) {
             SQLiteDatabase db =
@@ -302,12 +302,24 @@ public class SQLCipherUtils {
             st.close();
             db.close();
 
-            db = SQLiteDatabase.openDatabase(decryptedFile.getAbsolutePath(), "",
-                    null, SQLiteDatabase.OPEN_READWRITE);
+            db = SQLiteDatabase.openDatabase(decryptedFile.getAbsolutePath(), "", 
+                    null, SQLiteDatabase.OPEN_READWRITE, null, null);
             db.setVersion(version);
             db.close();
         } else {
             throw new FileNotFoundException(originalFile.getAbsolutePath() + " not found");
+        }
+    }
+
+    public static byte[] getBytes(char[] data) {
+        if (data != null && data.length != 0) {
+            CharBuffer charBuffer = CharBuffer.wrap(data);
+            ByteBuffer byteBuffer = Charset.forName("UTF-8").encode(charBuffer);
+            byte[] result = new byte[byteBuffer.limit()];
+            byteBuffer.get(result);
+            return result;
+        } else {
+            return null;
         }
     }
 }

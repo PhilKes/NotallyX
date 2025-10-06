@@ -29,8 +29,7 @@ import com.philkes.notallyx.utils.getExternalMediaDirectory
 import com.philkes.notallyx.utils.security.SQLCipherUtils
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import java.io.File
-import net.sqlcipher.database.SQLiteDatabase
-import net.sqlcipher.database.SupportFactory
+import net.zetetic.database.sqlcipher.SupportOpenHelperFactory
 
 @TypeConverters(Converters::class)
 @Database(entities = [BaseNote::class, Label::class], version = 9)
@@ -135,7 +134,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                         Migration9,
                     )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                SQLiteDatabase.loadLibs(context)
+                System.loadLibrary("sqlcipher")
                 if (preferences.biometricLock.value == BiometricLock.ENABLED) {
                     if (
                         SQLCipherUtils.getDatabaseState(getCurrentDatabaseFile(context)) ==
@@ -198,7 +197,7 @@ abstract class NotallyDatabase : RoomDatabase() {
             val cipher = getInitializedCipherForDecryption(iv = initializationVector)
             val encryptedPassphrase = preferences.databaseEncryptionKey.value
             val passphrase = cipher.doFinal(encryptedPassphrase)
-            val factory = SupportFactory(passphrase)
+            val factory = SupportOpenHelperFactory(passphrase)
             instanceBuilder.openHelperFactory(factory)
         }
 
