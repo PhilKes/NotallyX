@@ -2,11 +2,14 @@ package com.philkes.notallyx.data.model
 
 import android.content.Context
 import android.text.Html
+import android.util.Base64
 import androidx.core.text.toHtml
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.dao.NoteIdReminder
 import com.philkes.notallyx.data.model.BaseNote.Companion.COLOR_DEFAULT
 import com.philkes.notallyx.presentation.applySpans
+import com.philkes.notallyx.utils.decodeToBitmap
+import java.io.File
 import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -173,7 +176,7 @@ private fun JSONObject.getLongOrDefault(key: String, defaultValue: Long): Long {
     }
 }
 
-fun BaseNote.toHtml(showDateCreated: Boolean) = buildString {
+fun BaseNote.toHtml(showDateCreated: Boolean, imagesRootFolder: File?) = buildString {
     val date = DateFormat.getDateInstance(DateFormat.FULL).format(timestamp)
     val title = Html.escapeHtml(title)
 
@@ -202,6 +205,22 @@ fun BaseNote.toHtml(showDateCreated: Boolean) = buildString {
                 append("<li><input type=\"checkbox\" $child $checked>$body</li>")
             }
             append("</ol>")
+        }
+    }
+    if (images.isNotEmpty()) {
+        append("<h3>Attached Images</h3>")
+        images.forEach { image ->
+            val file =
+                if (imagesRootFolder != null) File(imagesRootFolder, image.localName) else null
+            file?.readBytes()?.let { bytes ->
+                val base64String = Base64.encodeToString(bytes, Base64.NO_WRAP)
+                val options = file.decodeToBitmap()
+                val width = options?.width
+                val height = options?.height
+                append(
+                    "<img src=\"data:image/jpeg;base64,$base64String\" alt=\"${image.originalName}\"${options?.let { " width=\"$width\" height=\"$height\"" } ?: ""} />"
+                )
+            }
         }
     }
     append("</body></html>")
