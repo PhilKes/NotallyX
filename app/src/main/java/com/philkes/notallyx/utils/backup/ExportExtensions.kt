@@ -504,7 +504,7 @@ private fun ZipParameters.copy(fileNameInZip: String? = this.fileNameInZip): Zip
 }
 
 fun exportPdfFile(
-    app: Context,
+    app: ContextWrapper,
     note: BaseNote,
     folder: DocumentFile,
     fileName: String = note.title,
@@ -531,7 +531,11 @@ fun exportPdfFile(
     }
     folder.createFile(ExportMimeType.PDF.mimeType, fileName)?.let {
         val file = DocumentFile.fromFile(File(app.getExportedPath(), filePath))
-        val html = note.toHtml(NotallyXPreferences.getInstance(app).showDateCreated())
+        val html =
+            note.toHtml(
+                NotallyXPreferences.getInstance(app).showDateCreated(),
+                app.getExternalImagesDirectory(),
+            )
         app.printPdf(
             file,
             html,
@@ -555,7 +559,7 @@ fun exportPdfFile(
 }
 
 suspend fun exportPlainTextFile(
-    app: Context,
+    app: ContextWrapper,
     note: BaseNote,
     exportType: ExportMimeType,
     folder: DocumentFile,
@@ -592,7 +596,8 @@ suspend fun exportPlainTextFile(
                                 ExportMimeType.JSON -> note.toJson()
                                 ExportMimeType.HTML ->
                                     note.toHtml(
-                                        NotallyXPreferences.getInstance(app).showDateCreated()
+                                        NotallyXPreferences.getInstance(app).showDateCreated(),
+                                        app.getExternalImagesDirectory(),
                                     )
 
                                 else -> TODO("Unsupported MimeType for Export")
