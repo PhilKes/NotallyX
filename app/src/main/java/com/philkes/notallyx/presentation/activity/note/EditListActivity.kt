@@ -217,7 +217,7 @@ class EditListActivity : EditActivity(Type.LIST), MoreListActions {
     override fun configureUI() {
         binding.EnterTitle.setOnNextAction { listManager.moveFocusToNext(-1) }
 
-        if (notallyModel.isNewNote || notallyModel.items.isEmpty()) {
+        if (notallyModel.items.isEmpty()) {
             listManager.add(pushChange = false)
         }
     }
