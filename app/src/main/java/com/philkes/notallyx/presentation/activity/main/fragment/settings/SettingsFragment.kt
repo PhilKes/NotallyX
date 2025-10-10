@@ -290,7 +290,17 @@ class SettingsFragment : Fragment() {
                 model.savePreference(textSize, newValue)
             }
         }
-
+        alwaysShowSearchBar.observe(viewLifecycleOwner) { value ->
+            binding.ShowSearchInTopBar.setup(
+                alwaysShowSearchBar,
+                value,
+                requireContext(),
+                layoutInflater,
+                R.string.always_show_search_bar_hint,
+            ) { enabled ->
+                model.savePreference(alwaysShowSearchBar, enabled)
+            }
+        }
         notesSorting.observe(viewLifecycleOwner) { notesSort ->
             binding.NotesSortOrder.setup(
                 notesSorting,
