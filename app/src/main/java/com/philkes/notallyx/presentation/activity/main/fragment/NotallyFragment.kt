@@ -183,12 +183,15 @@ abstract class NotallyFragment : Fragment(), ItemListener {
             val navController = findNavController()
             navController.addOnDestinationChangedListener { controller, destination, arguments ->
                 if (destination.id == R.id.Search) {
-                    //                setText("")
-                    visibility = View.VISIBLE
+                    // Always show search bar in Search fragment
+                    binding?.EnterSearchKeywordLayout?.visibility = View.VISIBLE
                     requestFocus()
                     activity?.showKeyboard(this)
                 } else {
-                    //                visibility = View.GONE
+                    // In other fragments, respect the preference
+                    val alwaysShowSearchBar = model.preferences.alwaysShowSearchBar.value
+                    binding?.EnterSearchKeywordLayout?.visibility =
+                        if (alwaysShowSearchBar) View.VISIBLE else View.GONE
                     setText("")
                     clearFocus()
                     activity?.hideKeyboard(this)

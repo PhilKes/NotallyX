@@ -39,6 +39,7 @@ import com.philkes.notallyx.databinding.ActivityMainBinding
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.DisplayLabelFragment.Companion.EXTRA_DISPLAYED_LABEL
 import com.philkes.notallyx.presentation.activity.main.fragment.NotallyFragment
+import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
 import com.philkes.notallyx.presentation.add
@@ -97,6 +98,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         setupNavigation()
 
         setupActivityResultLaunchers()
+
+        preferences.alwaysShowSearchBar.observe(this) { invalidateOptionsMenu() }
 
         val fragmentIdToLoad = intent.getIntExtra(EXTRA_FRAGMENT_TO_OPEN, -1)
         if (fragmentIdToLoad != -1) {
@@ -739,8 +742,73 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        // Only show search icon if preference is not enabled and not in Reminders or Settings
+        // fragments
+        val currentDestinationId = navController.currentDestination?.id
+        if (
+            !preferences.alwaysShowSearchBar.value &&
+                !ACTIVITES_WITHOUT_SEARCH.contains(currentDestinationId)
+        ) {
+
+            // If in Search fragment, show X icon instead of search icon
+            val isInSearchFragment = currentDestinationId == R.id.Search
+            val iconRes = if (isInSearchFragment) R.drawable.close else R.drawable.search
+            val titleRes = if (isInSearchFragment) R.string.cancel else R.string.search
+
+            menu
+                .add(Menu.NONE, ACTION_SEARCH, Menu.NONE, titleRes)
+                .setIcon(iconRes)
+                .setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS)
+        }
+
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            ACTION_SEARCH -> {
+                val isInSearchFragment = navController.currentDestination?.id == R.id.Search
+
+                if (isInSearchFragment) {
+                    // If in Search fragment, navigate back to cancel search
+                    baseModel.keyword = ""
+                    navController.popBackStack()
+                } else {
+                    // Navigate to search fragment
+                    val currentFragment =
+                        supportFragmentManager
+                            .findFragmentById(R.id.NavHostFragment)
+                            ?.childFragmentManager
+                            ?.fragments
+                            ?.firstOrNull()
+
+                    if (currentFragment is NotallyFragment) {
+                        navController.navigate(
+                            R.id.Search,
+                            Bundle().apply {
+                                putSerializable(
+                                    SearchFragment.EXTRA_INITIAL_FOLDER,
+                                    baseModel.folder.value,
+                                )
+                                putSerializable(
+                                    SearchFragment.EXTRA_INITIAL_LABEL,
+                                    baseModel.currentLabel,
+                                )
+                            },
+                        )
+                    }
+                }
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     companion object {
         const val EXTRA_FRAGMENT_TO_OPEN = "notallyx.intent.extra.FRAGMENT_TO_OPEN"
         const val EXTRA_SKIP_START_VIEW_ON_BACK = "notallyx.intent.extra.SKIP_START_VIEW_ON_BACK"
+        private const val ACTION_SEARCH = 1001
+        val ACTIVITES_WITHOUT_SEARCH = setOf(R.id.Settings, R.id.Reminders, R.id.Labels)
     }
 }

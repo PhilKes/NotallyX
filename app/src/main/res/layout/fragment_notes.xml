@@ -10,7 +10,9 @@
       android:layout_height="wrap_content"
       android:paddingStart="8dp"
       android:paddingEnd="8dp"
-      android:paddingBottom="8dp"
+      android:paddingBottom="0dp"
+      android:paddingTop="0dp"
+      android:visibility="gone"
       app:layout_constraintTop_toTopOf="parent"
       style="@style/RoundedTextInput"
       >

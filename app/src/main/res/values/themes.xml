@@ -143,10 +143,11 @@
         <item name="boxStrokeWidth">0dp</item>
         <item name="boxStrokeWidthFocused">0dp</item>
         <item name="hintEnabled">false</item>
-        <item name="shapeAppearance">@style/RoundedCorners</item>
+        <item name="shapeAppearanceOverlay">@style/RoundedCorners</item>
     </style>
 
     <style name="RoundedCorners">
+        <item name="cornerFamily">rounded</item>
         <item name="cornerSize">50%</item>
     </style>
 

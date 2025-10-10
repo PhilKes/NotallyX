@@ -328,4 +328,6 @@
     <string name="yearly">Yearly</string>
     <string name="years">Years</string>
     <string name="your_notes_associated">Your notes attached to this label will not be deleted</string>
+    <string name="always_show_search_bar">Always show search bar expanded</string>
+    <string name="always_show_search_bar_hint">By enabling this, the search bar will always be shown in the layout instead of using a search icon in the top bar</string>
 </resources>
