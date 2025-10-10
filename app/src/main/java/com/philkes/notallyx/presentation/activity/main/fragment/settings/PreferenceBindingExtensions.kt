@@ -539,7 +539,7 @@ fun PreferenceBinding.setupStartView(
         val values =
             mutableListOf(notesText to START_VIEW_DEFAULT, unlabeledText to START_VIEW_UNLABELED)
                 .apply { labels?.forEach { add(it to it) } }
-        var selected = -1
+        var selected = values.indexOfFirst { it.first == textValue }
         layout.SelectionBox.apply {
             setSimpleItems(values.map { it.first }.toTypedArray())
             select(textValue)
@@ -550,8 +550,11 @@ fun PreferenceBinding.setupStartView(
             .setView(layout.root)
             .setPositiveButton(R.string.save) { dialog, _ ->
                 dialog.cancel()
-                val newValue = values[selected].second
-                onSave(newValue)
+                // Only save if a valid selection was made
+                if (selected >= 0 && selected < values.size) {
+                    val newValue = values[selected].second
+                    onSave(newValue)
+                }
             }
             .setCancelButton()
             .showAndFocus(allowFullSize = true)
