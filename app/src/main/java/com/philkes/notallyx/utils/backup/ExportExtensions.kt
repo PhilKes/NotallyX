@@ -38,6 +38,7 @@ import com.philkes.notallyx.data.model.toJson
 import com.philkes.notallyx.data.model.toTxt
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.MainActivity
+import com.philkes.notallyx.presentation.activity.main.fragment.settings.SettingsFragment
 import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.BackupFile
@@ -219,13 +220,13 @@ private fun ContextWrapper.requireBackupFolder(path: String, msg: String): Docum
         val folder = DocumentFile.fromTreeUri(this, path.toUri())!!
         if (!folder.exists()) {
             log(TAG, msg = msg)
-            tryPostErrorNotification(IllegalArgumentException("Folder '$path' does not exist"))
+            tryPostErrorNotification(BackupFolderNotExistsException(path))
             return null
         }
         folder
     } catch (e: Exception) {
         log(TAG, msg = msg, throwable = e)
-        tryPostErrorNotification(IllegalArgumentException("Folder '$path' does not exist", e))
+        tryPostErrorNotification(BackupFolderNotExistsException(path, e))
         return null
     }
 }
@@ -634,7 +635,7 @@ private fun Context.tryPostErrorNotification(e: Throwable) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 manager.createChannelIfNotExists(NOTIFICATION_CHANNEL_ID)
             }
-            val notification =
+            val notificationBuilder =
                 NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.error)
                     .setContentTitle(getString(R.string.auto_backup_failed))
@@ -674,8 +675,25 @@ private fun Context.tryPostErrorNotification(e: Throwable) {
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                         ),
                     )
-                    .build()
-            manager.notify(NOTIFICATION_ID, notification)
+
+            // Add a "Select Folder" button if the error is about a missing folder
+            if (e is BackupFolderNotExistsException) {
+                notificationBuilder.addAction(
+                    R.drawable.settings,
+                    getString(R.string.choose_folder),
+                    PendingIntent.getActivity(
+                        this,
+                        0,
+                        Intent(this, MainActivity::class.java).apply {
+                            putExtra(MainActivity.EXTRA_FRAGMENT_TO_OPEN, R.id.Settings)
+                            putExtra(SettingsFragment.EXTRA_SHOW_IMPORT_BACKUPS_FOLDER, true)
+                        },
+                        PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                    ),
+                )
+            }
+
+            manager.notify(NOTIFICATION_ID, notificationBuilder.build())
         }
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
