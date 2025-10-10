@@ -34,6 +34,7 @@ import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.view.misc.ItemListener
+import com.philkes.notallyx.presentation.view.note.listitem.init
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
@@ -169,7 +170,9 @@ class BaseNoteVH(
             } else {
                 LinearLayout.visibility = VISIBLE
                 val forceShowFirstItem = preferences.maxItems < 1 && isTitleEmpty
-                val filteredList = items.take(if (forceShowFirstItem) 1 else preferences.maxItems)
+                val initializedItems = items.init()
+                val filteredList =
+                    initializedItems.take(if (forceShowFirstItem) 1 else preferences.maxItems)
                 LinearLayout.children.forEachIndexed { index, view ->
                     if (view.id != R.id.ItemsRemaining) {
                         if (index < filteredList.size) {
