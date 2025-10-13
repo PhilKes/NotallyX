@@ -222,7 +222,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         labels.addAll(list)
     }
 
-    suspend fun setState(id: Long) {
+    suspend fun setState(id: Long, createInDb: Boolean = true) {
         if (id != 0L) {
             isNewNote = false
 
@@ -254,15 +254,17 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 reminders.value = baseNote.reminders
                 viewMode.value = baseNote.viewMode
             } else {
-                originalNote = createBaseNote()
+                originalNote = createBaseNote(createInDb)
                 app.showToast(R.string.cant_find_note)
             }
-        } else originalNote = createBaseNote()
+        } else originalNote = createBaseNote(createInDb)
     }
 
-    private suspend fun createBaseNote(): BaseNote {
+    private suspend fun createBaseNote(createInDb: Boolean = true): BaseNote {
         val baseNote = getBaseNote()
-        id = withContext(Dispatchers.IO) { baseNoteDao.insert(baseNote) }
+        if (createInDb) {
+            id = withContext(Dispatchers.IO) { baseNoteDao.insert(baseNote) }
+        }
         return baseNote.copy(id = id)
     }
 
