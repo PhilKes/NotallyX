@@ -77,7 +77,29 @@
                 <data android:mimeType="*/*" />
             </intent-filter>
 
-            <intent-filter>
+            <intent-filter android:label="@string/convert_to_text_note">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="file" android:mimeType="text/*" />
+                <data android:scheme="content" android:mimeType="text/*" />
+
+                <data android:scheme="file" android:mimeType="application/json" />
+                <data android:scheme="content" android:mimeType="application/json" />
+
+                <data android:scheme="file" android:mimeType="application/xml" />
+                <data android:scheme="content" android:mimeType="application/xml" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".presentation.activity.note.EditTextPlainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+
+            <intent-filter android:label="@string/edit">
                 <action android:name="android.intent.action.VIEW" />
 
                 <category android:name="android.intent.category.DEFAULT" />

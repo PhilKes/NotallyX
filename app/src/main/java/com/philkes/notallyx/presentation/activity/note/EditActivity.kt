@@ -91,6 +91,7 @@ import com.philkes.notallyx.utils.FileError
 import com.philkes.notallyx.utils.backup.exportNotes
 import com.philkes.notallyx.utils.changeStatusAndNavigationBarColor
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
+import com.philkes.notallyx.utils.getFileName
 import com.philkes.notallyx.utils.getMimeType
 import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.log
@@ -147,14 +148,18 @@ abstract class EditActivity(private val type: Type) :
 
     override fun finish() {
         lifecycleScope.launch(Dispatchers.Main) {
-            if (notallyModel.isEmpty()) {
-                notallyModel.deleteBaseNote(checkAutoSave = false)
-            } else if (notallyModel.isModified()) {
-                saveNote()
-            } else {
-                notallyModel.checkBackupOnSave()
-            }
+            checkSave()
             super.finish()
+        }
+    }
+
+    protected open suspend fun checkSave() {
+        if (notallyModel.isEmpty()) {
+            notallyModel.deleteBaseNote(checkAutoSave = false)
+        } else if (notallyModel.isModified()) {
+            saveNote()
+        } else {
+            notallyModel.checkBackupOnSave()
         }
     }
 
@@ -191,7 +196,7 @@ abstract class EditActivity(private val type: Type) :
             val selectedId = intent.getLongExtra(EXTRA_SELECTED_BASE_NOTE, 0L)
             val id = persistedId ?: selectedId
             if (persistedId == null || notallyModel.originalNote == null) {
-                notallyModel.setState(id)
+                notallyModel.setState(id, intent.data == null)
             }
             if (notallyModel.isNewNote) {
                 when (intent.action) {
@@ -816,7 +821,8 @@ abstract class EditActivity(private val type: Type) :
                         null
                     }
             } ?: intent.getStringExtra(Intent.EXTRA_TEXT)
-        val title = intent.getStringExtra(Intent.EXTRA_SUBJECT)
+        val title =
+            intent.getStringExtra(Intent.EXTRA_SUBJECT) ?: intent.data?.let { getFileName(it) }
         if (text != null) {
             notallyModel.body = Editable.Factory.getInstance().newEditable(text)
         }

@@ -76,7 +76,6 @@ class EditNoteActivity : EditActivity(Type.NOTE), AddNoteActions {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setupActivityResultLaunchers()
     }
 
