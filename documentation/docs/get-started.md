@@ -2,46 +2,35 @@
 sidebar_position: 1
 ---
 
-# Tutorial Intro
+# Introduction to NotallyX
 
-Let's discover **Docusaurus in less than 5 minutes**.
+Welcome to the official documentation for **NotallyX**, a minimalistic yet powerful note-taking app for Android.
+
+![NotallyX Logo](/img/logo.png)
+
+## What is NotallyX?
+
+NotallyX is an open-source note-taking application designed to be simple, intuitive, and feature-rich. It's an extended version of the original Notally app, with additional features and improvements.
+
+Whether you need to jot down quick thoughts, create detailed task lists, or organize your ideas with colors and labels, NotallyX provides all the tools you need without unnecessary complexity.
+
+## Key Features
+
+- **Rich Text Notes**: Create notes with support for bold, italics, mono space, and strike-through formatting
+- **Task Lists**: Organize your to-dos with subtasks and automatic sorting of completed items
+- **Reminders**: Set notifications for important notes
+- **File Attachments**: Add pictures, PDFs, and other files to your notes
+- **Organization Tools**: Sort, color, pin, and label your notes for quick access
+- **Security**: Lock your notes with biometric authentication or PIN
+- **Backup**: Configure automatic backups to keep your notes safe
+- **Widgets**: Access important notes directly from your home screen
+- **Audio Notes**: Create quick audio recordings
+- **Customization**: Extensive preferences to adjust the app to your liking
 
 ## Getting Started
 
-Get started by **creating a new site**.
+Ready to start using NotallyX? Check out our [Quick Start Guide](quick-start.md) to learn the basics.
 
-Or **try Docusaurus immediately** with **[docusaurus.new](https://docusaurus.new)**.
+## Contributing
 
-### What you'll need
-
-- [Node.js](https://nodejs.org/en/download/) version 18.0 or above:
-  - When installing Node.js, you are recommended to check all checkboxes related to dependencies.
-
-## Generate a new site
-
-Generate a new Docusaurus site using the **classic template**.
-
-The classic template will automatically be added to your project after you run the command:
-
-```bash
-npm init docusaurus@latest my-website classic
-```
-
-You can type this command into Command Prompt, Powershell, Terminal, or any other integrated terminal of your code editor.
-
-The command also installs all necessary dependencies you need to run Docusaurus.
-
-## Start your site
-
-Run the development server:
-
-```bash
-cd my-website
-npm run start
-```
-
-The `cd` command changes the directory you're working with. In order to work with your newly created Docusaurus site, you'll need to navigate the terminal there.
-
-The `npm run start` command builds your website locally and serves it through a development server, ready for you to view at http://localhost:3000/.
-
-Open `docs/intro.md` (this page) and edit some lines: the site **reloads automatically** and displays your changes.
+NotallyX is an open-source project, and contributions are welcome! Check out our [Contribution Guidelines](contributing.md) to learn how you can help improve the app.

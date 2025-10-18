@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="885.08923"
+   height="248.33305"
+   viewBox="0 0 885.08924 248.33305"
+   fill="none"
+   version="1.1"
+   id="svg19"
+   sodipodi:docname="kofi_donate.svg"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs23">
+    <rect
+       x="549.41486"
+       y="-47.903282"
+       width="10.723866"
+       height="47.190613"
+       id="rect32082" />
+    <rect
+       x="259.72845"
+       y="90.00251"
+       width="26.547588"
+       height="52.512074"
+       id="rect6504" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview21"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     showgrid="false"
+     inkscape:zoom="0.53479382"
+     inkscape:cx="97.233734"
+     inkscape:cy="258.04337"
+     inkscape:window-width="1920"
+     inkscape:window-height="1012"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer2"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0" />
+  <mask
+     id="mask0_1_219"
+     maskUnits="userSpaceOnUse"
+     x="-1"
+     y="0"
+     width="242"
+     height="194">
+    <path
+       d="M 240.469,0.958984 H -0.00585938 V 193.918 H 240.469 Z"
+       fill="#ffffff"
+       id="path2" />
+  </mask>
+  <text
+     xml:space="preserve"
+     id="text6502"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect6504);fill:#000000;fill-opacity:1;stroke:none"
+     transform="translate(32.42157,27.606585)" />
+  <text
+     xml:space="preserve"
+     id="text32080"
+     style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;white-space:pre;shape-inside:url(#rect32082);fill:#000000;fill-opacity:1;stroke:none"
+     transform="translate(32.42157,27.606585)" />
+  <g
+     inkscape:groupmode="layer"
+     id="layer1"
+     inkscape:label="Layer 1"
+     transform="translate(32.42157,27.606585)">
+    <rect
+       style="fill:#7285d0;fill-opacity:1"
+       id="rect44510"
+       width="885.08923"
+       height="248.33305"
+       x="-32.42157"
+       y="-27.606585"
+       ry="82.157364" />
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="Layer 2"
+     transform="translate(32.42157,27.606585)">
+    <g
+       mask="url(#mask0_1_219)"
+       id="g17">
+      <path
+         d="m 96.1344,193.911 c -35.0032,0 -63.4747,-15.655 -80.1623,-44.082 C 1.19788,124.912 -0.00585938,97.9229 -0.00585938,67.7662 -0.00585938,49.8876 5.37293,34.3215 15.5413,22.7466 24.8861,12.1157 38.1271,5.22907 52.8317,3.35378 70.2858,1.14271 91.9848,0.958984 114.545,0.958984 c 36.714,0 47.085,0.449816 61.53,1.894296 19.215,1.90698 35.383,9.07872 46.749,20.74222 11.544,11.8473 17.645,27.6669 17.645,45.7672 v 3.6367 c 0,30.8856 -20.648,56.7336 -49.423,63.7596 -2.148,5.068 -4.809,10.112 -7.957,15.078 l -0.083,0.127 c -10.137,15.668 -33.964,41.954 -79.605,41.954 h -7.2729 z"
+         fill="#ffffff"
+         id="path5" />
+      <path
+         d="m 174.568,17.9772 c -13.641,-1.3621 -23.188,-1.8183 -60.016,-1.8183 -23.644,0 -43.6512,0.2281 -59.7876,2.2745 -21.3695,2.7306 -39.5586,19.0951 -39.5586,49.334 0,30.2392 1.5902,53.6546 13.8683,74.3396 13.8684,23.644 37.0561,36.6 67.0671,36.6 h 7.2728 c 36.828,0 56.836,-19.551 66.839,-35.009 4.321,-6.824 7.501,-13.64 9.548,-20.464 26.146,-2.274 45.469,-23.8716 45.469,-50.2399 v -3.6364 c 0,-28.4145 -18.639,-48.1937 -50.696,-51.3805 z"
+         fill="#ffffff"
+         id="path7" />
+      <path
+         d="m 15.1975,67.7674 c 0,-30.2389 18.1891,-46.6034 39.5584,-49.334 16.1428,-2.0464 36.1501,-2.2745 59.7881,-2.2745 36.828,0 46.375,0.4562 60.015,1.8183 32.058,3.1804 50.696,22.9598 50.696,51.3805 v 3.6364 c 0,26.3746 -19.323,47.9719 -45.469,50.2399 -2.046,6.824 -5.227,13.64 -9.548,20.464 -10.003,15.458 -30.01,35.009 -66.838,35.009 h -7.2736 c -30.0109,0 -53.1987,-12.956 -67.0669,-36.6 C 16.7814,121.422 15.1912,98.4563 15.1912,67.7674"
+         fill="#202020"
+         id="path9" />
+      <path
+         d="m 32.2469,67.9899 c 0,29.3269 1.8185,48.1941 11.3658,65.6991 10.9098,20.235 30.6891,27.964 53.199,27.964 h 7.0453 c 29.554,0 43.879,-14.324 51.836,-26.824 3.865,-6.367 7.273,-13.412 9.091,-22.282 l 1.363,-5.683 h 8.185 c 18.189,0 33.876,-14.774 33.876,-33.6474 v -3.4084 c 0,-21.1413 -13.184,-32.2854 -36.15,-35.0095 -12.956,-1.1341 -20.686,-1.5903 -57.52,-1.5903 -24.7778,0 -42.5108,0.228 -55.9228,2.2744 -18.8669,2.7306 -26.3745,13.4123 -26.3745,32.5071"
+         fill="#ffffff"
+         id="path11" />
+      <path
+         d="m 166.158,83.6801 c 0,2.7306 2.046,4.7771 5.683,4.7771 11.594,0 17.961,-6.5953 17.961,-17.5049 0,-10.9096 -6.367,-17.7328 -17.961,-17.7328 -3.637,0 -5.683,2.0462 -5.683,4.7768 v 25.6903 z"
+         fill="#202020"
+         id="path13" />
+      <path
+         d="m 54.5321,82.3198 c 0,13.4122 7.5011,25.0062 17.0486,34.1042 6.3671,6.138 16.3708,12.506 23.1878,16.598 2.0462,1.135 4.0926,1.819 6.3675,1.819 2.73,0 4.998,-0.684 6.823,-1.819 6.823,-4.092 16.82,-10.46 22.96,-16.598 9.775,-9.092 17.276,-20.6857 17.276,-34.1042 0,-14.5525 -10.909,-27.5083 -26.596,-27.5083 -9.319,0 -15.687,4.7767 -20.463,11.3657 C 96.8147,59.582 90.2259,54.8115 80.9001,54.8115 c -15.9146,0 -26.3745,12.9558 -26.3745,27.5083"
+         fill="#ff5a16"
+         id="path15" />
+    </g>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:173.333px;line-height:1.25;font-family:sans-serif;fill:#000000;fill-opacity:1;stroke:none"
+       x="251.86853"
+       y="154.95969"
+       id="text2844"><tspan
+         id="tspan2842"
+         x="251.86853"
+         y="154.95969"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:173.333px;font-family:Roboto;-inkscape-font-specification:Roboto;fill:#ffffff;fill-opacity:1"
+         sodipodi:role="line">Donate</tspan></text>
+  </g>
+</svg>

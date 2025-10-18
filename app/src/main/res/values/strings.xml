@@ -126,6 +126,7 @@
     <string name="disallow_screenshots">Disallow Screenshots</string>
     <string name="discard">Discard</string>
     <string name="display_text">Text to display</string>
+    <string name="documentation">Documentation</string>
     <string name="donate">Make a Donation</string>
     <string name="drag_handle">Drag Handle</string>
     <string name="edit">Edit</string>

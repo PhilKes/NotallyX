@@ -753,6 +753,7 @@ class SettingsFragment : Fragment() {
             Rate.setOnClickListener {
                 openLink("https://play.google.com/store/apps/details?id=com.philkes.notallyx")
             }
+            Documentation.setOnClickListener { openLink("https://philkes.github.io/NotallyX") }
             SourceCode.setOnClickListener { openLink("https://github.com/PhilKes/NotallyX") }
             Libraries.setOnClickListener {
                 val libraries =

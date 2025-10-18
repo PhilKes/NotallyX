@@ -1,0 +1,95 @@
+---
+sidebar_position: 5
+---
+
+# Security and Privacy
+
+NotallyX provides several features to help keep your notes secure and private. This guide explains how to use note locking, biometric authentication, and backup features to protect your data.
+
+
+## Note Locking
+
+<img src={require('/img/phoneScreenshots/8.png').default} width="32%" alt="Security Features in NotallyX"/>
+
+You can lock the app to prevent unauthorized access. It require authentication (biometric or PIN) to view the contents of the app.
+
+### Setting Up App Lock
+
+To setup the app lock, you need to set up authentication:
+
+1. Open the app settings
+2. Navigate to "Security"
+3. Enable "Lock app with device biometric or PIN"
+4. If you haven't setup device security you will be prompted to do so (at least PIN setup is needed)
+5. Whenever your device was locked, NotallyX will be locked too and require authentication to see the notes
+
+## Auto-Backup
+
+NotallyX can automatically back up your notes to prevent data loss.
+
+### Configuring Auto-Backup
+
+1. Open the app settings
+2. Navigate to "Auto Backups"
+3. Tap "Backups Folder" and "Choose folder" to select a folder for backups
+4. After you've set your backups folder you can:
+    - Enable auto backups whenever a note changed ("Backup on exit Note automatically")
+    - Enable periodic backups
+    - Configure the amount of previous backups to keep
+
+### Manual Backup
+
+You can also create backups manually:
+
+1. Open the app settings
+2. Navigate to "Backup"
+3. Tap "Export backup"
+4. Choose a location and name for the backup
+5. Tap "Save"
+
+### Restoring from Backup
+
+If you need to restore your notes from a backup:
+
+1. Open the app settings
+2. Navigate to "Backup"
+3. Tap "Import backup"
+4. Select the backup file you want to restore from
+5. If your backup is password protected, provide the correct password
+6. Tap "Import Backup"
+
+Note: Importing a backup does not delete any existing notes/labels
+
+## Data Storage
+
+### Where Your Data is Stored
+
+NotallyX stores all your notes locally on your device. Your data is not uploaded to any cloud service unless you explicitly use a cloud storage service to back up your notes.
+
+
+### Permissions
+
+NotallyX requires minimal permissions to function:
+
+- **Storage**: Required for saving notes and attachments
+- **Biometric**: Optional, only used if you enable biometric authentication
+- **Microphone**: Optional, only used for audio notes
+- **Alarms**: Optional, only used when setting reminders for notes
+- **Notifications**: Optional, only used for failed backups or reminders
+
+You can review and manage these permissions in your device's settings.
+
+## Privacy Considerations
+
+### No Data Collection
+
+NotallyX does not collect any personal data or usage statistics. Your notes remain private on your device.
+For the up-to-date privacy policy, see [Privacy-Policy](https://github.com/PhilKes/NotallyX/blob/main/Privacy-Policy.md)
+
+### Third-Party Services
+
+If you use features that interact with third-party services (such as sharing notes), be aware that those services may have different privacy policies.
+
+## Related Features
+
+- [Settings](./settings.mdx): Learn about ways to customize NotallyX
