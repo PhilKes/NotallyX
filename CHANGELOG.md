@@ -1,5 +1,24 @@
 # Changelog
 
+## [v7.5.0](https://github.com/PhilKes/NotallyX/tree/v7.5.0) (2025-10-18)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.4.2...v7.5.0)
+
+### Added Features
+
+- \[Feature request\] Option to hide search bar [\#662](https://github.com/PhilKes/NotallyX/issues/662)
+- Support as a text editor [\#649](https://github.com/PhilKes/NotallyX/issues/649)
+- Replace the search bar with a search icon [\#241](https://github.com/PhilKes/NotallyX/issues/241)
+
+### Fixed Bugs
+
+- Checklist element added when rotating phone [\#659](https://github.com/PhilKes/NotallyX/issues/659)
+- Bug:After exporting to PDF, there is only text and no images. [\#655](https://github.com/PhilKes/NotallyX/issues/655)
+- Some tasks are unnecessarily displayed as subtasks [\#652](https://github.com/PhilKes/NotallyX/issues/652)
+- Search bar text is not centered vertically \(UI issue\) [\#642](https://github.com/PhilKes/NotallyX/issues/642)
+- Crash when save "start view" setting without changing it [\#639](https://github.com/PhilKes/NotallyX/issues/639)
+- Subtask Glitch: Unable to Move or Uncheck After Toggling [\#12](https://github.com/PhilKes/NotallyX/issues/12)
+
 ## [v7.4.2](https://github.com/PhilKes/NotallyX/tree/v7.4.2) (2025-07-04)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.4.1...v7.4.2)
