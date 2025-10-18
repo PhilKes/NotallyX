@@ -8,6 +8,8 @@
     <string name="adding_files">Dateien hinzufügen</string>
     <string name="adding_images">Bilder hinzufügen</string>
     <string name="all">Alle</string>
+    <string name="always_show_search_bar">Suchleiste immer ausgeklappt anzeigen</string>
+    <string name="always_show_search_bar_hint">Ist dies aktiviert, wird die Suchleiste immer ausgeklappt anstatt des Suche-Symbols oben rechts angezeigt</string>
     <string name="appearance">Erscheinungsbild</string>
     <string name="archive">Archivieren</string>
     <string name="archived">Archiv</string>
@@ -122,6 +124,7 @@
     <string name="disallow_screenshots">Screenshots verbieten</string>
     <string name="discard">Verwerfen</string>
     <string name="display_text">Anzeigetext</string>
+    <string name="documentation">Dokumentation</string>
     <string name="donate">Spende</string>
     <string name="drag_handle">Ziehgriff</string>
     <string name="edit">Bearbeiten</string>
