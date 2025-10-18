@@ -1,0 +1,4 @@
+- Setting to hide search bar
+- Editor mode to edit plain text files
+- Exported PDFs now include images
+- Minor UI bug fixes

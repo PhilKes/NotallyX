@@ -1,0 +1,4 @@
+- Option zum Ausblenden der Suchleiste
+- Editor Modus um Textdateien zu bearbeiten
+- Exportierte PDFs beinhalten ab jetzt auch Bilder
+- Kleiner UI Fixes
