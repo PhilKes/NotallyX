@@ -4,6 +4,11 @@
     <b><a href="https://philkes.github.io/NotallyX/">NotallyX | Minimalistic note taking app</a></b>
     <p>
         <center>
+            <a href="https://ko-fi.com/philkes"><img alt='Donate' height='30' src='documentation/static/img/kofi_donate.svg' /></a>
+        </center>
+    </p>
+    <p>
+        <center>
             <a href='https://play.google.com/store/apps/details?id=com.philkes.notallyx&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png' height='80'/></a>
             <a href="https://f-droid.org/en/packages/com.philkes.notallyx"><img alt='IzzyOnDroid' height='80' src='https://fdroid.gitlab.io/artwork/badge/get-it-on.png' /></a>
             <a href="https://apt.izzysoft.de/fdroid/index/apk/com.philkes.notallyx"><img alt='F-Droid' height='80' src='https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png' /></a>
