@@ -21,8 +21,8 @@
 -keep class ** implements org.ocpsoft.prettytime.TimeUnit
 
 # SQLCipher
--keep class net.sqlcipher.** { *; }
--keep class net.sqlcipher.database.** { *; }
+-keep class net.zetetic.database.** { *; }
+-keep class net.zetetic.database.sqlcipher.* { *; }
 
 # SimpleXML
 -keepattributes Signature
