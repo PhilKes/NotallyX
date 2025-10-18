@@ -8,6 +8,8 @@
     <string name="adding_files">添加文件中</string>
     <string name="adding_images">添加图片中</string>
     <string name="all">所有</string>
+    <string name="always_show_search_bar">始终显示展开的搜索栏</string>
+    <string name="always_show_search_bar_hint">启用后，将始终在布局中显示搜索栏而不是用顶栏中的搜索图标进行展示</string>
     <string name="appearance">外观</string>
     <string name="archive">存档</string>
     <string name="archived">已存档</string>
@@ -121,6 +123,7 @@
     <string name="disallow_screenshots">禁止截屏</string>
     <string name="discard">取消</string>
     <string name="display_text">要展示的我呢本</string>
+    <string name="documentation">文件记录</string>
     <string name="donate">捐赠</string>
     <string name="drag_handle">拖动处理</string>
     <string name="edit">编辑</string>
