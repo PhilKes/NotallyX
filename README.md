@@ -60,6 +60,10 @@ If you find any bugs or want to propose a new Feature/Enhancement, feel free to 
 
 When using the app and an unknown error occurs, causing the app to crash you will see a dialog (see showcase video in https://github.com/PhilKes/NotallyX/pull/171) from which you can immediately create a bug report on Github with the crash details pre-filled.
 
+### Translations
+<!-- translations:start -->
+<!-- translations:end -->
+
 #### Beta Releases
 
 I occasionally release BETA versions of the app during development, since its very valuable for me to get feedback before publicly releasing a new version.

@@ -1,0 +1,27 @@
+name: Update Translation Coverage in README
+
+on:
+  push:
+    paths:
+      - app/src/main/res/values*/strings.xml
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python 3
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.x"
+
+      - name: Calculate translation coverage and update README
+        run: python .github/scripts/update_translation_coverage.py
+
+      - name: Commit and push changes
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: Updated translation coverage
