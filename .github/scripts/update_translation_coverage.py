@@ -5,7 +5,46 @@ import re
 
 BASE_PATH = Path("app/src/main/res")
 BASE_DIR = BASE_PATH / "values"
-README_FILE = Path("README.md")
+OUTPUT_FILE = Path("TRANSLATIONS.md")
+
+LOCALE_FLAGS = {
+    "en": ("🇺🇸", "English"),
+    "ca": ("🇪🇸", "Catalan"),
+    "cs": ("🇨🇿", "Czech"),
+    "da": ("🇩🇰", "Danish"),
+    "de": ("🇩🇪", "German"),
+    "el": ("🇬🇷", "Greek"),
+    "es": ("🇪🇸", "Spanish"),
+    "fr": ("🇫🇷", "French"),
+    "hu": ("🇭🇺", "Hungarian"),
+    "id": ("🇮🇩", "Indonesian"),
+    "it": ("🇮🇹", "Italian"),
+    "ja": ("🇯🇵", "Japanese"),
+    "my": ("🇲🇲", "Burmese"),
+    "nb": ("🇳🇴", "Norwegian Bokmål"),
+    "nl": ("🇳🇱", "Dutch"),
+    "nn": ("🇳🇴", "Norwegian Nynorsk"),
+    "pl": ("🇵🇱", "Polish"),
+    "pt-rbr": ("🇧🇷", "Portuguese (Brazil)"),
+    "pt-rpt": ("🇵🇹", "Portuguese (Portugal)"),
+    "ro": ("🇷🇴", "Romanian"),
+    "ru": ("🇷🇺", "Russian"),
+    "sk": ("🇸🇰", "Slovak"),
+    "sl": ("🇸🇮", "Slovenian"),
+    "sv": ("🇸🇪", "Swedish"),
+    "tl": ("🇵🇭", "Tagalog"),
+    "tr": ("🇹🇷", "Turkish"),
+    "uk": ("🇺🇦", "Ukrainian"),
+    "vi": ("🇻🇳", "Vietnamese"),
+    "zh-rcn": ("🇨🇳", "Chinese (Simplified)"),
+    "zh-rtw": ("🇹🇼", "Chinese (Traditional)"),
+}
+
+
+def get_flag_and_label(locale_code: str) -> str:
+    code = locale_code.lower()
+    flag, label = LOCALE_FLAGS.get(code, ("🏳️", code))  # Fallback flag and code
+    return f"{flag} {label}"
 
 def extract_keys(xml_path: Path):
     """Extract unique translation keys from strings.xml including <string>, <plurals>, <string-array>."""
@@ -35,16 +74,23 @@ def generate_coverage_table():
     coverage_rows = []
 
     # Include base language explicitly
-    coverage_rows.append(("English", 100, len(base_keys), total_keys))
+    coverage_rows.append(("🇺🇸 English", 100, len(base_keys), total_keys))
 
-    # Find other language folders like values-de, values-fr etc.
-    for lang_dir in sorted(BASE_PATH.glob("values-*")):
-        lang = lang_dir.name.removeprefix("values-")
+    # Iterate over locale folders
+    for lang_dir in sorted(BASE_PATH.iterdir()):
+        if not lang_dir.is_dir():
+            continue
+        if not LOCALE_FOLDER_PATTERN.match(lang_dir.name):
+            continue
+
+        locale_code = lang_dir.name.removeprefix("values-")
         xml_file = lang_dir / "strings.xml"
         keys = extract_keys(xml_file)
         translated_count = len(base_keys.intersection(keys))
         percent = int((translated_count / total_keys) * 100)
-        coverage_rows.append((lang.capitalize(), percent, translated_count, total_keys))
+
+        label = get_flag_and_label(locale_code)
+        coverage_rows.append((label, percent, translated_count, total_keys))
 
     # Build markdown table
     table_lines = [
@@ -57,11 +103,11 @@ def generate_coverage_table():
     return "\n".join(table_lines)
 
 def update_readme_section():
-    if not README_FILE.exists():
-        print("README.md not found.")
+    if not OUTPUT_FILE.exists():
+        print("TRANSLATIONS.md not found.")
         return
 
-    content = README_FILE.read_text(encoding="utf-8")
+    content = OUTPUT_FILE.read_text(encoding="utf-8")
 
     start_tag = "<!-- translations:start -->"
     end_tag = "<!-- translations:end -->"
@@ -76,8 +122,8 @@ def update_readme_section():
         # Append at end if tags not found
         updated_content = content.strip() + "\n\n" + new_section
 
-    README_FILE.write_text(updated_content, encoding="utf-8")
-    print("README.md updated with translation coverage.")
+    OUTPUT_FILE.write_text(updated_content, encoding="utf-8")
+    print("TRANSLATIONS.md updated with translation coverage.")
 
 if __name__ == "__main__":
     update_readme_section()

@@ -60,44 +60,6 @@ If you find any bugs or want to propose a new Feature/Enhancement, feel free to 
 
 When using the app and an unknown error occurs, causing the app to crash you will see a dialog (see showcase video in https://github.com/PhilKes/NotallyX/pull/171) from which you can immediately create a bug report on Github with the crash details pre-filled.
 
-### Translations
-<!-- translations:start -->
-| Language | Coverage |
-|----------|----------|
-| English | 100% (307/307) |
-| Ca | 21% (65/307) |
-| Cs | 98% (301/307) |
-| Da | 22% (69/307) |
-| De | 99% (305/307) |
-| El | 23% (72/307) |
-| Es | 98% (301/307) |
-| Fr | 98% (301/307) |
-| Hu | 21% (65/307) |
-| Id | 24% (75/307) |
-| It | 94% (291/307) |
-| Ja | 23% (73/307) |
-| My | 29% (90/307) |
-| Nb | 34% (106/307) |
-| Night | 0% (0/307) |
-| Nl | 69% (212/307) |
-| Nn | 34% (106/307) |
-| Pl | 97% (300/307) |
-| Pt-rbr | 21% (66/307) |
-| Pt-rpt | 23% (71/307) |
-| Ro | 98% (301/307) |
-| Ru | 97% (298/307) |
-| Sk | 21% (65/307) |
-| Sl | 35% (109/307) |
-| Sv | 20% (63/307) |
-| Tl | 21% (65/307) |
-| Tr | 23% (73/307) |
-| Uk | 21% (65/307) |
-| V23 | 0% (0/307) |
-| V27 | 0% (0/307) |
-| Vi | 34% (107/307) |
-| Zh-rcn | 98% (303/307) |
-| Zh-rtw | 95% (294/307) |
-<!-- translations:end -->
 
 #### Beta Releases
 
@@ -112,17 +74,9 @@ If you wish to verify your downloaded .apk file, here is the app's certificate S
 `D2:14:B6:05:7B:79:F8:25:09:DD:CD:1E:35:19:65:B3:C6:EC:C4:B2:A3:89:6E:5C:DF:88:5A:70:A0:B6:1D:FD`
 
 ### Translations
+
 All translations are crowd sourced.
-To contribute:
-1. Download current [translations.xlsx](https://github.com/PhilKes/NotallyX/raw/refs/heads/main/app/translations.xlsx)
-2. Open in Excel/LibreOffice and add missing translations
-   Notes:
-   - Missing translations are marked in red
-   - You can filter by key or any language column values
-   - Non-Translatable strings are hidden and marked in gray, do not add translations for them
-   - For plurals, some languages need/have more quantity strings than others, if a quantity string in the default language (english) is not needed the row is highlighted in yellow. If your language does not need that quantity string either, ignore them.
-3. Open a [Update Translations Issue](https://github.com/PhilKes/NotallyX/issues/new?assignees=&labels=translations&projects=&template=translation.md&title=%3CINSERT+LANGUAGE+HERE%3E+translations+update)
-4. I will create a Pull-Request to add your updated translations
+For details on how to contribute translations and what languages are available, see [TRANSLATIONS](./TRANSLATIONS.md)
 
 See [Android Translations Converter](https://github.com/PhilKes/android-translations-converter-plugin) for more details
 
