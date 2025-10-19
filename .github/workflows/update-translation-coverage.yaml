@@ -9,10 +9,16 @@ on:
 jobs:
   update-readme:
     runs-on: ubuntu-latest
+    permissions:
+      # Give the default GITHUB_TOKEN write permission to commit and push the
+      # added or changed files to the repository.
+      contents: write
 
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
+        with:
+          ref: ${{ github.head_ref }}
 
       - name: Setup Python 3
         uses: actions/setup-python@v4
