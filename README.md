@@ -78,8 +78,6 @@ If you wish to verify your downloaded .apk file, here is the app's certificate S
 All translations are crowd sourced.
 For details on how to contribute translations and what languages are available, see [TRANSLATIONS](./TRANSLATIONS.md)
 
-See [Android Translations Converter](https://github.com/PhilKes/android-translations-converter-plugin) for more details
-
 ### Contributing
 
 If you would like to contribute code yourself, just grab any open issue (that has no other developer assigned yet), leave a comment that you want to work on it and start developing by forking this repo.

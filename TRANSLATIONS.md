@@ -12,6 +12,8 @@ To contribute:
 3. Open a [Update Translations Issue](https://github.com/PhilKes/NotallyX/issues/new?assignees=&labels=translations&projects=&template=translation.md&title=%3CINSERT+LANGUAGE+HERE%3E+translations+update)
 4. I will create a Pull-Request to add your updated translations
 
+See [Android Translations Converter](https://github.com/PhilKes/android-translations-converter-plugin) for more details
+
 # Coverage
 
 <!-- translations:start -->
