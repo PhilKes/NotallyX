@@ -6,7 +6,7 @@ import re
 BASE_PATH = Path("app/src/main/res")
 BASE_DIR = BASE_PATH / "values"
 OUTPUT_FILE = Path("TRANSLATIONS.md")
-
+LOCALE_FOLDER_PATTERN = re.compile(r"^values-([a-z]{2,3}(-r[A-Z]{2})?)$")
 LOCALE_FLAGS = {
     "en": ("🇺🇸", "English"),
     "ca": ("🇪🇸", "Catalan"),
