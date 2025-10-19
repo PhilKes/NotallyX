@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.print.PdfPrintListener
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
@@ -52,6 +53,8 @@ import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreference
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_DEFAULT
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.START_VIEW_UNLABELED
 import com.philkes.notallyx.presentation.viewmodel.preference.Theme
+import com.philkes.notallyx.presentation.viewmodel.progress.DeleteProgress
+import com.philkes.notallyx.presentation.viewmodel.progress.ExportNotesProgress
 import com.philkes.notallyx.utils.ActionMode
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.MIME_TYPE_JSON
@@ -123,8 +126,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     val imageRoot = app.getExternalImagesDirectory()
 
     val importProgress = MutableLiveData<ImportProgress>()
-    val exportProgress = MutableLiveData<Progress>()
-    val deletionProgress = MutableLiveData<Progress>()
+    val progress = MutableLiveData<Progress>()
 
     val actionMode = ActionMode()
 
@@ -321,14 +323,16 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     fun exportBackup(uri: Uri) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                app.exportAsZip(
-                    uri,
-                    password = preferences.backupPassword.value,
-                    backupProgress = exportProgress,
-                )
-            }
-            app.showToast(R.string.saved_to_device)
+            val exportedNotes =
+                withContext(Dispatchers.IO) {
+                    return@withContext app.exportAsZip(
+                        uri,
+                        password = preferences.backupPassword.value,
+                        backupProgress = progress,
+                    )
+                }
+            val message = app.getQuantityString(R.plurals.exported_notes, exportedNotes)
+            app.showToast(message)
         }
     }
 
@@ -399,43 +403,62 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             app.log(TAG, throwable = throwable)
             actionMode.close(true)
-            exportProgress.postValue(Progress(inProgress = false))
+            progress.postValue(ExportNotesProgress(inProgress = false))
             app.showToast(R.string.something_went_wrong)
         }
         viewModelScope.launch(exceptionHandler) {
             val counter = AtomicInteger(0)
-            for (note in notes) {
-                exportProgress.postValue(Progress(total = notes.size))
-                when (selectedExportMimeType) {
-                    ExportMimeType.TXT,
-                    ExportMimeType.JSON,
-                    ExportMimeType.HTML -> {
+            progress.postValue(ExportNotesProgress(total = notes.size))
+            when (selectedExportMimeType) {
+                ExportMimeType.PDF -> {
+                    for (note in notes) {
+                        exportPdfFile(
+                            app,
+                            note,
+                            DocumentFile.fromTreeUri(app, folderUri)!!,
+                            progress = progress,
+                            counter = counter,
+                            total = notes.size,
+                            pdfPrintListener =
+                                object : PdfPrintListener {
+                                    override fun onSuccess(file: DocumentFile) {
+                                        actionMode.close(true)
+                                        progress.postValue(ExportNotesProgress(inProgress = false))
+                                        val message =
+                                            app.getQuantityString(
+                                                R.plurals.exported_notes,
+                                                counter.get(),
+                                            )
+                                        app.showToast("$message to '${folderUri.lastPathSegment}'")
+                                    }
+
+                                    override fun onFailure(message: CharSequence?) {
+                                        app.log(TAG, stackTrace = message as String?)
+                                        actionMode.close(true)
+                                        progress.postValue(ExportNotesProgress(inProgress = false))
+                                    }
+                                },
+                        )
+                    }
+                }
+                else -> {
+                    for (note in notes) {
                         exportPlainTextFile(
                             app,
                             note,
                             selectedExportMimeType,
                             DocumentFile.fromTreeUri(app, folderUri)!!,
-                            progress = exportProgress,
+                            progress = progress,
                             counter = counter,
                             total = notes.size,
                         )
                     }
-
-                    ExportMimeType.PDF -> {
-                        exportPdfFile(
-                            app,
-                            note,
-                            DocumentFile.fromTreeUri(app, folderUri)!!,
-                            progress = exportProgress,
-                            counter = counter,
-                            total = notes.size,
-                        )
-                    }
+                    actionMode.close(true)
+                    progress.postValue(ExportNotesProgress(inProgress = false))
+                    val message = app.getQuantityString(R.plurals.exported_notes, counter.get())
+                    app.showToast("$message to '${folderUri.lastPathSegment}'")
                 }
             }
-            actionMode.close(true)
-            exportProgress.postValue(Progress(inProgress = false))
-            app.showToast(R.string.saved_to_device)
         }
     }
 
@@ -506,7 +529,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
     private fun deleteBaseNotes(ids: LongArray) {
         val attachments = ArrayList<Attachment>()
         viewModelScope.launch {
-            deletionProgress.value = Progress(indeterminate = true)
+            progress.value = DeleteProgress(indeterminate = true)
             val notes = withContext(Dispatchers.IO) { baseNoteDao.getByIds(ids) }
             notes.forEach { note ->
                 attachments.addAll(note.images)
@@ -517,7 +540,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             app.cancelNoteReminders(notes.toNoteIdReminders())
             withContext(Dispatchers.IO) {
                 baseNoteDao.delete(ids)
-                app.deleteAttachments(attachments, ids, deletionProgress)
+                app.deleteAttachments(attachments, ids, progress)
             }
         }
     }

@@ -47,6 +47,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
+import com.philkes.notallyx.presentation.viewmodel.progress.BackupProgress
 import com.philkes.notallyx.utils.MIME_TYPE_ZIP
 import com.philkes.notallyx.utils.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.SUBFOLDER_FILES
@@ -63,7 +64,6 @@ import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.logToFile
 import com.philkes.notallyx.utils.nameWithoutExtension
 import com.philkes.notallyx.utils.recreateDir
-import com.philkes.notallyx.utils.removeTrailingParentheses
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
 import com.philkes.notallyx.utils.wrapWithChooser
@@ -265,7 +265,7 @@ fun ContextWrapper.exportAsZip(
     password: String = PASSWORD_EMPTY,
     backupProgress: MutableLiveData<Progress>? = null,
 ): Int {
-    backupProgress?.postValue(Progress(indeterminate = true))
+    backupProgress?.postValue(BackupProgress(indeterminate = true))
     val tempFile = File.createTempFile("export", "tmp", cacheDir)
     try {
         val zipFile =
@@ -292,7 +292,7 @@ fun ContextWrapper.exportAsZip(
         val files = databaseOriginal.getBaseNoteDao().getAllFiles().toFileAttachments()
         val audios = databaseOriginal.getBaseNoteDao().getAllAudios()
         val totalAttachments = images.count() + files.count() + audios.size
-        backupProgress?.postValue(Progress(0, totalAttachments))
+        backupProgress?.postValue(BackupProgress(0, totalAttachments))
 
         val counter = AtomicInteger(0)
         images.export(
@@ -324,7 +324,9 @@ fun ContextWrapper.exportAsZip(
                 } catch (exception: Exception) {
                     log(TAG, throwable = exception)
                 } finally {
-                    backupProgress?.postValue(Progress(counter.incrementAndGet(), totalAttachments))
+                    backupProgress?.postValue(
+                        BackupProgress(counter.incrementAndGet(), totalAttachments)
+                    )
                 }
             }
 
@@ -336,7 +338,7 @@ fun ContextWrapper.exportAsZip(
             }
             zipFile.file.delete()
         }
-        backupProgress?.postValue(Progress(inProgress = false))
+        backupProgress?.postValue(BackupProgress(inProgress = false))
         return totalNotes
     } finally {
         tempFile.delete()
@@ -444,7 +446,7 @@ private fun Sequence<FileAttachment>.export(
         } catch (exception: Exception) {
             context.log(TAG, throwable = exception)
         } finally {
-            backupProgress?.postValue(Progress(counter.incrementAndGet(), total))
+            backupProgress?.postValue(BackupProgress(counter.incrementAndGet(), total))
         }
     }
 }
@@ -518,11 +520,13 @@ fun exportPdfFile(
     val validFileName = fileName.ifBlank { app.getString(R.string.note) }
     val filePath = "$validFileName.${ExportMimeType.PDF.fileExtension}"
     if (folder.findFile(filePath)?.exists() == true) {
+        val duplicateFileName =
+            findFreeDuplicateFileName(folder, validFileName, ExportMimeType.PDF.fileExtension)
         return exportPdfFile(
             app,
             note,
             folder,
-            "${validFileName.removeTrailingParentheses()} ($duplicateFileCount)",
+            duplicateFileName,
             pdfPrintListener,
             progress,
             counter,
@@ -530,7 +534,7 @@ fun exportPdfFile(
             duplicateFileCount + 1,
         )
     }
-    folder.createFile(ExportMimeType.PDF.mimeType, fileName)?.let {
+    folder.createFile(ExportMimeType.PDF.mimeType, validFileName)?.let {
         val file = DocumentFile.fromFile(File(app.getExportedPath(), filePath))
         val html =
             note.toHtml(
@@ -546,9 +550,11 @@ fun exportPdfFile(
                         app.contentResolver.openInputStream(file.uri)?.copyTo(outStream)
                     }
                     progress?.postValue(
-                        Progress(current = counter!!.incrementAndGet(), total = total!!)
+                        BackupProgress(current = counter!!.incrementAndGet(), total = total!!)
                     )
-                    pdfPrintListener?.onSuccess(file)
+                    if (counter!!.get() == total!!) {
+                        pdfPrintListener?.onSuccess(file)
+                    }
                 }
 
                 override fun onFailure(message: CharSequence?) {
@@ -570,13 +576,16 @@ suspend fun exportPlainTextFile(
     total: Int? = null,
     duplicateFileCount: Int = 1,
 ): DocumentFile? {
-    if (folder.findFile("$fileName.${exportType.fileExtension}")?.exists() == true) {
+    val validFileName = fileName.ifBlank { app.getString(R.string.note) }
+    if (folder.findFile("$validFileName.${exportType.fileExtension}")?.exists() == true) {
+        val duplicateFileName =
+            findFreeDuplicateFileName(folder, validFileName, exportType.fileExtension)
         return exportPlainTextFile(
             app,
             note,
             exportType,
             folder,
-            "${fileName.removeTrailingParentheses()} ($duplicateFileCount)",
+            duplicateFileName,
             progress,
             counter,
             total,
@@ -584,7 +593,6 @@ suspend fun exportPlainTextFile(
         )
     }
     return withContext(Dispatchers.IO) {
-        val validFileName = fileName.takeIf { it.isNotBlank() } ?: app.getString(R.string.note)
         val file =
             folder.createFile(exportType.mimeType, validFileName)?.let {
                 app.contentResolver.openOutputStream(it.uri)?.use { stream ->
@@ -608,9 +616,28 @@ suspend fun exportPlainTextFile(
                 }
                 it
             }
-        progress?.postValue(Progress(current = counter!!.incrementAndGet(), total = total!!))
+        progress?.postValue(BackupProgress(current = counter!!.incrementAndGet(), total = total!!))
         return@withContext file
     }
+}
+
+private fun findFreeDuplicateFileName(
+    folder: DocumentFile,
+    fileName: String,
+    fileExtension: String,
+): String {
+    val existingNames = folder.listFiles().mapNotNull { it.name }.toSet()
+    if ("$fileName.$fileExtension" !in existingNames) return fileName
+
+    var index = 0
+    var newName: String
+
+    do {
+        index++
+        newName = "$fileName ($index).$fileExtension"
+    } while (newName in existingNames)
+
+    return "$fileName ($index)"
 }
 
 fun Context.exportPreferences(preferences: NotallyXPreferences, uri: Uri): Boolean {
@@ -745,9 +772,7 @@ fun LockedActivity<*>.exportNotes(
                         },
                 )
             }
-            ExportMimeType.TXT,
-            ExportMimeType.JSON,
-            ExportMimeType.HTML ->
+            else ->
                 lifecycleScope.launch {
                     exportPlainTextFile(
                             this@exportNotes,

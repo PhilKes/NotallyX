@@ -399,25 +399,23 @@ fun Context.hideKeyboard(view: View) {
         ?.hideSoftInputFromWindow(view.windowToken, 0)
 }
 
-fun MutableLiveData<out Progress>.setupProgressDialog(activity: Activity, titleId: Int) {
-    setupProgressDialog(activity, activity.layoutInflater, activity as LifecycleOwner, titleId)
+fun MutableLiveData<out Progress>.setupProgressDialog(activity: Activity) {
+    setupProgressDialog(activity, activity.layoutInflater, activity as LifecycleOwner)
 }
 
-fun MutableLiveData<out Progress>.setupProgressDialog(fragment: Fragment, titleId: Int) {
+fun MutableLiveData<out Progress>.setupProgressDialog(fragment: Fragment) {
     setupProgressDialog(
         fragment.requireContext(),
         fragment.layoutInflater,
         fragment.viewLifecycleOwner,
-        titleId,
     )
 }
 
-fun MutableLiveData<ImportProgress>.setupImportProgressDialog(fragment: Fragment, titleId: Int) {
+fun MutableLiveData<ImportProgress>.setupImportProgressDialog(fragment: Fragment) {
     setupProgressDialog(
         fragment.requireContext(),
         fragment.layoutInflater,
         fragment.viewLifecycleOwner,
-        titleId,
     ) { context, binding, progress ->
         val stageStr =
             context.getString(
@@ -450,19 +448,18 @@ private fun <T : Progress> MutableLiveData<T>.setupProgressDialog(
     context: Context,
     layoutInflater: LayoutInflater,
     viewLifecycleOwner: LifecycleOwner,
-    titleId: Int,
     renderProgress: ((context: Context, binding: DialogProgressBinding, progress: T) -> Unit)? =
         null,
 ) {
     val dialogBinding = DialogProgressBinding.inflate(layoutInflater)
     val dialog =
         MaterialAlertDialogBuilder(context)
-            .setTitle(titleId)
             .setView(dialogBinding.root)
             .setCancelable(false)
             .create()
 
     observe(viewLifecycleOwner) { progress ->
+        dialog.setTitle(progress.titleId)
         if (progress.inProgress) {
             if (progress.indeterminate) {
                 dialogBinding.apply {
