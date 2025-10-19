@@ -67,6 +67,11 @@ These BETA releases have another `applicationId` as the release versions, thats 
 BETA versions also have their own data, they do not use the data of your NotallyX app
 You can download the most recent BETA release [here on Github](https://github.com/PhilKes/NotallyX/releases/tag/beta)
 
+#### APK Signing Certifcate Fingerprint
+
+If you wish to verify your downloaded .apk file, here is the app's certificate SHA256 fingerpint:
+`D2:14:B6:05:7B:79:F8:25:09:DD:CD:1E:35:19:65:B3:C6:EC:C4:B2:A3:89:6E:5C:DF:88:5A:70:A0:B6:1D:FD`
+
 ### Translations
 All translations are crowd sourced.
 To contribute:
