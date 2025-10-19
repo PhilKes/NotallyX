@@ -1,5 +1,6 @@
 package com.philkes.notallyx.data.imports
 
+import com.philkes.notallyx.R
 import com.philkes.notallyx.presentation.view.misc.Progress
 
 open class ImportProgress(
@@ -8,7 +9,7 @@ open class ImportProgress(
     inProgress: Boolean = true,
     indeterminate: Boolean = false,
     val stage: ImportStage = ImportStage.IMPORT_NOTES,
-) : Progress(current, total, inProgress, indeterminate)
+) : Progress(R.string.importing_backup, current, total, inProgress, indeterminate)
 
 enum class ImportStage {
     IMPORT_NOTES,

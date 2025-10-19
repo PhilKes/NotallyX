@@ -35,7 +35,6 @@ import com.philkes.notallyx.presentation.activity.main.MainActivity
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setEnabledSecureFlag
 import com.philkes.notallyx.presentation.setupImportProgressDialog
-import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.showAndFocus
 import com.philkes.notallyx.presentation.showDialog
 import com.philkes.notallyx.presentation.showToast
@@ -401,11 +400,7 @@ class SettingsFragment : Fragment() {
                 exportBackupActivityResultLauncher.launch(intent)
             }
         }
-        model.exportProgress.setupProgressDialog(this@SettingsFragment, R.string.exporting_backup)
-        model.importProgress.setupImportProgressDialog(
-            this@SettingsFragment,
-            R.string.importing_backup,
-        )
+        model.importProgress.setupImportProgressDialog(this@SettingsFragment)
     }
 
     private fun NotallyXPreferences.setupAutoBackups(binding: FragmentSettingsBinding) {
@@ -685,7 +680,6 @@ class SettingsFragment : Fragment() {
                     .show()
             }
         }
-        model.deletionProgress.setupProgressDialog(this@SettingsFragment, R.string.deleting_files)
     }
 
     private fun setupAbout(binding: FragmentSettingsBinding) {

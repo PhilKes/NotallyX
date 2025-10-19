@@ -153,6 +153,10 @@
     <string name="export_settings_failure">Failed to export settings, did you choose an invalid path\?</string>
     <string name="export_settings_message">All Settings will be exported to a JSON file, which can be used to re-import stored settings.\n\nBe aware, that this does not include encrypted settings like the auto-backup password or the biometric encryption key</string>
     <string name="export_settings_success">Successfully exported settings</string>
+    <plurals name="exported_notes">
+        <item quantity="one">Exported %1$s Note</item>
+        <item quantity="other">Exported %1$s Notes</item>
+    </plurals>
     <string name="exporting_backup">Exporting backup</string>
     <string name="extracted_files">Files extracted</string>
     <string name="filter">Filter</string>

@@ -47,6 +47,7 @@ import com.philkes.notallyx.presentation.dp
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.movedToResId
 import com.philkes.notallyx.presentation.setCancelButton
+import com.philkes.notallyx.presentation.setupProgressDialog
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.TriStateCheckBox
 import com.philkes.notallyx.presentation.view.misc.tristatecheckbox.setMultiChoiceTriStateItems
@@ -127,6 +128,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
             },
         )
         onBackPressedDispatcher.addCallback(this, actionModeCancelCallback)
+
+        baseModel.progress.setupProgressDialog(this)
     }
 
     private fun configureEdgeToEdgeInsets() {

@@ -14,6 +14,7 @@ import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.isImage
 import com.philkes.notallyx.presentation.view.misc.Progress
+import com.philkes.notallyx.presentation.viewmodel.progress.DeleteAttachmentProgress
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import java.io.File
 import java.io.FileFilter
@@ -117,7 +118,7 @@ fun ContextWrapper.deleteAttachments(
     progress: MutableLiveData<Progress>? = null,
 ) {
     if (attachments.isNotEmpty()) {
-        progress?.postValue(Progress(0, attachments.size))
+        progress?.postValue(DeleteAttachmentProgress(0, attachments.size))
         val imageRoot = getExternalImagesDirectory()
         val audioRoot = getExternalAudioDirectory()
         val fileRoot = getExternalFilesDirectory()
@@ -134,13 +135,13 @@ fun ContextWrapper.deleteAttachments(
             if (file != null && file.exists()) {
                 file.delete()
             }
-            progress?.postValue(Progress(index + 1, attachments.size))
+            progress?.postValue(DeleteAttachmentProgress(index + 1, attachments.size))
         }
     }
     if (ids?.isNotEmpty() == true) {
         WidgetProvider.sendBroadcast(this, ids)
     }
-    progress?.postValue(Progress(inProgress = false))
+    progress?.postValue(DeleteAttachmentProgress(inProgress = false))
 }
 
 fun Context.getBackupDir() = getEmptyFolder("backup")

@@ -39,6 +39,7 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
+import com.philkes.notallyx.presentation.viewmodel.progress.AddFilesProgress
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.Event
@@ -156,7 +157,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                 R.string.error_while_renaming_file
             }
         viewModelScope.launch {
-            addingFiles.postValue(Progress(0, uris.size))
+            addingFiles.postValue(AddFilesProgress(0, uris.size))
 
             val successes = ArrayList<FileAttachment>()
             val errors = ArrayList<FileError>()
@@ -166,10 +167,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
                     app.importFile(uri, directory, fileType, errorWhileRenaming)
                 fileAttachment?.let { successes.add(it) }
                 error?.let { errors.add(it) }
-                addingFiles.postValue(Progress(index + 1, uris.size))
+                addingFiles.postValue(AddFilesProgress(index + 1, uris.size))
             }
 
-            addingFiles.postValue(Progress(inProgress = false))
+            addingFiles.postValue(AddFilesProgress(inProgress = false))
 
             if (successes.isNotEmpty()) {
                 val copy =

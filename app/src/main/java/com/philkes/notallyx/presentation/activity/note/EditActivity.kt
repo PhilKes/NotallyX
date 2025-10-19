@@ -1202,7 +1202,7 @@ abstract class EditActivity(private val type: Type) :
         setupImages()
         setupFiles()
         setupAudios()
-        notallyModel.addingFiles.setupProgressDialog(this, R.string.adding_files)
+        notallyModel.addingFiles.setupProgressDialog(this)
         notallyModel.eventBus.observe(this) { event ->
             event.handle { errors -> displayFileErrors(errors) }
         }
