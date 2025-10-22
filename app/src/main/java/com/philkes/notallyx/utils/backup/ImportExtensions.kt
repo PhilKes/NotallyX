@@ -76,7 +76,11 @@ suspend fun ContextWrapper.importZip(
     try {
         val importedNotes =
             withContext(Dispatchers.IO) {
-                val stream = requireNotNull(contentResolver.openInputStream(zipFileUri))
+                val stream =
+                    requireNotNull(
+                        contentResolver.openInputStream(zipFileUri),
+                        { "InputStream for zipFileUri '$zipFileUri' is null" },
+                    )
                 val tempZipFile = File(databaseFolder, "TEMP.zip")
                 stream.copyToFile(tempZipFile)
                 val zipFile = ZipFile(tempZipFile)
@@ -375,7 +379,11 @@ suspend fun Context.importFile(
     proposedMimeType: String? = null,
 ): Pair<FileAttachment?, FileError?> {
     return withContext(Dispatchers.IO) {
-        val document = requireNotNull(DocumentFile.fromSingleUri(this@importFile, uri))
+        val document =
+            requireNotNull(
+                DocumentFile.fromSingleUri(this@importFile, uri),
+                { "importFile: could not read file from: '$uri'" },
+            )
         val displayName = document.name ?: getString(R.string.unknown_name)
         try {
 
@@ -386,7 +394,11 @@ suspend fun Context.importFile(
             */
             val temp = File(directory, "Temp")
 
-            val inputStream = requireNotNull(contentResolver.openInputStream(uri))
+            val inputStream =
+                requireNotNull(
+                    contentResolver.openInputStream(uri),
+                    { "importFile: InputStream for '$uri' is null" },
+                )
             inputStream.copyToFile(temp)
 
             val originalName = getFileName(uri)

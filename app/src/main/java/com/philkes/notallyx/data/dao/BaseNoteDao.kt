@@ -142,14 +142,16 @@ interface BaseNoteDao {
      * In this case, an exception will be thrown. It is the caller's responsibility to handle it.
      */
     suspend fun updateChecked(id: Long, position: Int, checked: Boolean) {
-        val items = requireNotNull(get(id)).items
+        val items =
+            requireNotNull(get(id), { "updateChecked: Note with id '$id' does not exist" }).items
         items[position].checked = checked
         updateItems(id, items)
     }
 
     /** see [updateChecked] */
     suspend fun updateChecked(id: Long, positions: List<Int>, checked: Boolean) {
-        val items = requireNotNull(get(id)).items
+        val items =
+            requireNotNull(get(id), { "updateChecked: Note with id '$id' does not exist" }).items
         positions.forEach { position -> items[position].checked = checked }
         updateItems(id, items)
     }

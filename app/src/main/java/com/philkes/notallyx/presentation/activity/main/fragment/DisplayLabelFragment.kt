@@ -20,7 +20,11 @@ class DisplayLabelFragment : NotallyFragment() {
     override fun getBackground() = R.drawable.label
 
     override fun getObservable(): LiveData<List<Item>> {
-        label = requireNotNull(requireArguments().getString(EXTRA_DISPLAYED_LABEL))
+        label =
+            requireNotNull(
+                requireArguments().getString(EXTRA_DISPLAYED_LABEL),
+                { "DisplayLabelFragment does not have '$EXTRA_DISPLAYED_LABEL' arg" },
+            )
         return model.getNotesByLabel(label)
     }
 

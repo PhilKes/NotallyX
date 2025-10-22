@@ -235,7 +235,11 @@ class ViewImageActivity : LockedActivity<ActivityViewImageBinding>() {
             withContext(Dispatchers.IO) {
                 val mediaRoot = application.getExternalImagesDirectory()
                 val file =
-                    if (mediaRoot != null) File(mediaRoot, requireNotNull(currentImage).localName)
+                    if (mediaRoot != null)
+                        File(
+                            mediaRoot,
+                            requireNotNull(currentImage, { "currentImage is null" }).localName,
+                        )
                     else null
                 if (file != null && file.exists()) {
                     val output = contentResolver.openOutputStream(uri) as FileOutputStream

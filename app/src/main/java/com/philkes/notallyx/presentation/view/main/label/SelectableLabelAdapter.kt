@@ -19,6 +19,6 @@ class SelectableLabelAdapter(private val selectedLabels: List<String>) :
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): SelectableLabelVH {
         val inflater = LayoutInflater.from(parent.context)
         val binding = RecyclerSelectableLabelBinding.inflate(inflater, parent, false)
-        return SelectableLabelVH(binding, requireNotNull(onChecked))
+        return SelectableLabelVH(binding, requireNotNull(onChecked, { "onChecked is null" }))
     }
 }

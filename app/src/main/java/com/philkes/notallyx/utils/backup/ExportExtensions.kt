@@ -106,7 +106,7 @@ fun ContextWrapper.createBackup(): Result {
     val path = preferences.backupsFolder.value
 
     if (path != EMPTY_PATH) {
-        val uri = Uri.parse(path)
+        val uri = path.toUri()
         val folder =
             requireBackupFolder(
                 path,
@@ -127,7 +127,12 @@ fun ContextWrapper.createBackup(): Result {
             val backupFilePrefix = PERIODIC_BACKUP_FILE_PREFIX
             val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}.zip"
             log(msg = "Creating '$uri/$name'...")
-            val zipUri = requireNotNull(folder.createFile(MIME_TYPE_ZIP, name)).uri
+            val zipUri =
+                requireNotNull(
+                        folder.createFile(MIME_TYPE_ZIP, name),
+                        { "Failed to create '$name' for Backup in Folder: '${folder.uri}'" },
+                    )
+                    .uri
             val exportedNotes = app.exportAsZip(zipUri, password = preferences.backupPassword.value)
             log(msg = "Exported $exportedNotes notes")
             val backupFiles = folder.listZipFiles(backupFilePrefix)

@@ -200,7 +200,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
             doAfterTextChanged { text ->
                 val isSearchFragment = navController.currentDestination?.id == R.id.Search
                 if (isSearchFragment) {
-                    model.keyword = requireNotNull(text).trim().toString()
+                    model.keyword = requireNotNull(text, { "text is null" }).trim().toString()
                 }
                 if (text?.isNotEmpty() == true && !isSearchFragment) {
                     setText("")

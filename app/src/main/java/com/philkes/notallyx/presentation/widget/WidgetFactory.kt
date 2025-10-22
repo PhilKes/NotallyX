@@ -53,7 +53,7 @@ class WidgetFactory(
 
     override fun getViewAt(position: Int): RemoteViews {
         val copy = baseNote
-        requireNotNull(copy)
+        requireNotNull(copy, { "baseNote is null" })
 
         return when (copy.type) {
             Type.NOTE -> getNoteView(copy)

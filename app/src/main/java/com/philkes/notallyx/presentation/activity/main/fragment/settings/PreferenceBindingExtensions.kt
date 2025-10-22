@@ -434,7 +434,11 @@ fun PreferenceBinding.setupBackupsFolder(
         root.setOnClickListener { chooseBackupFolder() }
     } else {
         val uri = Uri.parse(value)
-        val folder = requireNotNull(DocumentFile.fromTreeUri(context, uri))
+        val folder =
+            requireNotNull(
+                DocumentFile.fromTreeUri(context, uri),
+                { "Folder with uri: '$uri' does not exist" },
+            )
         if (folder.exists()) {
             val path = uri.toReadablePath()
             Value.text = path

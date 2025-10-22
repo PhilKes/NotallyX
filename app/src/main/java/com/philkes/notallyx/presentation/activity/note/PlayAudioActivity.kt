@@ -52,7 +52,8 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         configureEdgeToEdgeInsets()
         audio =
             requireNotNull(
-                intent?.let { IntentCompat.getParcelableExtra(it, EXTRA_AUDIO, Audio::class.java) }
+                intent?.let { IntentCompat.getParcelableExtra(it, EXTRA_AUDIO, Audio::class.java) },
+                { "PlayAudioActivity intent has no '$EXTRA_AUDIO' extra" },
             )
         binding.AudioControlView.setDuration(audio.duration)
 
@@ -159,7 +160,7 @@ class PlayAudioActivity : LockedActivity<ActivityPlayAudioBinding>() {
         super.onDestroy()
         if (service != null) {
             unbindService(connection)
-            requireNotNull(service).onStateChange = null
+            requireNotNull(service, { "service is null" }).onStateChange = null
             service = null
         }
         if (isFinishing) {

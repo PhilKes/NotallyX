@@ -32,7 +32,11 @@ class SelectLabelsActivity : LockedActivity<ActivityLabelBinding>() {
         configureEdgeToEdgeInsets()
 
         val savedList = savedInstanceState?.getStringArrayList(EXTRA_SELECTED_LABELS)
-        val passedList = requireNotNull(intent.getStringArrayListExtra(EXTRA_SELECTED_LABELS))
+        val passedList =
+            requireNotNull(
+                intent.getStringArrayListExtra(EXTRA_SELECTED_LABELS),
+                { "SelectLabelsActivity intent has no '$EXTRA_SELECTED_LABELS' extra" },
+            )
         selectedLabels = savedList ?: passedList
 
         val result = Intent()

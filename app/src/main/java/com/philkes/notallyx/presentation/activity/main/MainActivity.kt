@@ -494,7 +494,9 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
                         fragmentIdToLoad != null &&
                             navController.currentDestination?.id != fragmentIdToLoad
                     ) {
-                        navigateWithAnimation(requireNotNull(fragmentIdToLoad))
+                        navigateWithAnimation(
+                            requireNotNull(fragmentIdToLoad, { "fragmentIdToLoad is null" })
+                        )
                     }
                 }
             }

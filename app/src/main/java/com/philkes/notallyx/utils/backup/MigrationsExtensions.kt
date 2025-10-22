@@ -19,7 +19,11 @@ fun Context.clearAllFolders() {
 
 fun Context.getPreviousLabels(): List<Label> {
     val preferences = getLabelsPreferences()
-    val labels = requireNotNull(preferences.getStringSet("labelItems", emptySet()))
+    val labels =
+        requireNotNull(
+            preferences.getStringSet("labelItems", emptySet()),
+            { "preference do not have 'labelItems' String set" },
+        )
     return labels.map { value -> Label(value) }
 }
 

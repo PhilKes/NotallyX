@@ -210,7 +210,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         if (labelCache[label] == null) {
             labelCache[label] = Content(baseNoteDao.getBaseNotesByLabel(label), ::transform)
         }
-        return requireNotNull(labelCache[label])
+        return requireNotNull(labelCache[label], { "labelCache has no '$label' value" })
     }
 
     fun getNotesWithoutLabel(): Content {
@@ -357,7 +357,11 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         viewModelScope.launch(exceptionHandler) {
             val importedNotes =
                 withContext(Dispatchers.IO) {
-                    val stream = requireNotNull(app.contentResolver.openInputStream(uri))
+                    val stream =
+                        requireNotNull(
+                            app.contentResolver.openInputStream(uri),
+                            { "InputStream for '$uri' is null" },
+                        )
                     val (baseNotes, labels) = stream.readAsBackup()
                     commonDao.importBackup(baseNotes, labels)
                     baseNotes.size
