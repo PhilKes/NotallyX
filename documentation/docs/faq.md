@@ -1,5 +1,6 @@
 ---
-sidebar_position: 7
+title: ❓ FAQ
+sidebar_position: 9
 ---
 
 # FAQ - Frequently Asked Questions
@@ -57,7 +58,7 @@ Yes, you can use the backup and restore feature to transfer your notes to a new 
 ### Can I sync my notes across multiple devices?
 
 NotallyX doesn't include built-in sync functionality. However, you can use third-party cloud storage services to sync your backup files across devices.
-See [Settings](./features/settings.mdx#asd)
+See [Settings](settings.mdx#asd)
 
 ### Can I recover deleted notes?
 

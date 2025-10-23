@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  webdav:
+    image: bytemark/webdav
+    container_name: webdav
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    environment:
+      AUTH_TYPE: Basic
+      USERNAME: webdavuser
+      PASSWORD: webdavpass
+    volumes:
+      - ./shared:/var/lib/dav

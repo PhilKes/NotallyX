@@ -1,0 +1,65 @@
+---
+title: 💾 Backups
+type: category
+description: How to securely backup your data
+sidebar_position: 6
+---
+
+# Backups
+
+NotallyX provides several features to help backing up your data.
+
+
+### Auto-Backup
+NotallyX can automatically back up your notes to prevent data loss.
+
+1. Open the app settings
+2. Navigate to "Auto Backups"
+3. Tap "Backups Folder" and "Choose folder" to select a folder for backups
+4. After you've set your backups folder you can:
+    - Enable auto backups whenever a note changed ("Backup on exit Note automatically")
+    - Enable periodic backups
+    - Configure the amount of previous backups to keep
+
+### Manual Backup
+
+You can also create backups manually:
+
+1. Open the app settings
+2. Navigate to "Backup"
+3. Tap "Export backup"
+4. Choose a location and name for the backup
+5. Tap "Save"
+
+### Using Cloud-Storage/WebDAV
+
+#### SAF Mounts
+If you wish to store your backups on a Cloud-Storage/WebDAV, you need to use a third-party app to mount your Cloud-Storage/WebDAV on your device, so that the SAF (Storage Access Framework) can access it.
+For generic WebDAV servers you can use apps like [DAVx⁵](https://f-droid.org/en/packages/at.bitfire.davdroid/), [RS File Explorer](https://play.google.com/store/search?q=rs+file+explorer&c=apps&hl=en) or similar,
+as long as they are able to mount your WebDAV server into your android system.
+E.g. for [DAVx⁵](https://f-droid.org/en/packages/at.bitfire.davdroid/):
+1. Open DAVx⁵ -> Menu -> `WebDAV mounts` -> `+`
+2. Enter `URL`, `Display Name`, `Username`, `Password` of your WebDAV Server ->  `Add mount`
+3. After adding your mount, you can go back into NotallyX and setup the backup folder, you will now see your WebDAV in the file chooser and can pick any folder on it:
+<img src={require('/img/webdav.png').default} width="32%" alt="WebDAV in File Chooser" />
+
+#### Synchronization
+Instead of mounting your Cloud-Storage/WebDAV you can also use apps like [FolderSync](https://play.google.com/store/apps/details?id=dk.tacit.android.foldersync.lite&hl=en) to sync a folder on your device with other devices and simply set NotallyX's backup folder to that synched folder.
+
+
+### Restoring from Backup
+
+If you need to restore your notes from a backup:
+
+1. Open the app settings
+2. Navigate to "Backup"
+3. Tap "Import backup"
+4. Select the backup file you want to restore from
+5. If your backup is password protected, provide the correct password
+6. Tap "Import Backup"
+
+Note: Importing a backup does not delete any existing notes/labels
+
+## Related Features
+
+- [Settings](../settings.mdx): Learn about ways to customize NotallyX

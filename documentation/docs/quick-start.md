@@ -1,4 +1,5 @@
 ---
+title: 🚀 Quick Start
 sidebar_position: 1
 ---
 
@@ -57,7 +58,7 @@ To organize notes by category:
 3. Select existing labels or create a new one
 4. Tap "Apply"
 
-For more details see 🏷️ [Labels and Organization](features/labels-organization.mdx)
+For more details see 🏷️ [Labels and Organization](features/labels.mdx)
 
 ### Coloring Notes
 
@@ -75,4 +76,4 @@ To visually distinguish notes:
 
 ## Next Steps
 
-Now that you know the basics, explore the [Features Overview](features/overview.md) to learn about more advanced capabilities of NotallyX.
+Now that you know the basics, explore the [Features Overview](./features) to learn about more advanced capabilities of NotallyX.

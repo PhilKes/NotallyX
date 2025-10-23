@@ -1,4 +1,5 @@
 ---
+title: 🤝🏼 Contributing
 sidebar_position: 10
 ---
 

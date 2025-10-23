@@ -1,6 +1,7 @@
 {
   "label": "Features",
   "position": 3,
+  "collapsible": false,
   "link": {
     "type": "generated-index",
     "description": "Explore the features and capabilities of NotallyX."
