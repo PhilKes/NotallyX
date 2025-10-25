@@ -129,8 +129,11 @@ fun ContextWrapper.createBackup(): Result {
             log(msg = "Creating '$uri/$name'...")
             val zipUri =
                 requireNotNull(
-                        folder.createFile(MIME_TYPE_ZIP, name),
-                        { "Failed to create '$name' for Backup in Folder: '${folder.uri}'" },
+                        folder.createFile(MIME_TYPE_ZIP, name)
+                            ?: folder.createFile(MIME_TYPE_ZIP, name.removeSuffix(".zip")),
+                        {
+                            "Failed to create '$name' for Backup in Folder: '${folder.uri}', make sure the selected folder exists"
+                        },
                     )
                     .uri
             val exportedNotes = app.exportAsZip(zipUri, password = preferences.backupPassword.value)
