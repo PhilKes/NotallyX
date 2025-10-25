@@ -43,7 +43,6 @@ import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
-import java.lang.UnsupportedOperationException
 import java.net.URLEncoder
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -426,10 +425,20 @@ fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
     this.observeForever(wrapperObserver)
 }
 
-fun Uri.toReadablePath(): String {
-    return path!!
+fun Context.toReadablePath(uri: Uri): String {
+    if (uri.authority == "com.android.externalstorage.documents") {
+        return toReadable(uri.path!!)
+    }
+    val documentFile = DocumentFile.fromTreeUri(this, uri)
+    return documentFile?.name?.let { "${uri.authority}/$it" }
+        ?: uri.path?.let { toReadable(it) }
+        ?: uri.toString()
+}
+
+private fun toReadable(uriPath: String): String {
+    return uriPath
         .replaceFirst("/tree/primary:", "Internal Storage/")
-        .replaceFirst("/tree/.*:".toRegex(), "External Storage/")
+        .replace("^/tree/([^:]+):/?".toRegex(), "External Storage/$1/")
 }
 
 val isBeforeVanillaIceCream
