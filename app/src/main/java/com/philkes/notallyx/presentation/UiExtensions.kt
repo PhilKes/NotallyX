@@ -841,20 +841,78 @@ fun Fragment.showDialog(
     messageResId: Int,
     positiveButtonTextResId: Int,
     onPositiveButtonClickListener: DialogInterface.OnClickListener,
+    neutralButtonTextResId: Int? = null,
+    onNeutralButtonClickListener: DialogInterface.OnClickListener? = null,
+    fullSize: Boolean = false,
 ) =
     requireContext()
-        .showDialog(messageResId, positiveButtonTextResId, onPositiveButtonClickListener)
+        .showDialog(
+            messageResId,
+            positiveButtonTextResId,
+            onPositiveButtonClickListener,
+            neutralButtonTextResId,
+            onNeutralButtonClickListener,
+            fullSize,
+        )
+
+fun Fragment.showDialog(
+    message: String,
+    positiveButtonTextResId: Int,
+    onPositiveButtonClickListener: DialogInterface.OnClickListener,
+    neutralButtonTextResId: Int? = null,
+    onNeutralButtonClickListener: DialogInterface.OnClickListener? = null,
+    fullSize: Boolean = false,
+) =
+    requireContext()
+        .showDialog(
+            message,
+            positiveButtonTextResId,
+            onPositiveButtonClickListener,
+            neutralButtonTextResId,
+            onNeutralButtonClickListener,
+            fullSize,
+        )
 
 fun Context.showDialog(
     messageResId: Int,
     positiveButtonTextResId: Int,
     onPositiveButtonClickListener: DialogInterface.OnClickListener,
+    neutralButtonTextResId: Int? = null,
+    onNeutralButtonClickListener: DialogInterface.OnClickListener? = null,
+    fullSize: Boolean = false,
 ) {
-    MaterialAlertDialogBuilder(this)
-        .setMessage(messageResId)
-        .setPositiveButton(positiveButtonTextResId, onPositiveButtonClickListener)
-        .setCancelButton()
-        .show()
+    MaterialAlertDialogBuilder(this).apply {
+        setMessage(messageResId)
+        setPositiveButton(positiveButtonTextResId, onPositiveButtonClickListener)
+        setCancelButton()
+        neutralButtonTextResId?.let { setNeutralButton(it, onNeutralButtonClickListener) }
+        if (fullSize) {
+            showAndFocus(allowFullSize = true)
+        } else {
+            show()
+        }
+    }
+}
+
+fun Context.showDialog(
+    message: String,
+    positiveButtonTextResId: Int,
+    onPositiveButtonClickListener: DialogInterface.OnClickListener,
+    neutralButtonTextResId: Int? = null,
+    onNeutralButtonClickListener: DialogInterface.OnClickListener? = null,
+    fullSize: Boolean = false,
+) {
+    MaterialAlertDialogBuilder(this).apply {
+        setMessage(message)
+        setPositiveButton(positiveButtonTextResId, onPositiveButtonClickListener)
+        setCancelButton()
+        neutralButtonTextResId?.let { setNeutralButton(it, onNeutralButtonClickListener) }
+        if (fullSize) {
+            showAndFocus(allowFullSize = true)
+        } else {
+            show()
+        }
+    }
 }
 
 fun Fragment.showToast(messageResId: Int) = requireContext().showToast(messageResId)
