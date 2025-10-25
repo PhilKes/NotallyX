@@ -185,10 +185,10 @@ fun Context.logToFile(
     val logFile =
         folder.findFile(fileName).let {
             if (it == null || !it.exists()) {
-                folder.createFile("text/plain", fileName.removeSuffix(".txt"))
+                folder.createFileSafe("text/plain", fileName.removeSuffix(".txt"), ".txt")
             } else if (it.isLargerThanKb(MAX_LOGS_FILE_SIZE_KB)) {
                 it.delete()
-                folder.createFile("text/plain", fileName.removeSuffix(".txt"))
+                folder.createFileSafe("text/plain", fileName.removeSuffix(".txt"), ".txt")
             } else it
         }
 
@@ -385,6 +385,20 @@ fun DocumentFile.listZipFiles(prefix: String): List<DocumentFile> {
                 file.name?.startsWith(prefix, ignoreCase = true) == true
         }
     return zipFiles.sortedByDescending { it.lastModified() }
+}
+
+typealias DocumentFolder = DocumentFile
+
+fun DocumentFolder.createFileSafe(
+    mimeType: String,
+    fileName: String,
+    fileExtension: String,
+): DocumentFile {
+    return requireNotNull(
+        createFile(mimeType, fileName + fileExtension) ?: createFile(mimeType, fileName)
+    ) {
+        "Could not create '$fileName$fileExtension' in Folder '$name' (uri: '$uri')"
+    }
 }
 
 val DocumentFile.nameWithoutExtension: String?

@@ -53,6 +53,7 @@ import com.philkes.notallyx.utils.SUBFOLDER_AUDIOS
 import com.philkes.notallyx.utils.SUBFOLDER_FILES
 import com.philkes.notallyx.utils.SUBFOLDER_IMAGES
 import com.philkes.notallyx.utils.createChannelIfNotExists
+import com.philkes.notallyx.utils.createFileSafe
 import com.philkes.notallyx.utils.createReportBugIntent
 import com.philkes.notallyx.utils.getExportedPath
 import com.philkes.notallyx.utils.getExternalAudioDirectory
@@ -90,13 +91,13 @@ import net.lingala.zip4j.model.enums.EncryptionMethod
 private const val TAG = "ExportExtensions"
 private const val NOTIFICATION_CHANNEL_ID = "AutoBackups"
 private const val NOTIFICATION_ID = 123412
-private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs.txt"
+private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs"
 private const val OUTPUT_DATA_BACKUP_URI = "backupUri"
 
 const val AUTO_BACKUP_WORK_NAME = "com.philkes.notallyx.AutoBackupWork"
 const val OUTPUT_DATA_EXCEPTION = "exception"
 
-private const val ON_SAVE_BACKUP_FILE = "NotallyX_AutoBackup.zip"
+private const val ON_SAVE_BACKUP_FILE = "NotallyX_AutoBackup"
 private const val PERIODIC_BACKUP_FILE_PREFIX = "NotallyX_Backup_"
 
 fun ContextWrapper.createBackup(): Result {
@@ -116,7 +117,7 @@ fun ContextWrapper.createBackup(): Result {
             logToFile(
                 TAG,
                 folder,
-                NOTALLYX_BACKUP_LOGS_FILE,
+                "$NOTALLYX_BACKUP_LOGS_FILE.txt",
                 msg = msg,
                 throwable = throwable,
                 stackTrace = stackTrace,
@@ -125,17 +126,9 @@ fun ContextWrapper.createBackup(): Result {
         try {
             val formatter = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
             val backupFilePrefix = PERIODIC_BACKUP_FILE_PREFIX
-            val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}.zip"
-            log(msg = "Creating '$uri/$name'...")
-            val zipUri =
-                requireNotNull(
-                        folder.createFile(MIME_TYPE_ZIP, name)
-                            ?: folder.createFile(MIME_TYPE_ZIP, name.removeSuffix(".zip")),
-                        {
-                            "Failed to create '$name' for Backup in Folder: '${folder.uri}', make sure the selected folder exists"
-                        },
-                    )
-                    .uri
+            val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
+            log(msg = "Creating '$uri/$name.zip'...")
+            val zipUri = folder.createFileSafe(MIME_TYPE_ZIP, name, ".zip").uri
             val exportedNotes = app.exportAsZip(zipUri, password = preferences.backupPassword.value)
             log(msg = "Exported $exportedNotes notes")
             val backupFiles = folder.listZipFiles(backupFilePrefix)
@@ -175,12 +168,12 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
             "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed, because auto-backup path '$backupPath' is invalid",
         ) ?: return
     fun log(msg: String? = null, throwable: Throwable? = null) {
-        logToFile(TAG, folder, NOTALLYX_BACKUP_LOGS_FILE, msg = msg, throwable = throwable)
+        logToFile(TAG, folder, "$NOTALLYX_BACKUP_LOGS_FILE.txt", msg = msg, throwable = throwable)
     }
     try {
-        var backupFile = folder.findFile(ON_SAVE_BACKUP_FILE)
+        var backupFile = folder.findFile("$ON_SAVE_BACKUP_FILE.zip")
         if (savedNote == null || backupFile == null || !backupFile.exists()) {
-            backupFile = folder.createFile(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE)
+            backupFile = folder.createFileSafe(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE, ".zip")
             exportAsZip(backupFile!!.uri, password = password)
         } else {
             val (_, file) = copyDatabase()
@@ -215,10 +208,15 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
             }
         }
     } catch (e: Exception) {
-        log(
-            "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
-            e,
-        )
+        try {
+            log(
+                "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
+                e,
+            )
+        } catch (logException: Exception) {
+            tryPostErrorNotification(logException)
+            return
+        }
         tryPostErrorNotification(e)
     }
 }
@@ -258,12 +256,14 @@ suspend fun ContextWrapper.checkBackupOnSave(
 }
 
 fun ContextWrapper.deleteModifiedNoteBackup(backupPath: String) {
-    DocumentFile.fromTreeUri(this, backupPath.toUri())?.findFile(ON_SAVE_BACKUP_FILE)?.delete()
+    DocumentFile.fromTreeUri(this, backupPath.toUri())
+        ?.findFile("$ON_SAVE_BACKUP_FILE.zip")
+        ?.delete()
 }
 
 fun ContextWrapper.modifiedNoteBackupExists(backupPath: String): Boolean {
     return DocumentFile.fromTreeUri(this, backupPath.toUri())
-        ?.findFile(ON_SAVE_BACKUP_FILE)
+        ?.findFile("$ON_SAVE_BACKUP_FILE.zip")
         ?.exists() ?: false
 }
 
@@ -542,35 +542,41 @@ fun exportPdfFile(
             duplicateFileCount + 1,
         )
     }
-    folder.createFile(ExportMimeType.PDF.mimeType, validFileName)?.let {
-        val file = DocumentFile.fromFile(File(app.getExportedPath(), filePath))
-        val html =
-            note.toHtml(
-                NotallyXPreferences.getInstance(app).showDateCreated(),
-                app.getExternalImagesDirectory(),
-            )
-        app.printPdf(
-            file,
-            html,
-            object : PdfPrintListener {
-                override fun onSuccess(file: DocumentFile) {
-                    app.contentResolver.openOutputStream(it.uri)?.use { outStream ->
-                        app.contentResolver.openInputStream(file.uri)?.copyTo(outStream)
-                    }
-                    progress?.postValue(
-                        BackupProgress(current = counter!!.incrementAndGet(), total = total!!)
-                    )
-                    if (counter!!.get() == total!!) {
-                        pdfPrintListener?.onSuccess(file)
-                    }
-                }
-
-                override fun onFailure(message: CharSequence?) {
-                    pdfPrintListener?.onFailure(message)
-                }
-            },
+    folder
+        .createFileSafe(
+            ExportMimeType.PDF.mimeType,
+            validFileName,
+            ".${ExportMimeType.PDF.fileExtension}",
         )
-    }
+        .let {
+            val file = DocumentFile.fromFile(File(app.getExportedPath(), filePath))
+            val html =
+                note.toHtml(
+                    NotallyXPreferences.getInstance(app).showDateCreated(),
+                    app.getExternalImagesDirectory(),
+                )
+            app.printPdf(
+                file,
+                html,
+                object : PdfPrintListener {
+                    override fun onSuccess(file: DocumentFile) {
+                        app.contentResolver.openOutputStream(it.uri)?.use { outStream ->
+                            app.contentResolver.openInputStream(file.uri)?.copyTo(outStream)
+                        }
+                        progress?.postValue(
+                            BackupProgress(current = counter!!.incrementAndGet(), total = total!!)
+                        )
+                        if (counter!!.get() == total!!) {
+                            pdfPrintListener?.onSuccess(file)
+                        }
+                    }
+
+                    override fun onFailure(message: CharSequence?) {
+                        pdfPrintListener?.onFailure(message)
+                    }
+                },
+            )
+        }
 }
 
 suspend fun exportPlainTextFile(
@@ -602,28 +608,33 @@ suspend fun exportPlainTextFile(
     }
     return withContext(Dispatchers.IO) {
         val file =
-            folder.createFile(exportType.mimeType, validFileName)?.let {
-                app.contentResolver.openOutputStream(it.uri)?.use { stream ->
-                    OutputStreamWriter(stream).use { writer ->
-                        writer.write(
-                            when (exportType) {
-                                ExportMimeType.TXT ->
-                                    note.toTxt(includeTitle = false, includeCreationDate = false)
+            folder
+                .createFileSafe(exportType.mimeType, validFileName, ".${exportType.fileExtension}")
+                .let {
+                    app.contentResolver.openOutputStream(it.uri)?.use { stream ->
+                        OutputStreamWriter(stream).use { writer ->
+                            writer.write(
+                                when (exportType) {
+                                    ExportMimeType.TXT ->
+                                        note.toTxt(
+                                            includeTitle = false,
+                                            includeCreationDate = false,
+                                        )
 
-                                ExportMimeType.JSON -> note.toJson()
-                                ExportMimeType.HTML ->
-                                    note.toHtml(
-                                        NotallyXPreferences.getInstance(app).showDateCreated(),
-                                        app.getExternalImagesDirectory(),
-                                    )
+                                    ExportMimeType.JSON -> note.toJson()
+                                    ExportMimeType.HTML ->
+                                        note.toHtml(
+                                            NotallyXPreferences.getInstance(app).showDateCreated(),
+                                            app.getExternalImagesDirectory(),
+                                        )
 
-                                else -> TODO("Unsupported MimeType for Export")
-                            }
-                        )
+                                    else -> TODO("Unsupported MimeType for Export")
+                                }
+                            )
+                        }
                     }
+                    it
                 }
-                it
-            }
         progress?.postValue(BackupProgress(current = counter!!.incrementAndGet(), total = total!!))
         return@withContext file
     }
