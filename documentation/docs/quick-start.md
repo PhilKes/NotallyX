@@ -76,4 +76,4 @@ To visually distinguish notes:
 
 ## Next Steps
 
-Now that you know the basics, explore the [Features Overview](./features) to learn about more advanced capabilities of NotallyX.
+Now that you know the basics, explore the [Features Overview](./category/features) to learn about more advanced capabilities of NotallyX.

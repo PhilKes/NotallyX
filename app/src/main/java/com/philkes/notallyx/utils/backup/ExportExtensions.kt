@@ -161,6 +161,14 @@ fun ContextWrapper.createBackup(): Result {
     return Result.success()
 }
 
+fun ContextWrapper.autoBackupOnSaveFileExists(backupPath: String): Boolean {
+    val backupFolderFile = DocumentFile.fromTreeUri(this, backupPath.toUri())
+    return backupFolderFile?.let {
+        val autoBackupFile = it.findFile("$ON_SAVE_BACKUP_FILE.zip")
+        autoBackupFile == null || !autoBackupFile.exists()
+    } ?: false
+}
+
 fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedNote: BaseNote?) {
     val folder =
         requireBackupFolder(
@@ -171,14 +179,24 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
         logToFile(TAG, folder, "$NOTALLYX_BACKUP_LOGS_FILE.txt", msg = msg, throwable = throwable)
     }
     try {
+        var changedNote = savedNote
         var backupFile = folder.findFile("$ON_SAVE_BACKUP_FILE.zip")
-        if (savedNote == null || backupFile == null || !backupFile.exists()) {
-            backupFile = folder.createFileSafe(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE, ".zip")
-            exportAsZip(backupFile!!.uri, password = password)
+        backupFile =
+            if (backupFile == null || !backupFile.exists()) {
+                if (savedNote != null) {
+                    log("Re-creating full backup since auto backup ZIP unexpectedly does not exist")
+                    changedNote = null
+                }
+                folder.createFileSafe(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE, ".zip")
+            } else backupFile
+        if (changedNote == null) {
+            // Export all notes
+            exportAsZip(backupFile.uri, password = password)
         } else {
+            // Only add changed note to existing backup ZIP
             val (_, file) = copyDatabase()
             val files =
-                with(savedNote) {
+                with(changedNote) {
                     images.map {
                         BackupFile(
                             SUBFOLDER_IMAGES,
