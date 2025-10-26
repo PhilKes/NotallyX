@@ -1,5 +1,13 @@
 # Changelog
 
+## [v7.5.1](https://github.com/PhilKes/NotallyX/tree/v7.5.1) (2025-10-26)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.5.0...v7.5.1)
+
+### Fixed Bugs
+
+- Does not export all selected notes [\#637](https://github.com/PhilKes/NotallyX/issues/637)
+
 ## [v7.5.0](https://github.com/PhilKes/NotallyX/tree/v7.5.0) (2025-10-18)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.4.2...v7.5.0)

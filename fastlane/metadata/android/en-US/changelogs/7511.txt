@@ -1,0 +1,3 @@
+- Fix exporting many notes at once
+- Fix duplicate backup logs txt files created
+- Added improve documentation on using WebDAV
