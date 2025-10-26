@@ -47,6 +47,6 @@ See [Android Translations Converter](https://github.com/PhilKes/android-translat
 | 🇹🇷 Turkish | 23% (73/307) |
 | 🇺🇦 Ukrainian | 21% (65/307) |
 | 🇻🇳 Vietnamese | 34% (107/307) |
-| 🇨🇳 Chinese (Simplified) | 98% (303/307) |
+| 🇨🇳 Chinese (Simplified) | 99% (304/307) |
 | 🇹🇼 Chinese (Traditional) | 95% (294/307) |
 <!-- translations:end -->

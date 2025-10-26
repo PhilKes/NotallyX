@@ -123,7 +123,7 @@
     <string name="disallow_screenshots">禁止截屏</string>
     <string name="discard">取消</string>
     <string name="display_text">要展示的我呢本</string>
-    <string name="documentation">文件记录</string>
+    <string name="documentation">文档</string>
     <string name="donate">捐赠</string>
     <string name="drag_handle">拖动处理</string>
     <string name="edit">编辑</string>
@@ -150,6 +150,10 @@
     <string name="export_settings_failure">未能导出设置，你选择的路径有效吗？</string>
     <string name="export_settings_message">所有设置都将导出为 JSON 文件，该文件可用于重新导入所存储的设置。请注意，这个文件中并不包含已加密的设置，如自动备份密码或生物特征认证密钥</string>
     <string name="export_settings_success">成功地导出了设置</string>
+    <plurals name="exported_notes">
+        <item quantity="one">导出了%1$s则笔记</item>
+        <item quantity="other">导出了%1$s则笔记</item>
+    </plurals>
     <string name="exporting_backup">正在导出备份</string>
     <string name="extracted_files">已提取文件</string>
     <string name="filter">过滤</string>
