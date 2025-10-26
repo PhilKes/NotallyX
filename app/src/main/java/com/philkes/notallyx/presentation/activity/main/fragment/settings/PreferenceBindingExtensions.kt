@@ -440,7 +440,7 @@ fun PreferenceBinding.setupBackupsFolder(
                 { "Folder with uri: '$uri' does not exist" },
             )
         if (folder.exists()) {
-            val path = uri.toReadablePath()
+            val path = context.toReadablePath(uri)
             Value.text = path
         } else Value.setText(R.string.cant_find_folder)
 

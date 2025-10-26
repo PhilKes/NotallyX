@@ -43,7 +43,6 @@ import java.io.File
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.io.PrintWriter
-import java.lang.UnsupportedOperationException
 import java.net.URLEncoder
 import java.text.DateFormat
 import java.text.SimpleDateFormat
@@ -185,10 +184,10 @@ fun Context.logToFile(
     val logFile =
         folder.findFile(fileName).let {
             if (it == null || !it.exists()) {
-                folder.createFile("text/plain", fileName.removeSuffix(".txt"))
+                folder.createFileSafe("text/plain", fileName.removeSuffix(".txt"), ".txt")
             } else if (it.isLargerThanKb(MAX_LOGS_FILE_SIZE_KB)) {
                 it.delete()
-                folder.createFile("text/plain", fileName.removeSuffix(".txt"))
+                folder.createFileSafe("text/plain", fileName.removeSuffix(".txt"), ".txt")
             } else it
         }
 
@@ -387,6 +386,20 @@ fun DocumentFile.listZipFiles(prefix: String): List<DocumentFile> {
     return zipFiles.sortedByDescending { it.lastModified() }
 }
 
+typealias DocumentFolder = DocumentFile
+
+fun DocumentFolder.createFileSafe(
+    mimeType: String,
+    fileName: String,
+    fileExtension: String,
+): DocumentFile {
+    return requireNotNull(
+        createFile(mimeType, fileName + fileExtension) ?: createFile(mimeType, fileName)
+    ) {
+        "Could not create '$fileName$fileExtension' in Folder '$name' (uri: '$uri')"
+    }
+}
+
 val DocumentFile.nameWithoutExtension: String?
     get() = name?.substringBeforeLast(".")
 
@@ -412,10 +425,20 @@ fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
     this.observeForever(wrapperObserver)
 }
 
-fun Uri.toReadablePath(): String {
-    return path!!
+fun Context.toReadablePath(uri: Uri): String {
+    if (uri.authority == "com.android.externalstorage.documents") {
+        return toReadable(uri.path!!)
+    }
+    val documentFile = DocumentFile.fromTreeUri(this, uri)
+    return documentFile?.name?.let { "${uri.authority}/$it" }
+        ?: uri.path?.let { toReadable(it) }
+        ?: uri.toString()
+}
+
+private fun toReadable(uriPath: String): String {
+    return uriPath
         .replaceFirst("/tree/primary:", "Internal Storage/")
-        .replaceFirst("/tree/.*:".toRegex(), "External Storage/")
+        .replace("^/tree/([^:]+):/?".toRegex(), "External Storage/$1/")
 }
 
 val isBeforeVanillaIceCream

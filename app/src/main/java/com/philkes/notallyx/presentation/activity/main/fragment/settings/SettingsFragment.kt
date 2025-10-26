@@ -18,6 +18,7 @@ import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity.RESULT_OK
+import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -622,35 +623,47 @@ class SettingsFragment : Fragment() {
     private fun NotallyXPreferences.setupSettings(binding: FragmentSettingsBinding) {
         binding.apply {
             ImportSettings.setOnClickListener {
-                showDialog(R.string.import_settings_message, R.string.import_action) { _, _ ->
-                    val intent =
-                        Intent(Intent.ACTION_OPEN_DOCUMENT)
-                            .apply {
-                                type = MIME_TYPE_JSON
-                                addCategory(Intent.CATEGORY_OPENABLE)
-                                putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
-                            }
-                            .wrapWithChooser(requireContext())
-                    importSettingsActivityResultLauncher.launch(intent)
-                }
+                showDialog(
+                    R.string.import_settings_message,
+                    R.string.import_action,
+                    { _, _ ->
+                        val intent =
+                            Intent(Intent.ACTION_OPEN_DOCUMENT)
+                                .apply {
+                                    type = MIME_TYPE_JSON
+                                    addCategory(Intent.CATEGORY_OPENABLE)
+                                    putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
+                                }
+                                .wrapWithChooser(requireContext())
+                        importSettingsActivityResultLauncher.launch(intent)
+                    },
+                )
             }
             ExportSettings.setOnClickListener {
-                showDialog(R.string.export_settings_message, R.string.export) { _, _ ->
-                    val intent =
-                        Intent(Intent.ACTION_CREATE_DOCUMENT)
-                            .apply {
-                                type = MIME_TYPE_JSON
-                                addCategory(Intent.CATEGORY_OPENABLE)
-                                putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
-                            }
-                            .wrapWithChooser(requireContext())
-                    exportSettingsActivityResultLauncher.launch(intent)
-                }
+                showDialog(
+                    R.string.export_settings_message,
+                    R.string.export,
+                    { _, _ ->
+                        val intent =
+                            Intent(Intent.ACTION_CREATE_DOCUMENT)
+                                .apply {
+                                    type = MIME_TYPE_JSON
+                                    addCategory(Intent.CATEGORY_OPENABLE)
+                                    putExtra(Intent.EXTRA_TITLE, "NotallyX_Settings.json")
+                                }
+                                .wrapWithChooser(requireContext())
+                        exportSettingsActivityResultLauncher.launch(intent)
+                    },
+                )
             }
             ResetSettings.setOnClickListener {
-                showDialog(R.string.reset_settings_message, R.string.reset_settings) { _, _ ->
-                    model.resetPreferences { _ -> showToast(R.string.reset_settings_success) }
-                }
+                showDialog(
+                    R.string.reset_settings_message,
+                    R.string.reset_settings,
+                    { _, _ ->
+                        model.resetPreferences { _ -> showToast(R.string.reset_settings_success) }
+                    },
+                )
             }
             dataInPublicFolder.observe(viewLifecycleOwner) { value ->
                 binding.DataInPublicFolder.setup(
@@ -803,10 +816,17 @@ class SettingsFragment : Fragment() {
     }
 
     private fun displayChooseBackupFolderDialog() {
-        showDialog(R.string.auto_backups_folder_hint, R.string.choose_folder) { _, _ ->
-            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).wrapWithChooser(requireContext())
-            chooseBackupFolderActivityResultLauncher.launch(intent)
-        }
+        showDialog(
+            getString(R.string.auto_backups_folder_hint, getString(R.string.documentation)),
+            R.string.choose_folder,
+            { _, _ ->
+                val intent = Intent(ACTION_OPEN_DOCUMENT_TREE).wrapWithChooser(requireContext())
+                chooseBackupFolderActivityResultLauncher.launch(intent)
+            },
+            R.string.documentation,
+            { _, _ -> openDocsLink("features/backups#using-cloud-storagewebdav") },
+            fullSize = true,
+        )
     }
 
     private fun showEnableBiometricLock() {
@@ -845,23 +865,31 @@ class SettingsFragment : Fragment() {
     }
 
     private fun showBiometricsNotSetupDialog() {
-        showDialog(R.string.biometrics_not_setup, R.string.tap_to_set_up) { _, _ ->
-            val intent =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    Intent(Settings.ACTION_BIOMETRIC_ENROLL)
-                } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    Intent(Settings.ACTION_FINGERPRINT_ENROLL)
-                } else {
-                    Intent(Settings.ACTION_SECURITY_SETTINGS)
-                }
-            setupLockActivityResultLauncher.launch(intent)
-        }
+        showDialog(
+            R.string.biometrics_not_setup,
+            R.string.tap_to_set_up,
+            { _, _ ->
+                val intent =
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        Intent(Settings.ACTION_BIOMETRIC_ENROLL)
+                    } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        Intent(Settings.ACTION_FINGERPRINT_ENROLL)
+                    } else {
+                        Intent(Settings.ACTION_SECURITY_SETTINGS)
+                    }
+                setupLockActivityResultLauncher.launch(intent)
+            },
+        )
     }
 
     private fun openLink(link: String) {
-        val uri = Uri.parse(link)
+        val uri = link.toUri()
         val intent = Intent(Intent.ACTION_VIEW, uri).wrapWithChooser(requireContext())
         startActivity(intent)
+    }
+
+    private fun openDocsLink(docPath: String) {
+        openLink("https://philkes.github.io/NotallyX/docs/$docPath")
     }
 
     private fun askForUriPermissions(uri: Uri) {

@@ -21,8 +21,10 @@ import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.backup.AUTO_BACKUP_WORK_NAME
 import com.philkes.notallyx.utils.backup.autoBackupOnSave
+import com.philkes.notallyx.utils.backup.autoBackupOnSaveFileExists
 import com.philkes.notallyx.utils.backup.cancelAutoBackup
 import com.philkes.notallyx.utils.backup.containsNonCancelled
+import com.philkes.notallyx.utils.backup.createBackup
 import com.philkes.notallyx.utils.backup.deleteModifiedNoteBackup
 import com.philkes.notallyx.utils.backup.isEqualTo
 import com.philkes.notallyx.utils.backup.modifiedNoteBackupExists
@@ -31,6 +33,7 @@ import com.philkes.notallyx.utils.backup.updateAutoBackup
 import com.philkes.notallyx.utils.observeOnce
 import com.philkes.notallyx.utils.security.UnlockReceiver
 import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -79,7 +82,9 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
                 backupFolderBefore,
                 backupFolder,
                 preferences.periodicBackups.value.periodInDays.toLong(),
+                execute = true,
             )
+            checkUpdateAutoBackupOnSave(backupFolderBefore, backupFolder)
         }
         preferences.periodicBackups.observeForever { value ->
             val backupFolder = preferences.backupsFolder.value
@@ -117,14 +122,12 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
                                 previousBackupPassword != backupPassword)
                     ) {
                         deleteModifiedNoteBackup(backupPath)
-                        MainScope().launch {
-                            withContext(Dispatchers.IO) {
-                                autoBackupOnSave(
-                                    backupPath,
-                                    savedNote = null,
-                                    password = backupPassword,
-                                )
-                            }
+                        runOnIODispatcher {
+                            autoBackupOnSave(
+                                backupPath,
+                                savedNote = null,
+                                password = backupPassword,
+                            )
                         }
                     }
                 }
@@ -136,6 +139,7 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
         backupFolderBefore: String?,
         backupFolder: String,
         periodInDays: Long,
+        execute: Boolean = false,
     ) {
         val workManager = getWorkManagerSafe() ?: return
         workManager.getWorkInfosForUniqueWorkLiveData(AUTO_BACKUP_WORK_NAME).observeOnce { workInfos
@@ -150,10 +154,30 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
                     (backupFolderBefore != null && backupFolderBefore != backupFolder)
             ) {
                 workManager.scheduleAutoBackup(this, periodInDays)
+                if (execute) {
+                    runOnIODispatcher { createBackup() }
+                }
             } else if (
                 workInfos.first().periodicityInfo?.isEqualTo(periodInDays, TimeUnit.DAYS) == false
             ) {
                 workManager.updateAutoBackup(workInfos, periodInDays)
+                if (execute) {
+                    runOnIODispatcher { createBackup() }
+                }
+            }
+        }
+    }
+
+    private fun checkUpdateAutoBackupOnSave(backupFolderBefore: String?, backupFolder: String) {
+        if (preferences.backupOnSave.value) {
+            if (backupFolderBefore == null && !autoBackupOnSaveFileExists(backupFolder)) {
+                runOnIODispatcher {
+                    autoBackupOnSave(backupFolder, preferences.backupPassword.value, null)
+                }
+            }
+        } else if (backupFolderBefore != backupFolder) {
+            runOnIODispatcher {
+                autoBackupOnSave(backupFolder, preferences.backupPassword.value, null)
             }
         }
     }
@@ -167,10 +191,8 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
         }
     }
 
-    companion object {
-        private fun isTestRunner(): Boolean {
-            return Build.FINGERPRINT.equals("robolectric", ignoreCase = true)
-        }
+    private fun <T> runOnIODispatcher(block: suspend CoroutineScope.() -> T) {
+        MainScope().launch { withContext(Dispatchers.IO, block) }
     }
 
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle?) {
@@ -188,4 +210,10 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
     override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {}
 
     override fun onActivityDestroyed(activity: Activity) {}
+
+    companion object {
+        private fun isTestRunner(): Boolean {
+            return Build.FINGERPRINT.equals("robolectric", ignoreCase = true)
+        }
+    }
 }

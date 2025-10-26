@@ -28,7 +28,7 @@
     <string name="auto_backup_on_save">Backup on exit Note automatically</string>
     <string name="auto_backup_on_save_hint">By enabling this, a backup (\"NotallyX_AutoBackup.zip\") is automatically created in the configured \"Backups Folder\" whenever a note is exited.\nBe aware this might affect performance</string>
     <string name="auto_backups_folder">Backups Folder</string>
-    <string name="auto_backups_folder_hint">Folder in which all auto backups will be stored in.</string>
+    <string name="auto_backups_folder_hint">Folder in which all auto backups will be stored in.\nIf you want to use Cloud-Storage/WebDAV for your backups, please read the docs (click \"%1$s\")</string>
     <string name="auto_backups_folder_rechoose">You need to re-choose your Backups Folder so that NotallyX has permission to write to it.\nYou can also press cancel to skip importing Backups Folder value</string>
     <string name="auto_backups_folder_set">Set up a Backups Folder above first</string>
     <string name="auto_save_after_idle_time">Auto save note after specified idle time</string>

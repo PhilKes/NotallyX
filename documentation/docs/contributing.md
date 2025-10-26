@@ -17,7 +17,7 @@ There are many ways to contribute to NotallyX, regardless of your technical skil
 - **Suggest features**: Have an idea for a new feature? Share it on [GitHub Issues](https://github.com/PhilKes/NotallyX/issues/new/choose)
 - **Improve documentation**: Help improve this documentation by suggesting changes or additions
 - **Spread the word**: Share NotallyX with others who might find it useful
-- **Translate the app**: Help make NotallyX available in more languages, see [Contributing Translations](#Contributing-Translations)
+- **Translate the app**: Help make NotallyX available in more languages, see `Contributing Translations` below
 
 ### For Developers
 
