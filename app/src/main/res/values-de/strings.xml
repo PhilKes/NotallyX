@@ -152,8 +152,8 @@
     <string name="export_settings_message">Alle Einstellungen werden als JSON Datei exportiert, die dann zum Re-Import genutzt werden kann.\n\nBeachte das hier bei verschlüsselte Einstellungen wie das Auto-Backup Passwort oder die biometrische Verschlüssung nicht exportiert wird</string>
     <string name="export_settings_success">Einstellungen erfolgreich exportiert</string>
     <plurals name="exported_notes">
-        <item quantity="one">1$s Notiz exportiert</item>
-        <item quantity="other">1$s Notizen exportiert</item>
+        <item quantity="one">%1$s Notiz exportiert</item>
+        <item quantity="other">%1$s Notizen exportiert</item>
     </plurals>
     <string name="exporting_backup">Backup Exportieren</string>
     <string name="extracted_files">Dateien extrahiert</string>
