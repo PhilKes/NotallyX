@@ -8,9 +8,7 @@
 .externalNativeBuild
 .cxx
 */.attach_pid*
-fastlane/*
-!fastlane/join-testers.png
-!fastlane/metadata
+fastlane/report.xml
 Gemfile*
 *.sh
 !generate-changelogs.sh

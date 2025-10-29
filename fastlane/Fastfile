@@ -1,0 +1,61 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Runs all the tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Submit a new Beta Build to Crashlytics Beta"
+  lane :beta do
+    gradle(task: "clean assembleRelease")
+    crashlytics
+  
+    # sh "your_script.sh"
+    # You can also use other beta testing services here
+  end
+
+  desc "Submit a new version to the internal track in the Google Play"
+  lane :deploy_internal do
+    gradle(task: "clean")
+    gradle(
+        task: 'bundle',
+        build_type: 'Release',
+        mapping_paths: ['app/obfuscation/mapping-release-bundle.txt', 'app/obfuscation/release-debug-symbols.zip']
+    )
+    upload_to_play_store(track: 'internal')
+  end
+
+
+  desc "Deploy a new version to the Google Play"
+  lane :deploy do
+    gradle(task: "clean assembleRelease")
+    upload_to_play_store
+  end
+
+  desc "Upload only metadata to the Google Play"
+  lane :upload_metadata do
+    supply(
+      metadata_path: "fastlane/metadata/android", # Path to your metadata folder
+      skip_upload_apk: true,
+      skip_upload_aab: true,
+      skip_upload_changelogs: true,
+      track: 'internal'
+    )
+  end
+end
