@@ -36,9 +36,11 @@ platform :android do
     gradle(
         task: 'bundle',
         build_type: 'Release',
+    )
+    upload_to_play_store(
+        track: 'internal',
         mapping_paths: ['app/obfuscation/mapping-release-bundle.txt', 'app/obfuscation/release-debug-symbols.zip']
     )
-    upload_to_play_store(track: 'internal')
   end
 
 

@@ -1,0 +1,2 @@
+- Fix PDF Export
+- Fix Notiz unten abgeschnitten wenn Gesten-Navigation aktiviert ist

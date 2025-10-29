@@ -1,5 +1,14 @@
 # Changelog
 
+## [v7.5.2](https://github.com/PhilKes/NotallyX/tree/v7.5.2) (2025-10-29)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.5.1...v7.5.2)
+
+### Fixed Bugs
+
+- Crash when exporting to PDF [\#684](https://github.com/PhilKes/NotallyX/issues/684)
+- Notes cut off at bottom when using gesture navigation [\#646](https://github.com/PhilKes/NotallyX/issues/646)
+
 ## [v7.5.1](https://github.com/PhilKes/NotallyX/tree/v7.5.1) (2025-10-26)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.5.0...v7.5.1)
