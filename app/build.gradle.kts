@@ -2,6 +2,8 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 import com.ncorti.ktfmt.gradle.tasks.KtfmtFormatTask
 import org.apache.commons.configuration2.PropertiesConfiguration
 import org.apache.commons.configuration2.io.FileHandler
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 plugins {
     id("com.android.application")
@@ -28,7 +30,7 @@ android {
         )
         vectorDrawables.generatedDensities?.clear()
         ndk {
-            debugSymbolLevel=  "FULL"
+            debugSymbolLevel = "FULL"
         }
     }
     ksp {
@@ -75,6 +77,64 @@ android {
             .forEach { output ->
                 output.outputFileName = "NotallyX-$versionName.apk"
             }
+
+        if (buildType.isMinifyEnabled) {
+            // Function to copy proguard mapping.txt file
+            fun copyMapping(suffix: String) {
+                val mappingFile = layout.buildDirectory.file("outputs/mapping/${buildType.name}/mapping.txt").get().asFile
+                if (mappingFile.exists()) {
+                    val target =
+                        File(project.projectDir, "obfuscation/mapping-${buildType.name}-$suffix.txt")
+                    target.parentFile.mkdirs()
+                    mappingFile.copyTo(target, overwrite = true)
+                    println("Copied mapping to: ${target.absolutePath}")
+                }
+            }
+            tasks.matching { it.name == "assemble${name.capitalize()}" }
+                .forEach { bundleTask ->
+                    bundleTask.doLast {
+                        copyMapping("apk")
+                    }
+                }
+            tasks.matching { it.name == "bundle${name.capitalize()}" }
+                .forEach { bundleTask ->
+                    bundleTask.doLast {
+                        copyMapping( "bundle")
+                    }
+                }
+
+            if (buildType.name == "release") {
+                // Match the bundle task for this variant
+                tasks.matching { it.name == "bundle${name.capitalize()}" }.forEach { bundleTask ->
+                    bundleTask.doLast {
+                        // Source folder with native debug symbols
+                        val nativeLibsDir = layout.buildDirectory.file(
+                            "intermediates/merged_native_libs/${buildType.name}/merge${buildType.name.capitalize()}NativeLibs/out/lib"
+                        ).get().asFile
+
+                        if (!nativeLibsDir.exists()) {
+                            println("No native debug symbols found in $nativeLibsDir")
+                            return@doLast
+                        }
+                        // Target zip file
+                        val outputZip = File(project.projectDir, "obfuscation/${buildType.name}-debug-symbols.zip")
+                        outputZip.parentFile.mkdirs()
+                        ZipOutputStream(outputZip.outputStream()).use { zipOut ->
+                            nativeLibsDir.walkTopDown().forEach { file ->
+                                if (file.isFile) {
+                                    // Preserve "lib/ABI/..." folder structure in the zip
+                                    val relativePath = nativeLibsDir.toPath().relativize(file.toPath()).toString()
+                                    zipOut.putNextEntry(ZipEntry(relativePath))
+                                    file.inputStream().use { it.copyTo(zipOut) }
+                                    zipOut.closeEntry()
+                                }
+                            }
+                        }
+                        println("Native debug symbols zipped to: ${outputZip.absolutePath}")
+                    }
+                }
+            }
+        }
     }
 
     dependenciesInfo {

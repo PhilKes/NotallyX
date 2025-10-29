@@ -15,7 +15,6 @@
 -renamesourcefileattribute SourceFile
 -dontobfuscate
 -optimizations !code/simplification/arithmetic,!field/*,!class/merging/*,!code/allocation/variable
--printmapping obfuscation/mapping.txt
 
 -keep class ** extends androidx.navigation.Navigator
 -keep class ** implements org.ocpsoft.prettytime.TimeUnit
