@@ -581,10 +581,17 @@ fun exportPdfFile(
                         app.contentResolver.openOutputStream(it.uri)?.use { outStream ->
                             app.contentResolver.openInputStream(file.uri)?.copyTo(outStream)
                         }
-                        progress?.postValue(
-                            BackupProgress(current = counter!!.incrementAndGet(), total = total!!)
-                        )
-                        if (counter!!.get() == total!!) {
+                        if (progress != null) {
+                            progress.postValue(
+                                BackupProgress(
+                                    current = counter!!.incrementAndGet(),
+                                    total = total!!,
+                                )
+                            )
+                            if (counter.get() == total) {
+                                pdfPrintListener?.onSuccess(file)
+                            }
+                        } else {
                             pdfPrintListener?.onSuccess(file)
                         }
                     }

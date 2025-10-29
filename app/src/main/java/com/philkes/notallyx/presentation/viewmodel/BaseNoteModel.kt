@@ -75,6 +75,7 @@ import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.scheduleNoteReminders
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
+import com.philkes.notallyx.utils.toReadablePath
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.Cipher
@@ -433,7 +434,9 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                                                 R.plurals.exported_notes,
                                                 counter.get(),
                                             )
-                                        app.showToast("$message to '${folderUri.lastPathSegment}'")
+                                        app.showToast(
+                                            "$message to '${app.toReadablePath(folderUri)}'"
+                                        )
                                     }
 
                                     override fun onFailure(message: CharSequence?) {
@@ -460,7 +463,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     actionMode.close(true)
                     progress.postValue(ExportNotesProgress(inProgress = false))
                     val message = app.getQuantityString(R.plurals.exported_notes, counter.get())
-                    app.showToast("$message to '${folderUri.lastPathSegment}'")
+                    app.showToast("$message to '${app.toReadablePath(folderUri)}'")
                 }
             }
         }
