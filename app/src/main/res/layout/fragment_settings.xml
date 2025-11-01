@@ -261,6 +261,13 @@
           android:text="@string/donate" />
 
         <TextView
+          android:id="@+id/ViewLogs"
+          style="@style/Preference"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:text="@string/view_logs" />
+
+        <TextView
             android:id="@+id/Documentation"
             style="@style/Preference"
             android:layout_width="match_parent"

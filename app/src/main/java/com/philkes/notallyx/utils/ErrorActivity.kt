@@ -26,9 +26,12 @@ class ErrorActivity : AppCompatActivity() {
             val stackTrace = CustomActivityOnCrash.getStackTraceFromIntent(intent)
             stackTrace?.let {
                 application.log(TAG, stackTrace = it)
-                Exception.text = stackTrace.lines().firstOrNull() ?: ""
+                ExceptionTitle.text = stackTrace.lines().firstOrNull()?.replaceFirst(":", ":\n")
+                ExceptionDetails.text = stackTrace.lines().drop(1).joinToString("\n")
+                CopyButton.setOnClickListener { copyToClipBoard(stackTrace) }
             }
             ReportButton.setOnClickListener { reportBug(stackTrace) }
+            ViewLogsButton.setOnClickListener { viewLogs() }
         }
     }
 

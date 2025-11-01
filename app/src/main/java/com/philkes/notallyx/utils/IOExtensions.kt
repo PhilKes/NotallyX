@@ -148,12 +148,13 @@ fun Context.getBackupDir() = getEmptyFolder("backup")
 
 fun Context.getExportedPath() = getEmptyFolder("exported")
 
-fun ContextWrapper.getLogsDir() = File(filesDir, "logs").also { it.mkdir() }
+fun ContextWrapper.getLogsDir() =
+    getExternalMediaDirectory("logs") ?: File(filesDir, "logs").also { it.mkdir() }
 
-const val APP_LOG_FILE_NAME = "notallyx-logs.txt"
+const val APP_LOG_FILE_NAME = "notallyx-logs"
 
 fun ContextWrapper.getLogFile(): File {
-    return File(getLogsDir(), APP_LOG_FILE_NAME)
+    return File(getLogsDir(), "$APP_LOG_FILE_NAME.txt")
 }
 
 private fun ContextWrapper.getExternalMediaDirectory(name: String): File? {
