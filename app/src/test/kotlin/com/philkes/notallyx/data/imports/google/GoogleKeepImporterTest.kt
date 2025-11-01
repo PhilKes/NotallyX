@@ -2,6 +2,7 @@ package com.philkes.notallyx.data.imports.google
 
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BodyString
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -246,7 +247,7 @@ class GoogleKeepImporterTest {
                 timestamp,
                 modifiedTimestamp,
                 labels,
-                body,
+                BodyString(body),
                 spans,
                 items,
                 images,

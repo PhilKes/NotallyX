@@ -1,6 +1,7 @@
 package com.philkes.notallyx.utils.backup
 
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BodyString
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.Label
 import com.philkes.notallyx.data.model.ListItem
@@ -107,7 +108,7 @@ private fun XmlPullParser.parseBaseNote(rootTag: String, folder: Folder): BaseNo
         timestamp,
         timestamp,
         labels,
-        body,
+        BodyString(body),
         spans,
         items,
         emptyList(),

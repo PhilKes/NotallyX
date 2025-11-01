@@ -107,6 +107,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.TextSize
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
+import com.philkes.notallyx.utils.changehistory.lastChangeAs
 import com.philkes.notallyx.utils.getUrl
 import java.util.Date
 import me.zhanghai.android.fastscroll.FastScrollerBuilder
@@ -340,7 +341,10 @@ fun StylableEditTextWithHistory.createTextWatcherWithHistory(
         private lateinit var stateBefore: EditTextState
 
         override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-            stateBefore = EditTextState(getTextClone(), selectionStart)
+            // Get state before from last change's after state (if it is EditTextChange
+            stateBefore =
+                changeHistory.lastChangeAs<EditTextWithHistoryChange>()?.newValue
+                    ?: EditTextState(getTextClone(), selectionStart)
         }
 
         override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
@@ -349,7 +353,7 @@ fun StylableEditTextWithHistory.createTextWatcherWithHistory(
 
         override fun afterTextChanged(s: Editable?) {
             val textAfter = requireNotNull(s, { "afterTextChanged: Editable is null" }).clone()
-            if (textAfter.hasNotChanged(stateBefore.text)) {
+            if (textAfter.hasNotChanged(stateBefore.getEditableText())) {
                 return
             }
             updateModel.invoke(textAfter)

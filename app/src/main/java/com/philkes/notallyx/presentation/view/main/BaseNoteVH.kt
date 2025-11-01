@@ -165,13 +165,13 @@ class BaseNoteVH(
     private fun bindNote(baseNote: BaseNote, keyword: String) {
         binding.LinearLayout.visibility = GONE
         if (keyword.isBlank()) {
-            bindNote(baseNote.body, baseNote.spans, baseNote.title.isEmpty())
+            bindNote(baseNote.body.value, baseNote.spans, baseNote.title.isEmpty())
             return
         }
         binding.Note.apply {
-            val snippet = extractSearchSnippet(baseNote.body, keyword)
+            val snippet = extractSearchSnippet(baseNote.body.value, keyword)
             if (snippet == null) {
-                bindNote(baseNote.body, baseNote.spans, baseNote.title.isEmpty())
+                bindNote(baseNote.body.value, baseNote.spans, baseNote.title.isEmpty())
             } else {
                 showSearchSnippet(snippet)
             }

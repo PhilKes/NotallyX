@@ -84,3 +84,10 @@ class ChangeHistory {
         private const val TAG = "ChangeHistory"
     }
 }
+
+fun <T> ChangeHistory.lastChangeAs(): T? {
+    if (canUndo.value) {
+        return lookUp() as? T
+    }
+    return null
+}

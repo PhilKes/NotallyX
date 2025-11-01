@@ -269,6 +269,7 @@ dependencies {
     }
     implementation("org.commonmark:commonmark:0.27.0")
     implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.27.0")
+    implementation("com.github.luben:zstd-jni:1.5.6-7@aar")
 
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
     androidTestImplementation("androidx.work:work-testing:2.9.1")

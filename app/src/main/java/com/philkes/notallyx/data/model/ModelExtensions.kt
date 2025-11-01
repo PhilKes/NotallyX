@@ -134,7 +134,7 @@ fun String.toBaseNote(): BaseNote {
         timestamp,
         modifiedTimestamp,
         labels,
-        body,
+        BodyString(body),
         spans,
         items,
         images,
@@ -193,7 +193,7 @@ fun BaseNote.toHtml(showDateCreated: Boolean, imagesRootFolder: File?) = buildSt
 
     when (type) {
         Type.NOTE -> {
-            val body = body.applySpans(spans).toHtml()
+            val body = body.value.applySpans(spans).toHtml()
             append(body)
         }
 
@@ -232,7 +232,7 @@ fun List<BaseNote>.toNoteIdReminders() = map { NoteIdReminder(it.id, it.reminder
 fun BaseNote.toMarkdown(): String = buildString {
     when (type) {
         Type.NOTE -> {
-            append(createMarkdownFromBodyAndSpans(body, spans))
+            append(createMarkdownFromBodyAndSpans(body.value, spans))
         }
         Type.LIST -> {
             append(items.toMarkdownChecklist())

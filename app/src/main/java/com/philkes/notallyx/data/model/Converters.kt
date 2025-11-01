@@ -8,6 +8,15 @@ import org.json.JSONObject
 
 object Converters {
 
+    // TypeConverter for BaseNote.body compression/decompression
+    @TypeConverter
+    fun fromBodyString(body: BodyString): String =
+        com.philkes.notallyx.utils.CompressUtility.compressIfNeeded(body.value)
+
+    @TypeConverter
+    fun toBodyString(dbValue: String): BodyString =
+        BodyString(com.philkes.notallyx.utils.CompressUtility.decompressIfNeeded(dbValue))
+
     @TypeConverter fun labelsToJson(labels: List<String>) = JSONArray(labels).toString()
 
     @TypeConverter fun jsonToLabels(json: String) = jsonToLabels(JSONArray(json))

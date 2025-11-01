@@ -105,7 +105,7 @@ class ModelExtensionsTest {
                 12354632465L,
                 945869546L,
                 listOf("label"),
-                "Body",
+                BodyString("Body"),
                 listOf(SpanRepresentation(0, 10, bold = true)),
                 mutableListOf(
                     createListItem("Item1", true, false),
