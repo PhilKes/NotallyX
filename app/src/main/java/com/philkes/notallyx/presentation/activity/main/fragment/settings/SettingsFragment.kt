@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.activity.main.fragment.settings
 import android.Manifest
 import android.app.Application
 import android.content.ActivityNotFoundException
+import android.content.ContextWrapper
 import android.content.Intent
 import android.content.Intent.ACTION_OPEN_DOCUMENT_TREE
 import android.content.pm.PackageManager
@@ -59,6 +60,7 @@ import com.philkes.notallyx.utils.getLogFile
 import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.reportBug
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
+import com.philkes.notallyx.utils.viewLogs
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.util.Date
 
@@ -805,6 +807,7 @@ class SettingsFragment : Fragment() {
                     .show()
             }
             Donate.setOnClickListener { openLink("https://ko-fi.com/philkes") }
+            ViewLogs.setOnClickListener { (requireContext() as ContextWrapper).viewLogs() }
 
             try {
                 val pInfo =

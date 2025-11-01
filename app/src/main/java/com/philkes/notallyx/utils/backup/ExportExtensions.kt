@@ -59,14 +59,15 @@ import com.philkes.notallyx.utils.getExportedPath
 import com.philkes.notallyx.utils.getExternalAudioDirectory
 import com.philkes.notallyx.utils.getExternalFilesDirectory
 import com.philkes.notallyx.utils.getExternalImagesDirectory
+import com.philkes.notallyx.utils.getLogFileUri
 import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.listZipFiles
 import com.philkes.notallyx.utils.log
-import com.philkes.notallyx.utils.logToFile
 import com.philkes.notallyx.utils.nameWithoutExtension
 import com.philkes.notallyx.utils.recreateDir
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
+import com.philkes.notallyx.utils.viewFile
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import java.io.FileInputStream
@@ -91,7 +92,6 @@ import net.lingala.zip4j.model.enums.EncryptionMethod
 private const val TAG = "ExportExtensions"
 private const val NOTIFICATION_CHANNEL_ID = "AutoBackups"
 private const val NOTIFICATION_ID = 123412
-private const val NOTALLYX_BACKUP_LOGS_FILE = "notallyx-backup-logs"
 private const val OUTPUT_DATA_BACKUP_URI = "backupUri"
 
 const val AUTO_BACKUP_WORK_NAME = "com.philkes.notallyx.AutoBackupWork"
@@ -113,31 +113,22 @@ fun ContextWrapper.createBackup(): Result {
                 path,
                 "Periodic Backup failed, because auto-backup path '$path' is invalid",
             ) ?: return Result.success()
-        fun log(msg: String? = null, throwable: Throwable? = null, stackTrace: String? = null) {
-            logToFile(
-                TAG,
-                folder,
-                "$NOTALLYX_BACKUP_LOGS_FILE.txt",
-                msg = msg,
-                throwable = throwable,
-                stackTrace = stackTrace,
-            )
-        }
         try {
             val formatter = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
             val backupFilePrefix = PERIODIC_BACKUP_FILE_PREFIX
             val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
-            log(msg = "Creating '$uri/$name.zip'...")
+            log(TAG, msg = "Creating '$uri/$name.zip'...")
             val zipUri = folder.createFileSafe(MIME_TYPE_ZIP, name, ".zip").uri
             val exportedNotes = app.exportAsZip(zipUri, password = preferences.backupPassword.value)
-            log(msg = "Exported $exportedNotes notes")
+            log(TAG, msg = "Exported $exportedNotes notes")
             val backupFiles = folder.listZipFiles(backupFilePrefix)
-            log(msg = "Found ${backupFiles.size} backups")
+            log(TAG, msg = "Found ${backupFiles.size} backups")
             val backupsToBeDeleted = backupFiles.drop(maxBackups)
             if (backupsToBeDeleted.isNotEmpty()) {
                 log(
+                    TAG,
                     msg =
-                        "Deleting ${backupsToBeDeleted.size} oldest backups (maxBackups: $maxBackups): ${backupsToBeDeleted.joinToString { "'${it.name.toString()}'" }}"
+                        "Deleting ${backupsToBeDeleted.size} oldest backups (maxBackups: $maxBackups): ${backupsToBeDeleted.joinToString { "'${it.name.toString()}'" }}",
                 )
             }
             backupsToBeDeleted.forEach {
@@ -145,13 +136,13 @@ fun ContextWrapper.createBackup(): Result {
                     it.delete()
                 }
             }
-            log(msg = "Finished backup to '$zipUri'")
+            log(TAG, msg = "Finished backup to '$zipUri'")
             preferences.periodicBackupLastExecution.save(Date().time)
             return Result.success(
                 Data.Builder().putString(OUTPUT_DATA_BACKUP_URI, zipUri.path!!).build()
             )
         } catch (e: Exception) {
-            log(msg = "Failed creating backup to '$path'", throwable = e)
+            log(TAG, msg = "Failed creating backup to '$path'", throwable = e)
             tryPostErrorNotification(e)
             return Result.success(
                 Data.Builder().putString(OUTPUT_DATA_EXCEPTION, e.message).build()
@@ -175,9 +166,6 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
             backupPath,
             "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed, because auto-backup path '$backupPath' is invalid",
         ) ?: return
-    fun log(msg: String? = null, throwable: Throwable? = null) {
-        logToFile(TAG, folder, "$NOTALLYX_BACKUP_LOGS_FILE.txt", msg = msg, throwable = throwable)
-    }
     try {
         var changedNote = savedNote
         var backupFile = folder.findFile("$ON_SAVE_BACKUP_FILE.zip")
@@ -218,8 +206,9 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
                 exportToZip(backupFile.uri, files, password)
             } catch (e: ZipException) {
                 log(
+                    TAG,
                     msg =
-                        "Re-creating full backup since existing auto backup ZIP is corrupt: ${e.message}"
+                        "Re-creating full backup since existing auto backup ZIP is corrupt: ${e.message}",
                 )
                 backupFile.delete()
                 autoBackupOnSave(backupPath, password, savedNote)
@@ -228,6 +217,7 @@ fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedN
     } catch (e: Exception) {
         try {
             log(
+                TAG,
                 "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
                 e,
             )
@@ -700,12 +690,27 @@ fun Context.exportPreferences(preferences: NotallyXPreferences, uri: Uri): Boole
     }
 }
 
-private fun Context.tryPostErrorNotification(e: Throwable) {
+private fun ContextWrapper.tryPostErrorNotification(e: Throwable) {
     fun postErrorNotification(e: Throwable) {
         getSystemService<NotificationManager>()?.let { manager ->
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 manager.createChannelIfNotExists(NOTIFICATION_CHANNEL_ID)
             }
+            val bugIntent =
+                try {
+                    createReportBugIntent(
+                        e.stackTraceToString(),
+                        title = "Auto Backup failed",
+                        body = "Error occurred during auto backup, see logs below",
+                    )
+                } catch (e: IllegalArgumentException) {
+                    createReportBugIntent(
+                        stackTrace =
+                            "PLEASE PASTE YOUR NOTALLYX LOGS FILE CONTENT HERE (Error Notification -> 'View Logs')",
+                        title = "Auto Backup failed",
+                        body = "Error occurred during auto backup, see logs below.",
+                    )
+                }
             val notificationBuilder =
                 NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID)
                     .setSmallIcon(R.drawable.error)
@@ -738,11 +743,20 @@ private fun Context.tryPostErrorNotification(e: Throwable) {
                         PendingIntent.getActivity(
                             this,
                             0,
-                            createReportBugIntent(
-                                e.stackTraceToString(),
-                                title = "Auto Backup failed",
-                                body = "Error occurred during auto backup, see logs below",
-                            ),
+                            bugIntent,
+                            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+                        ),
+                    )
+                    .addAction(
+                        R.drawable.text_file,
+                        getString(R.string.view_logs),
+                        PendingIntent.getActivity(
+                            this,
+                            0,
+                            Intent(Intent.ACTION_VIEW).apply {
+                                setDataAndType(getLogFileUri(), "text/plain")
+                                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                            },
                             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                         ),
                     )
@@ -849,17 +863,6 @@ private fun LockedActivity<*>.showFileOptionsDialog(
         .add(R.string.view_file) { viewFile(getUriForFile(File(file.uri.path!!)), mimeType) }
         .add(R.string.save_to_device) { saveFileToDevice(file, mimeType, resultLauncher) }
         .show()
-}
-
-private fun LockedActivity<*>.viewFile(uri: Uri, mimeType: String) {
-    val intent =
-        Intent(Intent.ACTION_VIEW)
-            .apply {
-                setDataAndType(uri, mimeType)
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-            }
-            .wrapWithChooser(this)
-    startActivity(intent)
 }
 
 private fun LockedActivity<*>.saveFileToDevice(

@@ -22,12 +22,14 @@ import androidx.annotation.ColorInt
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.Observer
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.BuildConfig
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.BaseNote
@@ -36,8 +38,10 @@ import com.philkes.notallyx.data.model.toText
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
+import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
+import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
 import java.io.BufferedReader
 import java.io.File
 import java.io.InputStreamReader
@@ -148,7 +152,14 @@ fun ContextWrapper.log(
 ) {
     val folder = getLogsDir()
     folder.mkdir()
-    logToFile(tag, DocumentFile.fromFile(folder), APP_LOG_FILE_NAME, msg, throwable, stackTrace)
+    logToFile(
+        tag,
+        DocumentFile.fromFile(folder),
+        "$APP_LOG_FILE_NAME.txt",
+        msg,
+        throwable,
+        stackTrace,
+    )
 }
 
 fun ContextWrapper.getLastExceptionLog(): String? {
@@ -159,9 +170,21 @@ fun ContextWrapper.getLastExceptionLog(): String? {
     return null
 }
 
+fun ContextWrapper.viewLogs() {
+    val logFile = getLogFile()
+    if (logFile.exists()) {
+        viewFile(getUriForFile(logFile), ExportMimeType.TXT.mimeType)
+    } else {
+        showToast(getString(R.string.not_exists, logFile.name))
+    }
+}
+
+fun ContextWrapper.getLogFileUri() =
+    getLogFile().let { if (it.exists()) getUriForFile(it) else null }
+
 private const val MAX_LOGS_FILE_SIZE_KB: Long = 2048
 
-fun Context.logToFile(
+private fun Context.logToFile(
     tag: String,
     folder: DocumentFile,
     fileName: String,
@@ -233,12 +256,6 @@ fun Context.logToFile(
     } ?: Log.e(tag, "Error: log file could not be found or created")
 }
 
-fun Fragment.reportBug(stackTrace: String?) {
-    requireContext().catchNoBrowserInstalled {
-        startActivity(requireContext().createReportBugIntent(stackTrace))
-    }
-}
-
 fun Fragment.getExtraBooleanFromBundleOrIntent(
     bundle: Bundle?,
     key: String,
@@ -250,8 +267,29 @@ fun Fragment.getExtraBooleanFromBundleOrIntent(
     )
 }
 
+private fun Context.showConfirmCrashLogTooLong() {
+    MaterialAlertDialogBuilder(this)
+        .setMessage(
+            getString(R.string.report_bug_stacktrace_too_long, getString(R.string.continue_))
+        )
+        .setPositiveButton(R.string.continue_) { _, _ -> reportBug("<PASTE CRASH LOGS HERE>") }
+        .setCancelButton()
+        .show()
+}
+
 fun Context.reportBug(stackTrace: String?) {
-    catchNoBrowserInstalled { startActivity(createReportBugIntent(stackTrace)) }
+    catchNoBrowserInstalled {
+        try {
+            startActivity(createReportBugIntent(stackTrace))
+        } catch (_: IllegalArgumentException) {
+            copyToClipBoard(stackTrace!!)
+            showConfirmCrashLogTooLong()
+        }
+    }
+}
+
+fun Fragment.reportBug(stackTrace: String?) {
+    requireContext().reportBug(stackTrace)
 }
 
 fun Context.catchNoBrowserInstalled(callback: () -> Unit) {
@@ -270,20 +308,30 @@ fun Context.createReportBugIntent(
     fun String?.asQueryParam(paramName: String): String {
         return this?.let { "&$paramName=${URLEncoder.encode(this, "UTF-8")}" } ?: ""
     }
-    return Intent(
-            Intent.ACTION_VIEW,
-            Uri.parse(
-                "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${
-                    title.asQueryParam("title")
-                }&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${
-                    stackTrace.asQueryParam("logs")
-                }${
-                    body.asQueryParam("what-happened")
-                    }"
-                    .take(2000)
-            ),
-        )
-        .wrapWithChooser(this)
+
+    val url =
+        "https://github.com/PhilKes/NotallyX/issues/new?labels=bug&projects=&template=bug_report.yml${
+            title.asQueryParam("title")
+        }&version=${BuildConfig.VERSION_NAME}&android-version=${Build.VERSION.SDK_INT}${
+            stackTrace.asQueryParam("logs")
+        }${
+            body.asQueryParam("what-happened")
+        }"
+    if (url.length > 2000) {
+        throw IllegalArgumentException("Given stacktrace is too long to build a valid URL!")
+    }
+    return Intent(Intent.ACTION_VIEW, url.toUri()).wrapWithChooser(this)
+}
+
+fun Context.viewFile(uri: Uri, mimeType: String) {
+    val intent =
+        Intent(Intent.ACTION_VIEW)
+            .apply {
+                setDataAndType(uri, mimeType)
+                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            }
+            .wrapWithChooser(this)
+    startActivity(intent)
 }
 
 fun ContextWrapper.shareNote(note: BaseNote) {
@@ -393,9 +441,14 @@ fun DocumentFolder.createFileSafe(
     fileName: String,
     fileExtension: String,
 ): DocumentFile {
-    return requireNotNull(
-        createFile(mimeType, fileName + fileExtension) ?: createFile(mimeType, fileName)
-    ) {
+    var createdFile = createFile(mimeType, fileName)
+    if (createdFile == null) {
+        createdFile = createFile(mimeType, fileName + fileExtension)
+    } else if (createdFile.name?.endsWith(fileExtension) == false) {
+        createdFile.delete()
+        createdFile = createFile(mimeType, fileName + fileExtension)
+    }
+    return requireNotNull(createdFile) {
         "Could not create '$fileName$fileExtension' in Folder '$name' (uri: '$uri')"
     }
 }

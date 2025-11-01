@@ -1,27 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  xmlns:tools="http://schemas.android.com/tools"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent"
-  xmlns:app="http://schemas.android.com/apk/res-auto"
-  android:gravity="center">
-
-  <ScrollView
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    tools:ignore="UselessParent">
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:weightSum="10">
 
-    <LinearLayout
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:gravity="center"
-      android:orientation="vertical"
-      android:paddingBottom="@dimen/customactivityoncrash_activity_vertical_margin"
-      android:paddingLeft="@dimen/customactivityoncrash_activity_horizontal_margin"
-      android:paddingRight="@dimen/customactivityoncrash_activity_horizontal_margin"
-      android:paddingTop="@dimen/customactivityoncrash_activity_vertical_margin">
-
-      <ImageView
+    <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:contentDescription="@null"
@@ -29,7 +15,7 @@
         android:minHeight="100dp"
         android:src="@drawable/error" />
 
-      <TextView
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
@@ -38,29 +24,85 @@
         android:textSize="18sp"
         android:textStyle="bold" />
 
-      <TextView
-        android:id="@+id/Exception"
+    <TextView
+        android:id="@+id/ExceptionTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ellipsize="none"
+        android:scrollHorizontally="false"
+        android:singleLine="false"
+        android:gravity="center"
+        android:maxLines="2"
+        android:textColor="@android:color/black"
+        android:textIsSelectable="true"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
+        />
+
+    <!-- Exception text + copy button -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="4"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <HorizontalScrollView
+            android:layout_width="0dp"
+            android:layout_weight="9"
+            android:layout_height="match_parent"
+            android:scrollbars="horizontal">
+            <TextView
+                android:id="@+id/ExceptionDetails"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:ellipsize="none"
+                android:padding="8dp"
+                android:scrollbars="vertical|horizontal"
+                android:scrollHorizontally="false"
+                android:singleLine="false"
+                android:textColor="@android:color/black"
+                android:textIsSelectable="true"
+                android:textSize="14sp" />
+        </HorizontalScrollView>
+
+        <ImageButton
+            android:id="@+id/CopyButton"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="@string/copy"
+            android:src="@drawable/content_copy" />
+    </LinearLayout>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ViewLogsButton"
+        style="@style/Widget.Material3.Button.TextButton"
+        app:strokeColor="?attr/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
-        android:gravity="center"
-        android:textSize="14sp" />
+        android:insetTop="2dp"
+        android:insetBottom="2dp"
+        android:text="@string/view_logs"
+        android:textColor="?colorPrimary" />
 
-      <Button
+    <Button
         android:id="@+id/RestartButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
         android:text="@string/restart_app" />
 
-      <com.google.android.material.button.MaterialButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/ReportButton"
         style="@style/Widget.Material3.Button.OutlinedButton"
         app:strokeColor="?attr/colorPrimary"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
         android:text="@string/report_crash"
         android:textColor="?colorPrimary" />
-    </LinearLayout>
-  </ScrollView>
-</RelativeLayout>
+
+</LinearLayout>

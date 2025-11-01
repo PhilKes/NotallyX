@@ -234,6 +234,7 @@
     <string name="next">Next</string>
     <string name="no_auto_sort">No Autosort</string>
     <string name="none">None</string>
+    <string name="not_exists">\'%1$s\' does not exist</string>
     <string name="note">Note</string>
     <string name="notes">Notes</string>
     <string name="notes_sorted_by">Notes sorted by</string>
@@ -265,6 +266,7 @@
     <string name="repetition_custom">Custom Repetition</string>
     <string name="repetition_value_hint">Value</string>
     <string name="report_bug">Report an issue/bug</string>
+    <string name="report_bug_stacktrace_too_long">The crash logs are too long to automatically pre-fill the Github issue with it, therefore the crash logs have been copied to your clipboard.\nWhen you click \'%1$s\', your browser will open to create a Github issue for your crash.It is important that you paste the automatically copied crash logs into the Github issue\'s \'(Optional) Relevant log output\' field.</string>
     <string name="report_crash">Report bug with crash logs</string>
     <string name="reset_settings">Reset Settings</string>
     <string name="reset_settings_message">All Settings will be reset to their default value</string>
@@ -328,6 +330,7 @@
     <string name="updated_link">Updated Link</string>
     <string name="view">View</string>
     <string name="view_file">View file</string>
+    <string name="view_logs">View Log File</string>
     <string name="view_note">View note</string>
     <string name="weekly">Weekly</string>
     <string name="weeks">Weeks</string>
