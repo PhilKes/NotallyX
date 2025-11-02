@@ -259,11 +259,17 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             withContext(Dispatchers.IO) {
                 val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
                 database.checkpoint()
-                val directory = NotallyDatabase.getExternalDatabaseFile(app).parentFile
-                NotallyDatabase.getInternalDatabaseFiles(app).forEach {
-                    it.copyTo(File(directory, it.name), overwrite = true)
+                val targetDirectory = NotallyDatabase.getExternalDatabaseFile(app).parentFile
+                val internalDatabaseFiles = NotallyDatabase.getInternalDatabaseFiles(app)
+                internalDatabaseFiles.forEach {
+                    it.copyTo(File(targetDirectory, it.name), overwrite = true)
                 }
-                //                database.close()
+                val notallyDatabase = NotallyDatabase.getFreshDatabase(app, true)
+                if (!notallyDatabase.ping()) {
+                    throw RuntimeException(
+                        "Moving '${internalDatabaseFiles.map { it.name }}' to public '$targetDirectory' folder failed"
+                    )
+                }
             }
             savePreference(preferences.dataInPublicFolder, true)
             callback?.invoke()
@@ -275,14 +281,16 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             withContext(Dispatchers.IO) {
                 val database = NotallyDatabase.getDatabase(app, observePreferences = false).value
                 database.checkpoint()
-                val directory = NotallyDatabase.getInternalDatabaseFile(app).parentFile
-                val oldFiles = NotallyDatabase.getExternalDatabaseFiles(app)
-                oldFiles.forEach { it.copyTo(File(directory, it.name), overwrite = true) }
-                //                database.close()
-                oldFiles.forEach {
-                    if (it.exists()) {
-                        it.delete()
-                    }
+                val targetDirectory = NotallyDatabase.getInternalDatabaseFile(app).parentFile
+                val externalDatabaseFiles = NotallyDatabase.getExternalDatabaseFiles(app)
+                externalDatabaseFiles.forEach {
+                    it.copyTo(File(targetDirectory, it.name), overwrite = true)
+                }
+                val notallyDatabase = NotallyDatabase.getFreshDatabase(app, false)
+                if (!notallyDatabase.ping()) {
+                    throw RuntimeException(
+                        "Moving public '${externalDatabaseFiles.map { it.name }}' to internal '$targetDirectory' folder failed"
+                    )
                 }
             }
             savePreference(preferences.dataInPublicFolder, false)
