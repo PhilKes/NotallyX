@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical">
+
+  <TextView
+      android:id="@+id/ExceptionTitle"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:scrollHorizontally="false"
+      android:singleLine="false"
+      android:gravity="center"
+      android:padding="4dp"
+      android:textColor="@android:color/black"
+      android:textIsSelectable="true"
+      android:textSize="14sp"
+      android:textStyle="bold"
+      android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
+      />
+
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="200dp"
+      android:gravity="center"
+      android:orientation="horizontal"
+      android:weightSum="10">
+
+    <HorizontalScrollView
+        android:layout_width="0dp"
+        android:layout_weight="9"
+        android:layout_height="match_parent"
+        android:scrollbars="horizontal">
+      <TextView
+          android:id="@+id/ExceptionDetails"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:ellipsize="none"
+          android:padding="8dp"
+          android:scrollbars="vertical|horizontal"
+          android:scrollHorizontally="false"
+          android:singleLine="false"
+          android:textColor="@android:color/black"
+          android:textIsSelectable="true"
+          android:textSize="14sp" />
+    </HorizontalScrollView>
+
+    <ImageButton
+        android:id="@+id/CopyButton"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/copy"
+        android:src="@drawable/content_copy" />
+  </LinearLayout>
+
+  <TextView
+      android:id="@+id/Message"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:visibility="gone"
+      android:padding="8dp"
+      android:textColor="@android:color/black"
+      android:textSize="14sp" />
+</LinearLayout>

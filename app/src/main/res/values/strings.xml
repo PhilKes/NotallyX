@@ -84,6 +84,8 @@
     <string name="copied_link">Copied Link to Clipboard</string>
     <string name="copy">Copy</string>
     <string name="count" translatable="false">%1$d / %2$d</string>
+    <string name="crash_export_backup_failed">Unfortunately, exporting the backup failed.\nPlease use the \'%1$s\' button to report the crash</string>
+    <string name="crash_export_backup_message">You can try to create a backup of your notes by clicking \'%1$s\'.\nThis might fail if the crash lead to broken/corrupted data. In that case, please use the \'%2$s\' button to report the crash</string>
     <string name="crash_message">An unexpected error occurred.\nSorry for the inconvenience.</string>
     <string name="create_github_issue">Create Github Issue</string>
     <string name="creation_date">Created</string>
