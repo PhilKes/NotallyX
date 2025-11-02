@@ -170,12 +170,16 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
 
     private fun checkUpdateAutoBackupOnSave(backupFolderBefore: String?, backupFolder: String) {
         if (preferences.backupOnSave.value) {
-            if (backupFolderBefore == null && !autoBackupOnSaveFileExists(backupFolder)) {
+            if (
+                backupFolderBefore == null &&
+                    backupFolder != EMPTY_PATH &&
+                    !autoBackupOnSaveFileExists(backupFolder)
+            ) {
                 runOnIODispatcher {
                     autoBackupOnSave(backupFolder, preferences.backupPassword.value, null)
                 }
             }
-        } else if (backupFolderBefore != backupFolder) {
+        } else if (backupFolderBefore != backupFolder && backupFolder != EMPTY_PATH) {
             runOnIODispatcher {
                 autoBackupOnSave(backupFolder, preferences.backupPassword.value, null)
             }
