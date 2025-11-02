@@ -102,7 +102,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
-        android:text="@string/report_crash"
+        android:text="@string/report_bug"
+        android:textColor="?colorPrimary" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/ExportBackupButton"
+        style="@style/Widget.Material3.Button.OutlinedButton"
+        app:strokeColor="?attr/colorPrimary"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/customactivityoncrash_activity_vertical_margin"
+        android:text="@string/export_backup"
         android:textColor="?colorPrimary" />
 
 </LinearLayout>

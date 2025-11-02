@@ -97,6 +97,7 @@ private const val OUTPUT_DATA_BACKUP_URI = "backupUri"
 const val AUTO_BACKUP_WORK_NAME = "com.philkes.notallyx.AutoBackupWork"
 const val OUTPUT_DATA_EXCEPTION = "exception"
 
+val BACKUP_TIMESTAMP_FORMATTER = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
 private const val ON_SAVE_BACKUP_FILE = "NotallyX_AutoBackup"
 private const val PERIODIC_BACKUP_FILE_PREFIX = "NotallyX_Backup_"
 
@@ -114,9 +115,9 @@ fun ContextWrapper.createBackup(): Result {
                 "Periodic Backup failed, because auto-backup path '$path' is invalid",
             ) ?: return Result.success()
         try {
-            val formatter = SimpleDateFormat("yyyyMMdd-HHmmssSSS", Locale.ENGLISH)
             val backupFilePrefix = PERIODIC_BACKUP_FILE_PREFIX
-            val name = "$backupFilePrefix${formatter.format(System.currentTimeMillis())}"
+            val name =
+                "$backupFilePrefix${BACKUP_TIMESTAMP_FORMATTER.format(System.currentTimeMillis())}"
             log(TAG, msg = "Creating '$uri/$name.zip'...")
             val zipUri = folder.createFileSafe(MIME_TYPE_ZIP, name, ".zip").uri
             val exportedNotes = app.exportAsZip(zipUri, password = preferences.backupPassword.value)
