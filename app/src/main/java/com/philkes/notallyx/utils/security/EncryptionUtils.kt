@@ -6,7 +6,6 @@ import android.os.Build
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
 import androidx.annotation.RequiresApi
-import com.philkes.notallyx.data.NotallyDatabase
 import java.io.File
 import java.security.KeyStore
 import javax.crypto.Cipher
@@ -18,21 +17,41 @@ private const val ENCRYPTION_KEY_NAME = "notallyx_database_encryption_key"
 
 private const val ANDROID_KEYSTORE = "AndroidKeyStore"
 
-fun encryptDatabase(context: ContextWrapper, passphrase: ByteArray) {
-    val dbFile = NotallyDatabase.getCurrentDatabaseFile(context)
-    val state = SQLCipherUtils.getDatabaseState(dbFile)
-    if (state == SQLCipherUtils.State.UNENCRYPTED) {
-        SQLCipherUtils.encrypt(context, dbFile, passphrase)
+fun encryptDatabase(context: ContextWrapper, dbFile: File, passphrase: ByteArray) {
+    if (dbFile.isUnencryptedDatabase) {
+        try {
+            SQLCipherUtils.encrypt(context, dbFile, passphrase)
+            if (dbFile.isUnencryptedDatabase) {
+                throw EncryptionException(
+                    "Encrypt was executed, but database is still not encrypted"
+                )
+            }
+        } catch (e: Exception) {
+            throw EncryptionException("Encryption of ${dbFile.name} failed", e)
+        }
     }
 }
 
-fun decryptDatabase(context: ContextWrapper, passphrase: ByteArray) {
-    val dbFile = NotallyDatabase.getCurrentDatabaseFile(context)
-    val state = SQLCipherUtils.getDatabaseState(dbFile)
-    if (state == SQLCipherUtils.State.ENCRYPTED) {
-        SQLCipherUtils.decrypt(context, dbFile, passphrase)
+fun decryptDatabase(context: ContextWrapper, dbFile: File, passphrase: ByteArray) {
+    if (dbFile.isEncryptedDatabase) {
+        try {
+            SQLCipherUtils.decrypt(context, dbFile, passphrase)
+            if (SQLCipherUtils.getDatabaseState(dbFile) == SQLCipherUtils.State.ENCRYPTED) {
+                throw DecryptionException(
+                    "Decrypt was executed, but database is still not decrypted"
+                )
+            }
+        } catch (e: Exception) {
+            throw DecryptionException("Decryption of ${dbFile.name} failed", e)
+        }
     }
 }
+
+val File.isEncryptedDatabase: Boolean
+    get() = SQLCipherUtils.getDatabaseState(this) == SQLCipherUtils.State.ENCRYPTED
+
+val File.isUnencryptedDatabase: Boolean
+    get() = SQLCipherUtils.getDatabaseState(this) == SQLCipherUtils.State.UNENCRYPTED
 
 fun decryptDatabase(
     context: Context,

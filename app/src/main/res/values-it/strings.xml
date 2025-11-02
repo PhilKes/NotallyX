@@ -246,7 +246,7 @@
     <string name="repetition">Ripetizione</string>
     <string name="repetition_custom">Ripetizione personalizzata</string>
     <string name="repetition_value_hint">Valore</string>
-    <string name="report_bug">Segnala un problema/bug</string>
+    <string name="report_bug">Segnala bug</string>
     <string name="report_crash">Segnala un bug con i registri di crash</string>
     <string name="reset_settings">Reimposta Impostazioni</string>
     <string name="reset_settings_message">Tutte le Impostazioni verranno ripristinate ai valori predefiniti</string>

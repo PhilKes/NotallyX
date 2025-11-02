@@ -255,7 +255,7 @@
     <string name="repetition">Repetare</string>
     <string name="repetition_custom">Repetare personalizată</string>
     <string name="repetition_value_hint">Valoare</string>
-    <string name="report_bug">Raportează o problemă/eroare</string>
+    <string name="report_bug">Raportează eroare</string>
     <string name="report_crash">Raportează o eroare cu jurnalele de erori</string>
     <string name="reset_settings">Resetează Setările</string>
     <string name="reset_settings_message">Toate setările vor fi resetate la valorile implicite</string>

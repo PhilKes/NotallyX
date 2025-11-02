@@ -23,6 +23,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputLayout.END_ICON_PASSWORD_TOGGLE
 import com.philkes.notallyx.NotallyXApplication
@@ -58,11 +59,16 @@ import com.philkes.notallyx.utils.getExtraBooleanFromBundleOrIntent
 import com.philkes.notallyx.utils.getLastExceptionLog
 import com.philkes.notallyx.utils.getLogFile
 import com.philkes.notallyx.utils.getUriForFile
+import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.reportBug
+import com.philkes.notallyx.utils.security.DecryptionException
+import com.philkes.notallyx.utils.security.EncryptionException
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
+import com.philkes.notallyx.utils.showErrorDialog
 import com.philkes.notallyx.utils.viewLogs
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.util.Date
+import kotlinx.coroutines.launch
 
 class SettingsFragment : Fragment() {
 
@@ -663,7 +669,11 @@ class SettingsFragment : Fragment() {
                     R.string.reset_settings_message,
                     R.string.reset_settings,
                     { _, _ ->
-                        model.resetPreferences { _ -> showToast(R.string.reset_settings_success) }
+                        lifecycleScope.launch {
+                            model.resetPreferences { _ ->
+                                showToast(R.string.reset_settings_success)
+                            }
+                        }
                     },
                 )
             }
@@ -839,12 +849,27 @@ class SettingsFragment : Fragment() {
             R.string.enable_lock_title,
             R.string.enable_lock_description,
             onSuccess = { cipher ->
+                val app = (requireActivity().application as NotallyXApplication)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    model.enableBiometricLock(cipher)
+                    lifecycleScope.launch {
+                        try {
+                            model.enableBiometricLock(cipher)
+                        } catch (e: EncryptionException) {
+                            app.log(TAG, throwable = e)
+                            showErrorDialog(
+                                e,
+                                R.string.biometrics_setup_failure,
+                                getString(
+                                    R.string.biometrics_setup_failure_encrypt,
+                                    getString(R.string.report_bug),
+                                ),
+                            )
+                            return@launch
+                        }
+                        app.locked.value = false
+                        showToast(R.string.biometrics_setup_success)
+                    }
                 }
-                val app = (activity?.application as NotallyXApplication)
-                app.locked.value = false
-                showToast(R.string.biometrics_setup_success)
             },
         ) {
             showBiometricsNotSetupDialog()
@@ -860,9 +885,25 @@ class SettingsFragment : Fragment() {
             model.preferences.iv.value!!,
             onSuccess = { cipher ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                    model.disableBiometricLock(cipher)
+                    val app = (requireActivity().application as NotallyXApplication)
+                    lifecycleScope.launch {
+                        try {
+                            model.disableBiometricLock(cipher)
+                        } catch (e: DecryptionException) {
+                            app.log(TAG, throwable = e)
+                            showErrorDialog(
+                                e,
+                                R.string.biometrics_setup_failure,
+                                getString(
+                                    R.string.biometrics_setup_failure_decrypt,
+                                    getString(R.string.report_bug),
+                                ),
+                            )
+                            return@launch
+                        }
+                        showToast(R.string.biometrics_disable_success)
+                    }
                 }
-                showToast(R.string.biometrics_disable_success)
             },
         ) {}
     }
@@ -906,6 +947,7 @@ class SettingsFragment : Fragment() {
     }
 
     companion object {
+        private const val TAG = "SettingsFragment"
         const val EXTRA_SHOW_IMPORT_BACKUPS_FOLDER =
             "notallyx.intent.extra.SHOW_IMPORT_BACKUPS_FOLDER"
     }

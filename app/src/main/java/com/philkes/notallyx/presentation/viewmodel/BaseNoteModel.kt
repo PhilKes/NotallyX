@@ -19,6 +19,7 @@ import androidx.room.withTransaction
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
+import com.philkes.notallyx.data.NotallyDatabase.Companion.DATABASE_NAME
 import com.philkes.notallyx.data.dao.BaseNoteDao
 import com.philkes.notallyx.data.dao.CommonDao
 import com.philkes.notallyx.data.dao.LabelDao
@@ -60,6 +61,7 @@ import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.MIME_TYPE_JSON
 import com.philkes.notallyx.utils.backup.clearAllFolders
 import com.philkes.notallyx.utils.backup.clearAllLabels
+import com.philkes.notallyx.utils.backup.copyDatabase
 import com.philkes.notallyx.utils.backup.exportAsZip
 import com.philkes.notallyx.utils.backup.exportPdfFile
 import com.philkes.notallyx.utils.backup.exportPlainTextFile
@@ -71,10 +73,15 @@ import com.philkes.notallyx.utils.cancelNoteReminders
 import com.philkes.notallyx.utils.deleteAttachments
 import com.philkes.notallyx.utils.getBackupDir
 import com.philkes.notallyx.utils.getExternalImagesDirectory
+import com.philkes.notallyx.utils.getExternalMediaDirectory
 import com.philkes.notallyx.utils.log
 import com.philkes.notallyx.utils.scheduleNoteReminders
+import com.philkes.notallyx.utils.security.DecryptionException
+import com.philkes.notallyx.utils.security.EncryptionException
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.encryptDatabase
+import com.philkes.notallyx.utils.security.isEncryptedDatabase
+import com.philkes.notallyx.utils.security.isUnencryptedDatabase
 import com.philkes.notallyx.utils.toReadablePath
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
@@ -283,24 +290,55 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun enableBiometricLock(cipher: Cipher) {
+    suspend fun enableBiometricLock(cipher: Cipher) {
         savePreference(preferences.iv, cipher.iv)
         val passphrase = preferences.databaseEncryptionKey.init(cipher)
-        encryptDatabase(app, passphrase)
-        savePreference(preferences.fallbackDatabaseEncryptionKey, passphrase)
-        savePreference(preferences.biometricLock, BiometricLock.ENABLED)
+        withContext(Dispatchers.IO) {
+            database.close()
+            val (_, dbFileCopy) = app.copyDatabase(suffix = "-encrypt")
+            val (_, dbFileBackup) = app.copyDatabase(suffix = "-encrypt-backup")
+            encryptDatabase(app, dbFileCopy, passphrase)
+            val originalDbFile = NotallyDatabase.getCurrentDatabaseFile(app)
+            dbFileCopy.copyTo(originalDbFile, overwrite = true)
+            if (originalDbFile.isUnencryptedDatabase) {
+                dbFileBackup.copyTo(originalDbFile, overwrite = true)
+                val externalBackupFile =
+                    File(app.getExternalMediaDirectory(), "${DATABASE_NAME}_Backup-encrypt")
+                dbFileBackup.copyTo(externalBackupFile, overwrite = true)
+                throw EncryptionException(
+                    "Encrypt succeeded but overwritten database is not encrypted"
+                )
+            }
+            savePreference(preferences.fallbackDatabaseEncryptionKey, passphrase)
+            savePreference(preferences.biometricLock, BiometricLock.ENABLED)
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun disableBiometricLock(cipher: Cipher? = null, callback: (() -> Unit)? = null) {
+    suspend fun disableBiometricLock(cipher: Cipher? = null, callback: (() -> Unit)? = null) {
         val encryptedPassphrase = preferences.databaseEncryptionKey.value
         val passphrase =
             cipher?.doFinal(encryptedPassphrase)
                 ?: preferences.fallbackDatabaseEncryptionKey.value!!
-        database.close()
-        decryptDatabase(app, passphrase)
-        savePreference(preferences.biometricLock, BiometricLock.DISABLED)
-        callback?.invoke()
+        withContext(Dispatchers.IO) {
+            database.close()
+            val (_, dbFileCopy) = app.copyDatabase(decrypt = false, suffix = "-decrypt")
+            val (_, dbFileBackup) = app.copyDatabase(decrypt = false, suffix = "-decrypt-backup")
+            decryptDatabase(app, dbFileCopy, passphrase)
+            val originalDbFile = NotallyDatabase.getCurrentDatabaseFile(app)
+            dbFileCopy.copyTo(originalDbFile, overwrite = true)
+            if (originalDbFile.isEncryptedDatabase) {
+                dbFileBackup.copyTo(originalDbFile, overwrite = true)
+                val externalBackupFile =
+                    File(app.getExternalMediaDirectory(), "${DATABASE_NAME}_Backup-decrypt")
+                dbFileBackup.copyTo(externalBackupFile, overwrite = true)
+                throw DecryptionException(
+                    "Decrypt succeeded but overwritten database is still encrypted"
+                )
+            }
+            savePreference(preferences.biometricLock, BiometricLock.DISABLED)
+            callback?.invoke()
+        }
     }
 
     fun <T> savePreference(preference: BasePreference<T>, value: T) {
@@ -605,7 +643,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun resetPreferences(callback: (restartRequired: Boolean) -> Unit) {
+    suspend fun resetPreferences(callback: (restartRequired: Boolean) -> Unit) {
         val backupsFolder = preferences.backupsFolder.value
         val publicFolder = preferences.dataInPublicFolder.value
         val isThemeDefault = preferences.theme.value == Theme.FOLLOW_SYSTEM

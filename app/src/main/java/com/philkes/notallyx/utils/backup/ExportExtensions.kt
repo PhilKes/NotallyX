@@ -421,19 +421,24 @@ private fun createZipFromDirectory(
     }
 }
 
-fun ContextWrapper.copyDatabase(): Pair<NotallyDatabase, File> {
+fun ContextWrapper.copyDatabase(
+    decrypt: Boolean = true,
+    suffix: String = "",
+): Pair<NotallyDatabase, File> {
     val database = NotallyDatabase.getDatabase(this, observePreferences = false).value
     database.checkpoint()
     val preferences = NotallyXPreferences.getInstance(this)
     val databaseFile = NotallyDatabase.getCurrentDatabaseFile(this)
-    return if (preferences.isLockEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    return if (
+        decrypt && preferences.isLockEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+    ) {
         val cipher = getInitializedCipherForDecryption(iv = preferences.iv.value!!)
         val passphrase = cipher.doFinal(preferences.databaseEncryptionKey.value)
-        val decryptedFile = File(cacheDir, DATABASE_NAME)
+        val decryptedFile = File(cacheDir, DATABASE_NAME + suffix)
         decryptDatabase(this, passphrase, databaseFile, decryptedFile)
         Pair(database, decryptedFile)
     } else {
-        val dbFile = File(cacheDir, DATABASE_NAME)
+        val dbFile = File(cacheDir, DATABASE_NAME + suffix)
         databaseFile.copyTo(dbFile, overwrite = true)
         Pair(database, dbFile)
     }

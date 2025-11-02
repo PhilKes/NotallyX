@@ -248,7 +248,7 @@
     <string name="reminder_no_repetition">不重複</string>
     <string name="reminders">提醒</string>
     <string name="remove_link">移除連結</string>
-    <string name="report_bug">報告問題/錯誤</string>
+    <string name="report_bug">報告錯誤</string>
     <string name="report_crash">使用崩潰日誌報告錯誤</string>
     <string name="reset_settings">重置設定</string>
     <string name="reset_settings_message">所有設定都將重設為預設值</string>

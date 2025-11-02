@@ -94,7 +94,7 @@ If NotallyX crashes, you'll see a crash screen that allows you to report the iss
 If the app crashed and you did not see a crash screen:
 1. Re-open the app (if possible)
 2. From the Overview, tap the sidebar menu icon
-3. Tap "Settings" > In "About" section > "Send Feedback" > "Report an issue/bug"
+3. Tap "Settings" > In "About" section > "Send Feedback" > "Report Bug"
 4. This will open a browser to the Github create Issue site
 5. If not already logged in, please login or create a new Github account
 6. A bug report template will be pre filled with useful information for the developers
@@ -143,5 +143,5 @@ See our [Contribution Guidelines](contributing.md) for information on how to con
 
 ### I found a bug. How do I report it?
 
-- From inside the app: Tap "Settings" > In "About" section > "Send Feedback" > "Report an issue/bug" (this will prefill the last crash logs and other useful information)
+- From inside the app: Tap "Settings" > In "About" section > "Send Feedback" > "Report Bug" (this will prefill the last crash logs and other useful information)
 - You can also report bugs directly by [creating a new issue](https://github.com/PhilKes/NotallyX/issues/new/choose) on GitHub. Please include as much detail as possible, including steps to reproduce the issue.
