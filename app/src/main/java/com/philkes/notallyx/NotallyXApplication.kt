@@ -73,7 +73,10 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
                     )
             }
             if (oldTheme != null) {
-                WidgetProvider.updateWidgets(this, locked = locked.value)
+                WidgetProvider.updateWidgets(
+                    this,
+                    locked = preferences.isLockEnabled && locked.value,
+                )
             }
         }
 
@@ -109,7 +112,9 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
         }
         preferences.biometricLock.observeForever(biometricLockObserver)
 
-        locked.observeForever { isLocked -> WidgetProvider.updateWidgets(this, locked = isLocked) }
+        locked.observeForever { isLocked ->
+            WidgetProvider.updateWidgets(this, locked = preferences.isLockEnabled && isLocked)
+        }
 
         preferences.backupPassword.observeForeverWithPrevious {
             (previousBackupPassword, backupPassword) ->
