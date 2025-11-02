@@ -35,6 +35,7 @@ import com.philkes.notallyx.R
 import com.philkes.notallyx.data.model.BaseNote
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.data.model.toText
+import com.philkes.notallyx.databinding.DialogErrorBinding
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_SELECTED_BASE_NOTE
 import com.philkes.notallyx.presentation.activity.note.EditListActivity
 import com.philkes.notallyx.presentation.activity.note.EditNoteActivity
@@ -181,6 +182,54 @@ fun ContextWrapper.viewLogs() {
 
 fun ContextWrapper.getLogFileUri() =
     getLogFile().let { if (it.exists()) getUriForFile(it) else null }
+
+fun Fragment.showErrorDialog(
+    throwable: Throwable,
+    titleResId: Int,
+    message: String,
+    originalStacktrace: String? = null,
+) {
+    val stacktrace = throwable.stackTraceToString()
+    val layout =
+        DialogErrorBinding.inflate(layoutInflater, null, false).apply {
+            ExceptionTitle.text = message
+            ExceptionDetails.text = stacktrace
+            CopyButton.setOnClickListener { requireContext().copyToClipBoard(stacktrace) }
+        }
+    MaterialAlertDialogBuilder(requireContext())
+        .setTitle(titleResId)
+        .setView(layout.root)
+        .setPositiveButton(R.string.report_bug) { dialog, _ ->
+            dialog.cancel()
+            reportBug(originalStacktrace ?: throwable.stackTraceToString())
+        }
+        .setCancelButton()
+        .show()
+}
+
+fun Activity.showErrorDialog(
+    throwable: Throwable,
+    titleResId: Int,
+    message: String,
+    originalStacktrace: String? = null,
+) {
+    val stacktrace = throwable.stackTraceToString()
+    val layout =
+        DialogErrorBinding.inflate(layoutInflater, null, false).apply {
+            ExceptionTitle.text = message
+            ExceptionDetails.text = stacktrace
+            CopyButton.setOnClickListener { copyToClipBoard(stacktrace) }
+        }
+    MaterialAlertDialogBuilder(this)
+        .setTitle(titleResId)
+        .setView(layout.root)
+        .setPositiveButton(R.string.report_bug) { dialog, _ ->
+            dialog.cancel()
+            reportBug(originalStacktrace ?: throwable.stackTraceToString())
+        }
+        .setCancelButton()
+        .show()
+}
 
 private const val MAX_LOGS_FILE_SIZE_KB: Long = 2048
 

@@ -261,7 +261,7 @@
     <string name="repetition">重复</string>
     <string name="repetition_custom">定制重复</string>
     <string name="repetition_value_hint">值</string>
-    <string name="report_bug">报告问题/错误</string>
+    <string name="report_bug">报告错误</string>
     <string name="report_crash">报告问题/错误</string>
     <string name="reset_settings">重置设置</string>
     <string name="reset_settings_message">所有设置都将重置为默认值</string>

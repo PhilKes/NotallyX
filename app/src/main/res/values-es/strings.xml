@@ -255,7 +255,7 @@
     <string name="repetition">Repetición</string>
     <string name="repetition_custom">Repetición personalizada</string>
     <string name="repetition_value_hint">Valor</string>
-    <string name="report_bug">Informar de incidente/error</string>
+    <string name="report_bug">Informar error</string>
     <string name="report_crash">Informar de error con traza de ejecución</string>
     <string name="reset_settings">Restablecer ajustes</string>
     <string name="reset_settings_message">Todos los ajustes serán restablecidos a su valor por defecto</string>

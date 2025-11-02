@@ -262,7 +262,7 @@
     <string name="repetition">Wiederholung</string>
     <string name="repetition_custom">Benutzer. Wiederholung</string>
     <string name="repetition_value_hint">Wert</string>
-    <string name="report_bug">Fehler/Bug melden</string>
+    <string name="report_bug">Bug melden</string>
     <string name="report_crash">Bug mit Crash logs melden</string>
     <string name="reset_settings">Einstellungen zurücksetzen</string>
     <string name="reset_settings_message">Alle Einstellungen werden auf ihre Default-Werte zurückgesetzt</string>

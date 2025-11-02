@@ -184,7 +184,7 @@
     <string name="recording">Opnemen…</string>
     <string name="redo">Opnieuw doen</string>
     <string name="remove_link">Verwijder Link</string>
-    <string name="report_bug">Rapporteer een probleem/fout</string>
+    <string name="report_bug">Bug melden</string>
     <string name="restore">Herstellen</string>
     <plurals name="restored_selected_notes">
         <item quantity="one">Herstelde %1$d notitie</item>

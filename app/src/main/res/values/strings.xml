@@ -46,6 +46,9 @@
     <string name="biometrics_failure">Failed to authenticate via Biometric/PIN</string>
     <string name="biometrics_no_support">No biometric features available on this device</string>
     <string name="biometrics_not_setup">Biometrics/PIN are not setup for your device yet</string>
+    <string name="biometrics_setup_failure">Failed to setup Biometric/PIN lock</string>
+    <string name="biometrics_setup_failure_decrypt">Decryption of the database failed.\nPlease use \'%1$s\' to report the error</string>
+    <string name="biometrics_setup_failure_encrypt">Encryption of the database failed.\nPlease use \'%1$s\' to report the error</string>
     <string name="biometrics_setup_success">Biometric/PIN lock has been enabled</string>
     <string name="bold">Bold</string>
     <string name="calculating">Calculating…</string>
@@ -267,7 +270,7 @@
     <string name="repetition">Repetition</string>
     <string name="repetition_custom">Custom Repetition</string>
     <string name="repetition_value_hint">Value</string>
-    <string name="report_bug">Report an issue/bug</string>
+    <string name="report_bug">Report Bug</string>
     <string name="report_bug_stacktrace_too_long">The crash logs are too long to automatically pre-fill the Github issue with it, therefore the crash logs have been copied to your clipboard.\nWhen you click \'%1$s\', your browser will open to create a Github issue for your crash.It is important that you paste the automatically copied crash logs into the Github issue\'s \'(Optional) Relevant log output\' field.</string>
     <string name="report_crash">Report bug with crash logs</string>
     <string name="reset_settings">Reset Settings</string>

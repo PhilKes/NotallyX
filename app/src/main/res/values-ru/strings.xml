@@ -261,7 +261,7 @@
     <string name="repetition">Повтор</string>
     <string name="repetition_custom">Свой вариант повтора</string>
     <string name="repetition_value_hint">Значение</string>
-    <string name="report_bug">Сообщить об ошибке/баге</string>
+    <string name="report_bug">Сообщить об ошибке</string>
     <string name="report_crash">Отправить отчёт об ошибке</string>
     <string name="reset_settings">Сбросить настройки</string>
     <string name="reset_settings_message">Все настройки будут сброшены к значениям по умолчанию</string>

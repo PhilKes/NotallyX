@@ -261,7 +261,7 @@
     <string name="repetition">Opakování</string>
     <string name="repetition_custom">Vlastní opakování</string>
     <string name="repetition_value_hint">Hodnota</string>
-    <string name="report_bug">Nahlásit problém/chybu</string>
+    <string name="report_bug">Nahlásit chybu</string>
     <string name="report_crash">Nahlásit chybu spolu s protokoly o pádu.\n\n</string>
     <string name="reset_settings">Resetovat nastavení</string>
     <string name="reset_settings_message">Všechna nastavení budou obnovena na výchozí hodnotu.</string>

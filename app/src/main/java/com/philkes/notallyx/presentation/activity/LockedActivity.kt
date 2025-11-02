@@ -15,6 +15,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.NotallyXApplication
@@ -23,6 +24,7 @@ import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
+import kotlinx.coroutines.launch
 
 abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
@@ -82,9 +84,12 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
                         .setMessage(R.string.unlock_with_biometrics_not_setup)
                         .setPositiveButton(R.string.disable) { _, _ ->
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                                baseModel.disableBiometricLock()
+                                lifecycleScope.launch {
+                                    baseModel.disableBiometricLock()
+                                    showToast(R.string.biometrics_disable_success)
+                                }
                             }
-                            show()
+                            hide()
                         }
                         .setNegativeButton(R.string.tap_to_set_up) { _, _ ->
                             val intent =
@@ -102,8 +107,10 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
                 BIOMETRIC_ERROR_HW_NOT_PRESENT -> {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                        baseModel.disableBiometricLock()
-                        showToast(R.string.biometrics_disable_success)
+                        lifecycleScope.launch {
+                            baseModel.disableBiometricLock()
+                            showToast(R.string.biometrics_disable_success)
+                        }
                     }
                     show()
                 }

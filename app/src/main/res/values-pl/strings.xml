@@ -266,7 +266,7 @@
     <string name="repetition">Powtarzanie</string>
     <string name="repetition_custom">Niestandardowe powtarzanie</string>
     <string name="repetition_value_hint">Liczba</string>
-    <string name="report_bug">Zgłoś problem/błąd</string>
+    <string name="report_bug">Zgłoś błąd</string>
     <string name="report_crash">Zgłoś błąd z dziennikami awarii</string>
     <string name="reset_settings">Przywróć ustawienia</string>
     <string name="reset_settings_message">Wszystkie ustawienia zostaną zresetowane do wartości domyślnych</string>

@@ -10,8 +10,10 @@ import androidx.lifecycle.lifecycleScope
 import cat.ereza.customactivityoncrash.CustomActivityOnCrash
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.philkes.notallyx.R
+import com.philkes.notallyx.R.string.auto_backup_failed
+import com.philkes.notallyx.R.string.crash_export_backup_failed
+import com.philkes.notallyx.R.string.report_bug
 import com.philkes.notallyx.databinding.ActivityErrorBinding
-import com.philkes.notallyx.databinding.DialogErrorBinding
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.setupProgressDialog
@@ -92,13 +94,12 @@ class ErrorActivity : AppCompatActivity() {
                     result.data?.data?.let { uri ->
                         val preferences = NotallyXPreferences.getInstance(this)
                         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
-                            //                            MaterialAlertDialogBuilder(this)
-                            //                                .setTitle(R.string.auto_backup_failed)
-                            //
-                            // .setMessage(throwable.stackTraceToString())
-                            //                                .setCancelButton()
-                            //                                .show()
-                            showErrorDialog(throwable, stacktrace)
+                            showErrorDialog(
+                                throwable,
+                                auto_backup_failed,
+                                getString(crash_export_backup_failed, this.getString(report_bug)),
+                                originalStacktrace = stacktrace,
+                            )
                         }
                         lifecycleScope.launch(exceptionHandler) {
                             val exportedNotes =
@@ -121,26 +122,6 @@ class ErrorActivity : AppCompatActivity() {
                 }
             }
         exportBackupProgress.setupProgressDialog(this)
-    }
-
-    private fun showErrorDialog(throwable: Throwable, originalStacktrace: String?) {
-        val stacktrace = throwable.stackTraceToString()
-        val layout =
-            DialogErrorBinding.inflate(layoutInflater, null, false).apply {
-                ExceptionTitle.text =
-                    getString(R.string.crash_export_backup_failed, getString(R.string.report_bug))
-                ExceptionDetails.text = stacktrace
-                CopyButton.setOnClickListener { copyToClipBoard(stacktrace) }
-            }
-        MaterialAlertDialogBuilder(this)
-            .setTitle(R.string.auto_backup_failed)
-            .setView(layout.root)
-            .setPositiveButton(R.string.report_bug) { dialog, _ ->
-                dialog.cancel()
-                reportBug(originalStacktrace)
-            }
-            .setCancelButton()
-            .show()
     }
 
     companion object {
