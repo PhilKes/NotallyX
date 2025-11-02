@@ -228,6 +228,9 @@ class NotallyXPreferences private constructor(private val context: Context) {
         startView.refresh()
     }
 
+    val isLockEnabled: Boolean
+        get() = biometricLock.value == BiometricLock.ENABLED
+
     private fun reload() {
         setOf(
                 textSize,

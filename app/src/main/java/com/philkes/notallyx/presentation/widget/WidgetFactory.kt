@@ -11,6 +11,7 @@ import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.NotallyDatabase
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BaseNote.Companion.COLOR_DEFAULT
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.Type
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
@@ -82,9 +83,11 @@ class WidgetFactory(
             setOnClickFillInIntent(R.id.ChangeNote, getWidgetSelectNoteIntent(widgetId))
             setOnClickFillInIntent(R.id.LinearLayout, getWidgetOpenNoteIntent(note.type, note.id))
 
-            val (_, controlsColor) = app.extractWidgetColors(note.color, preferences)
-            setTextViewsTextColor(listOf(R.id.Title, R.id.Note), controlsColor)
-            setImageViewColor(R.id.ChangeNote, controlsColor)
+            if (note.color != COLOR_DEFAULT) {
+                val (_, controlsColor) = app.extractWidgetColors(note.color, preferences)
+                setTextViewsTextColor(listOf(R.id.Title, R.id.Note), controlsColor)
+                setImageViewColor(R.id.ChangeNote, controlsColor)
+            }
         }
     }
 

@@ -135,7 +135,7 @@ abstract class NotallyDatabase : RoomDatabase() {
                     )
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 System.loadLibrary("sqlcipher")
-                if (preferences.biometricLock.value == BiometricLock.ENABLED) {
+                if (preferences.isLockEnabled) {
                     if (
                         SQLCipherUtils.getDatabaseState(getCurrentDatabaseFile(context)) ==
                             SQLCipherUtils.State.ENCRYPTED
