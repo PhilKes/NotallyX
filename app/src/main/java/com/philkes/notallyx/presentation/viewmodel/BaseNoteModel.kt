@@ -610,7 +610,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         val publicFolder = preferences.dataInPublicFolder.value
         val isThemeDefault = preferences.theme.value == Theme.FOLLOW_SYSTEM
         val finishCallback = { callback(!isThemeDefault) }
-        if (preferences.biometricLock.value == BiometricLock.ENABLED) {
+        if (preferences.isLockEnabled) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 disableBiometricLock {
                     finishResetPreferencesAfterBiometric(

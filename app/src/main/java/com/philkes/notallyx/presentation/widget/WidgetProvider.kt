@@ -42,11 +42,17 @@ class WidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
         when (intent.action) {
-            ACTION_NOTES_MODIFIED -> {
+            ACTION_NOTES_MODIFIED,
+            Intent.ACTION_LOCALE_CHANGED -> {
                 val app = context.applicationContext as NotallyXApplication
+                val preferences = NotallyXPreferences.getInstance(context)
                 val noteIds = intent.getLongArrayExtra(EXTRA_MODIFIED_NOTES)
                 if (noteIds != null) {
-                    updateWidgets(context, noteIds, locked = app.locked.value)
+                    updateWidgets(
+                        context,
+                        noteIds,
+                        locked = preferences.isLockEnabled && app.locked.value,
+                    )
                 }
             }
             ACTION_OPEN_NOTE -> openActivity(context, intent, EditNoteActivity::class.java)
@@ -88,7 +94,12 @@ class WidgetProvider : AppWidgetProvider() {
                     }
                 } finally {
                     val app = context.applicationContext as NotallyXApplication
-                    updateWidgets(context, longArrayOf(noteId), locked = app.locked.value)
+                    val preferences = NotallyXPreferences.getInstance(context)
+                    updateWidgets(
+                        context,
+                        longArrayOf(noteId),
+                        locked = preferences.isLockEnabled && app.locked.value,
+                    )
                     pendingResult.finish()
                 }
             }
@@ -144,7 +155,14 @@ class WidgetProvider : AppWidgetProvider() {
         appWidgetIds.forEach { id ->
             val noteId = preferences.getWidgetData(id)
             val noteType = preferences.getWidgetNoteType(id) ?: return
-            updateWidget(app, appWidgetManager, id, noteId, noteType, locked = app.locked.value)
+            updateWidget(
+                app,
+                appWidgetManager,
+                id,
+                noteId,
+                noteType,
+                locked = preferences.isLockEnabled && app.locked.value,
+            )
         }
     }
 
@@ -210,7 +228,6 @@ class WidgetProvider : AppWidgetProvider() {
                                 Intent(context, WidgetProvider::class.java).asPendingIntent(context),
                             )
                         }
-
                     manager.updateAppWidget(id, view)
                     manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)
                     return@launch
@@ -234,9 +251,6 @@ class WidgetProvider : AppWidgetProvider() {
                                 Intent(context, WidgetProvider::class.java).asPendingIntent(context),
                             )
 
-                            val preferences = NotallyXPreferences.getInstance(context)
-                            val (backgroundColor, _) =
-                                context.extractWidgetColors(color, preferences)
                             noteType?.let {
                                 setOnClickPendingIntent(
                                     R.id.Layout,
@@ -245,7 +259,12 @@ class WidgetProvider : AppWidgetProvider() {
                                         .asPendingIntent(context),
                                 )
                             }
-                            setInt(R.id.Layout, "setBackgroundColor", backgroundColor)
+                            val preferences = NotallyXPreferences.getInstance(context)
+                            if (color != BaseNote.COLOR_DEFAULT) {
+                                val (backgroundColor, _) =
+                                    context.extractWidgetColors(color, preferences)
+                                setInt(R.id.Layout, "setBackgroundColor", backgroundColor)
+                            }
                         }
                     manager.updateAppWidget(id, view)
                     manager.notifyAppWidgetViewDataChanged(id, R.id.ListView)

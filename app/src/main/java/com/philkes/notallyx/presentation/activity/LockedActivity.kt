@@ -21,7 +21,6 @@ import com.philkes.notallyx.NotallyXApplication
 import com.philkes.notallyx.R
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.viewmodel.BaseNoteModel
-import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.utils.security.showBiometricOrPinPrompt
 
@@ -51,7 +50,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
     }
 
     override fun onResume() {
-        if (preferences.biometricLock.value == BiometricLock.ENABLED) {
+        if (preferences.isLockEnabled) {
             if (hasToAuthenticateWithBiometric()) {
                 hide()
                 showLockScreen()
@@ -64,10 +63,7 @@ abstract class LockedActivity<T : ViewBinding> : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (
-            preferences.biometricLock.value == BiometricLock.ENABLED &&
-                notallyXApplication.locked.value
-        ) {
+        if (preferences.isLockEnabled && notallyXApplication.locked.value) {
             hide()
         }
     }

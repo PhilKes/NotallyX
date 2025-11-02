@@ -43,7 +43,6 @@ import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.BackupFile
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
-import com.philkes.notallyx.presentation.viewmodel.preference.BiometricLock
 import com.philkes.notallyx.presentation.viewmodel.preference.Constants.PASSWORD_EMPTY
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences
 import com.philkes.notallyx.presentation.viewmodel.preference.NotallyXPreferences.Companion.EMPTY_PATH
@@ -427,10 +426,7 @@ fun ContextWrapper.copyDatabase(): Pair<NotallyDatabase, File> {
     database.checkpoint()
     val preferences = NotallyXPreferences.getInstance(this)
     val databaseFile = NotallyDatabase.getCurrentDatabaseFile(this)
-    return if (
-        preferences.biometricLock.value == BiometricLock.ENABLED &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
-    ) {
+    return if (preferences.isLockEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val cipher = getInitializedCipherForDecryption(iv = preferences.iv.value!!)
         val passphrase = cipher.doFinal(preferences.databaseEncryptionKey.value)
         val decryptedFile = File(cacheDir, DATABASE_NAME)
