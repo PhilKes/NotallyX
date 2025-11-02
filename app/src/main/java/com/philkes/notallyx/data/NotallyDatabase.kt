@@ -45,6 +45,13 @@ abstract class NotallyDatabase : RoomDatabase() {
         getBaseNoteDao().query(SimpleSQLiteQuery("pragma wal_checkpoint(FULL)"))
     }
 
+    fun ping(): Boolean =
+        try {
+            getBaseNoteDao().query(SimpleSQLiteQuery("SELECT 1")) == 1
+        } catch (e: Exception) {
+            false
+        }
+
     private var biometricLockObserver: Observer<BiometricLock>? = null
     private var dataInPublicFolderObserver: Observer<Boolean>? = null
 
@@ -87,8 +94,11 @@ abstract class NotallyDatabase : RoomDatabase() {
             )
         }
 
-        private fun getCurrentDatabaseName(context: ContextWrapper): String {
-            return if (NotallyXPreferences.getInstance(context).dataInPublicFolder.value) {
+        private fun getCurrentDatabaseName(
+            context: ContextWrapper,
+            dataInPublicFolder: Boolean,
+        ): String {
+            return if (dataInPublicFolder) {
                 getExternalDatabaseFile(context).absolutePath
             } else {
                 DATABASE_NAME
@@ -108,20 +118,26 @@ abstract class NotallyDatabase : RoomDatabase() {
                 }
         }
 
-        fun getFreshDatabase(context: ContextWrapper): NotallyDatabase {
-            return createInstance(context, NotallyXPreferences.getInstance(context), false)
+        fun getFreshDatabase(context: ContextWrapper, dataInPublic: Boolean): NotallyDatabase {
+            return createInstance(
+                context,
+                NotallyXPreferences.getInstance(context),
+                false,
+                dataInPublic = dataInPublic,
+            )
         }
 
         private fun createInstance(
             context: ContextWrapper,
             preferences: NotallyXPreferences,
             observePreferences: Boolean,
+            dataInPublic: Boolean = preferences.dataInPublicFolder.value,
         ): NotallyDatabase {
             val instanceBuilder =
                 Room.databaseBuilder(
                         context,
                         NotallyDatabase::class.java,
-                        getCurrentDatabaseName(context),
+                        getCurrentDatabaseName(context, dataInPublic),
                     )
                     .addMigrations(
                         Migration2,
