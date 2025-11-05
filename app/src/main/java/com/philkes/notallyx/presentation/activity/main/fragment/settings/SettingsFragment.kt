@@ -403,7 +403,7 @@ class SettingsFragment : Fragment() {
                         .apply {
                             type = MIME_TYPE_ZIP
                             addCategory(Intent.CATEGORY_OPENABLE)
-                            putExtra(Intent.EXTRA_TITLE, "NotallyX Backup")
+                            putExtra(Intent.EXTRA_TITLE, "NotallyX Backup.zip")
                         }
                         .wrapWithChooser(requireContext())
                 exportBackupActivityResultLauncher.launch(intent)

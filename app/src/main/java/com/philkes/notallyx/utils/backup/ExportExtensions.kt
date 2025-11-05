@@ -297,7 +297,6 @@ fun ContextWrapper.exportAsZip(
 
         val (databaseOriginal, databaseCopy) = copyDatabase()
         zipFile.addFile(databaseCopy, zipParameters.copy(DATABASE_NAME))
-        databaseCopy.delete()
 
         val imageRoot = getExternalImagesDirectory()
         val fileRoot = getExternalFilesDirectory()
@@ -353,6 +352,7 @@ fun ContextWrapper.exportAsZip(
                 outputStream.flush()
             }
             zipFile.file.delete()
+            databaseCopy.delete()
         }
         backupProgress?.postValue(BackupProgress(inProgress = false))
         return totalNotes
