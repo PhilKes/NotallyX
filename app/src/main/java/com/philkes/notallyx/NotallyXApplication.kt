@@ -140,6 +140,13 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
         }
     }
 
+    private fun folderChanged(folderBefore: String?, folderAfter: String): Boolean {
+        if (folderBefore == null || folderAfter == EMPTY_PATH) {
+            return false
+        }
+        return folderBefore != folderAfter
+    }
+
     private fun checkUpdatePeriodicBackup(
         backupFolderBefore: String?,
         backupFolder: String,
@@ -156,7 +163,7 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
             } else if (
                 workInfos.isNullOrEmpty() ||
                     workInfos.all { it.state == WorkInfo.State.CANCELLED } ||
-                    (backupFolderBefore != null && backupFolderBefore != backupFolder)
+                    folderChanged(backupFolderBefore, backupFolder)
             ) {
                 workManager.scheduleAutoBackup(this, periodInDays)
                 if (execute) {
@@ -184,7 +191,7 @@ class NotallyXApplication : Application(), Application.ActivityLifecycleCallback
                     autoBackupOnSave(backupFolder, preferences.backupPassword.value, null)
                 }
             }
-        } else if (backupFolderBefore != backupFolder && backupFolder != EMPTY_PATH) {
+        } else if (folderChanged(backupFolderBefore, backupFolder)) {
             runOnIODispatcher {
                 autoBackupOnSave(backupFolder, preferences.backupPassword.value, null)
             }
