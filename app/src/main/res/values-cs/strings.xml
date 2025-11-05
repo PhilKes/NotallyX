@@ -8,6 +8,8 @@
     <string name="adding_files">Přidávání souborů</string>
     <string name="adding_images">Přidávání obrázků</string>
     <string name="all">Všechny</string>
+    <string name="always_show_search_bar">Trvale zobrazit vyhledávací pole</string>
+    <string name="always_show_search_bar_hint">Povolením této možnosti bude namísto ikony vyhledávání v horní liště trvale zobrazeno vyhledávací pole.</string>
     <string name="appearance">Vzhled</string>
     <string name="archive">Archivovat</string>
     <string name="archived">Archivované</string>
@@ -126,6 +128,7 @@
     <string name="disallow_screenshots">Zakázat pořizování snímků obrazovky</string>
     <string name="discard">Zahodit</string>
     <string name="display_text">Text k zobrazení</string>
+    <string name="documentation">Dokumentace</string>
     <string name="donate">Podpořit</string>
     <string name="drag_handle">Chytni a přetáhni</string>
     <string name="edit">Upravit</string>
@@ -152,6 +155,11 @@
     <string name="export_settings_failure">Nepodařilo se exportovat nastavení, nezvolili jste neplatnou cestu\?</string>
     <string name="export_settings_message">Všechna nastavení se vyexportují do souboru JSON, který lze použít k opětovnému importu uložených nastavení.\n\Všimněte si, že toto nastavení nezahrnuje šifrovaná nastavení, jako je heslo pro automatické zálohování nebo biometrický šifrovací klíč.</string>
     <string name="export_settings_success">Nastavení úspěšně exportováno</string>
+    <plurals name="exported_notes">
+        <item quantity="few">Exportovány %1$s poznámky</item>
+        <item quantity="many">Exportováno %1$s poznámek</item>
+        <item quantity="one">Exportována %1$s poznámka</item>
+    </plurals>
     <string name="exporting_backup">Vytváří se záloha</string>
     <string name="extracted_files">Soubory byly extrahovány</string>
     <string name="filter">Filtrovat</string>
@@ -261,7 +269,7 @@
     <string name="repetition">Opakování</string>
     <string name="repetition_custom">Vlastní opakování</string>
     <string name="repetition_value_hint">Hodnota</string>
-    <string name="report_bug">Nahlásit chybu</string>
+    <string name="report_bug">Nahlásit problém/chybu</string>
     <string name="report_crash">Nahlásit chybu spolu s protokoly o pádu.\n\n</string>
     <string name="reset_settings">Resetovat nastavení</string>
     <string name="reset_settings_message">Všechna nastavení budou obnovena na výchozí hodnotu.</string>
@@ -312,7 +320,7 @@
     <string name="unarchive">Zrušit archivaci</string>
     <plurals name="unarchived_selected_notes">
         <item quantity="few">Obnoveny %1$d poznámky</item>
-        <item quantity="many">Obnoveny %1$d poznámky</item>
+        <item quantity="many">Obnoveno %1$d poznámek</item>
         <item quantity="one">Obnoveny %1$d poznámky</item>
     </plurals>
     <string name="uncheck_all_items">Zrušit výběr všech položek</string>
