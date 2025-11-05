@@ -1,0 +1,3 @@
+- Auto Backup fixes
+- Fix widget locked after reboot
+- Fix widget color adapts when theme changes

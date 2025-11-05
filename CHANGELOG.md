@@ -1,5 +1,17 @@
 # Changelog
 
+## [v7.5.3](https://github.com/PhilKes/NotallyX/tree/v7.5.3) (2025-11-05)
+
+[Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.5.2...v7.5.3)
+
+### Fixed Bugs
+
+- Auto backup is triggered even though they are disabled [\#706](https://github.com/PhilKes/NotallyX/issues/706)
+- Auto Backup failed [\#691](https://github.com/PhilKes/NotallyX/issues/691)
+- After restarting the phone,  the widget sometimes remains locked until it is edited for the first time. [\#614](https://github.com/PhilKes/NotallyX/issues/614)
+- Crashes when trying to lock app [\#607](https://github.com/PhilKes/NotallyX/issues/607)
+- Widget unreadable after system automatically changes dark/light mode. [\#595](https://github.com/PhilKes/NotallyX/issues/595)
+
 ## [v7.5.2](https://github.com/PhilKes/NotallyX/tree/v7.5.2) (2025-10-29)
 
 [Full Changelog](https://github.com/PhilKes/NotallyX/compare/v7.5.1...v7.5.2)
