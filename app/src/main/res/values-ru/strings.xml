@@ -8,6 +8,8 @@
     <string name="adding_files">Добавление файлов</string>
     <string name="adding_images">Добавление изображений</string>
     <string name="all">Все</string>
+    <string name="always_show_search_bar">Всегда показывать развернутую строку поиска</string>
+    <string name="always_show_search_bar_hint">При включении этой функции строка поиска всегда будет отображаться вместо использования значка поиска в верхней панели</string>
     <string name="appearance">Внешний вид</string>
     <string name="archive">Архивировать</string>
     <string name="archived">Архив</string>
@@ -20,8 +22,8 @@
     <string name="attach_file">Прикрепить файл</string>
     <string name="audio_recordings">Аудиозаписи</string>
     <string name="auto_backup">Автобэкапы</string>
-    <string name="auto_backup_error_message">Ошибка при авто-резервной копии: \n\'%1$s\'\nПроверьте настройки или сообщите об ошибке</string>
-    <string name="auto_backup_failed">Сбой авто-резервирования NotallyX</string>
+    <string name="auto_backup_error_message">Ошибка при авторезервной копии: \n\'%1$s\'\nПроверьте настройки или сообщите об ошибке</string>
+    <string name="auto_backup_failed">Сбой авторезервирования NotallyX</string>
     <string name="auto_backup_last">Последняя резервная копия</string>
     <string name="auto_backup_on_save">Создавать резервную копию при выходе (авто)</string>
     <string name="auto_backup_on_save_hint">При включении этой функции в папке резервных копий (Папка резервных копий) автоматически создаётся архив NotallyX_AutoBackup.zip при выходе из заметки.\nЭто может повлиять на производительность</string>
@@ -36,7 +38,7 @@
     <string name="backup_password">Пароль для резервной копии</string>
     <string name="backup_password_hint">При включении этой функции все новые ZIP-архивы резервных копий буду зашифрованы и защищены паролем</string>
     <string name="backup_period_days">Интервал авторезервирования (в днях)</string>
-    <string name="backup_periodic">Переодические резервные копии</string>
+    <string name="backup_periodic">Периодические резервные копии</string>
     <string name="backup_periodic_hint">При включении этой функции резервные копии будут автоматически сохраняться в указанную папку.\nФункция может не работать при включенном режиме энергосбережения</string>
     <string name="behaviour">Биометрия</string>
     <string name="biometric_lock">Блокировать приложение с помощью биометрии или PIN-кода</string>
@@ -86,7 +88,7 @@
     <string name="crash_message">Произошла непредвиденная ошибка.\nПриносим извинения за причиненные неудобства.</string>
     <string name="create_github_issue">Сообщить об ошибке на GitHub</string>
     <string name="creation_date">Создано</string>
-    <string name="custom">Пользовтаельский</string>
+    <string name="custom">Пользовательский</string>
     <string name="daily">Дни</string>
     <string name="dark">Тёмная</string>
     <string name="data_in_public">Сохранять данные в общедоступной папке</string>
@@ -126,6 +128,7 @@
     <string name="disallow_screenshots">Запретить создание скриншотов</string>
     <string name="discard">Отменить</string>
     <string name="display_text">Текст для отображения</string>
+    <string name="documentation">Документация</string>
     <string name="donate">Сделать пожертвование</string>
     <string name="drag_handle">Перетащить</string>
     <string name="edit">Редактировать</string>
@@ -152,6 +155,11 @@
     <string name="export_settings_failure">Не удалось экспортировать настройки. Возможно, указан недопустимый путь</string>
     <string name="export_settings_message">Все настройки будут сохранены в JSON-файл для последующего импорта.\n\nОбратите внимание: зашифрованные данные (пароль авторезерва и биометрический ключ) не экспортируются.</string>
     <string name="export_settings_success">Настройки успешно экспортированы</string>
+    <plurals name="exported_notes">
+        <item quantity="few">Экспортировано %1$d заметки</item>
+        <item quantity="one">Экспортирована %1$d заметка</item>
+        <item quantity="other">Экспортировано %1$d заметок</item>
+    </plurals>
     <string name="exporting_backup">Экспорт резервной копии</string>
     <string name="extracted_files">Файлы извлечены</string>
     <string name="filter">Фильтры</string>
@@ -162,7 +170,7 @@
     <string name="grid">Сетка</string>
     <string name="help">Помощь</string>
     <string name="hours">Часов</string>
-    <string name="image_format_not_supported">Формат изображения не поддерживыется</string>
+    <string name="image_format_not_supported">Формат изображения не поддерживается</string>
     <string name="images_hidden_in_overview">Если эта функция включена, изображения заметок будут скрыты из общего списка.</string>
     <string name="images_hidden_in_overview_title">Скрыть изображения в общем списке</string>
     <string name="import_action">Импорт</string>
@@ -261,7 +269,7 @@
     <string name="repetition">Повтор</string>
     <string name="repetition_custom">Свой вариант повтора</string>
     <string name="repetition_value_hint">Значение</string>
-    <string name="report_bug">Сообщить об ошибке</string>
+    <string name="report_bug">Сообщить об ошибке/баге</string>
     <string name="report_crash">Отправить отчёт об ошибке</string>
     <string name="reset_settings">Сбросить настройки</string>
     <string name="reset_settings_message">Все настройки будут сброшены к значениям по умолчанию</string>
@@ -287,9 +295,12 @@
     <string name="send_feedback">Сообщить о проблеме</string>
     <string name="settings">Настройки</string>
     <string name="share">Поделиться</string>
+    <string name="single_file">Один файл</string>
+    <string name="single_note_or_list">Одна заметка или список</string>
     <string name="skip">Пропустить</string>
     <string name="small">Маленький</string>
     <string name="something_went_wrong">Что-то пошло не так. Пожалуйста, повторите попытку</string>
+    <string name="something_went_wrong_audio">Что-то пошло не так. Аудиозапись могла быть перемещена или удалена.\n\nОшибка: (%1$d, %2$d)</string>
     <string name="sort_direction">Порядок сортировки</string>
     <string name="source_code">Исходный код</string>
     <string name="start">Старт</string>
@@ -305,7 +316,7 @@
     <string name="theme">Тема</string>
     <string name="theme_use_dynamic_colors">Использовать цвета обоев</string>
     <string name="title">Заголовок</string>
-    <string name="to_record_audio">Что-бы записывать аудиозаписи, разрешите NotallyX доступ к микрофону</string>
+    <string name="to_record_audio">Чтобы записывать аудиозаписи, разрешите NotallyX доступ к микрофону</string>
     <string name="unarchive">Разархивировать</string>
     <plurals name="unarchived_selected_notes">
         <item quantity="few">Извлечено %1$d заметки</item>

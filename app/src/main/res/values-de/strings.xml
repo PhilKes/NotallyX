@@ -45,6 +45,9 @@
     <string name="biometrics_failure">Fehler bei Authentifizierung per Biometrie/PIN</string>
     <string name="biometrics_no_support">Dein Geräte verfügt über keine biometrischen Features</string>
     <string name="biometrics_not_setup">Biometrie/PIN wurde für dein Gerät noch nicht eingerichtet</string>
+    <string name="biometrics_setup_failure">Biometrie/PIN Setup ist fehlgeschlagen</string>
+    <string name="biometrics_setup_failure_decrypt">Entschlüsseln der Datenbank fehlgeschlagen\nBitte nutzte ‘%1$s’ um den Fehler zu melden</string>
+    <string name="biometrics_setup_failure_encrypt">Verschlüsseln der Datenbank fehlgeschlagen\nBitte nutzte ‘%1$s’ um den Fehler zu melden</string>
     <string name="biometrics_setup_success">Biometrische/PIN Sperre aktiviert</string>
     <string name="bold">Fett</string>
     <string name="calculating">Berechne…</string>
@@ -82,6 +85,8 @@
     <string name="convert_to_text_note">Zu Text-Notiz konvertieren</string>
     <string name="copied_link">Link kopiert</string>
     <string name="copy">Kopieren</string>
+    <string name="crash_export_backup_failed">Exportieren des Backups fehlgeschlagen.\nBitte nutze den \'%1$s\' Button um den Fehler zu melden</string>
+    <string name="crash_export_backup_message">Du kannst versuchen ein Backup deiner Notizen über \'%1$s\' zu erstellen.\nDies könnte fehlschlagen wenn der Fehler zu korrupten Daten geführt hat. In diesem Fall, benutze bitte den ‘%2$s’ Button um den Fehler zu melden</string>
     <string name="crash_message">Ein unerwarteter Fehler ist aufgetreten.\nEntschuldigung für die Unannehmlichkeiten.\n</string>
     <string name="create_github_issue">Github Issue erstellen</string>
     <string name="creation_date">Erstellt</string>
@@ -232,6 +237,7 @@
     <string name="next">Nächste</string>
     <string name="no_auto_sort">Nicht automatisch sortieren</string>
     <string name="none">Keines</string>
+    <string name="not_exists">\'%1$d’ existiert nicht</string>
     <string name="note">Notiz</string>
     <string name="notes">Notizen</string>
     <string name="notes_sorted_by">Notizen sortieren nach</string>
@@ -263,6 +269,7 @@
     <string name="repetition_custom">Benutzer. Wiederholung</string>
     <string name="repetition_value_hint">Wert</string>
     <string name="report_bug">Bug melden</string>
+    <string name="report_bug_stacktrace_too_long">Die Crash Logs sind  zu lang um sie automatisch im Github issue zu befüllen, daher wurden die Crash logs kopiert.\nWenn du auf ‘%1$s’ klickst, öffnet sich ein Browser um ein Github issue für deinen Fehler anzulegen. Es ist wichtig, dass du die automatisch kopierten Logs in das Feld ‘(Optional) Relevant log output’ des Github issues kopierst.</string>
     <string name="report_crash">Bug mit Crash logs melden</string>
     <string name="reset_settings">Einstellungen zurücksetzen</string>
     <string name="reset_settings_message">Alle Einstellungen werden auf ihre Default-Werte zurückgesetzt</string>
@@ -326,6 +333,7 @@
     <string name="updated_link">Link aktualisiert</string>
     <string name="view">Ansicht</string>
     <string name="view_file">Datei öffnen</string>
+    <string name="view_logs">Öffne Log Datei</string>
     <string name="view_note">Notiz ansehen</string>
     <string name="weekly">Wöchentlich</string>
     <string name="weeks">Wochen</string>
