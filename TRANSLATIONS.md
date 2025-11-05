@@ -21,9 +21,9 @@ See [Android Translations Converter](https://github.com/PhilKes/android-translat
 |----------|----------|
 | 🇺🇸 English | 100% (315/315) |
 | 🇪🇸 Catalan | 20% (65/315) |
-| 🇨🇿 Czech | 95% (301/315) |
+| 🇨🇿 Czech | 96% (305/315) |
 | 🇩🇰 Danish | 21% (69/315) |
-| 🇩🇪 German | 96% (305/315) |
+| 🇩🇪 German | 99% (313/315) |
 | 🇬🇷 Greek | 22% (72/315) |
 | 🇪🇸 Spanish | 95% (301/315) |
 | 🇫🇷 French | 95% (301/315) |
@@ -39,7 +39,7 @@ See [Android Translations Converter](https://github.com/PhilKes/android-translat
 | 🇧🇷 Portuguese (Brazil) | 20% (66/315) |
 | 🇵🇹 Portuguese (Portugal) | 22% (71/315) |
 | 🇷🇴 Romanian | 95% (301/315) |
-| 🇷🇺 Russian | 94% (298/315) |
+| 🇷🇺 Russian | 96% (305/315) |
 | 🇸🇰 Slovak | 20% (65/315) |
 | 🇸🇮 Slovenian | 34% (109/315) |
 | 🇸🇪 Swedish | 20% (63/315) |
