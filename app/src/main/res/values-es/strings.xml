@@ -8,6 +8,8 @@
     <string name="adding_files">Añadiendo ficheros</string>
     <string name="adding_images">Añadiendo imágenes</string>
     <string name="all">Todo</string>
+    <string name="always_show_search_bar">Mostrar siempre la barra de búsqueda expandida</string>
+    <string name="always_show_search_bar_hint">Al habilitar esta opción, la barra de búsqueda siempre se mostrará en el diseño en lugar de usar un icono de búsqueda en la barra superior.</string>
     <string name="appearance">Apariencia</string>
     <string name="archive">Archivar</string>
     <string name="archived">Archivados</string>
@@ -43,6 +45,9 @@
     <string name="biometrics_failure">Falló la autenticación biómetrica/PIN</string>
     <string name="biometrics_no_support">Este dispositivo no dispone de características biométricas</string>
     <string name="biometrics_not_setup">No está justada todavía la biometría/PIN para su dispositivo</string>
+    <string name="biometrics_setup_failure">Fallo al configurar el bloqueo biométrico/PIN</string>
+    <string name="biometrics_setup_failure_decrypt">Fallo en el descifrado de la base de datos.\nPor favor, use ‘%1$s’ para informar del error</string>
+    <string name="biometrics_setup_failure_encrypt">Fallo en el cifrado de la base de datos.\nPor favor, use ‘%1$s’ para informar del error</string>
     <string name="biometrics_setup_success">El bloqueo biométrico/PIN ha sido habilitado</string>
     <string name="bold">Negritas</string>
     <string name="calculating">Calculando…</string>
@@ -80,6 +85,8 @@
     <string name="convert_to_text_note">Convertir en nota de texto</string>
     <string name="copied_link">Enlace copiado al portapapeles</string>
     <string name="copy">Copiar</string>
+    <string name="crash_export_backup_failed">Lamentablemente, falló la exportación del backup.\nPor favor, use el botón ‘%1$s’ para informar del fallo.</string>
+    <string name="crash_export_backup_message">Puede intentar crear un backup de sus notas pinchando en ‘%1$s’.\nEsto podría fallar si el fallo provocó la pérdida o corrupción de datos. En ese caso, utiliza el botón «%2$s» para informar del fallo.</string>
     <string name="crash_message">Se produjo un error inesperado.\nDisculpe las molestias.</string>
     <string name="create_github_issue">Crear incidente en Github</string>
     <string name="creation_date">Creado</string>
@@ -122,6 +129,7 @@
     <string name="disallow_screenshots">No permitir capturas de pantalla</string>
     <string name="discard">Descartar</string>
     <string name="display_text">Texto a pantalla</string>
+    <string name="documentation">Documentación</string>
     <string name="donate">Hacer donación</string>
     <string name="drag_handle">Arrastra la asa</string>
     <string name="edit">Editar</string>
@@ -148,6 +156,10 @@
     <string name="export_settings_failure">Fallo al exportar ajustes, ¿has escogido una ruta no válida\?</string>
     <string name="export_settings_message">Todas las configuraciones se exportarán a un archivo JSON, que se puede utilizar para volver a importar las configuraciones almacenadas.\n\nTenga en cuenta que esto no incluye las configuraciones cifradas, como la contraseña de copia de seguridad automática o la clave de cifrado biométrico.</string>
     <string name="export_settings_success">Configuración exportada exitosamente</string>
+    <plurals name="exported_notes">
+        <item quantity="one">Exportada %1$s nota</item>
+        <item quantity="other">Exportadas %1$s notas</item>
+    </plurals>
     <string name="exporting_backup">Exportando copia de seguridad</string>
     <string name="extracted_files">Fichero extraído</string>
     <string name="filter">Filtro</string>
@@ -225,6 +237,7 @@
     <string name="next">Siguiente</string>
     <string name="no_auto_sort">No ordenar</string>
     <string name="none">Ninguno</string>
+    <string name="not_exists">\'%1$s’ no existe</string>
     <string name="note">Nota</string>
     <string name="notes">Notas</string>
     <string name="notes_sorted_by">Notas ordenadas por</string>
@@ -256,6 +269,7 @@
     <string name="repetition_custom">Repetición personalizada</string>
     <string name="repetition_value_hint">Valor</string>
     <string name="report_bug">Informar error</string>
+    <string name="report_bug_stacktrace_too_long">Los registros de fallos son demasiado extensos para rellenar automáticamente el ticket de GitHub, por lo que se han copiado al portapapeles.\nAl hacer clic en «%1$s», se abrirá tu navegador para crear un ticket de GitHub para el fallo. Es importante que pegues los registros de fallos copiados automáticamente en el campo «(Opcional) Salida de registro relevante» del ticket de GitHub.\n</string>
     <string name="report_crash">Informar de error con traza de ejecución</string>
     <string name="reset_settings">Restablecer ajustes</string>
     <string name="reset_settings_message">Todos los ajustes serán restablecidos a su valor por defecto</string>
@@ -319,6 +333,7 @@
     <string name="updated_link">Actualizar enlace</string>
     <string name="view">Vista</string>
     <string name="view_file">Ver fichero</string>
+    <string name="view_logs">Ver fichero de registro</string>
     <string name="view_note">Ver nota</string>
     <string name="weekly">Semanal</string>
     <string name="weeks">Semanas</string>

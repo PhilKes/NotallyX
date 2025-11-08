@@ -25,7 +25,7 @@ See [Android Translations Converter](https://github.com/PhilKes/android-translat
 | 🇩🇰 Danish | 21% (69/315) |
 | 🇩🇪 German | 99% (313/315) |
 | 🇬🇷 Greek | 22% (72/315) |
-| 🇪🇸 Spanish | 95% (301/315) |
+| 🇪🇸 Spanish | 99% (313/315) |
 | 🇫🇷 French | 95% (301/315) |
 | 🇭🇺 Hungarian | 20% (65/315) |
 | 🇮🇩 Indonesian | 23% (75/315) |
