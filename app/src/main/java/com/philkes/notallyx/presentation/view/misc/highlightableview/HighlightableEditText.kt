@@ -1,13 +1,12 @@
-package com.philkes.notallyx.presentation.view.misc
+package com.philkes.notallyx.presentation.view.misc.highlightableview
 
 import android.content.Context
 import android.text.Spanned
-import android.text.style.BackgroundColorSpan
 import android.text.style.CharacterStyle
 import android.util.AttributeSet
-import androidx.annotation.ColorInt
 import androidx.appcompat.widget.AppCompatEditText
 import com.philkes.notallyx.presentation.removeSelectionFromSpans
+import com.philkes.notallyx.presentation.view.misc.EditTextWithWatcher
 import com.philkes.notallyx.presentation.withAlpha
 
 /**
@@ -95,5 +94,3 @@ open class HighlightableEditText(context: Context, attrs: AttributeSet) :
         }
     }
 }
-
-class HighlightSpan(@ColorInt color: Int) : BackgroundColorSpan(color)

@@ -34,6 +34,8 @@ import com.philkes.notallyx.presentation.extractColor
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.setControlsContrastColorForAllViews
 import com.philkes.notallyx.presentation.view.misc.ItemListener
+import com.philkes.notallyx.presentation.view.misc.highlightableview.HighlightableTextView
+import com.philkes.notallyx.presentation.view.misc.highlightableview.SEARCH_SNIPPET_ITEM_LINES
 import com.philkes.notallyx.presentation.view.note.listitem.init
 import com.philkes.notallyx.presentation.viewmodel.preference.DateFormat
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
@@ -55,6 +57,12 @@ class BaseNoteVH(
     private val preferences: BaseNoteVHPreferences,
     listener: ItemListener,
 ) : RecyclerView.ViewHolder(binding.root) {
+
+    private var searchKeyword: String = ""
+
+    fun setSearchKeyword(keyword: String) {
+        this.searchKeyword = keyword
+    }
 
     init {
         val title = preferences.textSize.displayTitleSize
@@ -95,8 +103,8 @@ class BaseNoteVH(
         updateCheck(checked, baseNote.color)
 
         when (baseNote.type) {
-            Type.NOTE -> bindNote(baseNote.body, baseNote.spans, baseNote.title.isEmpty())
-            Type.LIST -> bindList(baseNote.items, baseNote.title.isEmpty())
+            Type.NOTE -> bindNote(baseNote, searchKeyword)
+            Type.LIST -> bindList(baseNote, searchKeyword)
         }
         val (date, datePrefixResId) =
             when (sortBy) {
@@ -111,12 +119,18 @@ class BaseNoteVH(
         setFiles(baseNote.files)
 
         binding.Title.apply {
-            text = baseNote.title
             isVisible = baseNote.title.isNotEmpty()
             updatePadding(
                 bottom =
                     if (baseNote.hasNoContents() || shouldOnlyDisplayTitle(baseNote)) 0 else 8.dp
             )
+            if (searchKeyword.isNotBlank()) {
+                val snippet = extractSearchSnippet(baseNote.title, searchKeyword)
+                if (snippet != null) {
+                    showSearchSnippet(snippet)
+                } else text = baseNote.title
+            } else text = baseNote.title
+
             setCompoundDrawablesWithIntrinsicBounds(
                 if (baseNote.type == Type.LIST && preferences.maxItems < 1)
                     R.drawable.checkbox_small
@@ -148,9 +162,23 @@ class BaseNoteVH(
         binding.RemindersView.isVisible = baseNote.reminders.any { it.hasUpcomingNotification() }
     }
 
-    private fun bindNote(body: String, spans: List<SpanRepresentation>, isTitleEmpty: Boolean) {
+    private fun bindNote(baseNote: BaseNote, keyword: String) {
         binding.LinearLayout.visibility = GONE
+        if (keyword.isBlank()) {
+            bindNote(baseNote.body, baseNote.spans, baseNote.title.isEmpty())
+            return
+        }
+        binding.Note.apply {
+            val snippet = extractSearchSnippet(baseNote.body, keyword)
+            if (snippet == null) {
+                bindNote(baseNote.body, baseNote.spans, baseNote.title.isEmpty())
+            } else {
+                showSearchSnippet(snippet)
+            }
+        }
+    }
 
+    private fun bindNote(body: String, spans: List<SpanRepresentation>, isTitleEmpty: Boolean) {
         binding.Note.apply {
             text = body.applySpans(spans)
             if (preferences.maxLines < 1) {
@@ -162,29 +190,84 @@ class BaseNoteVH(
         }
     }
 
-    private fun bindList(items: List<ListItem>, isTitleEmpty: Boolean) {
+    /** Shows a snippet of ListItems around the ListItem that contains keyword */
+    private fun LinearLayout.bindListSearch(
+        initializedItems: List<ListItem>,
+        keyword: String,
+        isTitleEmpty: Boolean,
+    ) {
+        binding.LinearLayout.visibility = VISIBLE
+        val keywordItemIdx =
+            initializedItems.indexOfFirst { it.body.contains(keyword, ignoreCase = true) }
+        if (keywordItemIdx == -1) {
+            return bindList(initializedItems, isTitleEmpty)
+        }
+        val listItemViews = children.filterIsInstance(HighlightableTextView::class.java).toList()
+        listItemViews.forEach { it.visibility = GONE }
+        val startItemIdx = (keywordItemIdx - SEARCH_SNIPPET_ITEM_LINES).coerceAtLeast(0)
+        val endItemIdx =
+            (keywordItemIdx + SEARCH_SNIPPET_ITEM_LINES).coerceAtMost(initializedItems.lastIndex)
+        (startItemIdx..endItemIdx).forEachIndexed { viewIdx, itemIdx ->
+            listItemViews[viewIdx].apply {
+                val item = initializedItems[itemIdx]
+                text = item.body
+                if (itemIdx == keywordItemIdx) {
+                    highlight(keyword)
+                }
+                handleChecked(this, item.checked)
+                visibility = VISIBLE
+                updateLayoutParams<LinearLayout.LayoutParams> {
+                    marginStart = if (item.isChild) 20.dp else 0
+                }
+            }
+        }
+        bindItemsRemaining(initializedItems.size, endItemIdx - startItemIdx + 1)
+    }
+
+    private fun bindList(baseNote: BaseNote, keyword: String) {
+        binding.Note.visibility = GONE
+        val initializedItems = baseNote.items.init()
+        if (baseNote.items.isEmpty()) {
+            binding.LinearLayout.visibility = GONE
+            return
+        }
+        if (keyword.isBlank()) {
+            bindList(initializedItems, baseNote.title.isEmpty())
+            return
+        }
+        binding.LinearLayout.bindListSearch(initializedItems, keyword, baseNote.title.isEmpty())
+    }
+
+    private fun bindItemsRemaining(totalItems: Int, displayedItems: Int) {
+        if (displayedItems > 0 && totalItems > displayedItems) {
+            binding.ItemsRemaining.apply {
+                visibility = VISIBLE
+                text = (totalItems - displayedItems).toString()
+            }
+        } else binding.ItemsRemaining.visibility = GONE
+    }
+
+    private fun bindList(initializedItems: List<ListItem>, isTitleEmpty: Boolean) {
         binding.apply {
-            Note.visibility = GONE
-            if (items.isEmpty()) {
+            bindItemsRemaining(initializedItems.size, preferences.maxItems)
+            if (initializedItems.isEmpty()) {
                 LinearLayout.visibility = GONE
             } else {
                 LinearLayout.visibility = VISIBLE
                 val forceShowFirstItem = preferences.maxItems < 1 && isTitleEmpty
-                val initializedItems = items.init()
                 val filteredList =
                     initializedItems.take(if (forceShowFirstItem) 1 else preferences.maxItems)
-                LinearLayout.children.forEachIndexed { index, view ->
-                    if (view.id != R.id.ItemsRemaining) {
+                LinearLayout.children
+                    .filterIsInstance(HighlightableTextView::class.java)
+                    .forEachIndexed { index, view ->
                         if (index < filteredList.size) {
                             val item = filteredList[index]
-                            (view as TextView).apply {
+                            view.apply {
                                 text = item.body
                                 handleChecked(this, item.checked)
                                 visibility = VISIBLE
-                                if (item.isChild) {
-                                    updateLayoutParams<LinearLayout.LayoutParams> {
-                                        marginStart = 20.dp
-                                    }
+                                updateLayoutParams<LinearLayout.LayoutParams> {
+                                    marginStart = if (item.isChild) 20.dp else 0
                                 }
                                 if (index == filteredList.lastIndex) {
                                     updatePadding(bottom = 0)
@@ -192,14 +275,6 @@ class BaseNoteVH(
                             }
                         } else view.visibility = GONE
                     }
-                }
-
-                if (preferences.maxItems > 0 && items.size > preferences.maxItems) {
-                    ItemsRemaining.apply {
-                        visibility = VISIBLE
-                        text = (items.size - preferences.maxItems).toString()
-                    }
-                } else ItemsRemaining.visibility = GONE
             }
         }
     }

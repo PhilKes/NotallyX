@@ -29,6 +29,8 @@ class BaseNoteAdapter(
     private val listener: ItemListener,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private var searchKeyword: String = ""
+
     private var list = SortedList(Item::class.java, notesSort.createCallback())
 
     override fun getItemViewType(position: Int): Int {
@@ -45,13 +47,19 @@ class BaseNoteAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (val item = list[position]) {
             is Header -> (holder as HeaderVH).bind(item)
-            is BaseNote ->
-                (holder as BaseNoteVH).bind(
-                    item,
-                    imageRoot,
-                    selectedIds.contains(item.id),
-                    notesSort.sortedBy,
-                )
+            is BaseNote -> {
+                (holder as BaseNoteVH).apply {
+                    setSearchKeyword(searchKeyword)
+                    bind(item, imageRoot, selectedIds.contains(item.id), notesSort.sortedBy)
+                }
+            }
+        }
+    }
+
+    fun setSearchKeyword(keyword: String) {
+        if (searchKeyword != keyword) {
+            searchKeyword = keyword
+            notifyDataSetChanged()
         }
     }
 
