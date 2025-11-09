@@ -248,7 +248,7 @@
     <string name="paused">Pausado</string>
     <string name="pin">Fijar</string>
     <string name="pinned">Fijados</string>
-    <string name="plain_text_files">Ficheros en texto plano</string>
+    <string name="plain_text_files">Ficheros en Markdown/texto plano</string>
     <string name="plain_text_files_help">Para importar notas desde archivos de texto sin formato (un solo archivo o carpeta), haga clic en Importar. Cada archivo se importa como una nota independiente y el nombre del archivo se convierte en el título de la nota. Si el contenido del texto comienza con una sintaxis de lista (p. ej., Markdown ’- [x]’, sintaxis NotallyX ’[✓]’ o ’*’, ’-’), se convertirá en una nota de lista.</string>
     <string name="play">Reproducir</string>
     <string name="please_grant_notally_alarm">Otorgar permiso a Notallyx para enviar recordatorios</string>

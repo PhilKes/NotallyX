@@ -377,9 +377,11 @@ fun Context.viewFile(uri: Uri, mimeType: String) {
         Intent(Intent.ACTION_VIEW)
             .apply {
                 setDataAndType(uri, mimeType)
-                flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
             .wrapWithChooser(this)
+            .apply { addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
     startActivity(intent)
 }
 

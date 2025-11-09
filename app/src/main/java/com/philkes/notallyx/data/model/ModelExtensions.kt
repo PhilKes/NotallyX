@@ -6,6 +6,7 @@ import android.util.Base64
 import androidx.core.text.toHtml
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.dao.NoteIdReminder
+import com.philkes.notallyx.data.imports.markdown.createMarkdownFromBodyAndSpans
 import com.philkes.notallyx.data.model.BaseNote.Companion.COLOR_DEFAULT
 import com.philkes.notallyx.presentation.applySpans
 import com.philkes.notallyx.utils.decodeToBitmap
@@ -227,6 +228,90 @@ fun BaseNote.toHtml(showDateCreated: Boolean, imagesRootFolder: File?) = buildSt
 }
 
 fun List<BaseNote>.toNoteIdReminders() = map { NoteIdReminder(it.id, it.reminders) }
+
+fun BaseNote.toMarkdown(): String = buildString {
+    when (type) {
+        Type.NOTE -> {
+            append(createMarkdownFromBodyAndSpans(body, spans))
+        }
+        Type.LIST -> {
+            append(items.toMarkdownChecklist())
+        }
+    }
+}
+
+private fun List<ListItem>.toMarkdownChecklist(): String = buildString {
+    for (item in this@toMarkdownChecklist) {
+        val check = if (item.checked) "[x]" else "[ ]"
+        val indent = if (item.isChild) "    " else ""
+        appendLine("$indent- $check ${item.body}")
+    }
+}
+
+private fun String.toMarkdownWithSpans(spans: List<SpanRepresentation>): String {
+    if (spans.isEmpty()) return this
+    val before = Array(this.length + 1) { StringBuilder() }
+    val after = Array(this.length + 1) { StringBuilder() }
+
+    // Prioritize links: avoid adding other markers within link ranges to reduce nesting issues
+    val linkRanges = spans.filter { it.link }.map { it.start to it.end }
+    fun inLinkRange(index: Int): Boolean =
+        linkRanges.any { index >= it.first && index <= it.second }
+
+    // Add markers for non-link spans first
+    spans
+        .filter { !it.link }
+        .forEach { s ->
+            val start = s.start.coerceIn(0, this.length)
+            val end = s.end.coerceIn(0, this.length)
+            if (start >= end) return@forEach
+            if (!inLinkRange(start) && !inLinkRange(end)) {
+                if (s.bold) {
+                    before[start].append("**")
+                    after[end].insert(0, "**")
+                }
+                if (s.italic) {
+                    before[start].append("_")
+                    after[end].insert(0, "_")
+                }
+                if (s.monospace) {
+                    before[start].append("`")
+                    after[end].insert(0, "`")
+                }
+                if (s.strikethrough) {
+                    before[start].append("~~")
+                    after[end].insert(0, "~~")
+                }
+            }
+        }
+
+    // Add link markers
+    spans
+        .filter { it.link }
+        .forEach { s ->
+            val start = s.start.coerceIn(0, this.length)
+            val end = s.end.coerceIn(0, this.length)
+            if (start >= end) return@forEach
+            before[start].append("[")
+            val url = s.linkData ?: this.safeSubstring(start, end)
+            after[end].append("](${url})")
+        }
+
+    // Build output
+    val out = StringBuilder()
+    for (i in 0..this.length) {
+        out.append(before[i])
+        if (i < this.length) out.append(this[i])
+        out.append(after[i])
+    }
+    return out.toString()
+}
+
+private fun String.safeSubstring(start: Int, end: Int): String {
+    val s = start.coerceIn(0, this.length)
+    val e = end.coerceIn(0, this.length)
+    return if (s < e) this.substring(s, e) else ""
+}
 
 fun BaseNote.attachmentsDifferFrom(other: BaseNote): Boolean {
     return files.size != other.files.size ||

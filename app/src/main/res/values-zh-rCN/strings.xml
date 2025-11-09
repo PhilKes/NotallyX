@@ -241,7 +241,7 @@
     <string name="paused">已暂停</string>
     <string name="pin">置于顶部</string>
     <string name="pinned">已置顶</string>
-    <string name="plain_text_files">纯文本文件</string>
+    <string name="plain_text_files">Markdown/纯文本文件</string>
     <string name="plain_text_files_help">为了从纯文本（单文件或文件夹）导入笔记，单击“导入”。每个文件被导入为单独的笔记，文件的名称变成笔记的标题。如果文本内容以清单语法开头（如   Markdown ’- [x]’, NotallyX 语法 ’[✓]’, 或 ’*’, ’-’），它将被转换为清单笔记。</string>
     <string name="play">播放</string>
     <string name="please_grant_notally_alarm">请授予 NotallyX 发送提醒的权限</string>

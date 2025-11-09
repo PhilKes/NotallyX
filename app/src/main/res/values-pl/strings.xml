@@ -246,7 +246,7 @@
     <string name="paused">Zatrzymano</string>
     <string name="pin">Przypnij</string>
     <string name="pinned">Przypięte</string>
-    <string name="plain_text_files">Zwykłe pliki tekstowe</string>
+    <string name="plain_text_files">Markdown/Zwykłe pliki tekstowe</string>
     <string name="plain_text_files_help">Aby zaimportować Notatki z plików tekstowych (pojedynczy plik lub folder), kliknij Przywracanie. Każdy plik jest importowany jako osobna notatka, a nazwa pliku staje się tytułem notatki. Jeśli treść tekstu zaczyna się od składni listy (np. Markdown „- [x]”, składnia NotallyX „[✓]” lub „*”, „-”), zostanie ona przekonwertowana na notatkę listy.</string>
     <string name="play">Nagrywaj</string>
     <string name="please_grant_notally_alarm">Zezwól NotallyX na wysyłanie przypomnień</string>

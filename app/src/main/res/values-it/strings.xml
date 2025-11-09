@@ -227,7 +227,7 @@
     <string name="paused">In pausa</string>
     <string name="pin">Fissa in cima</string>
     <string name="pinned">Note fissate in cima</string>
-    <string name="plain_text_files">File di testo semplice</string>
+    <string name="plain_text_files">File di Markdown/testo semplice</string>
     <string name="plain_text_files_help">Per importare le note da file (singolo file o cartella) di testo semplice, clicca Importa. Ogni file verrà importato in una nota separata, il nome del file diventerà il titolo della nota. Se il contenuto inizia con la sintassi di lista (per esempio ’- [x]’ in Markdown, ’[✓]’ nella sintassi di Notallyx, oppure ’*’, ’-’) verrà importato come Lista.</string>
     <string name="play">Play</string>
     <string name="please_grant_notally_alarm">Per favore concedi a NotallyX il permesso per inviare promemoria</string>

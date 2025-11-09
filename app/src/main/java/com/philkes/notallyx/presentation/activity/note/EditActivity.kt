@@ -88,7 +88,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.backup.exportNotes
+import com.philkes.notallyx.utils.backup.exportNote
 import com.philkes.notallyx.utils.changeStatusAndNavigationBarColor
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.getFileName
@@ -116,7 +116,6 @@ abstract class EditActivity(private val type: Type) :
     private lateinit var selectLabelsActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var playAudioActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var attachFilesActivityResultLauncher: ActivityResultLauncher<Intent>
-    private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var pinMenuItem: MenuItem
@@ -403,18 +402,11 @@ abstract class EditActivity(private val type: Type) :
                     }
                 }
             }
-
         exportFileActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> baseModel.exportSelectedFileToUri(uri) }
-                }
-            }
-        exportNotesActivityResultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        baseModel.exportNotesToFolder(uri, listOf(notallyModel.getBaseNote()))
+                        baseModel.exportNoteToFile(uri, notallyModel.getBaseNote(), binding.root)
                     }
                 }
             }
@@ -964,12 +956,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     override fun export(mimeType: ExportMimeType) {
-        exportNotes(
-            mimeType,
-            listOf(notallyModel.getBaseNote()),
-            exportFileActivityResultLauncher,
-            exportNotesActivityResultLauncher,
-        )
+        exportNote(notallyModel.getBaseNote(), mimeType, exportFileActivityResultLauncher)
     }
 
     private fun delete() {

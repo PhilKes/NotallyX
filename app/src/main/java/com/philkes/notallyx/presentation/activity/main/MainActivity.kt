@@ -465,8 +465,8 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
 
     private fun exportSelectedNotes(mimeType: ExportMimeType) {
         exportNotes(
-            mimeType,
             baseModel.actionMode.selectedNotes.values,
+            mimeType,
             exportFileActivityResultLauncher,
             exportNotesActivityResultLauncher,
         )
@@ -563,13 +563,17 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         exportFileActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> baseModel.exportSelectedFileToUri(uri) }
+                    result.data?.data?.let { uri ->
+                        baseModel.exportSelectedNoteToFile(uri, binding.root)
+                    }
                 }
             }
         exportNotesActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> baseModel.exportSelectedNotesToFolder(uri) }
+                    result.data?.data?.let { uri ->
+                        baseModel.exportSelectedNotesToFolder(uri, binding.root)
+                    }
                 }
             }
     }

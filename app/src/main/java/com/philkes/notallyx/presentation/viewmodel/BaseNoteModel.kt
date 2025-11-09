@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.print.PdfPrintListener
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
@@ -44,6 +45,7 @@ import com.philkes.notallyx.presentation.activity.main.fragment.settings.Setting
 import com.philkes.notallyx.presentation.getQuantityString
 import com.philkes.notallyx.presentation.restartApplication
 import com.philkes.notallyx.presentation.setCancelButton
+import com.philkes.notallyx.presentation.showSnackbar
 import com.philkes.notallyx.presentation.showToast
 import com.philkes.notallyx.presentation.view.misc.NotNullLiveData
 import com.philkes.notallyx.presentation.view.misc.Progress
@@ -64,7 +66,9 @@ import com.philkes.notallyx.utils.backup.clearAllLabels
 import com.philkes.notallyx.utils.backup.copyDatabase
 import com.philkes.notallyx.utils.backup.exportAsZip
 import com.philkes.notallyx.utils.backup.exportPdfFile
+import com.philkes.notallyx.utils.backup.exportPdfFileFolder
 import com.philkes.notallyx.utils.backup.exportPlainTextFile
+import com.philkes.notallyx.utils.backup.exportPlainTextFileFolder
 import com.philkes.notallyx.utils.backup.getPreviousLabels
 import com.philkes.notallyx.utils.backup.getPreviousNotes
 import com.philkes.notallyx.utils.backup.importZip
@@ -83,6 +87,7 @@ import com.philkes.notallyx.utils.security.encryptDatabase
 import com.philkes.notallyx.utils.security.isEncryptedDatabase
 import com.philkes.notallyx.utils.security.isUnencryptedDatabase
 import com.philkes.notallyx.utils.toReadablePath
+import com.philkes.notallyx.utils.viewFile
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 import javax.crypto.Cipher
@@ -100,7 +105,6 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
     private val labelCache = HashMap<String, Content>()
 
-    var selectedExportFile: DocumentFile? = null
     lateinit var selectedExportMimeType: ExportMimeType
 
     lateinit var labels: LiveData<List<String>>
@@ -439,18 +443,58 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         }
     }
 
-    fun exportSelectedFileToUri(uri: Uri) {
-        viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                app.contentResolver.openOutputStream(uri)?.use { output ->
-                    app.contentResolver.openInputStream(selectedExportFile!!.uri)?.copyTo(output)
+    fun exportNoteToFile(fileUri: Uri, note: BaseNote, snackbarView: View) {
+        val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+            app.log(TAG, throwable = throwable)
+            actionMode.close(true)
+            app.showToast(R.string.something_went_wrong)
+        }
+        viewModelScope.launch(exceptionHandler) {
+            when (selectedExportMimeType) {
+                ExportMimeType.PDF -> {
+                    exportPdfFile(
+                        app,
+                        note,
+                        DocumentFile.fromSingleUri(app, fileUri)!!,
+                        pdfPrintListener =
+                            object : PdfPrintListener {
+                                override fun onSuccess(file: DocumentFile) {
+                                    actionMode.close(true)
+                                    val message = app.getQuantityString(R.plurals.exported_notes, 1)
+                                    snackbarView.showFileSnackbar(
+                                        "$message to '${app.toReadablePath(fileUri)}'",
+                                        fileUri,
+                                        ExportMimeType.PDF,
+                                    )
+                                }
+
+                                override fun onFailure(message: CharSequence?) {
+                                    app.log(TAG, stackTrace = message as String?)
+                                    actionMode.close(true)
+                                }
+                            },
+                    )
+                }
+                else -> {
+                    exportPlainTextFile(
+                        app,
+                        note,
+                        DocumentFile.fromSingleUri(app, fileUri)!!,
+                        selectedExportMimeType,
+                    )
+                    actionMode.close(true)
+                    val message = app.getQuantityString(R.plurals.exported_notes, 1)
+                    snackbarView.showFileSnackbar(
+                        "$message to '${app.toReadablePath(fileUri)}'",
+                        fileUri,
+                        selectedExportMimeType,
+                    )
                 }
             }
-            app.showToast(R.string.saved_to_device)
         }
     }
 
-    fun exportNotesToFolder(folderUri: Uri, notes: Collection<BaseNote>) {
+    fun exportNotesToFolder(folderUri: Uri, notes: Collection<BaseNote>, snackbarView: View) {
         val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
             app.log(TAG, throwable = throwable)
             actionMode.close(true)
@@ -463,7 +507,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
             when (selectedExportMimeType) {
                 ExportMimeType.PDF -> {
                     for (note in notes) {
-                        exportPdfFile(
+                        exportPdfFileFolder(
                             app,
                             note,
                             DocumentFile.fromTreeUri(app, folderUri)!!,
@@ -480,7 +524,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                                                 R.plurals.exported_notes,
                                                 counter.get(),
                                             )
-                                        app.showToast(
+                                        snackbarView.showSnackbar(
                                             "$message to '${app.toReadablePath(folderUri)}'"
                                         )
                                     }
@@ -496,7 +540,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                 }
                 else -> {
                     for (note in notes) {
-                        exportPlainTextFile(
+                        exportPlainTextFileFolder(
                             app,
                             note,
                             selectedExportMimeType,
@@ -509,14 +553,22 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
                     actionMode.close(true)
                     progress.postValue(ExportNotesProgress(inProgress = false))
                     val message = app.getQuantityString(R.plurals.exported_notes, counter.get())
-                    app.showToast("$message to '${app.toReadablePath(folderUri)}'")
+                    snackbarView.showSnackbar("$message to '${app.toReadablePath(folderUri)}'")
                 }
             }
         }
     }
 
-    fun exportSelectedNotesToFolder(folderUri: Uri) {
-        exportNotesToFolder(folderUri, actionMode.selectedNotes.values)
+    fun exportSelectedNotesToFolder(folderUri: Uri, snackbarView: View) {
+        exportNotesToFolder(folderUri, actionMode.selectedNotes.values, snackbarView)
+    }
+
+    fun exportSelectedNoteToFile(fileUri: Uri, snackbarView: View) {
+        exportNoteToFile(fileUri, actionMode.selectedNotes.values.first(), snackbarView)
+    }
+
+    private fun View.showFileSnackbar(msg: String, fileUri: Uri, mimeType: ExportMimeType) {
+        showSnackbar(msg, R.string.open_link) { app.viewFile(fileUri, mimeType.mimeType) }
     }
 
     fun pinBaseNotes(pinned: Boolean) {
@@ -852,6 +904,7 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
 
 enum class ExportMimeType(val mimeType: String, val fileExtension: String) {
     TXT("text/plain", "txt"),
+    MD("text/markdown", "md"),
     PDF("application/pdf", "pdf"),
     JSON(MIME_TYPE_JSON, "json"),
     HTML("text/html", "html"),

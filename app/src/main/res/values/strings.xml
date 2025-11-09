@@ -250,8 +250,8 @@
     <string name="paused">Paused</string>
     <string name="pin">Pin</string>
     <string name="pinned">Pinned</string>
-    <string name="plain_text_files">Plain Text Files</string>
-    <string name="plain_text_files_help">In order to import your Notes from plain text files (single file or folder), click Import. Every file is imported as a separate note, the file’s name becomes the note’s title. If the text contents start with list syntax (e.g. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’) it will be converted to a List note.</string>
+    <string name="plain_text_files">Markdown/Plain Text Files</string>
+    <string name="plain_text_files_help">In order to import your Notes from markdown/plain text files (single file or folder), click Import. Every file is imported as a separate note, the file’s name becomes the note’s title. If the text contents start with list syntax (e.g. Markdown ’- [x]’, NotallyX syntax ’[✓]’, or ’*’, ’-’) it will be converted to a List note.</string>
     <string name="play">Play</string>
     <string name="please_grant_notally_alarm">Please grant NotallyX to send reminders</string>
     <string name="please_grant_notally_audio">Please grant NotallyX the permission to record audio. Recordings never leave your device</string>
