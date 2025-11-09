@@ -563,7 +563,7 @@ class MainActivity : LockedActivity<ActivityMainBinding>() {
         exportFileActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> baseModel.exportSelectedFileToUri(uri) }
+                    result.data?.data?.let { uri -> baseModel.exportSelectedNoteToFile(uri) }
                 }
             }
         exportNotesActivityResultLauncher =

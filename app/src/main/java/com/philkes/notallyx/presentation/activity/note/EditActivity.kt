@@ -116,7 +116,6 @@ abstract class EditActivity(private val type: Type) :
     private lateinit var selectLabelsActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var playAudioActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var attachFilesActivityResultLauncher: ActivityResultLauncher<Intent>
-    private lateinit var exportNotesActivityResultLauncher: ActivityResultLauncher<Intent>
     private lateinit var exportFileActivityResultLauncher: ActivityResultLauncher<Intent>
 
     private lateinit var pinMenuItem: MenuItem
@@ -403,18 +402,11 @@ abstract class EditActivity(private val type: Type) :
                     }
                 }
             }
-
         exportFileActivityResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
-                    result.data?.data?.let { uri -> baseModel.exportSelectedFileToUri(uri) }
-                }
-            }
-        exportNotesActivityResultLauncher =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-                if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        baseModel.exportNotesToFolder(uri, listOf(notallyModel.getBaseNote()))
+                        baseModel.exportNoteToFile(uri, notallyModel.getBaseNote())
                     }
                 }
             }
@@ -968,7 +960,7 @@ abstract class EditActivity(private val type: Type) :
             mimeType,
             listOf(notallyModel.getBaseNote()),
             exportFileActivityResultLauncher,
-            exportNotesActivityResultLauncher,
+            exportFileActivityResultLauncher,
         )
     }
 

@@ -13,7 +13,6 @@ import android.os.Build
 import android.print.PdfPrintListener
 import android.print.printPdf
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
@@ -40,7 +39,6 @@ import com.philkes.notallyx.data.model.toTxt
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.MainActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.settings.SettingsFragment
-import com.philkes.notallyx.presentation.view.misc.MenuDialog
 import com.philkes.notallyx.presentation.view.misc.Progress
 import com.philkes.notallyx.presentation.viewmodel.BackupFile
 import com.philkes.notallyx.presentation.viewmodel.ExportMimeType
@@ -60,14 +58,11 @@ import com.philkes.notallyx.utils.getExternalAudioDirectory
 import com.philkes.notallyx.utils.getExternalFilesDirectory
 import com.philkes.notallyx.utils.getExternalImagesDirectory
 import com.philkes.notallyx.utils.getLogFileUri
-import com.philkes.notallyx.utils.getUriForFile
 import com.philkes.notallyx.utils.listZipFiles
 import com.philkes.notallyx.utils.log
-import com.philkes.notallyx.utils.nameWithoutExtension
 import com.philkes.notallyx.utils.recreateDir
 import com.philkes.notallyx.utils.security.decryptDatabase
 import com.philkes.notallyx.utils.security.getInitializedCipherForDecryption
-import com.philkes.notallyx.utils.viewFile
 import com.philkes.notallyx.utils.wrapWithChooser
 import java.io.File
 import java.io.FileInputStream
@@ -525,7 +520,7 @@ private fun ZipParameters.copy(fileNameInZip: String? = this.fileNameInZip): Zip
     return ZipParameters(this).apply { this@apply.fileNameInZip = fileNameInZip }
 }
 
-fun exportPdfFile(
+fun exportPdfFileFolder(
     app: ContextWrapper,
     note: BaseNote,
     folder: DocumentFile,
@@ -541,7 +536,7 @@ fun exportPdfFile(
     if (folder.findFile(filePath)?.exists() == true) {
         val duplicateFileName =
             findFreeDuplicateFileName(folder, validFileName, ExportMimeType.PDF.fileExtension)
-        return exportPdfFile(
+        return exportPdfFileFolder(
             app,
             note,
             folder,
@@ -559,45 +554,52 @@ fun exportPdfFile(
             validFileName,
             ".${ExportMimeType.PDF.fileExtension}",
         )
-        .let {
-            val file = DocumentFile.fromFile(File(app.getExportedPath(), filePath))
-            val html =
-                note.toHtml(
-                    NotallyXPreferences.getInstance(app).showDateCreated(),
-                    app.getExternalImagesDirectory(),
-                )
-            app.printPdf(
-                file,
-                html,
-                object : PdfPrintListener {
-                    override fun onSuccess(file: DocumentFile) {
-                        app.contentResolver.openOutputStream(it.uri)?.use { outStream ->
-                            app.contentResolver.openInputStream(file.uri)?.copyTo(outStream)
-                        }
-                        if (progress != null) {
-                            progress.postValue(
-                                BackupProgress(
-                                    current = counter!!.incrementAndGet(),
-                                    total = total!!,
-                                )
-                            )
-                            if (counter.get() == total) {
-                                pdfPrintListener?.onSuccess(file)
-                            }
-                        } else {
-                            pdfPrintListener?.onSuccess(file)
-                        }
-                    }
-
-                    override fun onFailure(message: CharSequence?) {
-                        pdfPrintListener?.onFailure(message)
-                    }
-                },
-            )
-        }
+        .let { exportPdfFile(app, note, it, progress, counter, total, pdfPrintListener) }
 }
 
-suspend fun exportPlainTextFile(
+fun exportPdfFile(
+    app: ContextWrapper,
+    note: BaseNote,
+    outputFile: DocumentFile,
+    progress: MutableLiveData<Progress>? = null,
+    counter: AtomicInteger? = null,
+    total: Int? = null,
+    pdfPrintListener: PdfPrintListener? = null,
+) {
+    val tempFile = DocumentFile.fromFile(File(app.getExportedPath(), "temp.pdf"))
+    val html =
+        note.toHtml(
+            NotallyXPreferences.getInstance(app).showDateCreated(),
+            app.getExternalImagesDirectory(),
+        )
+    app.printPdf(
+        tempFile,
+        html,
+        object : PdfPrintListener {
+            override fun onSuccess(file: DocumentFile) {
+                app.contentResolver.openOutputStream(outputFile.uri)?.use { outStream ->
+                    app.contentResolver.openInputStream(file.uri)?.copyTo(outStream)
+                }
+                if (progress != null) {
+                    progress.postValue(
+                        BackupProgress(current = counter!!.incrementAndGet(), total = total!!)
+                    )
+                    if (counter.get() == total) {
+                        pdfPrintListener?.onSuccess(file)
+                    }
+                } else {
+                    pdfPrintListener?.onSuccess(file)
+                }
+            }
+
+            override fun onFailure(message: CharSequence?) {
+                pdfPrintListener?.onFailure(message)
+            }
+        },
+    )
+}
+
+suspend fun exportPlainTextFileFolder(
     app: ContextWrapper,
     note: BaseNote,
     exportType: ExportMimeType,
@@ -612,7 +614,7 @@ suspend fun exportPlainTextFile(
     if (folder.findFile("$validFileName.${exportType.fileExtension}")?.exists() == true) {
         val duplicateFileName =
             findFreeDuplicateFileName(folder, validFileName, exportType.fileExtension)
-        return exportPlainTextFile(
+        return exportPlainTextFileFolder(
             app,
             note,
             exportType,
@@ -629,32 +631,39 @@ suspend fun exportPlainTextFile(
             folder
                 .createFileSafe(exportType.mimeType, validFileName, ".${exportType.fileExtension}")
                 .let {
-                    app.contentResolver.openOutputStream(it.uri)?.use { stream ->
-                        OutputStreamWriter(stream).use { writer ->
-                            writer.write(
-                                when (exportType) {
-                                    ExportMimeType.TXT ->
-                                        note.toTxt(
-                                            includeTitle = false,
-                                            includeCreationDate = false,
-                                        )
-
-                                    ExportMimeType.JSON -> note.toJson()
-                                    ExportMimeType.HTML ->
-                                        note.toHtml(
-                                            NotallyXPreferences.getInstance(app).showDateCreated(),
-                                            app.getExternalImagesDirectory(),
-                                        )
-                                    ExportMimeType.MD -> note.toMarkdown()
-                                    else -> TODO("Unsupported MimeType for Export")
-                                }
-                            )
-                        }
-                    }
+                    exportPlainTextFile(app, note, it, exportType)
                     it
                 }
         progress?.postValue(BackupProgress(current = counter!!.incrementAndGet(), total = total!!))
         return@withContext file
+    }
+}
+
+fun exportPlainTextFile(
+    app: ContextWrapper,
+    note: BaseNote,
+    outputFile: DocumentFile,
+    exportType: ExportMimeType,
+) {
+    app.contentResolver.openOutputStream(outputFile.uri)?.use { stream ->
+        OutputStreamWriter(stream).use { writer ->
+            writer.write(
+                when (exportType) {
+                    ExportMimeType.TXT ->
+                        note.toTxt(includeTitle = false, includeCreationDate = false)
+
+                    ExportMimeType.JSON -> note.toJson()
+                    ExportMimeType.HTML ->
+                        note.toHtml(
+                            NotallyXPreferences.getInstance(app).showDateCreated(),
+                            app.getExternalImagesDirectory(),
+                        )
+
+                    ExportMimeType.MD -> note.toMarkdown()
+                    else -> TODO("Unsupported MimeType for Export: $exportType")
+                }
+            )
+        }
     }
 }
 
@@ -805,47 +814,19 @@ fun LockedActivity<*>.exportNotes(
     baseModel.selectedExportMimeType = mimeType
     if (notes.size == 1) {
         val baseNote = notes.first()
-        when (mimeType) {
-            ExportMimeType.PDF -> {
-                exportPdfFile(
-                    this,
-                    baseNote,
-                    DocumentFile.fromFile(getExportedPath()),
-                    pdfPrintListener =
-                        object : PdfPrintListener {
-
-                            override fun onSuccess(file: DocumentFile) {
-                                showFileOptionsDialog(
-                                    file,
-                                    ExportMimeType.PDF.mimeType,
-                                    saveFileResultLauncher,
-                                )
-                            }
-
-                            override fun onFailure(message: CharSequence?) {
-                                Toast.makeText(
-                                        this@exportNotes,
-                                        R.string.something_went_wrong,
-                                        Toast.LENGTH_SHORT,
-                                    )
-                                    .show()
-                            }
-                        },
-                )
-            }
-            else ->
-                lifecycleScope.launch {
-                    exportPlainTextFile(
-                            this@exportNotes,
-                            baseNote,
-                            mimeType,
-                            DocumentFile.fromFile(getExportedPath()),
-                        )
-                        ?.let {
-                            showFileOptionsDialog(it, mimeType.mimeType, saveFileResultLauncher)
-                        }
+        // Store the selected note for export and immediately ask user for target location
+        baseModel.selectedExportBaseNote = baseNote
+        val suggestedName =
+            (baseNote.title.ifBlank { getString(R.string.note) }) + "." + mimeType.fileExtension
+        val intent =
+            Intent(Intent.ACTION_CREATE_DOCUMENT)
+                .apply {
+                    type = mimeType.mimeType
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                    putExtra(Intent.EXTRA_TITLE, suggestedName)
                 }
-        }
+                .wrapWithChooser(this)
+        saveFileResultLauncher.launch(intent)
     } else {
         lifecycleScope.launch {
             val intent =
@@ -855,32 +836,4 @@ fun LockedActivity<*>.exportNotes(
             exportToFolderResultLauncher.launch(intent)
         }
     }
-}
-
-private fun LockedActivity<*>.showFileOptionsDialog(
-    file: DocumentFile,
-    mimeType: String,
-    resultLauncher: ActivityResultLauncher<Intent>,
-) {
-    MenuDialog(this)
-        .add(R.string.view_file) { viewFile(getUriForFile(File(file.uri.path!!)), mimeType) }
-        .add(R.string.save_to_device) { saveFileToDevice(file, mimeType, resultLauncher) }
-        .show()
-}
-
-private fun LockedActivity<*>.saveFileToDevice(
-    file: DocumentFile,
-    mimeType: String,
-    resultLauncher: ActivityResultLauncher<Intent>,
-) {
-    val intent =
-        Intent(Intent.ACTION_CREATE_DOCUMENT)
-            .apply {
-                type = mimeType
-                addCategory(Intent.CATEGORY_OPENABLE)
-                putExtra(Intent.EXTRA_TITLE, file.nameWithoutExtension!!)
-            }
-            .wrapWithChooser(this)
-    baseModel.selectedExportFile = file
-    resultLauncher.launch(intent)
 }
