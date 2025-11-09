@@ -43,8 +43,8 @@ class PlainTextImporter : ExternalImporter {
                     // If content contains recognizable list syntax, prefer importing as LIST
                     // If its markdown there could only be a headerline, ignore it for LISTs
                     val listContent =
-                        if (content.startsWith("#")) {
-                            content.lines().drop(1).joinToString { "\n" }
+                        if (file.isMarkdownFile() && content.startsWith("#")) {
+                            content.lines().drop(1).joinToString("\n")
                         } else content
                     listContent.findListSyntaxRegex()?.let { listSyntaxRegex ->
                         listItems.addAll(listContent.extractListItems(listSyntaxRegex))

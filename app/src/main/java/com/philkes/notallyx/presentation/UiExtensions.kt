@@ -84,6 +84,7 @@ import com.google.android.material.shape.MaterialShapeDrawable
 import com.google.android.material.shape.RelativeCornerSize
 import com.google.android.material.shape.RoundedCornerTreatment
 import com.google.android.material.shape.ShapeAppearanceModel
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.philkes.notallyx.R
 import com.philkes.notallyx.data.imports.ImportProgress
@@ -926,6 +927,21 @@ fun Context.showToast(message: CharSequence) =
     ContextCompat.getMainExecutor(this).execute {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
+
+fun View.showSnackbar(
+    msgResId: Int,
+    actionResId: Int? = null,
+    onActionListener: View.OnClickListener? = null,
+) = showSnackbar(getString(msgResId), actionResId, onActionListener)
+
+fun View.showSnackbar(
+    message: String,
+    actionResId: Int? = null,
+    onActionListener: View.OnClickListener? = null,
+) =
+    Snackbar.make(this, message, Snackbar.LENGTH_LONG)
+        .apply { actionResId?.let { setAction(it, onActionListener) } }
+        .show()
 
 fun Context.restartApplication(
     fragmentIdToOpen: Int? = null,

@@ -806,27 +806,14 @@ private fun ContextWrapper.tryPostErrorNotification(e: Throwable) {
 }
 
 fun LockedActivity<*>.exportNotes(
-    mimeType: ExportMimeType,
     notes: Collection<BaseNote>,
-    saveFileResultLauncher: ActivityResultLauncher<Intent>,
+    mimeType: ExportMimeType,
+    exportToFileResultLauncher: ActivityResultLauncher<Intent>,
     exportToFolderResultLauncher: ActivityResultLauncher<Intent>,
 ) {
     baseModel.selectedExportMimeType = mimeType
     if (notes.size == 1) {
-        val baseNote = notes.first()
-        // Store the selected note for export and immediately ask user for target location
-        baseModel.selectedExportBaseNote = baseNote
-        val suggestedName =
-            (baseNote.title.ifBlank { getString(R.string.note) }) + "." + mimeType.fileExtension
-        val intent =
-            Intent(Intent.ACTION_CREATE_DOCUMENT)
-                .apply {
-                    type = mimeType.mimeType
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                    putExtra(Intent.EXTRA_TITLE, suggestedName)
-                }
-                .wrapWithChooser(this)
-        saveFileResultLauncher.launch(intent)
+        exportNote(notes.first(), mimeType, exportToFileResultLauncher)
     } else {
         lifecycleScope.launch {
             val intent =
@@ -836,4 +823,22 @@ fun LockedActivity<*>.exportNotes(
             exportToFolderResultLauncher.launch(intent)
         }
     }
+}
+
+fun LockedActivity<*>.exportNote(
+    note: BaseNote,
+    mimeType: ExportMimeType,
+    exportToFileResultLauncher: ActivityResultLauncher<Intent>,
+) {
+    val suggestedName =
+        (note.title.ifBlank { getString(R.string.note) }) + "." + mimeType.fileExtension
+    val intent =
+        Intent(Intent.ACTION_CREATE_DOCUMENT)
+            .apply {
+                type = mimeType.mimeType
+                addCategory(Intent.CATEGORY_OPENABLE)
+                putExtra(Intent.EXTRA_TITLE, suggestedName)
+            }
+            .wrapWithChooser(this)
+    exportToFileResultLauncher.launch(intent)
 }

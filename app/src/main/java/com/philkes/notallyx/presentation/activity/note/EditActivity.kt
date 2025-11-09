@@ -88,7 +88,7 @@ import com.philkes.notallyx.presentation.viewmodel.preference.ListItemSort
 import com.philkes.notallyx.presentation.viewmodel.preference.NotesSortBy
 import com.philkes.notallyx.presentation.widget.WidgetProvider
 import com.philkes.notallyx.utils.FileError
-import com.philkes.notallyx.utils.backup.exportNotes
+import com.philkes.notallyx.utils.backup.exportNote
 import com.philkes.notallyx.utils.changeStatusAndNavigationBarColor
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.getFileName
@@ -406,7 +406,7 @@ abstract class EditActivity(private val type: Type) :
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
                 if (result.resultCode == RESULT_OK) {
                     result.data?.data?.let { uri ->
-                        baseModel.exportNoteToFile(uri, notallyModel.getBaseNote())
+                        baseModel.exportNoteToFile(uri, notallyModel.getBaseNote(), binding.root)
                     }
                 }
             }
@@ -956,12 +956,7 @@ abstract class EditActivity(private val type: Type) :
     }
 
     override fun export(mimeType: ExportMimeType) {
-        exportNotes(
-            mimeType,
-            listOf(notallyModel.getBaseNote()),
-            exportFileActivityResultLauncher,
-            exportFileActivityResultLauncher,
-        )
+        exportNote(notallyModel.getBaseNote(), mimeType, exportFileActivityResultLauncher)
     }
 
     private fun delete() {
