@@ -235,7 +235,7 @@
     <string name="paused">Întrerupt</string>
     <string name="pin">Fixează</string>
     <string name="pinned">Fixat</string>
-    <string name="plain_text_files">Fișiere cu text simplu</string>
+    <string name="plain_text_files">Fișiere cu Markdown/text simplu</string>
     <string name="plain_text_files_help">Pentru a importa notele din fișiere cu text simplu (un singur fișier sau dosar), clic pe Import. Fiecare fișier este importat ca o notă separată, iar numele fișierului devine titlul notei. Dacă conținutul textului începe cu sintaxa de listă (de exemplu, Markdown „- [x]”, sintaxa NotallyX „[✓]” sau „*”, „-”), acesta va fi convertit într-o notă de tip listă.</string>
     <string name="play">Redă</string>
     <string name="please_grant_notally_alarm">Permite NotallyX să trimită memento-uri.</string>

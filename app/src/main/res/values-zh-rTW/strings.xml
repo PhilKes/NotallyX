@@ -232,7 +232,7 @@
     <string name="paused">已暫停</string>
     <string name="pin">置頂</string>
     <string name="pinned">已置頂</string>
-    <string name="plain_text_files">純文字檔案</string>
+    <string name="plain_text_files">Markdown/純文字檔案</string>
     <string name="play">播放</string>
     <string name="please_grant_notally_alarm">請授權 NotallyX 來傳送提醒</string>
     <string name="please_grant_notally_audio">請授予 NotallyX 錄製音訊的權限。錄音永遠不會離開你的設備</string>

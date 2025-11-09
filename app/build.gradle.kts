@@ -267,6 +267,8 @@ dependencies {
     implementation("org.simpleframework:simple-xml:2.7.1") {
         exclude(group = "xpp3", module = "xpp3")
     }
+    implementation("org.commonmark:commonmark:0.27.0")
+    implementation("org.commonmark:commonmark-ext-gfm-strikethrough:0.27.0")
 
     androidTestImplementation("androidx.room:room-testing:$roomVersion")
     androidTestImplementation("androidx.work:work-testing:2.9.1")

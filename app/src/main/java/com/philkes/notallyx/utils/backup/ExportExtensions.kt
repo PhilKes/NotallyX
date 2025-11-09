@@ -35,6 +35,7 @@ import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.toHtml
 import com.philkes.notallyx.data.model.toJson
+import com.philkes.notallyx.data.model.toMarkdown
 import com.philkes.notallyx.data.model.toTxt
 import com.philkes.notallyx.presentation.activity.LockedActivity
 import com.philkes.notallyx.presentation.activity.main.MainActivity
@@ -644,7 +645,7 @@ suspend fun exportPlainTextFile(
                                             NotallyXPreferences.getInstance(app).showDateCreated(),
                                             app.getExternalImagesDirectory(),
                                         )
-
+                                    ExportMimeType.MD -> note.toMarkdown()
                                     else -> TODO("Unsupported MimeType for Export")
                                 }
                             )
