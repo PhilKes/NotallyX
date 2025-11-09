@@ -3,8 +3,8 @@ package com.philkes.notallyx.utils.changehistory
 import android.text.Editable
 import androidx.core.text.getSpans
 import com.philkes.notallyx.presentation.clone
-import com.philkes.notallyx.presentation.view.misc.HighlightSpan
 import com.philkes.notallyx.presentation.view.misc.StylableEditTextWithHistory
+import com.philkes.notallyx.presentation.view.misc.highlightableview.HighlightSpan
 
 class EditTextWithHistoryChange(
     private val editText: StylableEditTextWithHistory,

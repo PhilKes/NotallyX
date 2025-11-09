@@ -27,6 +27,7 @@ import com.philkes.notallyx.databinding.FragmentNotesBinding
 import com.philkes.notallyx.presentation.activity.main.MainActivity
 import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_FOLDER
 import com.philkes.notallyx.presentation.activity.main.fragment.SearchFragment.Companion.EXTRA_INITIAL_LABEL
+import com.philkes.notallyx.presentation.activity.note.EditActivity
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_FOLDER_FROM
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_FOLDER_TO
 import com.philkes.notallyx.presentation.activity.note.EditActivity.Companion.EXTRA_NOTE_ID
@@ -187,6 +188,7 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                     binding?.EnterSearchKeywordLayout?.visibility = View.VISIBLE
                     requestFocus()
                     activity?.showKeyboard(this)
+                    notesAdapter?.setSearchKeyword(model.keyword)
                 } else {
                     // In other fragments, respect the preference
                     val alwaysShowSearchBar = model.preferences.alwaysShowSearchBar.value
@@ -195,16 +197,18 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                     setText("")
                     clearFocus()
                     activity?.hideKeyboard(this)
+                    notesAdapter?.setSearchKeyword("")
                 }
             }
             doAfterTextChanged { text ->
                 val isSearchFragment = navController.currentDestination?.id == R.id.Search
                 if (isSearchFragment) {
-                    model.keyword = requireNotNull(text, { "text is null" }).trim().toString()
+                    model.keyword = requireNotNull(text, { "text is null" }).toString()
+                    notesAdapter?.apply { setSearchKeyword(model.keyword) }
                 }
                 if (text?.isNotEmpty() == true && !isSearchFragment) {
                     setText("")
-                    model.keyword = text.trim().toString()
+                    model.keyword = text.toString()
                     navController.navigate(
                         R.id.Search,
                         Bundle().apply {
@@ -212,6 +216,9 @@ abstract class NotallyFragment : Fragment(), ItemListener {
                             putSerializable(EXTRA_INITIAL_LABEL, model.currentLabel)
                         },
                     )
+                }
+                this@NotallyFragment.binding?.MainListView?.apply {
+                    postOnAnimationDelayed({ scrollToPosition(0) }, 10)
                 }
             }
         }
@@ -299,6 +306,12 @@ abstract class NotallyFragment : Fragment(), ItemListener {
     private fun goToActivity(activity: Class<*>, baseNote: BaseNote) {
         val intent = Intent(requireContext(), activity)
         intent.putExtra(EXTRA_SELECTED_BASE_NOTE, baseNote.id)
+        // If launched from Search fragment with a non-empty keyword, pass it to the editor to
+        // auto-highlight
+        val isInSearch = view?.findNavController()?.currentDestination?.id == R.id.Search
+        if (isInSearch && model.keyword.isNotBlank()) {
+            intent.putExtra(EditActivity.EXTRA_INITIAL_SEARCH_QUERY, model.keyword)
+        }
         openNoteActivityResultLauncher.launch(intent)
     }
 

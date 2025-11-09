@@ -3,6 +3,7 @@ package com.philkes.notallyx.presentation.view.misc
 import android.content.Context
 import android.util.AttributeSet
 import android.view.KeyEvent
+import com.philkes.notallyx.presentation.view.misc.highlightableview.HighlightableEditText
 
 class EditTextAutoClearFocus(context: Context, attributeSet: AttributeSet) :
     HighlightableEditText(context, attributeSet) {

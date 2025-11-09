@@ -236,6 +236,21 @@ abstract class EditActivity(private val type: Type) :
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        // If launched with an initial search query (from global search), auto-start in-note search
+        intent.getStringExtra(EXTRA_INITIAL_SEARCH_QUERY)?.let { initialQuery ->
+            if (initialQuery.isNotBlank()) {
+                binding.EnterSearchKeyword.postOnAnimation {
+                    startSearch()
+                    binding.EnterSearchKeyword.setText(initialQuery)
+                    binding.EnterSearchKeyword.setSelection(initialQuery.length)
+                }
+            }
+            intent.removeExtra(EXTRA_INITIAL_SEARCH_QUERY)
+        }
+    }
+
     private fun configureEdgeToEdgeInsets() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
@@ -1242,6 +1257,7 @@ abstract class EditActivity(private val type: Type) :
         const val EXTRA_NOTE_ID = "notallyx.intent.extra.NOTE_ID"
         const val EXTRA_FOLDER_FROM = "notallyx.intent.extra.FOLDER_FROM"
         const val EXTRA_FOLDER_TO = "notallyx.intent.extra.FOLDER_TO"
+        const val EXTRA_INITIAL_SEARCH_QUERY = "notallyx.intent.extra.INITIAL_SEARCH_QUERY"
 
         val DEFAULT_EXCEPTION_HANDLER = Thread.getDefaultUncaughtExceptionHandler()
     }

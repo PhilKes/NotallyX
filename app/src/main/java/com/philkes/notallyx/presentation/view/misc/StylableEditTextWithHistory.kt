@@ -24,6 +24,7 @@ import com.philkes.notallyx.presentation.createTextWatcherWithHistory
 import com.philkes.notallyx.presentation.removeSelectionFromSpans
 import com.philkes.notallyx.presentation.setCancelButton
 import com.philkes.notallyx.presentation.showAndFocus
+import com.philkes.notallyx.presentation.view.misc.highlightableview.HighlightableEditText
 import com.philkes.notallyx.utils.changehistory.ChangeHistory
 import com.philkes.notallyx.utils.changehistory.EditTextState
 import com.philkes.notallyx.utils.changehistory.EditTextWithHistoryChange
