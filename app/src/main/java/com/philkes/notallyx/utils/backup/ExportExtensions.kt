@@ -76,7 +76,10 @@ import java.util.Locale
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import net.lingala.zip4j.ZipFile
 import net.lingala.zip4j.exception.ZipException
@@ -152,76 +155,97 @@ fun ContextWrapper.autoBackupOnSaveFileExists(backupPath: String): Boolean {
     val backupFolderFile = DocumentFile.fromTreeUri(this, backupPath.toUri())
     return backupFolderFile?.let {
         val autoBackupFile = it.findFile("$ON_SAVE_BACKUP_FILE.zip")
-        autoBackupFile == null || !autoBackupFile.exists()
+        autoBackupFile != null && autoBackupFile.exists()
     } ?: false
 }
 
-fun ContextWrapper.autoBackupOnSave(backupPath: String, password: String, savedNote: BaseNote?) {
-    val folder =
-        requireBackupFolder(
-            backupPath,
-            "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed, because auto-backup path '$backupPath' is invalid",
-        ) ?: return
-    try {
-        var changedNote = savedNote
-        var backupFile = folder.findFile("$ON_SAVE_BACKUP_FILE.zip")
-        backupFile =
-            if (backupFile == null || !backupFile.exists()) {
-                if (savedNote != null) {
-                    log("Re-creating full backup since auto backup ZIP unexpectedly does not exist")
-                    changedNote = null
-                }
-                folder.createFileSafe(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE, ".zip")
-            } else backupFile
-        if (changedNote == null) {
-            // Export all notes
-            exportAsZip(backupFile.uri, password = password)
-        } else {
-            // Only add changed note to existing backup ZIP
-            val (_, file) = copyDatabase()
-            val files =
-                with(changedNote) {
-                    images.map {
-                        BackupFile(
-                            SUBFOLDER_IMAGES,
-                            File(getExternalImagesDirectory(), it.localName),
+private val autoBackupOnSaveMutex = Mutex()
+
+suspend fun ContextWrapper.autoBackupOnSave(
+    backupPath: String,
+    password: String,
+    savedNote: BaseNote?,
+) {
+    autoBackupOnSaveMutex.withLock {
+        Log.d(
+            TAG,
+            "Starting Auto Backup${savedNote?.let { " for Note id: ${it.id} title: ${it.title}" } ?: ""}...",
+        )
+        val folder =
+            requireBackupFolder(
+                backupPath,
+                "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed, because auto-backup path '$backupPath' is invalid",
+            ) ?: return
+        try {
+            var changedNote = savedNote
+            var backupFile = folder.findFile("$ON_SAVE_BACKUP_FILE.zip")
+            backupFile =
+                if (backupFile == null || !backupFile.exists()) {
+                    if (savedNote != null) {
+                        log(
+                            "Re-creating full backup since auto backup ZIP unexpectedly does not exist"
                         )
-                    } +
-                        files.map {
+                        changedNote = null
+                    }
+                    folder.createFileSafe(MIME_TYPE_ZIP, ON_SAVE_BACKUP_FILE, ".zip")
+                } else backupFile
+            if (changedNote == null) {
+                // Export all notes
+                Log.d(TAG, "Creating full backup")
+                exportAsZip(backupFile.uri, password = password)
+                Log.d(TAG, "Finished full backup")
+            } else {
+                Log.d(TAG, "Creating partial backup for Note ${changedNote.id}")
+                // Only add changed note to existing backup ZIP
+                val (_, file) = copyDatabase()
+                val files =
+                    with(changedNote) {
+                        images.map {
                             BackupFile(
-                                SUBFOLDER_FILES,
-                                File(getExternalFilesDirectory(), it.localName),
+                                SUBFOLDER_IMAGES,
+                                File(getExternalImagesDirectory(), it.localName),
                             )
                         } +
-                        audios.map {
-                            BackupFile(SUBFOLDER_AUDIOS, File(getExternalAudioDirectory(), it.name))
-                        } +
-                        BackupFile(null, file)
+                            files.map {
+                                BackupFile(
+                                    SUBFOLDER_FILES,
+                                    File(getExternalFilesDirectory(), it.localName),
+                                )
+                            } +
+                            audios.map {
+                                BackupFile(
+                                    SUBFOLDER_AUDIOS,
+                                    File(getExternalAudioDirectory(), it.name),
+                                )
+                            } +
+                            BackupFile(null, file)
+                    }
+                try {
+                    exportToZip(backupFile.uri, files, password)
+                    Log.d(TAG, "Finished partial backup for Note ${changedNote.id}")
+                } catch (e: ZipException) {
+                    log(
+                        TAG,
+                        msg =
+                            "Re-creating full backup since existing auto backup ZIP is corrupt: ${e.message}",
+                    )
+                    backupFile.delete()
+                    autoBackupOnSave(backupPath, password, savedNote)
                 }
+            }
+        } catch (e: Exception) {
             try {
-                exportToZip(backupFile.uri, files, password)
-            } catch (e: ZipException) {
                 log(
                     TAG,
-                    msg =
-                        "Re-creating full backup since existing auto backup ZIP is corrupt: ${e.message}",
+                    "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
+                    e,
                 )
-                backupFile.delete()
-                autoBackupOnSave(backupPath, password, savedNote)
+            } catch (logException: Exception) {
+                tryPostErrorNotification(logException)
+                return
             }
+            tryPostErrorNotification(e)
         }
-    } catch (e: Exception) {
-        try {
-            log(
-                TAG,
-                "Auto backup on note save (${savedNote?.let { "id: '${savedNote.id}, title: '${savedNote.title}'" }}) failed",
-                e,
-            )
-        } catch (logException: Exception) {
-            tryPostErrorNotification(logException)
-            return
-        }
-        tryPostErrorNotification(e)
     }
 }
 
@@ -252,9 +276,12 @@ suspend fun ContextWrapper.checkBackupOnSave(
             if (forceFullBackup) {
                 deleteModifiedNoteBackup(backupPath)
             }
-            withContext(Dispatchers.IO) {
-                autoBackupOnSave(backupPath, preferences.backupPassword.value, note)
+            MainScope().launch {
+                withContext(Dispatchers.IO) {
+                    autoBackupOnSave(backupPath, preferences.backupPassword.value, note)
+                }
             }
+            println()
         }
     }
 }
