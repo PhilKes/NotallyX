@@ -76,7 +76,7 @@ class WidgetFactory(
 
             setTextViewTextSize(R.id.Note, TypedValue.COMPLEX_UNIT_SP, bodyTextSize)
             if (note.body.isNotEmpty()) {
-                setTextViewText(R.id.Note, note.body)
+                setTextViewText(R.id.Note, note.body.value)
                 setViewVisibility(R.id.Note, View.VISIBLE)
             } else setViewVisibility(R.id.Note, View.GONE)
 

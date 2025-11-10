@@ -18,7 +18,7 @@ data class BaseNote(
     val timestamp: Long,
     val modifiedTimestamp: Long,
     val labels: List<String>,
-    val body: String,
+    val body: BodyString,
     val spans: List<SpanRepresentation>,
     val items: List<ListItem>,
     val images: List<FileAttachment>,

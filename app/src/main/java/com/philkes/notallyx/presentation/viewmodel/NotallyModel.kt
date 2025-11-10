@@ -23,6 +23,7 @@ import com.philkes.notallyx.data.imports.txt.extractListItems
 import com.philkes.notallyx.data.imports.txt.findListSyntaxRegex
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BodyString
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -227,8 +228,10 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
         if (id != 0L) {
             isNewNote = false
 
-            val cachedNote = Cache.list.find { baseNote -> baseNote.id == id }
-            val baseNote = cachedNote ?: withContext(Dispatchers.IO) { baseNoteDao.get(id) }
+            //            val cachedNote = Cache.list.find { baseNote -> baseNote.id == id }
+            //            val baseNote = cachedNote ?: withContext(Dispatchers.IO) {
+            // baseNoteDao.get(id) }
+            val baseNote = withContext(Dispatchers.IO) { baseNoteDao.get(id) }
 
             if (baseNote != null) {
                 originalNote = baseNote.deepCopy()
@@ -244,7 +247,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
 
                 setLabels(baseNote.labels)
 
-                body = baseNote.body.applySpans(baseNote.spans)
+                body = baseNote.body.value.applySpans(baseNote.spans)
 
                 items.clear()
                 items.addAll(baseNote.items)
@@ -346,7 +349,7 @@ class NotallyModel(private val app: Application) : AndroidViewModel(app) {
             timestamp,
             modifiedTimestamp,
             labels,
-            body,
+            BodyString(body),
             spans,
             nonEmptyItems,
             images.value,

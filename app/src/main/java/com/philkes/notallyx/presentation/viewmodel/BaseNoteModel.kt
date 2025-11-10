@@ -59,7 +59,6 @@ import com.philkes.notallyx.presentation.viewmodel.preference.Theme
 import com.philkes.notallyx.presentation.viewmodel.progress.DeleteProgress
 import com.philkes.notallyx.presentation.viewmodel.progress.ExportNotesProgress
 import com.philkes.notallyx.utils.ActionMode
-import com.philkes.notallyx.utils.Cache
 import com.philkes.notallyx.utils.MIME_TYPE_JSON
 import com.philkes.notallyx.utils.backup.clearAllFolders
 import com.philkes.notallyx.utils.backup.clearAllLabels
@@ -162,10 +161,10 @@ class BaseNoteModel(private val app: Application) : AndroidViewModel(app) {
         //        colors = baseNoteDao.getAllColorsAsync()
         reminders = baseNoteDao.getAllRemindersAsync()
 
-        allNotes?.removeObserver(allNotesObserver!!)
-        allNotesObserver = Observer { list -> Cache.list = list }
-        allNotes = baseNoteDao.getAllAsync()
-        allNotes!!.observeForever(allNotesObserver!!)
+        //        allNotes?.removeObserver(allNotesObserver!!)
+        //        allNotesObserver = Observer { list -> Cache.list = list }
+        //        allNotes = baseNoteDao.getAllAsync()
+        //        allNotes!!.observeForever(allNotesObserver!!)
 
         labelsHiddenObserver?.let { preferences.labelsHidden.removeObserver(it) }
         labelsHiddenObserver = Observer { labelsHidden ->

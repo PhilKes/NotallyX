@@ -18,6 +18,7 @@ import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BodyString
 import com.philkes.notallyx.data.model.Converters
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
@@ -319,7 +320,7 @@ private fun Cursor.toBaseNote(): BaseNote {
         timestamp,
         modifiedTimestamp,
         labels,
-        body,
+        BodyString(body),
         spans,
         items,
         images,

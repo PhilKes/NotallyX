@@ -43,7 +43,7 @@ data class ListState(
  */
 class ListManager(
     private val recyclerView: RecyclerView,
-    private val changeHistory: ChangeHistory,
+    internal val changeHistory: ChangeHistory,
     private val preferences: NotallyXPreferences,
     private val inputMethodManager: InputMethodManager?,
     private val endSearch: (() -> Unit)?,
@@ -287,7 +287,7 @@ class ListManager(
         endSearch?.invoke()
         //        }
         val item = items[position]
-        item.body = value.text.toString()
+        item.body = value.getEditableText().toString()
         if (pushChange) {
             changeHistory.push(ListEditTextChange(stateBefore, getState(), this))
             // TODO: fix focus change

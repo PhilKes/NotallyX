@@ -14,6 +14,7 @@ import com.philkes.notallyx.data.imports.evernote.EvernoteImporter.Companion.par
 import com.philkes.notallyx.data.imports.parseBodyAndSpansFromHtml
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BodyString
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -149,7 +150,7 @@ fun EvernoteNote.mapToBaseNote(): BaseNote {
         timestamp = parseTimestamp(created),
         modifiedTimestamp = parseTimestamp(updated),
         labels = tag.map { it.name },
-        body = body,
+        body = BodyString(body),
         spans = spans,
         items = tasks.mapToListItem(),
         images = images,

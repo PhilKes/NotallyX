@@ -73,7 +73,6 @@ fun parseBodyAndSpansFromMarkdown(input: String): Pair<String, List<SpanRepresen
                         spans.add(SpanRepresentation(start, end, strikethrough = true))
                 } else {
                     sb.append(renderer.render(customNode))
-                    if (sb.isNotEmpty() && sb.last() != '\n') sb.append('\n')
                 }
             }
 
@@ -120,7 +119,6 @@ fun parseBodyAndSpansFromMarkdown(input: String): Pair<String, List<SpanRepresen
 
             override fun visit(image: Image) {
                 sb.append(renderer.render(image))
-                if (sb.isNotEmpty() && sb.last() != '\n') sb.append('\n')
             }
         }
     )

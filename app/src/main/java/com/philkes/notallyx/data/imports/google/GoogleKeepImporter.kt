@@ -11,6 +11,7 @@ import com.philkes.notallyx.data.imports.ImportStage
 import com.philkes.notallyx.data.imports.parseBodyAndSpansFromHtml
 import com.philkes.notallyx.data.model.Audio
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BodyString
 import com.philkes.notallyx.data.model.FileAttachment
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
@@ -156,7 +157,7 @@ class GoogleKeepImporter : ExternalImporter {
             timestamp = googleKeepNote.createdTimestampUsec / 1000,
             modifiedTimestamp = googleKeepNote.userEditedTimestampUsec / 1000,
             labels = googleKeepNote.labels.map { it.name },
-            body = body,
+            body = BodyString(body),
             spans = spans,
             items = items,
             images = images,

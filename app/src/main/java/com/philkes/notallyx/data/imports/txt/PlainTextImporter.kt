@@ -8,6 +8,7 @@ import com.philkes.notallyx.data.imports.ExternalImporter
 import com.philkes.notallyx.data.imports.ImportProgress
 import com.philkes.notallyx.data.imports.markdown.parseBodyAndSpansFromMarkdown
 import com.philkes.notallyx.data.model.BaseNote
+import com.philkes.notallyx.data.model.BodyString
 import com.philkes.notallyx.data.model.Folder
 import com.philkes.notallyx.data.model.ListItem
 import com.philkes.notallyx.data.model.NoteViewMode
@@ -80,7 +81,7 @@ class PlainTextImporter : ExternalImporter {
                             timestamp = timestamp,
                             modifiedTimestamp = timestamp,
                             labels = listOf(),
-                            body = if (listItems.isEmpty()) body else "",
+                            body = BodyString(if (listItems.isEmpty()) body else ""),
                             spans = if (listItems.isEmpty()) spans else listOf(),
                             items = listItems,
                             images = listOf(),

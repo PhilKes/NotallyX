@@ -388,7 +388,7 @@ fun Context.viewFile(uri: Uri, mimeType: String) {
 fun ContextWrapper.shareNote(note: BaseNote) {
     val body =
         when (note.type) {
-            Type.NOTE -> note.body
+            Type.NOTE -> note.body.value
             Type.LIST -> note.items.toMutableList().toText()
         }
     val filesUris =
